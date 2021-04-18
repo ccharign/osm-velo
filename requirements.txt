@@ -3,5 +3,5 @@ osmnx==1.0.1
 overpy==0.4
 requests==2.25.1
 matplotlib==3.3.3
-geopy=1.21.0
+geopy==1.21.0
 xml==1.30
