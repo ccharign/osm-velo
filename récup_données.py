@@ -4,12 +4,8 @@
 
 import geopy, overpy
 #import functools
-
-
-# Pour télécharger une carte avec overpass : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.4285,43.2671,-0.2541,43.3403]"
+from params import CHEMIN_XML #le xml élagué
 import xml.etree.ElementTree as xml # Manipuler le xml local
-
-CHEMIN_XML = "données/voies_et_nœuds.osm" #Adresse du fichier .osm utilisé pour chercher les nœuds d'une rue.
 
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"
@@ -86,42 +82,18 @@ def coords_lieu(nom_rue, ville=64000, pays="France", bavard=0):
 
 
 
+
+
+
 ###################################################
 #####          Recherche en local             #####
 ###################################################
 
 
 
-
-def élague_xml(chemin="données_inutiles/pau.osm"):
-    """
-    Entrée : chemin, chemin vers un fichier .osm
-             chemin_sortie, autre chemin
-    Effet : enregistre dans chemin_sortie un .osm contenant uniquement les voies, leur id, et les ref des nœuds qui la composent du .osm initial.
-
-    Ne devrait servir qu'une fois. À mettre dans un module init ?
-
-    """
-
-    print(f"Chargement du xml {chemin}")
-    a = xml.parse(chemin).getroot()
-    print("Création de l'arbre simplifié")
-    res = xml.Element("osm")
-    for c in a :
-        if c.tag == "way":
-            fils = xml.SubElement(res, "way")
-            fils.attrib["id" ]= c.attrib["id"]
-            for d in c:
-                if d.tag=="nd":#Les nœuds osm sur le way c
-                    petit_fils = xml.SubElement(fils, "nd")
-                    petit_fils.attrib["ref"] = d.attrib["ref"]
-    print("Enregistrement du xml simplifié")
-    xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8")
-    
-
-
-
+print(f"Chargement du xml {CHEMIN_XML}")
 root = xml.parse(CHEMIN_XML).getroot()
+print("fini\n")
 
 def nœuds_sur_tronçon_local(id_rue):
     """ Cherche les nœuds d'une rue dans le fichier local. Renvoie la liste des nœuds trouvés (int list).

@@ -21,7 +21,7 @@ def charge_graphe(zone = "Pau, France", option={"network_type":"all"}, bavard=0)
     except FileNotFoundError:
         if bavard:print("Graphe pas en mémoire. Chargement depuis osm.")
         g=ox.graph_from_place(zone, **option)
-        if bavard:print("Chargement fini. Je l'enregistr pour la prochaie fois.")
+        if bavard:print("Chargement fini. Je l'enregistre pour la prochaie fois.")
         ox.io.save_graphml(g, f"données/{zone}.graphml")
     
     gr = graphe(g)
@@ -29,18 +29,41 @@ def charge_graphe(zone = "Pau, France", option={"network_type":"all"}, bavard=0)
     return gr
 
 
-## brouillon
-"""
-g = ox.graph_from_place("Pau, France", network_type="all", simplify=False)
-G_proj = ox.project_graph(g)
-intersections = ox.consolidate_intersections(
-    G_proj, rebuild_graph=False, tolerance=10, dead_ends=False
-)
-G_simp = ox.consolidate_intersections(G_proj, rebuild_graph=True, tolerance=10, dead_ends=True) # perd la géométrie des arêtes
+
+# Pour télécharger une carte avec overpass : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.4285,43.2671,-0.2541,43.3403]"
+#Agglo : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.48,43.26,-0.25,43.35]"
+
+import xml.etree.ElementTree as xml # Manipuler le xml local
+
+from params import CHEMIN_XML # Chemin du xml élagué
 
 
-nc = ["r" if ox.simplification._is_endpoint(g, node) else "y" for node in g.nodes()]
-ox.plot_graph(g, node_color=nc)
-nc = ["r" if ox.simplification._is_endpoint(g, node, strict=False) else "y" for node in g.nodes()]
-fig, ax = ox.plot_graph(g, node_color=nc)
-"""
+def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
+    """
+    Entrée : chemin, chemin vers un fichier .osm
+             chemin_sortie, autre chemin
+    Effet : enregistre dans chemin_sortie un .osm contenant uniquement les voies, leur id, et les ref des nœuds qui la composent du .osm initial.
+
+    Ne devrait servir qu'une fois. À mettre dans un module init ?
+
+    """
+
+    print(f"Chargement du xml {chemin}")
+    a = xml.parse(chemin).getroot()
+    print("Création de l'arbre simplifié")
+    res = xml.Element("osm")
+    for c in a :
+        if c.tag == "way":
+            fils = xml.SubElement(res, "way")
+            fils.attrib["id" ]= c.attrib["id"]
+            for d in c:
+                if d.tag=="nd":#Les nœuds osm sur le way c
+                    petit_fils = xml.SubElement(fils, "nd")
+                    petit_fils.attrib["ref"] = d.attrib["ref"]
+    print("Enregistrement du xml simplifié")
+    xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8")
+    
+
+
+#def init_tout():
+    
