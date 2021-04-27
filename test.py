@@ -22,17 +22,20 @@ import chemins # classe chemin et lecture du csv
 g = init_graphe.charge_graphe(bavard=1)
 
 
-tous_les_chemins = chemins.chemins_of_csv("données/chemins.csv", g)
+tous_les_chemins = chemins.chemins_of_csv(g)
 
 def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
     tous_les_chemins.append(chemins.Chemin.of_étapes(étapes, pourcentage_détour, AR, g))
 
 ajoute_chemin( ["rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
 
-def affiche_chemins(chemins, g):
+def dessine_chemins(chemins, g):
     chemins_complets = [ dijkstra.chemin_étapes(g, c) for c in chemins ]
     g.affiche_chemins(chemins_complets)
-
+def affiche_chemins(chemins):
+    for c in chemins:
+        print(c)
+        print(c.étapes)
     
 def affiche_avant_après(chemins, g, nb_lectures):
     

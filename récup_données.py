@@ -102,16 +102,20 @@ def nœuds_sur_tronçon_local(id_rue):
     for c in root:
         if c.tag == "way" and c.attrib["id"] == str(id_rue) :
             return [int(truc.attrib["ref"]) for truc in c if truc.tag=="nd"]
+    return [] #Si rien de trouvé
         
 
-def nœuds_sur_rue_local(nom_rue,ville="64000", pays="France",bavard=0):
+def nœuds_sur_rue_local(nom_rue,ville="64000", pays="France", bavard=0):
     rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
     if bavard:print(rue)
     res=[]
     for tronçon in rue : #A priori, cherche_lieu renvoie une liste
-        id_rue = tronçon.raw["osm_id"]
-        if bavard:print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
-        res.extend(nœuds_sur_tronçon_local(id_rue))
+        if tronçon.raw["osm_type"] == "node":
+            res.append(  tronçon.raw["osm_id"] )
+        elif tronçon.raw["osm_type"] == "way":
+            id_rue = tronçon.raw["osm_id"]
+            if bavard:print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
+            res.extend(nœuds_sur_tronçon_local(id_rue))
     return res
 
 

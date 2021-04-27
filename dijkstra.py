@@ -3,6 +3,10 @@
 
 from heapq import heappush, heappop # pour faire du type List une structure de tas-min
 
+class PasDeChemin(Exception):
+    pass
+
+
 def chemin(g, départ, arrivée, p_détour):
     """  Nécessite une classe graphe avec méthode « voisins » qui prend un sommet s et le pourcentage de détou p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)"""
     assert p_détour <10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
@@ -32,7 +36,7 @@ def chemin(g, départ, arrivée, p_détour):
         chemin.reverse()
         return chemin
     else:
-        print(f"Pas de chemin trouvé de {départ} à {arrivée}")
+        raise PasDeChemin(f"Pas de chemin trouvé de {départ} à {arrivée}")
 
 
 def chemin_étapes(g, c):

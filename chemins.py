@@ -4,6 +4,7 @@ from récup_données import *
 from copy import deepcopy
 
 import module_graphe
+from params import VILLE_DÉFAUT
 
 #Pour test
 #import init_graphe
@@ -21,11 +22,13 @@ class Chemin():
     """ Attributs : - p_détour (float)
                     - étapes (int List), liste de nœuds
                     - AR (bool), indique si le retour est valable aussi.
+                    - texte (None ou str), texte d'où vient le chemin (pour déboguage)
     """
     def __init__(self, étapes, p_détour, AR):
         self.étapes = étapes
         self.p_détour = p_détour
         self.AR = AR
+        self.texte=None
 
         
     @classmethod
@@ -37,10 +40,15 @@ class Chemin():
         assert len(données)==3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
         print(données)
         p_détour = float(données[1])/100
-        étapes = [g.un_nœud_sur_rue(étape) for étape in données[2].split(";")]
+        étapes=[]
+        for c in données[2].split(";"):
+            rue, ville = lecture_étape(c)
+            étapes.append(g.un_nœud_sur_rue(rue, ville=ville))
         if données[0] == "oui": AR = True
         else: AR = False
-        return cls(étapes, p_détour, AR)
+        chemin = cls(étapes, p_détour, AR)
+        chemin.texte=(données[2])
+        return chemin
 
     @classmethod
     def of_étapes(cls, étapes, pourcentage_détour, AR, g):
@@ -64,10 +72,13 @@ class Chemin():
         return Chemin(list(reversed(self.étapes)), self.p_détour, self.AR)
     
     def __str__(self):
-        return ";".join(map(string,self.étapes))
+        if self.texte is not None:
+            return self.texte
+        else:
+            return ";".join(map(str,self.étapes))
 
    
-def chemins_of_csv(adresse_csv, g):
+def chemins_of_csv(g, adresse_csv="données/chemins.csv"):
     entrée = open(adresse_csv)
     #res=[g.chemin_of_string(ligne) for ligne in entrée ]
     res=[]
@@ -80,3 +91,21 @@ def chemins_of_csv(adresse_csv, g):
             print(f"Chemin abandonné : {ligne}")
     entrée.close()
     return res
+
+
+import re
+def lecture_étape(c):
+    """ Entrée : chaîne de caractère représetant une étape.
+        Sortie : nom de rue, ville, pays
+    """
+    e = re.compile("([^()]*)(\(.*\))")#Un texte puis un texte entre parenthèses
+    essai1 = re.findall(e, c)
+    if len(essai1)>0:
+        rue, ville = essai1[0]
+        return rue.strip(), ville[1:-1].strip() #retirer les parenthèses
+    else:
+        f = re.compile("^[^()]*$") # Pas de parenthèse du tout
+        if re.findall(f,c):
+            return c.strip(), VILLE_DÉFAUT
+        else:
+            raise ValueError(f"chaîne pas correcte : {c}")

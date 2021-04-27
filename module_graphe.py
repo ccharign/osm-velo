@@ -86,9 +86,9 @@ class graphe():
     def un_nœud_sur_rue(self, nom_rue,  ville="64000", pays="France"):
         """ Renvoie un nœud sur la rue. Càd un nœud OSM de la rue, qui soit présent dans le graphe. Si échec, renvoie un nœud le plus proche."""
 
-        nom_rue=nom_rue.strip()
-        ville=ville.strip()
-        pays=pays.strip()
+        nom_rue = nom_rue.strip()
+        ville = ville.strip()
+        pays = pays.strip()
         clef = f"{nom_rue},{ville},{pays}"
         
         def renvoie(res):
@@ -105,7 +105,7 @@ class graphe():
                 for n in liste_par_le_milieu(nœuds):
                     if n in self.multidigraphe.nodes:
                         return renvoie(n)
-                print(f"Pas trouvé de nœud sur la rue {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
+                print(f"Pas trouvé de nœud exactement sur {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
                 return renvoie( self.nœud_centre_rue(nom_rue, ville=ville, pays=pays) )
             except Exception as e :
                 print(e)
