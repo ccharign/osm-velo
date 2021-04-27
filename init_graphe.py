@@ -14,21 +14,35 @@ from module_graphe import graphe #ma classe de graphe
 # https://stackoverflow.com/questions/63466207/how-to-create-a-filtered-graph-from-an-osm-formatted-xml-file-using-osmnx
 
 
-def charge_graphe(zone = "Pau, France", option={"network_type":"all"}, bavard=0):
+def charge_graphe_par_zone(zone = "Pau, France", option={"network_type":"all"}, bavard=0):
     try:
         g= ox.io.load_graphml(f'données/{zone}.graphml')
         if bavard:print("Graphe en mémoire !")
     except FileNotFoundError:
         if bavard:print("Graphe pas en mémoire. Chargement depuis osm.")
         g=ox.graph_from_place(zone, **option)
-        if bavard:print("Chargement fini. Je l'enregistre pour la prochaie fois.")
+        if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
         ox.io.save_graphml(g, f"données/{zone}.graphml")
     
     gr = graphe(g)
     gr.charge_cache() # nœud_of_rue
     return gr
 
-
+def charge_graphe(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, option={"network_type":"all"}, bavard=1):
+    nom_fichier = f'données/{ouest}{sud}{est}{nord}.graphml'
+    try:
+        g= ox.io.load_graphml(nom_fichier)
+        if bavard:print("Graphe en mémoire !")
+    except FileNotFoundError:
+        if bavard:print("Graphe pas en mémoire. Chargement depuis osm.")
+        g=ox.graph_from_bbox(nord, sud, est, ouest, **option)
+        if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
+        ox.io.save_graphml(g, nom_fichier)
+    
+    gr = graphe(g)
+    if bavard:print("Chargement du cache nœud_of_rue")
+    gr.charge_cache() # nœud_of_rue
+    return gr
 
 # Pour télécharger une carte avec overpass : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.4285,43.2671,-0.2541,43.3403]"
 #Agglo : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.48,43.26,-0.25,43.35]"
