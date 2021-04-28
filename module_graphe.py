@@ -115,6 +115,7 @@ class graphe():
 
 
 
+        
                 
     def incr_cyclabilité(self, a, dc):
         """ Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
@@ -128,6 +129,12 @@ class graphe():
         self.cyclabilité={}
 
 
+    def rue_of_nœud(self, n):
+        """ renvoie le nom de la rue associée dans le cache au nœud n"""
+        for c, v in self.nœud_of_rue.items():
+            if v==n:
+                return c
+        raise RuntimeError("Le nœud {n} n'est pas dans le cache")
         
     def sauv_cache(self, chemin="données"):
         """ chemin est le chemin du répertoire. Le nom du fichier sera  "nœud_of_rue.csv"."""

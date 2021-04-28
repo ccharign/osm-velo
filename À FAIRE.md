@@ -1,15 +1,13 @@
  À FAIRE :
 
-- xml local dans init
 
-- Vérifier que tout va bien quand on précise un numéro de rue
-
-- Plus grande carte.
-  - pour le graphe et pour le xml local
+- Mettre aussi le dico rue_of_nœud tant qu'à faire ?
 
 - Normaliser les clefs d'adresses (pour le cache)
 
+- Accélérer l'apprentissage. Sauvegarder les trajets calculé par Dijkstra ?
 
+- Testes le module folium de osmnx
 
 
 À FAIRE (un jour)
@@ -21,6 +19,6 @@
 
 - Gestion des transitions entre deux rues.
 
-- Sauvegarde hors de osmnx pour portabilité
+- Sauvegarde hors de osmnx pour portabilité. Voir la doc de networkx.
 
 

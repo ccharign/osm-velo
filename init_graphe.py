@@ -1,11 +1,13 @@
 # -*- coding:utf-8 -*-
 
-
+import os
 import networkx as nx
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
 from module_graphe import graphe #ma classe de graphe
+import xml.etree.ElementTree as xml # Manipuler le xml local
 
+from params import CHEMIN_XML, CHEMIN_XML_COMPLET # Chemin du xml élagué
 
 # Pour la simplification dans osmnx :
 # https://github.com/gboeing/osmnx-examples/blob/master/notebooks/04-simplify-graph-consolidate-nodes.ipynb
@@ -24,11 +26,11 @@ def charge_graphe_par_zone(zone = "Pau, France", option={"network_type":"all"}, 
         if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
         ox.io.save_graphml(g, f"données/{zone}.graphml")
     
-    gr = graphe(g)
+    gr = graphe(ox.get_undirected(g))
     gr.charge_cache() # nœud_of_rue
     return gr
 
-def charge_graphe(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, option={"network_type":"all"}, bavard=1):
+def charge_graphe_bbox(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, option={"network_type":"all"}, bavard=1):
     nom_fichier = f'données/{ouest}{sud}{est}{nord}.graphml'
     try:
         g= ox.io.load_graphml(nom_fichier)
@@ -39,17 +41,35 @@ def charge_graphe(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, option
         if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
         ox.io.save_graphml(g, nom_fichier)
     
-    gr = graphe(g)
+    gr = graphe(ox.get_undirected(g))
     if bavard:print("Chargement du cache nœud_of_rue")
     gr.charge_cache() # nœud_of_rue
     return gr
 
+def charge_graphe_fichier(chemin = CHEMIN_XML_COMPLET, bavard=1):
+    nom_fichier = f'{os.path.basename(chemin)}.graphml'
+    try:
+        g = ox.io.load_graphml(nom_fichier)
+        if bavard:print("Graphe en mémoire !")
+    except FileNotFoundError:
+        if bavard : print(f"Chargement du graphe via le fichier {chemin}")
+        g = ox.graph.graph_from_xml(chemin, bidirectional=True)
+        if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
+        ox.io.save_graphml(g, nom_fichier)
+    gr = graphe(ox.get_undirected(g))
+    if bavard:print("Chargement du cache nœud_of_rue")
+    gr.charge_cache()
+    return gr
+
+# Choix de la fonction à utiliser
+charge_graphe = charge_graphe_bbox
+
+g = charge_graphe(bavard=1)
+
 # Pour télécharger une carte avec overpass : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.4285,43.2671,-0.2541,43.3403]"
 #Agglo : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.48,43.26,-0.25,43.35]"
 
-import xml.etree.ElementTree as xml # Manipuler le xml local
 
-from params import CHEMIN_XML # Chemin du xml élagué
 
 
 def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
