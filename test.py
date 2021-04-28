@@ -68,11 +68,12 @@ def affiche_chemins(chemins):
     for c in chemins:
         print(c)
         print(c.étapes)
-    
+
+        
 def affiche_avant_après(chemins, g, nb_lectures):
     
     chemins_avant = [ dijkstra.chemin(g, c.départ(), c.arrivée(), 0) for c in chemins ]
-    g.réinitialise_cyclabilité()
+    #g.réinitialise_cyclabilité()
     for _ in range(nb_lectures):
         apprentissage.lecture_plusieurs_chemins(g, chemins, bavard=1)
     
@@ -98,7 +99,7 @@ def test(départ, arrivée, p_détour):
 
 #test("rue Jules Supervielle", "cours Bosquet", 0.3)
 
-#apprentissage.n_lectures(10, g, tous_les_chemins, bavard=1)
+apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 
 def itinéraire(départ, arrivée, p_détour, g):
     """ Fonction finale. Affiche l'itinéraire, en utilisant le graphe déjà entrainé."""

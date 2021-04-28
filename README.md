@@ -10,7 +10,7 @@
 
  Dans les différentes fonction, pourcentage_détour est le pourcentage de détour accepté par le cycliste. 0 signifie aucun détour, 100 signifie qu'un trajet deux fois plus long serait accepté pour remplacer entièrement une rue non aménagée (réérence : rue Faisans) par une piste cyclable (référence : celle du Fébus).
 
- Le notebook démo.ipynb montre le fonctionnement. Vous pouvez le tester en ligne grâce à Binder sur https://mybinder.org/v2/gh/ccharign/osm-velo/HEAD?filepath=d%C3%A9mo.ipynb
+ Le notebook démo.ipynb ou test.py montrent le fonctionnement. Le notebook est testable en ligne grâce à Binder sur https://mybinder.org/v2/gh/ccharign/osm-velo/HEAD?filepath=d%C3%A9mo.ipynb
 
  Pour l'instant, seule la ville de Pau est en mémoire, mais les fonctions dans init_graphe et dans récup_données permettent de charger n'inporte quelle zone.
 
