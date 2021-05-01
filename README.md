@@ -13,7 +13,7 @@
  Le notebook démo.ipynb ou test.py montrent le fonctionnement. Le notebook est testable en ligne grâce à Binder :
  [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ccharign/osm-velo/HEAD?filepath=d%C3%A9mo.ipynb)
 
- Pour l'instant, seule la ville de Pau est en mémoire, mais les fonctions dans init_graphe et dans récup_données permettent de charger n'inporte quelle zone.
+ Pour l'instant, seule la ville de Pau et son agglomération est en mémoire, mais les fonctions dans init_graphe et dans récup_données permettent de charger n'inporte quelle zone.
 
  Pour contribuer en fournissant des trajets c'est ici https://framaforms.org/entrainement-du-calculateur-participatif-ditineraires-version-clic-1618406941
   
