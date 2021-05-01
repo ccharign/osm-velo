@@ -48,8 +48,8 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
 def lecture_plusieurs_chemins(g, chemins, bavard=0):
     n_modif = 0
     for chemin in chemins:
-        n_modif += lecture_meilleur_chemin(g, chemin, bavard=bavard)
-        if chemin.AR: n_modif += lecture_meilleur_chemin(g, chemin.renversé(), bavard=bavard)
+        n_modif += lecture_meilleur_chemin(g, chemin, bavard=bavard-1)
+        if chemin.AR: n_modif += lecture_meilleur_chemin(g, chemin.renversé(), bavard=bavard-1)
     return n_modif
 
 

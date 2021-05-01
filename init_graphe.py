@@ -16,19 +16,7 @@ from params import CHEMIN_XML, CHEMIN_XML_COMPLET # Chemin du xml élagué
 # https://stackoverflow.com/questions/63466207/how-to-create-a-filtered-graph-from-an-osm-formatted-xml-file-using-osmnx
 
 
-def charge_graphe_par_zone(zone = "Pau, France", option={"network_type":"all"}, bavard=0):
-    try:
-        g= ox.io.load_graphml(f'données/{zone}.graphml')
-        if bavard:print("Graphe en mémoire !")
-    except FileNotFoundError:
-        if bavard:print("Graphe pas en mémoire. Chargement depuis osm.")
-        g=ox.graph_from_place(zone, **option)
-        if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
-        ox.io.save_graphml(g, f"données/{zone}.graphml")
-    
-    gr = graphe(ox.get_undirected(g))
-    gr.charge_cache() # nœud_of_rue
-    return gr
+
 
 def charge_graphe_bbox(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, option={"network_type":"all"}, bavard=1):
     nom_fichier = f'données/{ouest}{sud}{est}{nord}.graphml'
@@ -36,32 +24,22 @@ def charge_graphe_bbox(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, o
         g= ox.io.load_graphml(nom_fichier)
         if bavard:print("Graphe en mémoire !")
     except FileNotFoundError:
-        if bavard:print("Graphe pas en mémoire. Chargement depuis osm.")
+        if bavard:print(f"Graphe pas en mémoire à {nom_fichier}. Chargement depuis osm.")
         g=ox.graph_from_bbox(nord, sud, est, ouest, **option)
+        print("conversion en graphe non orienté")
+        g=ox.get_undirected(g)
         if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
         ox.io.save_graphml(g, nom_fichier)
-    
-    gr = graphe(ox.get_undirected(g))
-    if bavard:print("Chargement du cache nœud_of_rue")
+
+
+    gr = graphe(g)
     gr.charge_cache() # nœud_of_rue
+    print("Chargement du graphe fini.\n")
     return gr
 
-def charge_graphe_fichier(chemin = CHEMIN_XML_COMPLET, bavard=1):
-    nom_fichier = f'{os.path.basename(chemin)}.graphml'
-    try:
-        g = ox.io.load_graphml(nom_fichier)
-        if bavard:print("Graphe en mémoire !")
-    except FileNotFoundError:
-        if bavard : print(f"Chargement du graphe via le fichier {chemin}")
-        g = ox.graph.graph_from_xml(chemin, bidirectional=True)
-        if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
-        ox.io.save_graphml(g, nom_fichier)
-    gr = graphe(ox.get_undirected(g))
-    if bavard:print("Chargement du cache nœud_of_rue")
-    gr.charge_cache()
-    return gr
 
-# Choix de la fonction à utiliser
+
+# Choix de la fonction à utiliser. (J'ai supprimé les autres de toute façon!)
 charge_graphe = charge_graphe_bbox
 
 g = charge_graphe(bavard=1)
@@ -76,10 +54,7 @@ def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
     """
     Entrée : chemin, chemin vers un fichier .osm
              chemin_sortie, autre chemin
-    Effet : enregistre dans chemin_sortie un .osm contenant uniquement les voies, leur id, et les ref des nœuds qui la composent du .osm initial.
-
-    Ne devrait servir qu'une fois. À mettre dans un module init ?
-
+    Effet : enregistre dans CHEMIN_XML (défini dans params.py) un .osm contenant uniquement les voies, leur id, et les ref des nœuds qui la composent du .osm initial.
     """
 
     print(f"Chargement du xml {chemin}")

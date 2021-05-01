@@ -31,6 +31,7 @@ class graphe():
     
     def __init__(self, g):
         self.multidigraphe = g
+        print("Calcul de la version sans multiarêtes")
         self.digraphe = ox.get_digraph(g)
         self.cyclabilité = {}
         self.nœud_of_rue = {}
@@ -62,6 +63,7 @@ class graphe():
         ox.plot_graph(self.multidigraphe,node_size=10 )
 
     def affiche_chemin(self, chemin, options={}):
+        print("Tracer du graphe et des chemins.")
         ox.plot.plot_graph_route(self.multidigraphe, chemin, node_size=12,**options)
         ### tracer un chemin avec plotly (pour prendre en compte la géom) : voir  https://towardsdatascience.com/find-and-plot-your-optimal-path-using-plotly-and-networkx-in-python-17e75387b873
 
