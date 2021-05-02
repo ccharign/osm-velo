@@ -6,3 +6,4 @@ données_inutiles
 .ipynb_*
 tests
 tmp/**
+!tmp/
