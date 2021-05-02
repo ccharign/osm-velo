@@ -1,7 +1,7 @@
  À FAIRE :
 
 
-- Mettre aussi le dico rue_of_nœud tant qu'à faire ?
+- Chargement du XML seulement si besoin
 
 - Normaliser les clefs d'adresses (pour le cache)
 

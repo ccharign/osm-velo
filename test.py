@@ -98,6 +98,7 @@ def test(départ, arrivée, p_détour):
     g.affiche_chemins([chemin_avant, chemin_après], {"route_colors":["r","b"]})
 
 #test("rue Jules Supervielle", "cours Bosquet", 0.3)
+#"avenue des marronniers", "boulevard Barbanègre"
 
 apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 
@@ -107,3 +108,13 @@ def itinéraire(départ, arrivée, p_détour, g):
     id_a = g.nœud_centre_rue(arrivée)
     c = g.chemin(id_d, id_a, p_détour)
     g.affiche_chemin(c)
+
+def test_folium(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
+    id_d = g.nœud_centre_rue(départ)
+    id_a = g.nœud_centre_rue(arrivée)
+    c = g.chemin(id_d, id_a, p_détour)
+    graphe_c = g.multidigraphe.subgraph(c)
+    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
+    nom = os.path.join(où_enregistrer, départ+arrivée+".html")
+    carte.save(nom)
+    #ox.plot_route_folium(g.multidigraphe,c)

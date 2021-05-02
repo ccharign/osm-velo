@@ -25,7 +25,7 @@ def cherche_lieu(nom_rue, ville=64000, pays="France", bavard=0):
             return lieu
         else:
             # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
-            print("Recherche Nominatim non structurée... Attention : résultat pas fiable")
+            print("La recherche structurée a échouée. Recherche Nominatim non structurée... Attention : résultat pas fiable")
             print(f'Essai 2 : "{nom_rue}, {ville}, {pays}" ')
             lieu = localisateur.geocode( f"{nom_rue}, {ville}, {pays}", exactly_one=False  )
             if lieu != None:

@@ -4,3 +4,5 @@ overpy==0.4
 requests==2.25.1
 matplotlib==3.4.1
 geopy==1.21.0
+branca==0.4.2
+folium==0.12.1
