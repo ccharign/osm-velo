@@ -97,8 +97,6 @@ def test(départ, arrivée, p_détour):
 
     g.affiche_chemins([chemin_avant, chemin_après], {"route_colors":["r","b"]})
 
-#test("rue Jules Supervielle", "cours Bosquet", 0.3)
-#"avenue des marronniers", "boulevard Barbanègre"
 
 apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 

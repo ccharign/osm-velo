@@ -43,6 +43,38 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
         LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
 
 
+
+def tronçons_rassemblés(l):
+    """ Entrée : l (int list list), liste de tronçons de rues.
+        Sortie : liste obtenue en recollant autant que possible deux tronçons qui se suivent (càd dernier nœud de l’un == premier de l’autre).
+    """
+    fini = False
+    res = l
+    à_essayer = l #file d’attente des tronçons à tester
+    
+    while not fini:
+        fini = True
+        for t1 in à_essayer :
+            t1_changé=False
+            if t1 in res : # sinon t1 avait déjà été fusionné
+                tmp = []
+                for t2 in res :
+                    if t2 != t1:
+                        if t1[0] == t2[-1]:
+                            t1 = t2+t1[1:]
+                            fini = False; t1_changé = True
+                        elif t1[-1] == t2[0]:
+                            t1 = t1+t2[1:]
+                            fini = False; t1_changé = True
+                        else:
+                            tmp.append(t2)
+                tmp.append(t1)
+                if t1_changé : à_essayer.append(t1)
+                # Ici, ∪_{t ∈ tmp} t  == ∪_{t ∈ l} t
+                res = tmp
+    return res
+
+            
 def nœuds_sur_rue(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
 
     res=[]
@@ -116,14 +148,19 @@ def nœuds_sur_tronçon_local(id_rue):
 def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
     if bavard:print(rue)
-    res=[]
+    res = []
     for tronçon in rue : #A priori, cherche_lieu renvoie une liste
         if tronçon.raw["osm_type"] == "node":
-            res.append(  tronçon.raw["osm_id"] )
+            res.append(  [tronçon.raw["osm_id"]] )
         elif tronçon.raw["osm_type"] == "way":
             id_rue = tronçon.raw["osm_id"]
             if bavard:print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
-            res.extend(nœuds_sur_tronçon_local(id_rue))
+            res.append(nœuds_sur_tronçon_local(id_rue))
+    nœuds_sur_tronçons = tronçons_rassemblés(res)
+
+    res = []
+    for t in nœuds_sur_tronçons :
+        res.extend(t)
     return res
 
 
