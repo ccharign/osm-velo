@@ -38,7 +38,7 @@ class Chemin():
         """
         données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
         assert len(données)==3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
-        print(données)
+        print("\n"+données)
         p_détour = float(données[1])/100
         étapes=[]
         for c in données[2].split(";"):

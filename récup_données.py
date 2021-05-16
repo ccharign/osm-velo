@@ -66,6 +66,11 @@ def tronçons_rassemblés(l):
                         elif t1[-1] == t2[0]:
                             t1 = t1+t2[1:]
                             fini = False; t1_changé = True
+                        elif t1[0] == t2[0]:
+                            t1 = reversed(t2) + t1[1:]
+                            fini = False; t1_changé = True
+                        elif t1[-1] = t2[-1]:
+                            t1 = t1[:-1] + reversed(t2)
                         else:
                             tmp.append(t2)
                 tmp.append(t1)
@@ -154,7 +159,7 @@ def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
             res.append(  [tronçon.raw["osm_id"]] )
         elif tronçon.raw["osm_type"] == "way":
             id_rue = tronçon.raw["osm_id"]
-            if bavard:print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
+            if bavard: print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
             res.append(nœuds_sur_tronçon_local(id_rue))
     nœuds_sur_tronçons = tronçons_rassemblés(res)
 
@@ -169,7 +174,7 @@ def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
 
 def kilométrage_piéton():
-    "Rien à voir : calcul du kilométrage de voies marquées «pedestrian» ou «footway»."""
+    """ Rien à voir : calcul du kilométrage de voies marquées « pedestrian » ou « footway »."""
     res=[]
     for c in root:
         if c.tag=="way":

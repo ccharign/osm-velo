@@ -79,14 +79,14 @@ class graphe():
         #print(coords)
         return ox.get_nearest_node(self.multidigraphe, coords)
     
-    def nœud_centre_rue(self, nom_rue, ville="64000", pays="France"):
+    def nœud_centre_rue(self, nom_rue, ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie le nœud le plus proche des coords enregistrées dans osm pour la rue.
         Pb si trop de nœuds ont été supprimés par osmnx ? """
         coords = coords_lieu(nom_rue, ville=ville, pays="France")
         return self.nœud_le_plus_proche(coords)
 
-    def un_nœud_sur_rue(self, nom_rue,  ville="64000", pays="France"):
-        """ Renvoie un nœud sur la rue. Càd un nœud OSM de la rue, qui soit présent dans le graphe. Si échec, renvoie un nœud le plus proche."""
+    def un_nœud_sur_rue(self, nom_rue,  ville= VILLE_DÉFAUT, pays="France"):
+        """ Renvoie un nœud OSM de la rue, qui soit présent dans le graphe. Si échec, renvoie un nœud le plus proche de la coordonnée associé à la rue par Nominatim."""
 
         nom_rue = nom_rue.strip()
         ville = ville.strip()
