@@ -4,7 +4,7 @@
 
 import geopy, overpy
 #import functools
-from params import CHEMIN_XML #le xml élagué
+from params import *
 import xml.etree.ElementTree as xml # Manipuler le xml local
 
 
@@ -14,7 +14,12 @@ localisateur = geopy.geocoders.osm.Nominatim(user_agent="pau à vélo")
 #geocode = functools.lru_cache(maxsize=128)(functools.partial(localisateur.geocode, timeout=5)) #mémoïzation
 api = overpy.Overpass()
 
-def cherche_lieu(nom_rue, ville=64000, pays="France", bavard=0):
+
+class LieuPasTrouvé(Exception):
+    pass
+
+
+def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
     """
     try:
@@ -25,23 +30,26 @@ def cherche_lieu(nom_rue, ville=64000, pays="France", bavard=0):
             return lieu
         else:
             # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
-            print("La recherche structurée a échouée. Recherche Nominatim non structurée... Attention : résultat pas fiable")
+            LOG_PB(f"La recherche structurée a échouée pour {nom_rue, ville}.")
+            print( "Recherche Nominatim non structurée... Attention : résultat pas fiable." )
             print(f'Essai 2 : "{nom_rue}, {ville}, {pays}" ')
             lieu = localisateur.geocode( f"{nom_rue}, {ville}, {pays}", exactly_one=False  )
             if lieu != None:
                 return lieu
             else:
-                raise NotFound
-    except:
-        print(f"lieu non trouvé : {nom_rue} ({ville})")
+                raise LieuPasTrouvé
+    except Exception as e:
+        print(e)
+        LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
 
 
-def nœuds_sur_rue(nom_rue, ville="Pau", pays="France", bavard=1):
+def nœuds_sur_rue(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
 
     res=[]
     
     # Partie 1 avec Nominatim je récupère l'id de la rue
     rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
+    if bavard:print(rue)
     
     for tronçon in rue : #A priori, cherche_lieu renvoie une liste
         id_rue = tronçon.raw["osm_id"]
@@ -105,7 +113,7 @@ def nœuds_sur_tronçon_local(id_rue):
     return [] #Si rien de trouvé
         
 
-def nœuds_sur_rue_local(nom_rue,ville="64000", pays="France", bavard=0):
+def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
     if bavard:print(rue)
     res=[]
@@ -117,6 +125,10 @@ def nœuds_sur_rue_local(nom_rue,ville="64000", pays="France", bavard=0):
             if bavard:print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
             res.extend(nœuds_sur_tronçon_local(id_rue))
     return res
+
+
+
+
 
 
 def kilométrage_piéton():

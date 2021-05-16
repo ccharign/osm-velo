@@ -87,8 +87,7 @@ def chemins_of_csv(g, adresse_csv="données/chemins.csv"):
             chemin = Chemin.of_ligne(ligne, g)
             res.append(chemin)
         except Exception as e:
-            print(e)
-            print(f"Chemin abandonné : {ligne}")
+            LOG_PB( f"{e}\n Chemin abandonné : {ligne}\n" )
     entrée.close()
     return res
 

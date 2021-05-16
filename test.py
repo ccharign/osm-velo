@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from importlib import reload # recharger un module après modif
-
+import subprocess
 import networkx as nx # graphe
 import osmnx as ox
 import requests
@@ -102,14 +102,9 @@ def test(départ, arrivée, p_détour):
 
 apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 
-def itinéraire(départ, arrivée, p_détour, g):
-    """ Fonction finale. Affiche l'itinéraire, en utilisant le graphe déjà entrainé."""
-    id_d = g.nœud_centre_rue(départ)
-    id_a = g.nœud_centre_rue(arrivée)
-    c = g.chemin(id_d, id_a, p_détour)
-    g.affiche_chemin(c)
 
-def test_folium(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
+
+def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
     id_d = g.nœud_centre_rue(départ)
     id_a = g.nœud_centre_rue(arrivée)
     c = g.chemin(id_d, id_a, p_détour)
@@ -117,4 +112,5 @@ def test_folium(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
     nom = os.path.join(où_enregistrer, départ+arrivée+".html")
     carte.save(nom)
+    subprocess.run(["firefox", nom])
     #ox.plot_route_folium(g.multidigraphe,c)
