@@ -54,7 +54,7 @@ def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
     """
     Entrée : chemin, chemin vers un fichier .osm
              chemin_sortie, autre chemin
-    Effet : enregistre dans CHEMIN_XML (défini dans params.py) un .osm contenant uniquement les voies, leur id, et les ref des nœuds qui la composent du .osm initial.
+    Effet : enregistre dans CHEMIN_XML (défini dans params.py) un .osm contenant uniquement les voies, leur id, leur nom et les ref des nœuds qui la composent du .osm initial.
     """
 
     print(f"Chargement du xml {chemin}")
@@ -64,11 +64,16 @@ def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
     for c in a :
         if c.tag == "way":
             fils = xml.SubElement(res, "way")
-            fils.attrib["id" ]= c.attrib["id"]
+            fils.attrib["id" ] = c.attrib["id"]
+            
             for d in c:
                 if d.tag=="nd":#Les nœuds osm sur le way c
                     petit_fils = xml.SubElement(fils, "nd")
                     petit_fils.attrib["ref"] = d.attrib["ref"]
+                elif d.tag == "tag" and d.attrib["k"]=="name": # le nom de c
+                    petit_fils = xml.SubElement(fils, "tag")
+                    petit_fils.attrib["k"] = "name"
+                    petit_fils.attrib["v"] = d.attrib["v"]
     print("Enregistrement du xml simplifié")
     xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8")
     
