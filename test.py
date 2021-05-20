@@ -4,9 +4,9 @@ from importlib import reload # recharger un module après modif
 import subprocess
 import networkx as nx # graphe
 import osmnx as ox
-import requests
-import matplotlib.cm as cm
-import matplotlib.colors as colors
+#import requests
+#import matplotlib.cm as cm
+#import matplotlib.colors as colors
 ox.config(use_cache=True, log_console=True)
 
 
@@ -17,8 +17,11 @@ import apprentissage
 import dijkstra
 
 import chemins # classe chemin et lecture du csv
+
 from params import *
 import récup_données
+
+from utils import *
 
 
 tous_les_chemins = chemins.chemins_of_csv(g)
@@ -29,39 +32,6 @@ def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
 
 ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
 
-
-def dessine_chemins(chemins, g):
-
-    chemins_directs=[]
-    for c in chemins:
-        try:
-            chemins_directs.append( dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
-        except dijkstra.PasDeChemin:
-            print(f"Pas de chemin pour {c}")
-
-    chemins_complets=[]
-    for c in chemins:
-        try:
-            chemins_complets.append( dijkstra.chemin_étapes(g, c) )
-        except dijkstra.PasDeChemin as e :
-            print(e)
-            print(f"Pas de chemin avec étapes pour {c}")
-            
-    #chemins_complets = [ dijkstra.chemin_étapes(g, c) for c in chemins ]
-    g.affiche_chemins(chemins_directs+chemins_complets )
-
-
-def cheminsValides(chemins):
-    """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
-    res=[]
-    for c in chemins:
-        try:
-            dijkstra.chemin_étapes(g, c)
-            res.append(c)
-        except dijkstra.PasDeChemin as e :
-            print(e)
-            print(f"Pas de chemin avec étapes pour {c}")
-    return res
 tous_les_chemins = cheminsValides(tous_les_chemins)
     
 def affiche_chemins(chemins):
@@ -100,31 +70,3 @@ def test(départ, arrivée, p_détour):
 
 #apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 
-
-
-def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
-    rd, vd = chemins.lecture_étape(départ)
-    ra, va = chemins.lecture_étape(arrivée)
-    id_d = g.un_nœud_sur_rue(rd, ville = vd)
-    id_a = g.un_nœud_sur_rue(ra, ville = va)
-    c = g.chemin(id_d, id_a, p_détour)
-    graphe_c = g.multidigraphe.subgraph(c)
-    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, départ+arrivée+".html")
-    carte.save(nom)
-    subprocess.run(["firefox", nom])
-    #ox.plot_route_folium(g.multidigraphe,c)
-
-
-    
-def affiche_sommets(s, où_enregistrer="tmp", g=g):
-    """ Entrée : s, liste de sommets """
-    graphe_c = g.multidigraphe.subgraph(s)
-    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, "affiche_sommets.html")
-    carte.save(nom)
-    subprocess.run(["firefox", nom])
-
-def affiche_rue(nom_rue, ville=VILLE_DÉFAUT):
-    sommets = récup_données.nœuds_sur_rue_local(nom_rue, ville=ville, pays="France", bavard=0)
-    affiche_sommets(sommets)
