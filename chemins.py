@@ -38,16 +38,16 @@ class Chemin():
         """
         données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
         assert len(données)==3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
-        print("\n"+données)
+        print("\n", données)
         p_détour = float(données[1])/100
-        étapes=[]
+        étapes = []
         for c in données[2].split(";"):
             rue, ville = lecture_étape(c)
             étapes.append(g.un_nœud_sur_rue(rue, ville=ville))
         if données[0] == "oui": AR = True
         else: AR = False
         chemin = cls(étapes, p_détour, AR)
-        chemin.texte=(données[2])
+        chemin.texte = (données[2])
         return chemin
 
     @classmethod
@@ -94,7 +94,7 @@ def chemins_of_csv(g, adresse_csv="données/chemins.csv"):
 
 import re
 def lecture_étape(c):
-    """ Entrée : chaîne de caractère représetant une étape.
+    """ Entrée : chaîne de caractère représentant une étape.
         Sortie : nom de rue, ville, pays
     """
     e = re.compile("([^()]*)(\(.*\))")#Un texte puis un texte entre parenthèses

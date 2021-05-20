@@ -10,15 +10,15 @@ import matplotlib.colors as colors
 ox.config(use_cache=True, log_console=True)
 
 
-from module_graphe import graphe #ma classe de graphe
+from module_graphe import graphe, nœuds_rue_of_adresse #ma classe de graphe
 from init_graphe import g # le graphe de Pau par défaut
 #import récup_données as rd
 import apprentissage
 import dijkstra
 
 import chemins # classe chemin et lecture du csv
-
-
+from params import *
+import récup_données
 
 
 tous_les_chemins = chemins.chemins_of_csv(g)
@@ -98,13 +98,15 @@ def test(départ, arrivée, p_détour):
     g.affiche_chemins([chemin_avant, chemin_après], {"route_colors":["r","b"]})
 
 
-apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
+#apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 
 
 
 def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
-    id_d = g.nœud_centre_rue(départ)
-    id_a = g.nœud_centre_rue(arrivée)
+    rd, vd = chemins.lecture_étape(départ)
+    ra, va = chemins.lecture_étape(arrivée)
+    id_d = g.un_nœud_sur_rue(rd, ville = vd)
+    id_a = g.un_nœud_sur_rue(ra, ville = va)
     c = g.chemin(id_d, id_a, p_détour)
     graphe_c = g.multidigraphe.subgraph(c)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
@@ -112,3 +114,17 @@ def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
     carte.save(nom)
     subprocess.run(["firefox", nom])
     #ox.plot_route_folium(g.multidigraphe,c)
+
+
+    
+def affiche_sommets(s, où_enregistrer="tmp", g=g):
+    """ Entrée : s, liste de sommets """
+    graphe_c = g.multidigraphe.subgraph(s)
+    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
+    nom = os.path.join(où_enregistrer, "affiche_sommets.html")
+    carte.save(nom)
+    subprocess.run(["firefox", nom])
+
+def affiche_rue(nom_rue, ville=VILLE_DÉFAUT):
+    sommets = récup_données.nœuds_sur_rue_local(nom_rue, ville=ville, pays="France", bavard=0)
+    affiche_sommets(sommets)

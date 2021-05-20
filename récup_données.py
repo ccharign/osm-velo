@@ -19,13 +19,18 @@ class LieuPasTrouvé(Exception):
     pass
 
 
+
+# Pour contourner le pb des tronçons manquant dans Nominatim :
+# 1) récupérer le nom osm de la rue
+# 2) recherche dans le xml local
+
 def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
     """
     try:
         #Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
         if bavard>1:print(f'Essai 1: "street":{nom_rue}, "city":{ville}, "country":{pays}')
-        lieu = localisateur.geocode( {"street":nom_rue, "city":ville, "country":pays, "dedup":0}, exactly_one=False  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
+        lieu = localisateur.geocode( {"street":nom_rue, "city":ville, "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
         if lieu != None:
             return lieu
         else:
@@ -67,10 +72,10 @@ def tronçons_rassemblés(l):
                             t1 = t1+t2[1:]
                             fini = False; t1_changé = True
                         elif t1[0] == t2[0]:
-                            t1 = reversed(t2) + t1[1:]
+                            t1 = list(reversed(t2)) + t1[1:]
                             fini = False; t1_changé = True
-                        elif t1[-1] = t2[-1]:
-                            t1 = t1[:-1] + reversed(t2)
+                        elif t1[-1] == t2[-1]:
+                            t1 = t1[:-1] + list(reversed(t2))
                         else:
                             tmp.append(t2)
                 tmp.append(t1)
@@ -156,22 +161,29 @@ def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     res = []
     for tronçon in rue : #A priori, cherche_lieu renvoie une liste
         if tronçon.raw["osm_type"] == "node":
-            res.append(  [tronçon.raw["osm_id"]] )
+            if bavard : print(f"Récupéré directement un nœud osm ({tronçon.raw['osm_id']}) pour {nom_rue} ({ville}). Je renvoie le premier de la liste.")
+            return(  [tronçon.raw["osm_id"]] )
         elif tronçon.raw["osm_type"] == "way":
             id_rue = tronçon.raw["osm_id"]
             if bavard: print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
             res.append(nœuds_sur_tronçon_local(id_rue))
     nœuds_sur_tronçons = tronçons_rassemblés(res)
 
-    res = []
-    for t in nœuds_sur_tronçons :
-        res.extend(t)
-    return res
+    if len(nœuds_sur_tronçons)>1:
+        print(f"  -- Je n’ai pas pu rassembler les tronçons pour {nom_rue}. --")
+        res = []
+        for t in nœuds_sur_tronçons :
+            res.extend(t)
+            return res
+    else:
+        return nœuds_sur_tronçons[0]    
 
 
-
-
-
+def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays = "France", bavard=0):
+    """ Entrée : une adresse, càd au minimum un numéro et un nom de rue.
+        Sortie : liste des nœuds osm récupérés via Nominatim.
+    """
+    pass
 
 def kilométrage_piéton():
     """ Rien à voir : calcul du kilométrage de voies marquées « pedestrian » ou « footway »."""

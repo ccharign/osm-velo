@@ -4,8 +4,8 @@ import networkx as nx
 import osmnx as ox
 import os
 import dijkstra
-from récup_données import nœuds_sur_rue, nœuds_sur_rue_local, coords_lieu
-
+from récup_données import nœuds_sur_rue, nœuds_sur_rue_local, coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
+from params import VILLE_DÉFAUT
 
 def liste_par_le_milieu(l):
     """ Renvoie un itérateur qui parcours l en commençant par son milieu puis par cercles concentriques."""
@@ -155,14 +155,74 @@ class graphe():
             self.nœud_of_rue[c] = int(v)
         entrée.close()
         
-    def sauvegarde(self, chemin):
+    def sauv_cycla(self, chemin="données/"):
         """ chemin : adresse et nom du fichier, sans l'extension"""
-        ox.io.save_graphml(graphe_pau_vélo,chemin+".graphml")
-        sortie_dico = open(chemin+"Cyclabilité.csv")
+        sortie_dico = open(os.path.join(chemin,"Cyclabilité.csv"), "w")
         for (s,t), v in self.cyclabilité.items():
             sortie.write(f"{s};{t};{v}\n")
         sortie.dico.close()
 
+    def charge_cycla(self, chemin="données/"):
+        entrée = open(os.path.join(chemin,"Cyclabilité.csv"))
+        for s,t,v in entrée:
+            self.cyclabilité[(s,t)] = v
+        entrée.close()
+
 
         
+#Rue bonado : 286678874 339665925
+def nœuds_rue_of_arête(g,s,t):
+    """Entrée : g (digraph)
+                s,t : deux sommets adjacents
+       Sortie : liste des nœuds de la rue contenant l’arête (s,t). Lu rue est identifiée par le paramètre "name" dans le graphe."""
+
+    déjàVu={} #En cas d’une rue qui bouclerait...
+    nom = g[s][t]["name"]
+    
+    def nœud_dans_direction(g,s,t,res):
+        """ Mêmes entrées, ainsi que res, tableau où mettre le résultat.
+        t sera mis dans res et noté déjÀVu, mais pas s.
+
+        Renvoie les nœuds uniquement dans la direction (s,t), càd ceux auxquels on accède via t et non via s."""
+
+        res.append(t)
+        déjàVu[t]=True
+        voisins = [v for v in g[t] if v not in déjàVu and v!=s and g[t][v].get("name","")==nom ]
+        if len(voisins)==0:
+            return res
+        elif len(voisins)==1:
+            return nœud_dans_direction(g,t,voisins[0],res)
+        else:
+            print(f"Trop de voisins pour le nœud {t} dans la rue {nom}.")
+            return nœud_dans_direction(g,t,voisins[0],res)
+        
+    return list(reversed(nœud_dans_direction(g,s,t,[]))) + nœud_dans_direction(g,t,s,[])
+
+def nœuds_rue_of_nom_et_nœud(g,n,nom):
+    """ Entrée : n (int) un nœud de la rue
+                 nom (str) le nom de la rue. Dois être le nom exact utilisé par osm et reporté dans le graphe.
+        Sortie : liste des nœuds de la rue, dans l’ordre topologique."""
+
+    for v in g[n]:
+        if g[n][v].get("name","")==nom:
+            return nœuds_rue_of_arête(g,n,v)
+    print(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
+        
+def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France",bavard=1):
+    """ Entrée : g (digraph)
+                 nom_rue (str)
+        Sortie : liste des nœuds de cette rue, dans l’ordre topologique."""
+
+    lieu = cherche_lieu(nom_rue,ville=ville,pays=pays, bavard=bavard-1)
+
+    for tronçon in lieu:
+        if tronçon.raw["osm_type"] == "way":
+            nom = lieu[0].raw["display_name"].split(",")[0] # est-ce bien fiable ?
+            print(f"nom trouvé : {nom}")
+            id_rue = tronçon.raw["osm_id"]
+            nœuds = nœuds_sur_tronçon_local(id_rue)
+            for n in nœuds:
+                if n in g.nodes:
+                    return nœuds_rue_of_nom_et_nœud(g,n,nom)
+    print("Pas réussi à trouver la rue et un nœud dessus")
     

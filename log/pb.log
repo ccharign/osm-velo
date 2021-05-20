@@ -42,3 +42,255 @@
 2021-05-16 15:58:27.662384   La recherche structurée a échouée pour ('CSTJF', '64000 Pau').
 2021-05-16 16:01:12.602937   Service timed out
  Lieu non trouvé : rue Lagardère (64000)
+2021-05-16 16:40:46.585420   can only concatenate str (not "list") to str
+ Chemin abandonné : "1"|"8350089"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"20 chemin Guilhem; avenue Sambre et Meuse;cours Bosquet; place de la République"
+
+
+2021-05-16 16:40:46.585575   can only concatenate str (not "list") to str
+ Chemin abandonné : "2"|"8352257"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"rue des réparatrices; avenue San Carlos;avenue des acacias;avenue de Montebello;avenue Bié Moulié;rue Gutenberg"
+
+
+2021-05-16 16:40:46.585700   can only concatenate str (not "list") to str
+ Chemin abandonné : "3"|"8352259"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"avenue du Loup;chemin des écoliers;rue Mozart;chemin Guilhem"
+
+
+2021-05-16 16:40:46.585800   can only concatenate str (not "list") to str
+ Chemin abandonné : "4"|"8352263"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF"
+
+
+2021-05-16 16:40:46.585913   can only concatenate str (not "list") to str
+ Chemin abandonné : "5"|"8358060"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros"
+
+
+2021-05-16 16:40:46.586014   can only concatenate str (not "list") to str
+ Chemin abandonné : "6"|"8358139"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; boulevard d'alsace-lorraine ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié"
+
+
+2021-05-16 16:40:46.586129   can only concatenate str (not "list") to str
+ Chemin abandonné : "7"|"8367222"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"0"|"rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; rue Bernadotte ; rue de Liège ; rue Lapouble"
+
+
+2021-05-16 16:40:46.586231   can only concatenate str (not "list") to str
+ Chemin abandonné : "8"|"8485488"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Mourot; rue Montpensier; rond-point du souvenir français; avenue de montardon; boulevard du cami salié; allée buffon; chemin de la forêt bastard"
+
+
+2021-05-16 16:40:46.586325   can only concatenate str (not "list") to str
+ Chemin abandonné : "9"|"8487644"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycée Barthou"
+
+
+2021-05-16 16:40:46.586425   can only concatenate str (not "list") to str
+ Chemin abandonné : "10"|"8488565"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Midi; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau"
+
+
+2021-05-16 16:40:46.586527   can only concatenate str (not "list") to str
+ Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
+
+
+2021-05-16 16:40:46.586629   can only concatenate str (not "list") to str
+ Chemin abandonné : "12"|"8585606"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"20"|"rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset"
+
+
+2021-05-16 19:54:13.951686   can only concatenate str (not "list") to str
+ Chemin abandonné : "1"|"8350089"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"20 chemin Guilhem; avenue Sambre et Meuse;cours Bosquet; place de la République"
+
+
+2021-05-16 19:54:13.951832   can only concatenate str (not "list") to str
+ Chemin abandonné : "2"|"8352257"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"rue des réparatrices; avenue San Carlos;avenue des acacias;avenue de Montebello;avenue Bié Moulié;rue Gutenberg"
+
+
+2021-05-16 19:54:13.951963   can only concatenate str (not "list") to str
+ Chemin abandonné : "3"|"8352259"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"avenue du Loup;chemin des écoliers;rue Mozart;chemin Guilhem"
+
+
+2021-05-16 19:54:13.952071   can only concatenate str (not "list") to str
+ Chemin abandonné : "4"|"8352263"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF"
+
+
+2021-05-16 19:54:13.952180   can only concatenate str (not "list") to str
+ Chemin abandonné : "5"|"8358060"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros"
+
+
+2021-05-16 19:54:13.952290   can only concatenate str (not "list") to str
+ Chemin abandonné : "6"|"8358139"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; boulevard d'alsace-lorraine ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié"
+
+
+2021-05-16 19:54:13.952404   can only concatenate str (not "list") to str
+ Chemin abandonné : "7"|"8367222"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"0"|"rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; rue Bernadotte ; rue de Liège ; rue Lapouble"
+
+
+2021-05-16 19:54:13.952510   can only concatenate str (not "list") to str
+ Chemin abandonné : "8"|"8485488"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Mourot; rue Montpensier; rond-point du souvenir français; avenue de montardon; boulevard du cami salié; allée buffon; chemin de la forêt bastard"
+
+
+2021-05-16 19:54:13.952620   can only concatenate str (not "list") to str
+ Chemin abandonné : "9"|"8487644"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycée Barthou"
+
+
+2021-05-16 19:54:13.952738   can only concatenate str (not "list") to str
+ Chemin abandonné : "10"|"8488565"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Midi; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau"
+
+
+2021-05-16 19:54:13.952849   can only concatenate str (not "list") to str
+ Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
+
+
+2021-05-16 19:54:13.952955   can only concatenate str (not "list") to str
+ Chemin abandonné : "12"|"8585606"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"20"|"rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset"
+
+
+2021-05-16 20:01:56.438231   can only concatenate str (not "list") to str
+ Chemin abandonné : "1"|"8350089"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"20 chemin Guilhem; avenue Sambre et Meuse;cours Bosquet; place de la République"
+
+
+2021-05-16 20:01:56.438476   can only concatenate str (not "list") to str
+ Chemin abandonné : "2"|"8352257"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"rue des réparatrices; avenue San Carlos;avenue des acacias;avenue de Montebello;avenue Bié Moulié;rue Gutenberg"
+
+
+2021-05-16 20:01:56.438700   can only concatenate str (not "list") to str
+ Chemin abandonné : "3"|"8352259"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"avenue du Loup;chemin des écoliers;rue Mozart;chemin Guilhem"
+
+
+2021-05-16 20:01:56.438891   can only concatenate str (not "list") to str
+ Chemin abandonné : "4"|"8352263"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF"
+
+
+2021-05-16 20:01:56.439028   can only concatenate str (not "list") to str
+ Chemin abandonné : "5"|"8358060"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros"
+
+
+2021-05-16 20:01:56.439159   can only concatenate str (not "list") to str
+ Chemin abandonné : "6"|"8358139"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; boulevard d'alsace-lorraine ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié"
+
+
+2021-05-16 20:01:56.439290   can only concatenate str (not "list") to str
+ Chemin abandonné : "7"|"8367222"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"0"|"rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; rue Bernadotte ; rue de Liège ; rue Lapouble"
+
+
+2021-05-16 20:01:56.439413   can only concatenate str (not "list") to str
+ Chemin abandonné : "8"|"8485488"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Mourot; rue Montpensier; rond-point du souvenir français; avenue de montardon; boulevard du cami salié; allée buffon; chemin de la forêt bastard"
+
+
+2021-05-16 20:01:56.439535   can only concatenate str (not "list") to str
+ Chemin abandonné : "9"|"8487644"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycée Barthou"
+
+
+2021-05-16 20:01:56.439655   can only concatenate str (not "list") to str
+ Chemin abandonné : "10"|"8488565"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Midi; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau"
+
+
+2021-05-16 20:01:56.439796   can only concatenate str (not "list") to str
+ Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
+
+
+2021-05-16 20:01:56.439917   can only concatenate str (not "list") to str
+ Chemin abandonné : "12"|"8585606"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"20"|"rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset"
+
+
+2021-05-16 20:10:45.267557   can only concatenate str (not "list") to str
+ Chemin abandonné : "1"|"8350089"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"20 chemin Guilhem; avenue Sambre et Meuse;cours Bosquet; place de la République"
+
+
+2021-05-16 20:10:45.267703   can only concatenate str (not "list") to str
+ Chemin abandonné : "2"|"8352257"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"rue des réparatrices; avenue San Carlos;avenue des acacias;avenue de Montebello;avenue Bié Moulié;rue Gutenberg"
+
+
+2021-05-16 20:10:45.267814   can only concatenate str (not "list") to str
+ Chemin abandonné : "3"|"8352259"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"avenue du Loup;chemin des écoliers;rue Mozart;chemin Guilhem"
+
+
+2021-05-16 20:10:45.267919   can only concatenate str (not "list") to str
+ Chemin abandonné : "4"|"8352263"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF"
+
+
+2021-05-16 20:10:45.268029   can only concatenate str (not "list") to str
+ Chemin abandonné : "5"|"8358060"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros"
+
+
+2021-05-16 20:10:45.268140   can only concatenate str (not "list") to str
+ Chemin abandonné : "6"|"8358139"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; boulevard d'alsace-lorraine ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié"
+
+
+2021-05-16 20:10:45.268249   can only concatenate str (not "list") to str
+ Chemin abandonné : "7"|"8367222"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"0"|"rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; rue Bernadotte ; rue de Liège ; rue Lapouble"
+
+
+2021-05-16 20:10:45.268357   can only concatenate str (not "list") to str
+ Chemin abandonné : "8"|"8485488"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Mourot; rue Montpensier; rond-point du souvenir français; avenue de montardon; boulevard du cami salié; allée buffon; chemin de la forêt bastard"
+
+
+2021-05-16 20:10:45.268463   can only concatenate str (not "list") to str
+ Chemin abandonné : "9"|"8487644"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycée Barthou"
+
+
+2021-05-16 20:10:45.268581   can only concatenate str (not "list") to str
+ Chemin abandonné : "10"|"8488565"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Midi; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau"
+
+
+2021-05-16 20:10:45.268689   can only concatenate str (not "list") to str
+ Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
+
+
+2021-05-16 20:10:45.268806   can only concatenate str (not "list") to str
+ Chemin abandonné : "12"|"8585606"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"20"|"rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset"
+
+
+2021-05-16 20:11:01.876956   can only concatenate str (not "list") to str
+ Chemin abandonné : "1"|"8350089"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"16/04/2021 - 22:02"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"20 chemin Guilhem; avenue Sambre et Meuse;cours Bosquet; place de la République"
+
+
+2021-05-16 20:11:01.877262   can only concatenate str (not "list") to str
+ Chemin abandonné : "2"|"8352257"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"rue des réparatrices; avenue San Carlos;avenue des acacias;avenue de Montebello;avenue Bié Moulié;rue Gutenberg"
+
+
+2021-05-16 20:11:01.877548   can only concatenate str (not "list") to str
+ Chemin abandonné : "3"|"8352259"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"avenue du Loup;chemin des écoliers;rue Mozart;chemin Guilhem"
+
+
+2021-05-16 20:11:01.877804   can only concatenate str (not "list") to str
+ Chemin abandonné : "4"|"8352263"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF"
+
+
+2021-05-16 20:11:01.878045   can only concatenate str (not "list") to str
+ Chemin abandonné : "5"|"8358060"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros"
+
+
+2021-05-16 20:11:01.878298   can only concatenate str (not "list") to str
+ Chemin abandonné : "6"|"8358139"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; boulevard d'alsace-lorraine ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié"
+
+
+2021-05-16 20:11:01.878377   can only concatenate str (not "list") to str
+ Chemin abandonné : "7"|"8367222"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"0"|"rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; rue Bernadotte ; rue de Liège ; rue Lapouble"
+
+
+2021-05-16 20:11:01.878490   can only concatenate str (not "list") to str
+ Chemin abandonné : "8"|"8485488"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"01/05/2021 - 12:25"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Mourot; rue Montpensier; rond-point du souvenir français; avenue de montardon; boulevard du cami salié; allée buffon; chemin de la forêt bastard"
+
+
+2021-05-16 20:11:01.878576   can only concatenate str (not "list") to str
+ Chemin abandonné : "9"|"8487644"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycée Barthou"
+
+
+2021-05-16 20:11:01.878684   can only concatenate str (not "list") to str
+ Chemin abandonné : "10"|"8488565"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Midi; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau"
+
+
+2021-05-16 20:11:01.878820   can only concatenate str (not "list") to str
+ Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
+
+
+2021-05-16 20:11:01.878943   can only concatenate str (not "list") to str
+ Chemin abandonné : "12"|"8585606"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"11/05/2021 - 10:01"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"20"|"rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset"
+
+
+2021-05-16 20:12:27.914621   La recherche structurée a échouée pour ('CSTJF', '64000 Pau').
+2021-05-16 20:12:28.914297   La recherche structurée a échouée pour ('CSTJF', '64000 Pau').
+2021-05-16 20:12:45.094688   Service timed out
+ Lieu non trouvé : 24 rue maréchal foch (64000 Pau)
+2021-05-16 20:32:25.400203   La recherche structurée a échouée pour ('chemin des coteaux de Guindalos (64110 Juranon)', '64000 Pau').
+2021-05-16 20:32:25.902444   
+ Lieu non trouvé : chemin des coteaux de Guindalos (64110 Juranon) (64000 Pau)
+2021-05-16 20:32:34.875530   La recherche structurée a échouée pour ('chemin des coteaux de Guindalos (64110 Jurançon)', '64000 Pau').
+2021-05-16 20:32:35.419089   
+ Lieu non trouvé : chemin des coteaux de Guindalos (64110 Jurançon) (64000 Pau)
+2021-05-16 20:51:41.626179   La recherche structurée a échouée pour ('CSTJF', '64000 Pau').
+2021-05-16 20:51:42.625065   La recherche structurée a échouée pour ('CSTJF', '64000 Pau').
