@@ -46,64 +46,7 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     except Exception as e:
         print(e)
         LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
-
-
-
-def tronçons_rassemblés(l):
-    """ Entrée : l (int list list), liste de tronçons de rues.
-        Sortie : liste obtenue en recollant autant que possible deux tronçons qui se suivent (càd dernier nœud de l’un == premier de l’autre).
-    """
-    fini = False
-    res = l
-    à_essayer = l #file d’attente des tronçons à tester
-    
-    while not fini:
-        fini = True
-        for t1 in à_essayer :
-            t1_changé=False
-            if t1 in res : # sinon t1 avait déjà été fusionné
-                tmp = []
-                for t2 in res :
-                    if t2 != t1:
-                        if t1[0] == t2[-1]:
-                            t1 = t2+t1[1:]
-                            fini = False; t1_changé = True
-                        elif t1[-1] == t2[0]:
-                            t1 = t1+t2[1:]
-                            fini = False; t1_changé = True
-                        elif t1[0] == t2[0]:
-                            t1 = list(reversed(t2)) + t1[1:]
-                            fini = False; t1_changé = True
-                        elif t1[-1] == t2[-1]:
-                            t1 = t1[:-1] + list(reversed(t2))
-                        else:
-                            tmp.append(t2)
-                tmp.append(t1)
-                if t1_changé : à_essayer.append(t1)
-                # Ici, ∪_{t ∈ tmp} t  == ∪_{t ∈ l} t
-                res = tmp
-    return res
-
             
-def nœuds_sur_rue(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
-
-    res=[]
-    
-    # Partie 1 avec Nominatim je récupère l'id de la rue
-    rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
-    if bavard:print(rue)
-    
-    for tronçon in rue : #A priori, cherche_lieu renvoie une liste
-        id_rue = tronçon.raw["osm_id"]
-        if bavard:print(f"id de {nom_rue} : {id_rue}")
-    
-        # Partie 2 avec Overpass je récupère les nœuds de cette rue
-        
-        r = api.query(f"way({id_rue});out;")
-        rue = r.ways[0]
-        nœuds = rue.get_nodes(resolve_missing=True)
-        res.extend([n.id for n in nœuds])
-    return res
 
 
 
@@ -140,10 +83,10 @@ def coords_lieu(nom_rue, ville=64000, pays="France", bavard=0):
 ###################################################
 
 
-
-print(f"Chargement du xml {CHEMIN_XML}")
-root = xml.parse(CHEMIN_XML).getroot()
-print("fini\n")
+#Plus besoin maintenant que j'utilise directement les données du graphe.
+#print(f"Chargement du xml {CHEMIN_XML}")
+#root = xml.parse(CHEMIN_XML).getroot()
+#print("fini\n")
 
 def nœuds_sur_tronçon_local(id_rue):
     """ Cherche les nœuds d'une rue dans le fichier local. Renvoie la liste des nœuds trouvés (int list).

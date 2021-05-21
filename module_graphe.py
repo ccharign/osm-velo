@@ -6,20 +6,17 @@ import os
 import dijkstra
 from récup_données import nœuds_sur_rue, nœuds_sur_rue_local, coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from params import VILLE_DÉFAUT
+import math
 
-def liste_par_le_milieu(l):
-    """ Renvoie un itérateur qui parcours l en commençant par son milieu puis par cercles concentriques."""
-    m=len(l)//2#au milieu ou juste après
-    yield(l[m])
-    i=1
-    while m-i>=0:
-        yield(l[m-i])
-        if m+i<len(l):
-            yield(l[m+i])
-        i+=1
-    
-    
 
+R_TERRE = 6378137# en mètres
+def distance_euc(c1, c2):
+    """ Formule simplifiée pour petites distances."""
+    long1, lat1 = c1
+    long2, lat2 = c2
+    dx = R_TERRE * (long2-long1) * math.pi / 180
+    dy = R_TERRE * (lat2-lat1) * math.pi / 180
+    return (dx**2+dy**2)**.5
 
 class graphe():
     """
@@ -86,7 +83,8 @@ class graphe():
         return self.nœud_le_plus_proche(coords)
 
     def un_nœud_sur_rue(self, nom_rue,  ville= VILLE_DÉFAUT, pays="France"):
-        """ Renvoie un nœud OSM de la rue, qui soit présent dans le graphe. Si échec, renvoie un nœud le plus proche de la coordonnée associé à la rue par Nominatim."""
+        """ Renvoie un nœud OSM de la rue, qui soit présent dans le graphe. Renvoie le nœud médian parmi ceux présents.
+        Si échec, renvoie un nœud le plus proche de la coordonnée associé à la rue par Nominatim."""
 
         nom_rue = nom_rue.strip()
         ville = ville.strip()
@@ -103,16 +101,16 @@ class graphe():
         else:
             try:
                 print(f"Recherche d'un nœud pour {nom_rue}")
-                nœuds = nœuds_sur_rue_local(nom_rue, ville=ville, pays=pays)
-                for n in liste_par_le_milieu(nœuds):
-                    if n in self.multidigraphe.nodes:
-                        return renvoie(n)
-                print(f"Pas trouvé de nœud exactement sur {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
-                return renvoie( self.nœud_centre_rue(nom_rue, ville=ville, pays=pays) )
+                nœuds = nœuds_rue_of_adresse(self, nom_rue, ville=ville, pays=pays)
+                n = len(nœuds)
+                if n>0:
+                    return renvoie(nœuds[n/2])
+                else:
+                    print(f"Pas trouvé de nœud exactement sur {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
+                    return renvoie( self.nœud_centre_rue(nom_rue, ville=ville, pays=pays) )
             except Exception as e :
-                print(e)
-                print("Je sauvegarde le cache pour la prochaine fois.")
-                self.sauv_cache()
+                print(f"Erreur lors de la recherche d'un nœud sur la rue {nom_rue} : {e}")
+
                 
 
 
