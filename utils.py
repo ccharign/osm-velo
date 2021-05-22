@@ -3,29 +3,29 @@
 ### Fonctions diverses pour utiliser le logiciel
 
 
-from importlib import reload # recharger un module après modif
+from importlib import reload  # recharger un module après modif
 import subprocess
-import networkx as nx # graphe
+import networkx as nx  # graphe
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
-
-
-from module_graphe import graphe #ma classe de graphe
-from init_graphe import g # le graphe de Pau par défaut
+from module_graphe import graphe  #ma classe de graphe
+from init_graphe import g  # le graphe de Pau par défaut
 #import récup_données as rd
 import apprentissage
 import dijkstra
-import chemins # classe chemin et lecture du csv
-from params import *
-
+import chemins  # classe chemin et lecture du csv
+from params import VILLE_DÉFAUT, NAVIGATEUR
+import os
+import récup_données
+import module_graphe
 
 
 def dessine_chemins(chemins, g):
 
-    chemins_directs=[]
+    chemins_directs = []
     for c in chemins:
         try:
-            chemins_directs.append( dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
+            chemins_directs.append(dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
 
@@ -38,17 +38,17 @@ def dessine_chemins(chemins, g):
             print(f"Pas de chemin avec étapes pour {c}")
             
     #chemins_complets = [ dijkstra.chemin_étapes(g, c) for c in chemins ]
-    g.affiche_chemins(chemins_directs+chemins_complets )
+    g.affiche_chemins(chemins_directs+chemins_complets)
 
 
 def cheminsValides(chemins):
     """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
-    res=[]
+    res = []
     for c in chemins:
         try:
             dijkstra.chemin_étapes(g, c)
             res.append(c)
-        except dijkstra.PasDeChemin as e :
+        except dijkstra.PasDeChemin as e:
             print(e)
             print(f"Pas de chemin avec étapes pour {c}")
     return res
@@ -58,8 +58,8 @@ def cheminsValides(chemins):
 def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
     rd, vd = chemins.lecture_étape(départ)
     ra, va = chemins.lecture_étape(arrivée)
-    id_d = g.un_nœud_sur_rue(rd, ville = vd)
-    id_a = g.un_nœud_sur_rue(ra, ville = va)
+    id_d = g.un_nœud_sur_rue(rd, ville=vd)
+    id_a = g.un_nœud_sur_rue(ra, ville=va)
     c = g.chemin(id_d, id_a, p_détour)
     graphe_c = g.multidigraphe.subgraph(c)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
@@ -67,7 +67,6 @@ def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
     carte.save(nom)
     subprocess.run(["firefox", nom])
     #ox.plot_route_folium(g.multidigraphe,c)
-
 
 
 def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
@@ -88,7 +87,7 @@ def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
 
 
 def flatten(c):
-    res=[]
+    res = []
     for x in c:
         res.extend(x)
     return res
@@ -96,26 +95,25 @@ def flatten(c):
 
 def dessine_chemins(chemins, g, où_enregistrer="tmp"):
 
-    chemins_directs=[]
+    chemins_directs = []
     for c in chemins:
         try:
-            chemins_directs.append( dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
+            chemins_directs.append(dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
-    carte = ox.plot_graph_folium(graphe_c_directs, popup_attribute="name", color = "red")
-    
+    carte = ox.plot_graph_folium(graphe_c_directs, popup_attribute="name", color="red")
 
-    chemins_complets=[]
+    chemins_complets = []
     for c in chemins:
         try:
-            chemins_complets.append( dijkstra.chemin_étapes(g, c) )
-        except dijkstra.PasDeChemin as e :
+            chemins_complets.append(dijkstra.chemin_étapes(g, c))
+        except dijkstra.PasDeChemin as e:
             print(e)
             print(f"Pas de chemin avec étapes pour {c}")
-    graphe_c_complets = g.multidigraphe.subgraph(flatten(chemins_conplets))
-    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte) # On rajoute ce graphe par-dessus le précédent dans le folium
-            
+    graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
+    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
+           
     nom = os.path.join(où_enregistrer, "dessine_chemins.html")
     carte.save(nom)
     subprocess.run([NAVIGATEUR, nom])
@@ -130,6 +128,7 @@ def affiche_sommets(s, où_enregistrer="tmp", g=g):
     carte.save(nom)
     subprocess.run(["firefox", nom])
 
-def affiche_rue(nom_rue, ville=VILLE_DÉFAUT):
-    sommets = récup_données.nœuds_sur_rue_local(nom_rue, ville=ville, pays="France", bavard=0)
+    
+def affiche_rue(g, nom_rue, ville=VILLE_DÉFAUT):
+    sommets = module_graphe.nœuds_rue_of_adresse(g, nom_rue, ville=ville, pays="France", bavard=0)
     affiche_sommets(sommets)

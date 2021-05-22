@@ -4,8 +4,8 @@
 
 import geopy, overpy
 #import functools
-from params import *
-import xml.etree.ElementTree as xml # Manipuler le xml local
+from params import VILLE_DÉFAUT
+import xml.etree.ElementTree as xml  # Manipuler le xml local
 
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"

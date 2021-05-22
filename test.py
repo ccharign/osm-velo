@@ -11,8 +11,8 @@ import osmnx as ox
 ox.config(use_cache=True, log_console=True)
 
 
-from module_graphe import graphe, nœuds_rue_of_adresse # ma classe de graphe
-from init_graphe import g # le graphe de Pau par défaut
+from module_graphe import graphe, nœuds_rue_of_adresse  # ma classe de graphe
+from init_graphe import g  # le graphe de Pau par défaut
 #import récup_données as rd
 import apprentissage
 import dijkstra
@@ -32,18 +32,18 @@ def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
     tous_les_chemins.append(chemins.Chemin.of_étapes(étapes, pourcentage_détour, AR, g))
 
 
-    ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
+ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
 
 tous_les_chemins = cheminsValides(tous_les_chemins)
-    
+
+
 def affiche_chemins(chemins):
     for c in chemins:
         print(c)
         print(c.étapes)
 
-        
+
 def affiche_avant_après(chemins, g, nb_lectures):
-    
     chemins_avant = [dijkstra.chemin(g, c.départ(), c.arrivée(), 0) for c in chemins]
     #g.réinitialise_cyclabilité()
     for _ in range(nb_lectures):
@@ -70,4 +70,3 @@ def test(départ, arrivée, p_détour):
 
 
 #apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
-
