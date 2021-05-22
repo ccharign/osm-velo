@@ -4,12 +4,14 @@ import networkx as nx
 import osmnx as ox
 import os
 import dijkstra
-from récup_données import nœuds_sur_rue, nœuds_sur_rue_local, coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
+from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from params import VILLE_DÉFAUT
 import math
 
 
 R_TERRE = 6378137# en mètres
+
+
 def distance_euc(c1, c2):
     """ Formule simplifiée pour petites distances."""
     long1, lat1 = c1
@@ -17,6 +19,7 @@ def distance_euc(c1, c2):
     dx = R_TERRE * (long2-long1) * math.pi / 180
     dy = R_TERRE * (lat2-lat1) * math.pi / 180
     return (dx**2+dy**2)**.5
+
 
 class graphe():
     """
@@ -40,28 +43,28 @@ class graphe():
         p_détour (float) : pourcentage de détour accepté.
         La longueur de l'arrête (s,t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
         """
-        cycla_corrigée = lambda voisin : (p_détour * self.cyclabilité.get((s,voisin), 1.) + 1 - p_détour)
+        cycla_corrigée = lambda voisin : (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
         return ( ( voisin, données["length"]/cycla_corrigée(voisin) )  for (voisin, données) in self.digraphe[s].items() )
     
     def liste_voisins(self, s):
-        return List(self.voisins)
+        return list(self.voisins)
     
     def est_arrête(self, s, t):
         return t in self.digraphe[s]
     
     def chemin(self, d, a, p_détour):
-        return dijkstra.chemin(self,d, a, p_détour)
+        return dijkstra.chemin(self, d, a, p_détour)
+    
     def chemin_étapes(self, c):
         """ Entrée : c, objet de la classe Chemin"""
-        return dijkstra.chemin_étapes(self,c)
+        return dijkstra.chemin_étapes(self, c)
 
-    
     def affiche(self):
-        ox.plot_graph(self.multidigraphe,node_size=10 )
+        ox.plot_graph(self.multidigraphe, node_size=10)
 
     def affiche_chemin(self, chemin, options={}):
         print("Tracer du graphe et des chemins.")
-        ox.plot.plot_graph_route(self.multidigraphe, chemin, node_size=12,**options)
+        ox.plot.plot_graph_route(self.multidigraphe, chemin, node_size=12, **options)
         ### tracer un chemin avec plotly (pour prendre en compte la géom) : voir  https://towardsdatascience.com/find-and-plot-your-optimal-path-using-plotly-and-networkx-in-python-17e75387b873
 
     def affiche_chemins(self, chemins,options={}):
@@ -92,24 +95,24 @@ class graphe():
         clef = f"{nom_rue},{ville},{pays}"
         
         def renvoie(res):
-            self.nœud_of_rue[clef]=res
-            print (f"Mis en cache : {res} pour {clef}")
+            self.nœud_of_rue[clef] = res
+            print(f"Mis en cache : {res} pour {clef}")
             return res
         
-        if clef in self.nœud_of_rue : #Recherche dans le cache
+        if clef in self.nœud_of_rue:  #Recherche dans le cache
             return self.nœud_of_rue[clef]
         else:
-            try:
+            #try:
                 print(f"Recherche d'un nœud pour {nom_rue}")
                 nœuds = nœuds_rue_of_adresse(self, nom_rue, ville=ville, pays=pays)
                 n = len(nœuds)
-                if n>0:
+                if n > 0:
                     return renvoie(nœuds[n/2])
                 else:
                     print(f"Pas trouvé de nœud exactement sur {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
                     return renvoie( self.nœud_centre_rue(nom_rue, ville=ville, pays=pays) )
-            except Exception as e :
-                print(f"Erreur lors de la recherche d'un nœud sur la rue {nom_rue} : {e}")
+            #except Exception as e:
+            #    print(f"Erreur lors de la recherche d'un nœud sur la rue {nom_rue} : {e}")
 
                 
 
@@ -194,33 +197,35 @@ def nœuds_rue_of_arête(g,s,t):
             print(f"Trop de voisins pour le nœud {t} dans la rue {nom}.")
             return nœud_dans_direction(g,t,voisins[0],res)
         
-    return list(reversed(nœud_dans_direction(g,s,t,[]))) + nœud_dans_direction(g,t,s,[])
+    return list(reversed(nœud_dans_direction(g, s, t, []))) + nœud_dans_direction(g, t, s, [])
 
-def nœuds_rue_of_nom_et_nœud(g,n,nom):
+
+def nœuds_rue_of_nom_et_nœud(g, n, nom):
     """ Entrée : n (int) un nœud de la rue
                  nom (str) le nom de la rue. Dois être le nom exact utilisé par osm et reporté dans le graphe.
         Sortie : liste des nœuds de la rue, dans l’ordre topologique."""
 
     for v in g[n]:
-        if g[n][v].get("name","")==nom:
-            return nœuds_rue_of_arête(g,n,v)
+        if g[n][v].get("name", "") == nom:
+            return nœuds_rue_of_arête(g, n, v)
     print(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
-        
-def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France",bavard=1):
+
+    
+def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
     """ Entrée : g (digraph)
                  nom_rue (str)
         Sortie : liste des nœuds de cette rue, dans l’ordre topologique."""
 
-    lieu = cherche_lieu(nom_rue,ville=ville,pays=pays, bavard=bavard-1)
+    lieu = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard-1)
 
     for tronçon in lieu:
         if tronçon.raw["osm_type"] == "way":
-            nom = lieu[0].raw["display_name"].split(",")[0] # est-ce bien fiable ?
+            nom = lieu[0].raw["display_name"].split(",")[0]  # est-ce bien fiable ?
             print(f"nom trouvé : {nom}")
             id_rue = tronçon.raw["osm_id"]
             nœuds = nœuds_sur_tronçon_local(id_rue)
             for n in nœuds:
                 if n in g.nodes:
-                    return nœuds_rue_of_nom_et_nœud(g,n,nom)
+                    return nœuds_rue_of_nom_et_nœud(g, n, nom)
     print("Pas réussi à trouver la rue et un nœud dessus")
     

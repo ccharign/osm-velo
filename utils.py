@@ -16,6 +16,7 @@ from init_graphe import g # le graphe de Pau par défaut
 import apprentissage
 import dijkstra
 import chemins # classe chemin et lecture du csv
+from params import *
 
 
 
