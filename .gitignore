@@ -7,4 +7,3 @@ données_inutiles
 tests
 tmp/**
 !tmp/
-**vieux
