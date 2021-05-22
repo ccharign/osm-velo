@@ -396,3 +396,32 @@
  Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
 
 
+2021-05-22 09:58:30.676649   La recherche structurée a échouée pour ('CSTJF', '64000 Pau').
+2021-05-22 09:58:31.223636   object of type 'NoneType' has no len()
+ Chemin abandonné : "4"|"8352263"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"17/04/2021 - 13:20"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"30"|"Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF"
+
+
+2021-05-22 09:58:31.697190   object of type 'NoneType' has no len()
+ Chemin abandonné : "5"|"8358060"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"18/04/2021 - 20:44"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros"
+
+
+2021-05-22 09:58:32.186579   object of type 'NoneType' has no len()
+ Chemin abandonné : "6"|"8358139"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"18/04/2021 - 20:58"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"20"|"véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue du maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié"
+
+
+2021-05-22 09:58:32.731289   object of type 'NoneType' has no len()
+ Chemin abandonné : "7"|"8367222"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"19/04/2021 - 18:27"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"0"|"rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; rue Bernadotte ; rue de Liège ; rue Lapouble"
+
+
+2021-05-22 09:58:33.191345   object of type 'NoneType' has no len()
+ Chemin abandonné : "9"|"8487644"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"01/05/2021 - 18:41"|"0"|"0.0.0.0"|"0"|"Anonymous"|"oui"|"40"|"4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycée Barthou"
+
+
+2021-05-22 09:58:33.796914   object of type 'NoneType' has no len()
+ Chemin abandonné : "10"|"8488565"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"01/05/2021 - 21:09"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Midi; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau"
+
+
+2021-05-22 09:58:34.287455   object of type 'NoneType' has no len()
+ Chemin abandonné : "11"|"8488608"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"01/05/2021 - 21:18"|"0"|"0.0.0.0"|"0"|"Anonymous"|"non"|"30"|"place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Midi; avenue de Montardon; avenue d'Attigny; rue d'Artouste"
+
+

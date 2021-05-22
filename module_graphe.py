@@ -9,7 +9,7 @@ from params import VILLE_DÉFAUT
 import math
 
 
-R_TERRE = 6378137# en mètres
+R_TERRE = 6378137  # en mètres
 
 
 def distance_euc(c1, c2):
@@ -65,27 +65,27 @@ class graphe():
     def affiche_chemin(self, chemin, options={}):
         print("Tracer du graphe et des chemins.")
         ox.plot.plot_graph_route(self.multidigraphe, chemin, node_size=12, **options)
-        ### tracer un chemin avec plotly (pour prendre en compte la géom) : voir  https://towardsdatascience.com/find-and-plot-your-optimal-path-using-plotly-and-networkx-in-python-17e75387b873
+        #  tracer un chemin avec plotly (pour prendre en compte la géom) : voir  https://towardsdatascience.com/find-and-plot-your-optimal-path-using-plotly-and-networkx-in-python-17e75387b873
 
-    def affiche_chemins(self, chemins,options={}):
-        if len(chemins)>1:
-            ox.plot_graph_routes(self.multidigraphe, chemins,  route_linewidth=6, node_size=10,**options)
-        elif len(chemins)==1:
-            ox.plot.plot_graph_route(self.multidigraphe, chemins[0], node_size=10,**options)
+    def affiche_chemins(self, chemins, options={}):
+        if len(chemins) > 1:
+            ox.plot_graph_routes(self.multidigraphe, chemins,  route_linewidth=6, node_size=10, **options)
+        elif len(chemins) == 1:
+            ox.plot.plot_graph_route(self.multidigraphe, chemins[0], node_size=10, **options)
 
 
-            
+           
     def nœud_le_plus_proche(self, coords):
         #print(coords)
         return ox.get_nearest_node(self.multidigraphe, coords)
-    
+   
     def nœud_centre_rue(self, nom_rue, ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie le nœud le plus proche des coords enregistrées dans osm pour la rue.
         Pb si trop de nœuds ont été supprimés par osmnx ? """
         coords = coords_lieu(nom_rue, ville=ville, pays="France")
         return self.nœud_le_plus_proche(coords)
 
-    def un_nœud_sur_rue(self, nom_rue,  ville= VILLE_DÉFAUT, pays="France"):
+    def un_nœud_sur_rue(self, nom_rue,  ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie un nœud OSM de la rue, qui soit présent dans le graphe. Renvoie le nœud médian parmi ceux présents.
         Si échec, renvoie un nœud le plus proche de la coordonnée associé à la rue par Nominatim."""
 
@@ -93,12 +93,12 @@ class graphe():
         ville = ville.strip()
         pays = pays.strip()
         clef = f"{nom_rue},{ville},{pays}"
-        
+       
         def renvoie(res):
             self.nœud_of_rue[clef] = res
             print(f"Mis en cache : {res} pour {clef}")
             return res
-        
+       
         if clef in self.nœud_of_rue:  #  Recherche dans le cache
             return self.nœud_of_rue[clef]
         else:
@@ -169,9 +169,7 @@ class graphe():
             self.cyclabilité[(s, t)] = v
         entrée.close()
 
-
-        
-#Rue bonado : 286678874 339665925
+       
 def nœuds_rue_of_arête(g, s, t):
     """Entrée : g (digraph)
                 s,t : deux sommets adjacents

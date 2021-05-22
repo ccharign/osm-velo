@@ -1,27 +1,23 @@
 #!usr/bin/python3
 # -*- coding:utf-8 -*-
 
-from importlib import reload # recharger un module après modif
+from importlib import reload  # recharger un module après modif
 import subprocess
-import networkx as nx # graphe
+import networkx as nx  # graphe
 import osmnx as ox
 #import requests
 #import matplotlib.cm as cm
 #import matplotlib.colors as colors
 ox.config(use_cache=True, log_console=True)
 
-
 from module_graphe import graphe, nœuds_rue_of_adresse  # ma classe de graphe
 from init_graphe import g  # le graphe de Pau par défaut
 #import récup_données as rd
 import apprentissage
 import dijkstra
-
-import chemins # classe chemin et lecture du csv
-
+import chemins  # classe chemin et lecture du csv
 from params import *
 import récup_données
-
 from utils import *
 
 
@@ -48,10 +44,10 @@ def affiche_avant_après(chemins, g, nb_lectures):
     #g.réinitialise_cyclabilité()
     for _ in range(nb_lectures):
         apprentissage.lecture_plusieurs_chemins(g, chemins, bavard=1)
-    
+  
     chemins_après = [dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour) for c in chemins]
-    
-    g.affiche_chemins(chemins_avant+chemins_après, {"route_colors":['r']*len(chemins_avant)+['b']*len(chemins_après)})
+  
+    g.affiche_chemins(chemins_avant+chemins_après, {"route_colors": ['r']*len(chemins_avant)+['b']*len(chemins_après)})
 
 
 def test(départ, arrivée, p_détour):
@@ -66,7 +62,7 @@ def test(départ, arrivée, p_détour):
 
     chemin_après = g.chemin(id_d, id_a, p_détour)
 
-    g.affiche_chemins([chemin_avant, chemin_après], {"route_colors":["r","b"]})
+    g.affiche_chemins([chemin_avant, chemin_après], {"route_colors": ["r","b"]})
 
 
 #apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)

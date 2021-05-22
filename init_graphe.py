@@ -18,22 +18,24 @@ from params import CHEMIN_XML, CHEMIN_XML_COMPLET # Chemin du xml élagué
 
 
 
-def charge_graphe_bbox(ouest =-0.4285 , sud=43.2671, est=-0.2541,nord=43.3403, option={"network_type":"all"}, bavard=1):
+def charge_graphe_bbox(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
     nom_fichier = f'données/{ouest}{sud}{est}{nord}.graphml'
     try:
-        g= ox.io.load_graphml(nom_fichier)
-        if bavard:print("Graphe en mémoire !")
+        g = ox.io.load_graphml(nom_fichier)
+        if bavard: print("Graphe en mémoire !")
     except FileNotFoundError:
-        if bavard:print(f"Graphe pas en mémoire à {nom_fichier}. Chargement depuis osm.")
-        g=ox.graph_from_bbox(nord, sud, est, ouest, **option)
+        if bavard: print(f"Graphe pas en mémoire à {nom_fichier}. Chargement depuis osm.")
+        g = ox.graph_from_bbox(nord, sud, est, ouest, **option)
         print("conversion en graphe non orienté")
-        g=ox.get_undirected(g)
-        if bavard:print("Chargement fini. Je l'enregistre pour la prochaine fois.")
+        g = ox.get_undirected(g)
+        if bavard: print("Chargement fini. Je l'enregistre pour la prochaine fois.")
         ox.io.save_graphml(g, nom_fichier)
 
-
     gr = graphe(g)
-    gr.charge_cache() # nœud_of_rue
+    print("Chargenent du cache nœud_of_rue")
+    gr.charge_cache()  # nœud_of_rue
+    print("Chargement de la cyclabilité")
+    gr.charge_cycla()
     print("Chargement du graphe fini.\n")
     return gr
 
@@ -61,23 +63,19 @@ def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
     a = xml.parse(chemin).getroot()
     print("Création de l'arbre simplifié")
     res = xml.Element("osm")
-    for c in a :
+    for c in a:
         if c.tag == "way":
             fils = xml.SubElement(res, "way")
-            fils.attrib["id" ] = c.attrib["id"]
+            fils.attrib["id"] = c.attrib["id"]
             
             for d in c:
-                if d.tag=="nd":#Les nœuds osm sur le way c
+                if d.tag == "nd":  #Les nœuds osm sur le way c
                     petit_fils = xml.SubElement(fils, "nd")
                     petit_fils.attrib["ref"] = d.attrib["ref"]
-                elif d.tag == "tag" and d.attrib["k"]=="name": # le nom de c
+                elif d.tag == "tag" and d.attrib["k"] == "name":  # le nom de c
                     petit_fils = xml.SubElement(fils, "tag")
                     petit_fils.attrib["k"] = "name"
                     petit_fils.attrib["v"] = d.attrib["v"]
     print("Enregistrement du xml simplifié")
-    xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8")
-    
+    xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8") 
 
-
-#def init_tout():
-    
