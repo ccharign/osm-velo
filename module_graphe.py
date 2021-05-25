@@ -28,14 +28,14 @@ class graphe():
                 - cyclabilité un dictionnaire (int * int) -> float, qui associe à une arrête (couple des id osm des nœuds) sa cyclabilité. Valeur par défaut : 1. Les distances serot divisées par  (p_détour × cycla + 1 - p_détour).
                 - nœud_of_rue : dictionnaire de type str -> int qui associe à un nom de rue l'identifiant correspondant dans le graphe. Calculé au moyen de la méthode un_nœud_sur_rue. Sert de cache pour ne pas surcharger overpy. La clé utilisée est "nom_rue,ville,pays".
     """
-    
+   
     def __init__(self, g):
         self.multidigraphe = g
         print("Calcul de la version sans multiarêtes")
         self.digraphe = ox.get_digraph(g)
         self.cyclabilité = {}
         self.nœud_of_rue = {}
-        
+       
     def voisins(self, s, p_détour):
         """
         La méthode utilisée par dijkstra.
@@ -45,16 +45,16 @@ class graphe():
         """
         cycla_corrigée = lambda voisin : (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
         return ( ( voisin, données["length"]/cycla_corrigée(voisin) )  for (voisin, données) in self.digraphe[s].items() )
-    
+   
     def liste_voisins(self, s):
         return list(self.voisins)
-    
+   
     def est_arrête(self, s, t):
         return t in self.digraphe[s]
-    
+  
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)
-    
+  
     def chemin_étapes(self, c):
         """ Entrée : c, objet de la classe Chemin"""
         return dijkstra.chemin_étapes(self, c)
@@ -74,11 +74,10 @@ class graphe():
             ox.plot.plot_graph_route(self.multidigraphe, chemins[0], node_size=10, **options)
 
 
-           
+         
     def nœud_le_plus_proche(self, coords):
-        #print(coords)
         return ox.get_nearest_node(self.multidigraphe, coords)
-   
+ 
     def nœud_centre_rue(self, nom_rue, ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie le nœud le plus proche des coords enregistrées dans osm pour la rue.
         Pb si trop de nœuds ont été supprimés par osmnx ? """
@@ -93,12 +92,12 @@ class graphe():
         ville = ville.strip()
         pays = pays.strip()
         clef = f"{nom_rue},{ville},{pays}"
-       
+     
         def renvoie(res):
             self.nœud_of_rue[clef] = res
             print(f"Mis en cache : {res} pour {clef}")
             return res
-       
+     
         if clef in self.nœud_of_rue:  #  Recherche dans le cache
             return self.nœud_of_rue[clef]
         else:
@@ -114,12 +113,12 @@ class graphe():
             #except Exception as e:
             #    print(f"Erreur lors de la recherche d'un nœud sur la rue {nom_rue} : {e}")
 
-                
+               
 
 
 
-        
-                
+       
+               
     def incr_cyclabilité(self, a, dc):
         """ Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
         Formule appliquée : *= (1+dc)
@@ -138,7 +137,7 @@ class graphe():
             if v == n:
                 return c
         raise RuntimeError("Le nœud {n} n'est pas dans le cache")
-        
+       
     def sauv_cache(self, chemin="données"):
         """ chemin est le chemin du répertoire. Le nom du fichier sera  "nœud_of_rue.csv"."""
         adresse = os.path.join(chemin, "nœud_of_rue.csv")
@@ -155,7 +154,7 @@ class graphe():
             c, v = ligne.strip().split(":")
             self.nœud_of_rue[c] = int(v)
         entrée.close()
-        
+       
     def sauv_cycla(self, chemin="données/"):
         """ chemin : adresse et nom du fichier, sans l'extension"""
         sortie = open(os.path.join(chemin, "Cyclabilité.csv"), "w")
@@ -169,7 +168,7 @@ class graphe():
             self.cyclabilité[(s, t)] = v
         entrée.close()
 
-       
+     
 def nœuds_rue_of_arête(g, s, t):
     """Entrée : g (digraph)
                 s,t : deux sommets adjacents
@@ -194,7 +193,7 @@ def nœuds_rue_of_arête(g, s, t):
         else:
             print(f"Trop de voisins pour le nœud {t} dans la rue {nom}.")
             return nœud_dans_direction(g, t, voisins[0], res)
-        
+       
     return list(reversed(nœud_dans_direction(g, s, t, []))) + nœud_dans_direction(g, t, s, [])
 
 
@@ -207,6 +206,7 @@ def nœuds_rue_of_nom_et_nœud(g, n, nom):
         if g[n][v].get("name", "") == nom:
             return nœuds_rue_of_arête(g, n, v)
     print(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
+    return []
 
 
 def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
@@ -226,3 +226,18 @@ def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard
                 if n in g.nodes:
                     return nœuds_rue_of_nom_et_nœud(g, n, nom)
     print("Pas réussi à trouver la rue et un nœud dessus")
+    return []
+
+def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
+    """ 
+    Entrée : g (digraph)
+             nom_rue (str)
+             coords ( (float, float) )
+    Renvoie le nœud sur la rue nom_rue le plus proche de coords."""
+
+    def coords_of_nœud(n):
+        return g.nodes[n]["x"], g.nodes[n]["y"]
+    nœuds = nœuds_rue_of_adresse(g, nom_rue, ville=ville, pays=pays, bavard=bavard-1)
+    tab = [ (distance_euc(coords_of_nœud(n),coords), n) for n in nœuds ]
+    _, res = min(tab)
+    return res

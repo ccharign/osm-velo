@@ -44,9 +44,9 @@ def affiche_avant_après(chemins, g, nb_lectures):
     #g.réinitialise_cyclabilité()
     for _ in range(nb_lectures):
         apprentissage.lecture_plusieurs_chemins(g, chemins, bavard=1)
-  
+
     chemins_après = [dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour) for c in chemins]
-  
+
     g.affiche_chemins(chemins_avant+chemins_après, {"route_colors": ['r']*len(chemins_avant)+['b']*len(chemins_après)})
 
 

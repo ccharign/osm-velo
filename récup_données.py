@@ -28,9 +28,9 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """
     try:
         #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
-        if bavard > 1:print(f'Essai 1: "street":{nom_rue}, "city":{ville}, "country":{pays}')
+        if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville}, "country":{pays}')
         lieu = localisateur.geocode( {"street":nom_rue, "city":ville, "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
-        if lieu != None:
+        if lieu is not None:
             return lieu
         else:
             # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
@@ -45,7 +45,7 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     except Exception as e:
         print(e)
         LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
-            
+   
 
 
 
@@ -84,7 +84,6 @@ def coords_lieu(nom_rue, ville=64000, pays="France", bavard=0):
 ###################################################
 
 
-
 print(f"Chargement du xml {CHEMIN_XML}")
 root = xml.parse(CHEMIN_XML).getroot()
 print("fini\n")
@@ -107,7 +106,7 @@ def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     for tronçon in rue:  #  A priori, cherche_lieu renvoie une liste
         if tronçon.raw["osm_type"] == "node":
             if bavard: print(f"Récupéré directement un nœud osm ({tronçon.raw['osm_id']}) pour {nom_rue} ({ville}). Je renvoie le premier de la liste.")
-            return [tronçon.raw["osm_id"]] 
+            return [tronçon.raw["osm_id"]]
         elif tronçon.raw["osm_type"] == "way":
             id_rue = tronçon.raw["osm_id"]
             if bavard: print(f"Je cherche les nœuds de {nom_rue} dans le tronçon {id_rue}.")
@@ -133,13 +132,13 @@ def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
 def kilométrage_piéton():
     """ Rien à voir : calcul du kilométrage de voies marquées « pedestrian » ou « footway »."""
-    res=[]
+    res = []
     for c in root:
-        if c.tag=="way":
+        if c.tag == "way":
             for truc in c:
-                if truc.tag == "tag" and truc.attrib["k"]=="highway" and truc.attrib["v"] in ["pedestrian", "footway"] :
+                if truc.tag == "tag" and truc.attrib["k"] == "highway" and truc.attrib["v"] in ["pedestrian", "footway"] :
                     res.append(c)
     for c in res:
         for truc in c:
-            if truc.tag == "tag" and truc.attrib["k"]=="name":print(truc.attrib["v"])
-#Faire une classe Nœud_OSM pour extraire les tags, les nœuds d'une voie etc
+            if truc.tag == "tag" and truc.attrib["k"] == "name": print(truc.attrib["v"])
+# #Faire une classe Nœud_OSM pour extraire les tags, les nœuds d'une voie etc
