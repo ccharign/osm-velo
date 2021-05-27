@@ -10,7 +10,6 @@ import xml.etree.ElementTree as xml  # Manipuler le xml local
 geopy.geocoders.options.default_user_agent = "pau à vélo"
 
 localisateur = geopy.geocoders.osm.Nominatim(user_agent="pau à vélo")
-#  geocode = functools.lru_cache(maxsize=128)(functools.partial(localisateur.geocode, timeout=5)) #mémoïzation
 api = overpy.Overpass()
 
 

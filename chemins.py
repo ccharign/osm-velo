@@ -114,6 +114,13 @@ def nœud_of_étape(c, g, bavard=0):
         g : graphe.
         Sortie : nœud de g associé à cette adresse. Si un numéro est indiqué, on cherche le nœud de la rue le plus proche. Sinon on prend le milieu de la rue."""
     c = c.strip()
+    if c in g.nœud_of_rue:  #  Recherche dans le cache
+            return g.nœud_of_rue[c]
+    def renvoie(res):
+            g.nœud_of_rue[c] = res
+            print(f"Mis en cache : {res} pour {c}")
+            return res
+        
     assert c != ""
     e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
     essai = re.findall(e, c)
@@ -133,7 +140,7 @@ def nœud_of_étape(c, g, bavard=0):
         if rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
-            return g.un_nœud_sur_rue(rue, ville=ville)
+            return renvoie(g.un_nœud_sur_rue(rue, ville=ville))
     else:
         coords = coords_lieu(f"{num} {rue}", ville=ville)
-        return module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville)
+        return renvoie(module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville))
