@@ -54,24 +54,9 @@ def cheminsValides(chemins):
     return res
 
 
-
 def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
-    rd, vd = chemins.lecture_étape(départ)
-    ra, va = chemins.lecture_étape(arrivée)
-    id_d = g.un_nœud_sur_rue(rd, ville=vd)
-    id_a = g.un_nœud_sur_rue(ra, ville=va)
-    c = g.chemin(id_d, id_a, p_détour)
-    graphe_c = g.multidigraphe.subgraph(c)
-    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, départ+arrivée+".html")
-    carte.save(nom)
-    subprocess.run(["firefox", nom])
-    #ox.plot_route_folium(g.multidigraphe,c)
-
-
-def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g):
-    id_d = g.nœud_centre_rue(départ)
-    id_a = g.nœud_centre_rue(arrivée)
+    id_d = chemins.nœud_of_étape(départ,g)
+    id_a = chemins.nœud_of_étape(arrivée,g)
     c = g.chemin(id_d, id_a, p_détour)
     graphe_c = g.multidigraphe.subgraph(c)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")

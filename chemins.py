@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from récup_données import *
+from récup_données import cherche_lieu, coords_lieu
 import module_graphe
 from params import VILLE_DÉFAUT, LOG_PB
 import re
@@ -18,6 +18,7 @@ def sans_guillemets(c):
     else:
         return c
 
+    
 class Chemin():
     """ Attributs : - p_détour (float)
                     - étapes (int List), liste de nœuds
@@ -30,7 +31,7 @@ class Chemin():
         self.AR = AR
         self.texte = None
 
-        
+       
     @classmethod
     def of_ligne(cls, ligne, g):
         """ Entrée : ligne (str), une ligne de csv du questionnaire. Les colonnes sont séparées par | . Il y a 12 colonnes, les 9 premières sont inutiles.
@@ -108,13 +109,15 @@ def lecture_étape(c):
             raise ValueError(f"chaîne pas correcte : {c}")
 
 
-def nœud_of_étape(c, g):
+def nœud_of_étape(c, g, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entr parenthèses.
         g : graphe.
         Sortie : nœud de g associé à cette adresse. Si un numéro est indiqué, on cherche le nœud de la rue le plus proche. Sinon on prend le milieu de la rue."""
-  
-    e = re.compile("([0-9]*)([^()0-9]+)(\((.*)\))?")
+    c = c.strip()
+    assert c != ""
+    e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
     essai = re.findall(e, c)
+    if bavard: print(essai)
     if len(essai) == 1:
         num, rue, _, ville = essai[0]
     elif len(essai) == 0:
@@ -127,7 +130,10 @@ def nœud_of_étape(c, g):
     if ville == "": ville = VILLE_DÉFAUT
 
     if num == "":
-        return g.un_nœud_sur_rue(rue, ville=ville)
+        if rue == "":
+            raise SyntaxError(f"adresse mal formée : {c}")
+        else:
+            return g.un_nœud_sur_rue(rue, ville=ville)
     else:
         coords = coords_lieu(f"{num} {rue}", ville=ville)
         return module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville)

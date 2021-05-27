@@ -109,7 +109,7 @@ class graphe():
                     return renvoie(nœuds[n//2])
                 else:
                     print(f"Pas trouvé de nœud exactement sur {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
-                    return renvoie( self.nœud_centre_rue(nom_rue, ville=ville, pays=pays) )
+                    return renvoie(self.nœud_centre_rue(nom_rue, ville=ville, pays=pays))
             #except Exception as e:
             #    print(f"Erreur lors de la recherche d'un nœud sur la rue {nom_rue} : {e}")
 
