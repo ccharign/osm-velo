@@ -2,14 +2,8 @@
 # -*- coding:utf-8 -*-
 
 from importlib import reload  # recharger un module après modif
-import subprocess
 import networkx as nx  # graphe
 import osmnx as ox
-#import requests
-#import matplotlib.cm as cm
-#import matplotlib.colors as colors
-ox.config(use_cache=True, log_console=True)
-
 from module_graphe import graphe, nœuds_rue_of_adresse  # ma classe de graphe
 from init_graphe import g  # le graphe de Pau par défaut
 #import récup_données as rd
@@ -20,6 +14,7 @@ from params import *
 import récup_données
 from utils import *
 
+ox.config(use_cache=True, log_console=True)
 
 tous_les_chemins = chemins.chemins_of_csv(g)
 
