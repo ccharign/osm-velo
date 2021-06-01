@@ -37,11 +37,11 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
     #Lecture du vieux chemin pour diminuer les coeffs :
     for a in liste_arêtes(vieux_chemin):
         if not a in arêtes_chemin:
-            if bavard >1:print(f"je diminue la cyclabilité de l'arête {a}")
-            n_modif+=1
+            if bavard >1: print(f"je diminue la cyclabilité de l'arête {a}")
+            n_modif += 1
             g.incr_cyclabilité(a, -ETA)
             
-    if bavard>=1:print(f"nombre d'arêtes modifiées : {n_modif}")
+    if bavard >= 1: print(f"nombre d'arêtes modifiées : {n_modif}")
     return n_modif
 
 
@@ -54,9 +54,9 @@ def lecture_plusieurs_chemins(g, chemins, bavard=0):
 
 
 def n_lectures(n, g, chemins, bavard=0):
-    if bavard>0: print(f"Début de l'apprentissage. C'est parti pour {n} lectures.")
+    print(f"Début de l'apprentissage. C'est parti pour {n} lectures.")
     for i in range(n):
-        if bavard:print(n-i)
+        print(n-i)
         lecture_plusieurs_chemins(g, chemins, bavard=bavard-1)
 
 def lecture_jusqu_à_perfection(g, chemins, bavard=0):

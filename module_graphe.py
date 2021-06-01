@@ -109,7 +109,7 @@ class graphe():
                     return renvoie(nœuds[n//2])
                 else:
                     print(f"Pas trouvé de nœud exactement sur {nom_rue} ({ville}). Je recherche le nœud le plus proche.")
-                    return renvoie( self.nœud_centre_rue(nom_rue, ville=ville, pays=pays) )
+                    return renvoie(self.nœud_centre_rue(nom_rue, ville=ville, pays=pays))
             #except Exception as e:
             #    print(f"Erreur lors de la recherche d'un nœud sur la rue {nom_rue} : {e}")
 
@@ -228,7 +228,7 @@ def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard
     print("Pas réussi à trouver la rue et un nœud dessus")
     return []
 
-def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
+def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ 
     Entrée : g (digraph)
              nom_rue (str)

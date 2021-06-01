@@ -3,14 +3,20 @@
 # Ce module regroupe les fonctions de recherche de données géographiques qui n'utilisent pas osmnx
 
 import geopy, overpy
-from params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML
+from params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
 import xml.etree.ElementTree as xml  # Manipuler le xml local
+import time
+import re
 
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"
 
-localisateur = geopy.geocoders.osm.Nominatim(user_agent="pau à vélo")
-#  geocode = functools.lru_cache(maxsize=128)(functools.partial(localisateur.geocode, timeout=5)) #mémoïzation
+localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
+
+def recherche_inversée(coords):
+    time.sleep(1)
+    return(localisateur.reverse(coords))
+    
 api = overpy.Overpass()
 
 
@@ -20,7 +26,7 @@ class LieuPasTrouvé(Exception):
 
 # Pour contourner le pb des tronçons manquant dans Nominatim :
 # 1) récupérer le nom osm de la rue
-# 2) recherche dans le xml local
+# 2) recherche dans le graphe
 
 
 def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
@@ -45,7 +51,7 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     except Exception as e:
         print(e)
         LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
-   
+
 
 
 
@@ -64,7 +70,7 @@ def coord_nœud(id_nœud):
     """).nodes[0]
     print(n)
     return float(n.lat), float(n.lon)
-  
+
 
 def coords_lieu(nom_rue, ville=64000, pays="France", bavard=0):
     lieu = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)[0]
@@ -128,6 +134,69 @@ def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
         Sortie : liste des nœuds osm récupérés via Nominatim.
     """
     pass
+
+
+
+
+########## Interpolation des adresses ##########
+
+def charge_rue_num_coords():
+    """ Renvoie le dictionnaire ville -> rue -> parité -> liste des (numéros, coords)"""
+    entrée = open(CHEMIN_JSON_NUM_COORDS)
+    res = {}
+    for ligne in entrée:
+        villerue, tmp = ligne.strip().split(":")
+        ville, rue = villerue.split(";")
+        données = tmp.split(";")
+        if ville not in res: res[ville] = {}
+        res[ville][rue] = ([], [])  # numéros pairs, numéros impairs
+
+        for k in range(2):
+            if données[k] != "":
+                for x in données[k].split("|"):
+                    num, lat, lon = x.split(",")
+                    res[ville][rue][k].append((int(num), (float(lat), float(lon))))
+    return res
+
+D_RUE_NUM_COORDS = charge_rue_num_coords()
+
+
+def barycentre(c1, c2, λ):
+    """ Entrée : c1,  c2 des coords
+                 λ ∈ [0,1]
+        Sortie : λc1 + (1-λ)c2"""
+    return (λ*c1[0]+(1-λ)*c2[0], λ*c1[1]+(1-λ)*c2[1])
+
+
+def coords_of_adresse(num, rue, ville=VILLE_DÉFAUT, pays="France"):
+    """ Cherche les coordonnées de l’adresse fournie en interpolant parmi les adresses connues."""
+    
+    nom_ville = re.findall("[0-9]*\ ?([^0-9]*)", ville)[0]
+    try:
+        k = num % 2  # parité du numéro
+        l = D_RUE_NUM_COORDS[nom_ville][rue][k]
+        if len(l) < 2:
+            return None
+        else:
+            deb, c1 = -1, (-1, -1)
+            fin, c2 = -1, (-1, -1)
+            for (n, c) in l:
+                if n <= num:
+                    deb, c1 = n, c
+                if n >= num:
+                    fin, c2 = n, c
+                    break
+            if (deb, c1) == (-1, (-1, -1)):  # num est plus petit que tous les éléments de l
+                ((deb, c1), (fin, c2)) = l[:2]
+            elif (fin, c2) == (-1, (-1, -1)):  # num est plus grand que tous les éléments de l
+                ((deb, c1), (fin, c2)) = l[-2:]
+            λ  = (num-fin)/(deb-fin)
+            return barycentre(c1, c2, λ)
+    
+    except KeyError as e:
+        print(f"Pas de données pour {e}")
+        return None
+
 
 
 def kilométrage_piéton():

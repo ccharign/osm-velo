@@ -2,12 +2,12 @@
 À FAIRE :
 
 
-- Recherche locale des rues
-	- laisser le nom des rues et des villes dans le xml
-	- recherche par nom de rue
-	- continuer d'utiliser nominatim pour trouver le nom de rue et de ville
 
-- tests de affiche_avant_après version folium
+
+- Recherche d’un numéro dans une rue
+  - rajouter la ville dans le dico pour interpolation
+  - programmer l’interpolation.
+
 
 - page php
 
