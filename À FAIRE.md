@@ -4,11 +4,6 @@
 
 
 
-- Recherche d’un numéro dans une rue
-  - rajouter la ville dans le dico pour interpolation
-  - programmer l’interpolation.
-
-
 - page php
 
 - Peut-on se passer complètement du xml ?

@@ -1,13 +1,15 @@
 # -*- coding:utf-8 -*-
 
 #import networkx as nx
-import osmnx as ox
+
 from module_graphe import graphe  # ma classe de graphe
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 from params import CHEMIN_XML, CHEMIN_XML_COMPLET, CHEMIN_JSON_NUM_COORDS  # Chemin du xml élagué
 import re
 import time
+import osmnx.io
 from récup_données import recherche_inversée, commune_of_adresse
+import subprocess
 #ox.config(use_cache=True, log_console=True)
 
 # Pour la simplification dans osmnx :
@@ -25,12 +27,8 @@ def charge_graphe_bbox(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, op
         g = ox.io.load_graphml(nom_fichier)
         if bavard: print("Graphe en mémoire !")
     except FileNotFoundError:
-        if bavard: print(f"Graphe pas en mémoire à {nom_fichier}. Chargement depuis osm.")
-        g = ox.graph_from_bbox(nord, sud, est, ouest, **option)
-        print("conversion en graphe non orienté")
-        g = ox.get_undirected(g)
-        if bavard: print("Chargement fini. Je l'enregistre pour la prochaine fois.")
-        ox.io.save_graphml(g, nom_fichier)
+        subprocess.call(["crée_graphe.py", nom_fichier])
+        g = ox.io.load_graphml(nom_fichier)
 
     gr = graphe(g)
     gr.charge_cache()  # nœud_of_rue
@@ -40,14 +38,6 @@ def charge_graphe_bbox(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, op
     return gr
 
 
-
-# Choix de la fonction à utiliser. (J'ai supprimé les autres de toute façon!)
-charge_graphe = charge_graphe_bbox
-
-#g = charge_graphe(bavard=1)
-
-# Pour télécharger une carte avec overpass : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.4285,43.2671,-0.2541,43.3403]"
-#Agglo : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.48,43.26,-0.25,43.35]"
 
 
 

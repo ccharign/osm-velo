@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import networkx as nx
-import osmnx as ox
+from osmnx import plot_graph, get_nearest_node, get_digraph
 import os
 import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
@@ -60,23 +60,11 @@ class graphe():
         return dijkstra.chemin_étapes(self, c)
 
     def affiche(self):
-        ox.plot_graph(self.multidigraphe, node_size=10)
-
-    def affiche_chemin(self, chemin, options={}):
-        print("Tracer du graphe et des chemins.")
-        ox.plot.plot_graph_route(self.multidigraphe, chemin, node_size=12, **options)
-        #  tracer un chemin avec plotly (pour prendre en compte la géom) : voir  https://towardsdatascience.com/find-and-plot-your-optimal-path-using-plotly-and-networkx-in-python-17e75387b873
-
-    def affiche_chemins(self, chemins, options={}):
-        if len(chemins) > 1:
-            ox.plot_graph_routes(self.multidigraphe, chemins,  route_linewidth=6, node_size=10, **options)
-        elif len(chemins) == 1:
-            ox.plot.plot_graph_route(self.multidigraphe, chemins[0], node_size=10, **options)
-
+        plot_graph(self.multidigraphe, node_size=10)
 
          
     def nœud_le_plus_proche(self, coords):
-        return ox.get_nearest_node(self.multidigraphe, coords)
+        return get_nearest_node(self.multidigraphe, coords)
  
     def nœud_centre_rue(self, nom_rue, ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie le nœud le plus proche des coords enregistrées dans osm pour la rue.

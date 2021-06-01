@@ -3,7 +3,7 @@
 
 from importlib import reload  # recharger un module après modif
 import networkx as nx  # graphe
-import osmnx as ox
+
 from module_graphe import graphe, nœuds_rue_of_adresse  # ma classe de graphe
 from init_graphe import g  # le graphe de Pau par défaut
 #import récup_données as rd
