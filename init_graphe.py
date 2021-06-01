@@ -109,14 +109,14 @@ def commune_of_adresse(adr):
             pass
 
 
-print("Chargement du xml (à remettre dans la fonction une fois les tests finis)")
-a = xml.parse("données_inutiles/pau.osm").getroot()
+
 def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
     """ Entrée : fichier xml d’openstreetmap
         Effet : crée un fichier texte associant à chaque rue la list des (numéro connu, coords correspondantes)"""
     
 
-    
+    print("Chargement du xml")
+    a = xml.parse("données_inutiles/pau.osm").getroot()
     
     print("Extraction des adresses connues")
     
