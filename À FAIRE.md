@@ -7,11 +7,13 @@
 	- recherche par nom de rue
 	- continuer d'utiliser nominatim pour trouver le nom de rue et de ville
 
-- tests
-
-- enregistrer  cycla
+- tests de affiche_avant_après version folium
 
 - page php
+
+- Peut-on se passer complètement du xml ?
+
+- limiter les imports de osmnx (seulement les modules utiles). Notamment le gros ne sert que pour la création du graphe -> ne pas mettre un import pour init_graph mais un subprocess ?
 
 À FAIRE (un jour)
 
@@ -21,13 +23,9 @@
 
 - Normaliser les clefs d'adresses (pour le cache)
 
+- A*
+
 - Accélérer l'apprentissage. Sauvegarder les trajets calculé par Dijkstra ?
-
-
--  Pour chaque rue présente dans les données de Pau à vélo, mettre un coeff dans un dico pour chaque arrête.
-
-- Sauvegarde et chargement des données :
-	     - la cyclabilité -> csv (s,t,cyclabilité de l'arête (s,t)). 
 
 - Gestion des transitions entre deux rues.
 
