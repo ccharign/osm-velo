@@ -24,11 +24,11 @@ import subprocess
 def charge_graphe_bbox(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
     nom_fichier = f'données/{ouest}{sud}{est}{nord}.graphml'
     try:
-        g = ox.io.load_graphml(nom_fichier)
+        g = osmnx.io.load_graphml(nom_fichier)
         if bavard: print("Graphe en mémoire !")
     except FileNotFoundError:
         subprocess.call(["crée_graphe.py", nom_fichier])
-        g = ox.io.load_graphml(nom_fichier)
+        g = osmnx.io.load_graphml(nom_fichier)
 
     gr = graphe(g)
     gr.charge_cache()  # nœud_of_rue
@@ -78,7 +78,7 @@ def int_of_num(n, bavard=0):
     """ Entrée : une chaîne représentant un numéro de rue.
         Sortie : ce numéro sous forme d’entier. Un éventuel "bis" ou "ter" sera supprimé."""
     e = re.compile("\ *([0-9]*)[^0-9]*$")
-    if bavard : print(n, re.findall(e, n))
+    if bavard: print(n, re.findall(e, n))
     num = re.findall(e, n)[0]
     return int(num)
 

@@ -5,7 +5,7 @@ from importlib import reload  # recharger un module après modif
 import networkx as nx  # graphe
 
 from module_graphe import graphe, nœuds_rue_of_adresse  # ma classe de graphe
-from init_graphe import g  # le graphe de Pau par défaut
+from init_graphe import charge_graphe_bbox  # le graphe de Pau par défaut
 #import récup_données as rd
 import apprentissage
 import dijkstra
@@ -14,7 +14,9 @@ from params import *
 import récup_données
 from utils import *
 
-ox.config(use_cache=True, log_console=True)
+
+
+g = charge_graphe_bbox()
 
 tous_les_chemins = chemins.chemins_of_csv(g)
 
@@ -25,7 +27,7 @@ def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
 
 ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
 
-tous_les_chemins = cheminsValides(tous_les_chemins)
+tous_les_chemins = cheminsValides(tous_les_chemins, g)
 
 
 def affiche_chemins(chemins):

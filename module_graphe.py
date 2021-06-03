@@ -30,9 +30,10 @@ class graphe():
     """
    
     def __init__(self, g):
+        """ g, MultiDiGraph"""
         self.multidigraphe = g
         print("Calcul de la version sans multiarêtes")
-        self.digraphe = ox.get_digraph(g)
+        self.digraphe = nx.DiGraph(g)  # ox.get_digraph(g)
         self.cyclabilité = {}
         self.nœud_of_rue = {}
        

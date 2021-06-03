@@ -9,7 +9,6 @@ import networkx as nx  # graphe
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
 from module_graphe import graphe  #ma classe de graphe
-from init_graphe import g  # le graphe de Pau par défaut
 #import récup_données as rd
 import apprentissage
 import dijkstra
@@ -41,7 +40,7 @@ def dessine_chemins(chemins, g):
     g.affiche_chemins(chemins_directs+chemins_complets)
 
 
-def cheminsValides(chemins):
+def cheminsValides(chemins, g):
     """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
     res = []
     for c in chemins:
@@ -54,7 +53,7 @@ def cheminsValides(chemins):
     return res
 
 
-def itinéraire(départ, arrivée, p_détour, où_enregistrer="tmp", g=g, bavard=0):
+def itinéraire(départ, arrivée, p_détour, g, où_enregistrer="tmp", bavard=0):
     id_d = chemins.nœud_of_étape(départ, g, bavard=bavard-1)
     id_a = chemins.nœud_of_étape(arrivée, g, bavard=bavard-1)
     c = g.chemin(id_d, id_a, p_détour)
@@ -104,7 +103,7 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
 
 
 
-def affiche_sommets(s, où_enregistrer="tmp", g=g):
+def affiche_sommets(s, g, où_enregistrer="tmp"):
     """ Entrée : s, liste de sommets """
     graphe_c = g.multidigraphe.subgraph(s)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
