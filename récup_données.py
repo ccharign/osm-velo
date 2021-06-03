@@ -2,7 +2,8 @@
 
 # Ce module regroupe les fonctions de recherche de données géographiques qui n'utilisent pas osmnx
 
-import geopy, overpy
+import geopy
+#, overpy
 from params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
@@ -17,7 +18,7 @@ def recherche_inversée(coords):
     time.sleep(1)
     return(localisateur.reverse(coords))
     
-api = overpy.Overpass()
+#api = overpy.Overpass()
 
 
 class LieuPasTrouvé(Exception):
@@ -160,6 +161,21 @@ def charge_rue_num_coords():
 
 D_RUE_NUM_COORDS = charge_rue_num_coords()
 
+def sauv_rue_nom_coords(d=D_RUE_NUM_COORDS):
+    """ Sauvegarde le dico ville -> rue -> parité -> liste des (numéros, coords) dans le fichier CHEMIN_JSON_NUM_COORDS.
+    Format :
+    Une ligne pour chaque couple (ville,rue).
+    ville; rue : liste_pairs;liste_impairs
+    Où liste_pairs et liste_impairs sont des (num, lat, lon) séparés par des |
+    """
+    sortie = open(CHEMIN_JSON_NUM_COORDS,"w")
+    for rue in d.keys():
+        for ville in d[rue].keys():
+            pairs   = [ str((num,lat,lon))[1:-1] for (num,(lat,lon)) in d[rue][ville][0]]
+            impairs = [ str((num,lat,lon))[1:-1] for (num,(lat,lon)) in d[rue][ville][1]]
+            à_écrire = "|".join(pairs)+";"+"|".join(inpairs)
+            sortie.write(à_écrire+"\n")
+    
 
 def barycentre(c1, c2, λ):
     """ Entrée : c1,  c2 des coords
