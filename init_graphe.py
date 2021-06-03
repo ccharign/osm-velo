@@ -8,7 +8,7 @@ from params import CHEMIN_XML, CHEMIN_XML_COMPLET, CHEMIN_JSON_NUM_COORDS  # Che
 import re
 import time
 import osmnx.io
-from récup_données import recherche_inversée, commune_of_adresse
+from récup_données import recherche_inversée
 import subprocess
 #ox.config(use_cache=True, log_console=True)
 
