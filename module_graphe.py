@@ -1,32 +1,22 @@
 # -*- coding:utf-8 -*-
 
 import networkx as nx
-from osmnx import plot_graph, get_nearest_node, get_digraph
+from osmnx import plot_graph, get_nearest_node
 import os
 import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
-from params import VILLE_DÉFAUT
-import math
+from params import VILLE_DÉFAUT, LOG_PB
+from petites_fonctions import distance_euc
 
-
-R_TERRE = 6378137  # en mètres
-
-
-def distance_euc(c1, c2):
-    """ Formule simplifiée pour petites distances."""
-    long1, lat1 = c1
-    long2, lat2 = c2
-    dx = R_TERRE * (long2-long1) * math.pi / 180
-    dy = R_TERRE * (lat2-lat1) * math.pi / 180
-    return (dx**2+dy**2)**.5
-
+class PasTrouvé(Exception):
+    pass
 
 class graphe():
     """
     Attributs : - multidigraphe : un multidigraph de networkx
                 - digraphe : le digraph correspondant
                 - cyclabilité un dictionnaire (int * int) -> float, qui associe à une arrête (couple des id osm des nœuds) sa cyclabilité. Valeur par défaut : 1. Les distances serot divisées par  (p_détour × cycla + 1 - p_détour).
-                - nœud_of_rue : dictionnaire de type str -> int qui associe à un nom de rue l'identifiant correspondant dans le graphe. Calculé au moyen de la méthode un_nœud_sur_rue. Sert de cache pour ne pas surcharger overpy. La clé utilisée est "nom_rue,ville,pays".
+                - nœud_of_rue : dictionnaire de type str -> int qui associe à un nom de rue l'identifiant correspondant dans le graphe. Calculé au moyen de la méthode un_nœud_sur_rue. Sert de cache. La clé utilisée est "nom_rue,ville,pays".
     """
    
     def __init__(self, g):
@@ -44,7 +34,7 @@ class graphe():
         p_détour (float) : pourcentage de détour accepté.
         La longueur de l'arrête (s,t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
         """
-        cycla_corrigée = lambda voisin : (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
+        cycla_corrigée = lambda voisin: (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
         return ( ( voisin, données["length"]/cycla_corrigée(voisin) )  for (voisin, données) in self.digraphe[s].items() )
    
     def liste_voisins(self, s):
@@ -56,9 +46,9 @@ class graphe():
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)
   
-    def chemin_étapes(self, c):
+    def chemin_étapes_ensembles(self, c):
         """ Entrée : c, objet de la classe Chemin"""
-        return dijkstra.chemin_étapes(self, c)
+        return dijkstra.chemin_étapes_ensembles(self, c)
 
     def affiche(self):
         plot_graph(self.multidigraphe, node_size=10)
@@ -76,7 +66,7 @@ class graphe():
     def un_nœud_sur_rue(self, nom_rue,  ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie un nœud OSM de la rue, qui soit présent dans le graphe. Renvoie le nœud médian parmi ceux présents.
         Si échec, renvoie un nœud le plus proche de la coordonnée associé à la rue par Nominatim."""
-
+        raise RuntimeError("Cette fonction n’est plus censée être utilisée")
         nom_rue = nom_rue.strip()
         ville = ville.strip()
         pays = pays.strip()
@@ -87,7 +77,7 @@ class graphe():
             print(f"Mis en cache : {res} pour {clef}")
             return res
      
-        if clef in self.nœud_of_rue:  #  Recherche dans le cache
+        if clef in self.nœud_of_rue:  # Recherche dans le cache
             return self.nœud_of_rue[clef]
         else:
             #try:
@@ -119,13 +109,13 @@ class graphe():
     def réinitialise_cyclabilité(self):
         self.cyclabilité = {}
 
-
+    
     def rue_of_nœud(self, n):
         """ renvoie le nom de la rue associée dans le cache au nœud n"""
         for c, v in self.nœud_of_rue.items():
             if v == n:
                 return c
-        raise RuntimeError("Le nœud {n} n'est pas dans le cache")
+        raise KeyError("Le nœud {n} n'est pas dans le cache")
        
     def sauv_cache(self, chemin="données"):
         """ chemin est le chemin du répertoire. Le nom du fichier sera  "nœud_of_rue.csv"."""
@@ -141,7 +131,8 @@ class graphe():
         entrée = open(adresse)
         for ligne in entrée:
             c, v = ligne.strip().split(":")
-            self.nœud_of_rue[c] = int(v)
+            l = list(map(int, v.split(",")))
+            self.nœud_of_rue[c] = l
         entrée.close()
        
     def sauv_cycla(self, chemin="données/"):
@@ -157,13 +148,13 @@ class graphe():
             self.cyclabilité[(s, t)] = v
         entrée.close()
 
-     
+
 def nœuds_rue_of_arête(g, s, t):
     """Entrée : g (digraph)
-                s,t : deux sommets adjacents
-       Sortie : liste des nœuds de la rue contenant l’arête (s,t). Lu rue est identifiée par le paramètre "name" dans le graphe."""
+                s, t : deux sommets adjacents
+       Sortie : liste des nœuds de la rue contenant l’arête (s, t). La rue est identifiée par le paramètre "name" dans le graphe."""
 
-    déjàVu = {}  #En cas d’une rue qui bouclerait...
+    déjàVu = {}  # En cas d’une rue qui bouclerait...
     nom = g[s][t]["name"]
     
     def nœud_dans_direction(g, s, t, res):
@@ -188,14 +179,13 @@ def nœuds_rue_of_arête(g, s, t):
 
 def nœuds_rue_of_nom_et_nœud(g, n, nom):
     """ Entrée : n (int) un nœud de la rue
-                 nom (str) le nom de la rue. Dois être le nom exact utilisé par osm et reporté dans le graphe.
+                 nom (str) le nom de la rue. Doit être le nom exact utilisé par osm et reporté dans le graphe.
         Sortie : liste des nœuds de la rue, dans l’ordre topologique."""
 
     for v in g[n]:
         if g[n][v].get("name", "") == nom:
             return nœuds_rue_of_arête(g, n, v)
-    print(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
-    return []
+    raise PasTrouvé(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
 
 
 def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
@@ -214,8 +204,8 @@ def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard
             for n in nœuds:
                 if n in g.nodes:
                     return nœuds_rue_of_nom_et_nœud(g, n, nom)
-    print("Pas réussi à trouver la rue et un nœud dessus")
-    return []
+    raise PasTrouvé(f"Pas réussi à trouver la rue et un nœud dessus : {nom_rue} ({ville})")
+
 
 def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ 

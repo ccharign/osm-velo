@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
+from petites_fonctions import distance_euc  # pour A*
+from heapq import heappush, heappop  # pour faire du type List une structure de tas-min
 
-from heapq import heappush, heappop # pour faire du type List une structure de tas-min
 
 class PasDeChemin(Exception):
     pass
@@ -38,6 +39,7 @@ def chemin(g, départ, arrivée, p_détour):
     else:
         raise PasDeChemin(f"Pas de chemin trouvé de {départ} à {arrivée}")
 
+    
 
 def chemin_étapes(g, c):
     """ Entrée : g : graphe
@@ -66,13 +68,12 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred):
     Effet : pred et dist sont remplis de manière à fournir tous les plus courts chemins d’un sommet de départ vers un sommet d’arrivée, en prenant compte des bonus/malus liés aux valeurs initiales de dist.
     """
 
-    
     àVisiter = []
     for (s, d) in dist.items():
         heappush(àVisiter, (d, s))
 
     fini = False
-    sommetsFinalsTraités = {}
+    sommetsFinalsTraités = set({})
     
     while len(àVisiter) > 0 and not fini:
         
@@ -83,27 +84,42 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred):
             fini = len(sommetsFinalsTraités) == len(arrivée)
             
         for t, l in g.voisins(s, p_détour):
-                if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
-                    dist[t] = dist[s]+l
-                    heappush(àVisiter, (dist[t], t))
-                    pred[t] = s
+            if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
+                dist[t] = dist[s]+l
+                heappush(àVisiter, (dist[t], t))
+                pred[t] = s
 
-  
-def chemin_étapes_ensembles(g, étapes, p_détour):
+
+def reconstruction(dist, pred, départ, arrivée):
+    """ Entrées : départ, sommets de départ (structure permettant un «in»)
+                  arrivée, sommets d’arrivée. Doit être itérable
+                  dist, le dictionnaire sommet -> dist min à un sommet de départ, créé par Dijkstra.
+        Sortie : plus court chemin d’un sommet de départ vers un sommet d’arrivée
+    """    
+    _, s = min((dist[s],s) for s in arrivée)  # On récupère le somet d’arrivée le plus proche.
+    chemin = [s]
+    while s not in départ:
+        s = pred[s]
+        chemin.append(s)
+    chemin.reverse()
+    return chemin
+
+
+def chemin_étapes_ensembles(g, c):
     """
     Entrées : départ et arrivée, deux sommets
-              étapes, une liste d’ensembles de sommets
+              c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds.)
     Sortie : plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins un sommet de chaque étape intéremédiaire.
     """
-
-    dist = {s: 0. for s in étapes[0]}
-    pred = {s: -1 for s in étapes[0]}
+    étapes = c.étapes
+    dist = {s: 0. for s in étapes[0].nœuds}
+    pred = {s: -1 for s in étapes[0].nœuds}
 
     for i in range(1, len(étapes)):
-        vers_une_étape(g, étapes[i-1], étapes[i], p_détour, dist, pred)
-        dist = {s: d for (s, d) in dist.items if s in étapes[i]}  # On efface tout sauf les sommet de l’étape qu’on vient d’atteindre
+        vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred)
+        dist = {s: d for (s, d) in dist.items() if s in étapes[i].nœuds}  # On efface tout sauf les sommet de l’étape qu’on vient d’atteindre
 
     try:
-        _, sommet_darrivée = min( (dist[s],s) for s in étapes[-1] )  # Sommet d’arrivée le plus proche d’un sommet de départ.
-    except KeyError as e:
-        raise PasDeChemin(f"Pas de chemin trouvé de {étapes[0]} à {étapes[-1]}")
+        return reconstruction(dist, pred, étapes[0].nœuds, étapes[-1].nœuds)
+    except KeyError as e:  # pour le cas où les sommets d’arrivée ne seraient pas dans dist
+        raise PasDeChemin(f"Pas de chemin trouvé pour {c} (sommet non atteint : {e}).")

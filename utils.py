@@ -45,7 +45,7 @@ def cheminsValides(chemins, g):
     res = []
     for c in chemins:
         try:
-            dijkstra.chemin_étapes(g, c)
+            dijkstra.chemin_étapes_ensembles(g, c)
             res.append(c)
         except dijkstra.PasDeChemin as e:
             print(e)
@@ -82,7 +82,7 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
     chemins_directs = []
     for c in chemins:
         try:
-            chemins_directs.append(dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
+            chemins_directs.append(dijkstra.chemin_étapes_ensembles(g, [c.départ(), c.arrivée()], c.p_détour))
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))

@@ -18,10 +18,19 @@ def sans_guillemets(c):
     else:
         return c
 
-    
+
+class Étape():
+    def __init__(self, adresse, g):
+        self.texte = adresse
+        self.nœuds = nœud_of_étape(adresse, g)
+
+    def __str__(self):
+        return self.texte
+
+
 class Chemin():
     """ Attributs : - p_détour (float)
-                    - étapes (int List), liste de nœuds
+                    - étapes (Étape list), liste de nœuds
                     - AR (bool), indique si le retour est valable aussi.
                     - texte (None ou str), texte d'où vient le chemin (pour déboguage)
     """
@@ -30,8 +39,8 @@ class Chemin():
         self.p_détour = p_détour
         self.AR = AR
         self.texte = None
-
-       
+    
+    
     @classmethod
     def of_ligne(cls, ligne, g):
         """ Entrée : ligne (str), une ligne de csv du questionnaire. Les colonnes sont séparées par | . Il y a 12 colonnes, les 9 premières sont inutiles.
@@ -43,7 +52,7 @@ class Chemin():
         p_détour = float(données[1])/100
         étapes = []
         for c in données[2].split(";"):
-            étapes.append(nœud_of_étape(c, g))
+            étapes.append(Étape(c, g))
         if données[0] == "oui": AR = True
         else: AR = False
         chemin = cls(étapes, p_détour, AR)
@@ -51,16 +60,16 @@ class Chemin():
         return chemin
 
     @classmethod
-    def of_étapes(cls, étapes, pourcentage_détour, AR, g):
+    def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g):
         """Plutôt pour rentrer à la main un chemin.
-        Entrées : étapes (str list).
+        Entrées : noms_étapes (str list).
                   pourcentage_détour (int)
                   AR (bool)
                   g (Graphe)
         """
-        id_étapes = [nœud_of_étape(é, g) for é in étapes]
-        return cls(id_étapes, pourcentage_détour/100, AR)
-        
+        étapes = [Étape(é, g) for é in noms_étapes]
+        return cls(étapes, pourcentage_détour/100, AR)
+    
     
     def départ(self):
         return self.étapes[0]
@@ -75,13 +84,13 @@ class Chemin():
         if self.texte is not None:
             return self.texte
         else:
-            return ";".join(map(str,self.étapes))
+            return ";".join(map(str, self.étapes))
 
    
 def chemins_of_csv(g, adresse_csv="données/chemins.csv"):
     entrée = open(adresse_csv)
     #res=[g.chemin_of_string(ligne) for ligne in entrée ]
-    res=[]
+    res = []
     for ligne in entrée:
         try:
             chemin = Chemin.of_ligne(ligne, g)
@@ -110,21 +119,28 @@ def lecture_étape(c):
 
 
 def nœud_of_étape(c, g, bavard=0):
-    """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entr parenthèses.
+    """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
-        Sortie : nœud de g associé à cette adresse. Si un numéro est indiqué, on cherche le nœud de la rue le plus proche. Sinon on prend le milieu de la rue."""
+        Sortie : liste de nœuds de g associé à cette adresse.
+           Si un numéro est indiqué, renvoie le singleton du nœud de la rue le plus proche.
+           Sinon renvoie la liste des nœuds de la rue."""
+
     c = c.strip()
-    if c in g.nœud_of_rue:  #  Recherche dans le cache
-            return g.nœud_of_rue[c]
-    def renvoie(res):
-            g.nœud_of_rue[c] = res
-            print(f"Mis en cache : {res} pour {c}")
-            return res
-        
     assert c != ""
+    
+    if c in g.nœud_of_rue:  # Recherche dans le cache
+        return g.nœud_of_rue[c]
+    
+    def renvoie(res):
+        assert res != []
+        g.nœud_of_rue[c] = ",".join(map(str, res))
+        print(f"Mis en cache : {res} pour {c}")
+        return res    
+
+    ## Analyse de l’adresse
     e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
     essai = re.findall(e, c)
-    if bavard: print(essai)
+    if bavard > 0: print(essai)
     if len(essai) == 1:
         num, rue, _, ville = essai[0]
     elif len(essai) == 0:
@@ -136,11 +152,21 @@ def nœud_of_étape(c, g, bavard=0):
     ville = ville.strip()
     if ville == "": ville = VILLE_DÉFAUT
 
+    # Pas de numéro de rue -> liste de tous les nœuds de la rue
     if num == "":
         if rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
-            return renvoie(g.un_nœud_sur_rue(rue, ville=ville))
-    else:
+            try:
+                res = module_graphe.nœuds_rue_of_adresse(g.digraphe, rue, ville=ville)
+                return renvoie(res)
+            except Exception as e:
+                LOG_PB(e)
+                coords = coords_lieu(f"{num} {rue}", ville=ville)
+                print(f"Pas réussi à obtenir la liste des nœuds de {rue}. Je vais prendre le nœud le plus proche de {coords}.")
+                return [g.nœud_le_plus_proche(coords)]
+                
+        
+    else:  # Numéro de rue ou échec de la fonction préc -> renvoyer un singleton
         coords = coords_lieu(f"{num} {rue}", ville=ville)
-        return renvoie(module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville))
+        return renvoie([module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville)])
