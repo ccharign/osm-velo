@@ -30,10 +30,6 @@ ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Ga
 tous_les_chemins = cheminsValides(tous_les_chemins, g)
 
 
-def affiche_chemins(chemins):
-    for c in chemins:
-        print(c)
-        print(c.étapes)
 
 
 def affiche_avant_après(chemins, g, nb_lectures):
@@ -63,3 +59,12 @@ def test(départ, arrivée, p_détour):
 
 
 #apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
+
+# vérif de la structure
+for c in tous_les_chemins:
+    for é in c.étapes:
+        try:
+            rien=é.nœuds
+        except Exception as e:
+            print(e)
+            print(c)

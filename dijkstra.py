@@ -2,18 +2,24 @@
 
 from petites_fonctions import distance_euc  # pour A*
 from heapq import heappush, heappop  # pour faire du type List une structure de tas-min
-
+import copy
 
 class PasDeChemin(Exception):
     pass
 
 
+
+##############################################################################
+############################## Dijkstra de base ##############################
+##############################################################################
+
+
 def chemin(g, départ, arrivée, p_détour):
     """  Nécessite une classe graphe avec méthode « voisins » qui prend un sommet s et le pourcentage de détour p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)"""
-    assert p_détour <10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
-    dist = {départ: 0.} #dist[s] contient l'estimation actuelle de d(départ, i) si s est gris, et la vraie valeur si s est noir.
+    assert p_détour < 10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
+    dist = {départ: 0.}  #dist[s] contient l'estimation actuelle de d(départ, i) si s est gris, et la vraie valeur si s est noir.
     pred = {départ: -1}
-    àVisiter =[(0, départ)] # tas des sommets à visiter. Doublons autorisés.
+    àVisiter =[(0, départ)]  # tas des sommets à visiter. Doublons autorisés.
 
     fini = False
     while len(àVisiter) > 0 and not fini:
@@ -55,7 +61,12 @@ def chemin_étapes(g, c):
     return res
 
 
+
+
+#######################################################################
 ########## En prenant pour étapes des *ensembles* de sommets ##########
+#######################################################################
+
 
 def vers_une_étape(g, départ, arrivée, p_détour, dist, pred):
     """
@@ -90,19 +101,17 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred):
                 pred[t] = s
 
 
-def reconstruction(dist, pred, départ, arrivée):
-    """ Entrées : départ, sommets de départ (structure permettant un «in»)
-                  arrivée, sommets d’arrivée. Doit être itérable
+def reconstruction(chemin, pred, départ):
+    """ Entrées : chemin, la fin du chemin retourné. chemin[0] est le point d’arrivée final, chemin[-1] est un sommet dans l’arrivée de cette étape.
+                  départ, sommets de départ de l’étape (structure permettant un «in»)
+                  arrivée, sommets d’arrivée de l’étape. Doit être itérable
                   dist, le dictionnaire sommet -> dist min à un sommet de départ, créé par Dijkstra.
-        Sortie : plus court chemin d’un sommet de départ vers un sommet d’arrivée
-    """    
-    _, s = min((dist[s],s) for s in arrivée)  # On récupère le somet d’arrivée le plus proche.
-    chemin = [s]
+        Effet : rempli chemin avec un plus court trajet de chmin[-1] vers un sommet de départ.
+    """  
+    s = chemin[-1]
     while s not in départ:
         s = pred[s]
         chemin.append(s)
-    chemin.reverse()
-    return chemin
 
 
 def chemin_étapes_ensembles(g, c):
@@ -111,15 +120,28 @@ def chemin_étapes_ensembles(g, c):
               c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds.)
     Sortie : plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins un sommet de chaque étape intéremédiaire.
     """
+    
     étapes = c.étapes
-    dist = {s: 0. for s in étapes[0].nœuds}
-    pred = {s: -1 for s in étapes[0].nœuds}
+    départ = étapes[0].nœuds
+    arrivée = étapes[-1].nœuds
+    
+    dist = {s: 0. for s in départ}
+    pred = {s: -1 for s in départ}
+    preds_précs = []
 
     for i in range(1, len(étapes)):
         vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred)
+        preds_précs.append(copy.deepcopy(pred))  # pour la reconstruction finale
+        # preds_précs[k] contient les données pour aller de étapes[k] vers étapes[k+1], k==i-1
         dist = {s: d for (s, d) in dist.items() if s in étapes[i].nœuds}  # On efface tout sauf les sommet de l’étape qu’on vient d’atteindre
 
-    try:
-        return reconstruction(dist, pred, étapes[0].nœuds, étapes[-1].nœuds)
-    except KeyError as e:  # pour le cas où les sommets d’arrivée ne seraient pas dans dist
-        raise PasDeChemin(f"Pas de chemin trouvé pour {c} (sommet non atteint : {e}).")
+    if all(s not in dist for s in arrivée):
+        raise PasDeChemin(f"Pas de chemin trouvé pour {c} (sommets non atteint : {e}).")
+    else:
+        _, fin = min(((dist[s], s) for s in arrivée))  # pb si un des sommets d’arrivée est ateint mais pas tous. N'arrive que si arrivée n’est pas connexe...
+        chemin = [fin]
+        for i in range(len(étapes)-1, 0, -1):
+            reconstruction(chemin, preds_précs[i-1], étapes[i-1].nœuds)
+        chemin.reverse()
+        return chemin
+        

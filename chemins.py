@@ -49,7 +49,7 @@ class Chemin():
         données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
         assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
         print("\n", données)
-        p_détour = float(données[1])/100
+        p_détour = float(données[1])/100.
         étapes = []
         for c in données[2].split(";"):
             étapes.append(Étape(c, g))
@@ -79,6 +79,10 @@ class Chemin():
     def renversé(self):
         assert self.AR, "chemin pas réversible"
         return Chemin(list(reversed(self.étapes)), self.p_détour, self.AR)
+
+    def direct(self):
+        """ Renvoie le chemin sans ses étapes intermédaires."""
+        return Chemin([self.départ(), self.arrivée()], self.p_détour, True)
     
     def __str__(self):
         if self.texte is not None:
@@ -133,11 +137,12 @@ def nœud_of_étape(c, g, bavard=0):
     
     def renvoie(res):
         assert res != []
-        g.nœud_of_rue[c] = ",".join(map(str, res))
+        assert all(isinstance(s, int) for s in res)
+        g.nœud_of_rue[c] = res
         print(f"Mis en cache : {res} pour {c}")
-        return res    
+        return res
 
-    ## Analyse de l’adresse
+    # Analyse de l’adresse
     e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
     essai = re.findall(e, c)
     if bavard > 0: print(essai)
@@ -166,7 +171,6 @@ def nœud_of_étape(c, g, bavard=0):
                 print(f"Pas réussi à obtenir la liste des nœuds de {rue}. Je vais prendre le nœud le plus proche de {coords}.")
                 return [g.nœud_le_plus_proche(coords)]
                 
-        
     else:  # Numéro de rue ou échec de la fonction préc -> renvoyer un singleton
         coords = coords_lieu(f"{num} {rue}", ville=ville)
         return renvoie([module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville)])

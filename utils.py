@@ -28,15 +28,15 @@ def dessine_chemins(chemins, g):
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
 
-    chemins_complets=[]
+    chemins_complets = []
     for c in chemins:
         try:
-            chemins_complets.append( dijkstra.chemin_étapes(g, c) )
+            chemins_complets.append(dijkstra.chemin_étapes_ensembles(g, c))
         except dijkstra.PasDeChemin as e :
             print(e)
             print(f"Pas de chemin avec étapes pour {c}")
             
-    #chemins_complets = [ dijkstra.chemin_étapes(g, c) for c in chemins ]
+    # chemins_complets = [ dijkstra.chemin_étapes(g, c) for c in chemins ]
     g.affiche_chemins(chemins_directs+chemins_complets)
 
 
@@ -54,10 +54,11 @@ def cheminsValides(chemins, g):
 
 
 def itinéraire(départ, arrivée, p_détour, g, où_enregistrer="tmp", bavard=0):
-    id_d = chemins.nœud_of_étape(départ, g, bavard=bavard-1)
-    id_a = chemins.nœud_of_étape(arrivée, g, bavard=bavard-1)
-    c = g.chemin(id_d, id_a, p_détour)
-    graphe_c = g.multidigraphe.subgraph(c)
+    d = chemins.Étape(départ, g)
+    a = chemins.Étape(arrivée, g)
+    c = chemins.Chemin([d, a], p_détour, False)
+    res = g.chemin_étapes_ensembles(c)
+    graphe_c = g.multidigraphe.subgraph(res)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
     nom = os.path.join(où_enregistrer, départ+arrivée+".html")
     carte.save(nom)
@@ -82,7 +83,7 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
     chemins_directs = []
     for c in chemins:
         try:
-            chemins_directs.append(dijkstra.chemin_étapes_ensembles(g, [c.départ(), c.arrivée()], c.p_détour))
+            chemins_directs.append(dijkstra.chemin_étapes_ensembles(g, c.direct()))
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
@@ -91,16 +92,16 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
     chemins_complets = []
     for c in chemins:
         try:
-            chemins_complets.append(dijkstra.chemin_étapes(g, c))
+            chemins_complets.append(dijkstra.chemin_étapes_ensembles(g, c))
         except dijkstra.PasDeChemin as e:
             print(e)
             print(f"Pas de chemin avec étapes pour {c}")
     graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
-    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium          
+    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
+    
     nom = os.path.join(où_enregistrer, "dessine_chemins.html")
     carte.save(nom)
     subprocess.run([NAVIGATEUR, nom])
-
 
 
 def affiche_sommets(s, g, où_enregistrer="tmp"):
@@ -111,7 +112,11 @@ def affiche_sommets(s, g, où_enregistrer="tmp"):
     carte.save(nom)
     subprocess.run(["firefox", nom])
 
-   
-def affiche_rue(g, nom_rue, ville=VILLE_DÉFAUT):
-    sommets = module_graphe.nœuds_rue_of_adresse(g, nom_rue, ville=ville, pays="France", bavard=0)
-    affiche_sommets(sommets)
+
+def affiche_rue(adresse, g):
+    """
+    Entrées : g, graphe
+              adresse, str
+    """
+    sommets = chemins.nœud_of_étape(adresse, g, bavard=0)
+    affiche_sommets(sommets, g)

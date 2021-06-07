@@ -21,8 +21,8 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
     """ Entrée : le chemin à suivre, donner par une liste d'étapes.
         Effet : Compare chemin avec le chemin renvoyé par g.chemin. Augmente de ETA la cyclabilité de chaque arrête présente dans chemin mais pas dans l'autre et diminue de ETA chaque arrête présente dans l'autre et pas dans chemin."""
     
-    vieux_chemin = g.chemin(chemin.départ(), chemin.arrivée(), chemin.p_détour)
-    chemin_complet = g.chemin_étapes(chemin)
+    vieux_chemin = g.chemin_étapes_ensembles(chemin.direct())
+    chemin_complet = g.chemin_étapes_ensembles(chemin)
     arêtes_chemin = dico_arêtes(chemin_complet)
     arêtes_vieux_chemin = dico_arêtes(vieux_chemin)
     n_modif = 0

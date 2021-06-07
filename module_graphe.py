@@ -121,8 +121,10 @@ class graphe():
         """ chemin est le chemin du répertoire. Le nom du fichier sera  "nœud_of_rue.csv"."""
         adresse = os.path.join(chemin, "nœud_of_rue.csv")
         sortie = open(adresse, "w")
+        
         for c, v in self.nœud_of_rue.items():
-            sortie.write(f"{c}:{v}\n")
+            à_écrire = ",".join(map(str, v))
+            sortie.write(f"{c}:{à_écrire}\n")
         sortie.close()
 
     def charge_cache(self, chemin="données"):
@@ -133,6 +135,11 @@ class graphe():
             c, v = ligne.strip().split(":")
             l = list(map(int, v.split(",")))
             self.nœud_of_rue[c] = l
+        entrée.close()
+
+    def vide_cache(self, chemin="données"):
+        adresse = os.path.join(chemin, "nœud_of_rue.csv")
+        entrée = open(adresse, "w")
         entrée.close()
        
     def sauv_cycla(self, chemin="données/"):
