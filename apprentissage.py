@@ -29,19 +29,19 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
     
     # Lecture du nouveau chemin pour augmenter les coeff.
     for a in liste_arêtes(chemin_complet):
-        if not a in arêtes_vieux_chemin:
-            if bavard >1:print(f"j'augmente la cyclabilité de l'arête {a}")
+        if a not in arêtes_vieux_chemin:
+            if bavard >0: print(f"j'augmente la cyclabilité de l'arête {a}")
             n_modif+=1
             g.incr_cyclabilité(a, ETA)
 
     #Lecture du vieux chemin pour diminuer les coeffs :
     for a in liste_arêtes(vieux_chemin):
         if not a in arêtes_chemin:
-            if bavard >1: print(f"je diminue la cyclabilité de l'arête {a}")
+            if bavard >0: print(f"je diminue la cyclabilité de l'arête {a}")
             n_modif += 1
             g.incr_cyclabilité(a, -ETA)
             
-    if bavard >= 1: print(f"nombre d'arêtes modifiées : {n_modif}")
+    if bavard >= 0: print(f"nombre d'arêtes modifiées : {n_modif}")
     return n_modif
 
 
@@ -57,14 +57,19 @@ def n_lectures(n, g, chemins, bavard=0):
     print(f"Début de l'apprentissage. C'est parti pour {n} lectures.")
     for i in range(n):
         print(n-i)
-        lecture_plusieurs_chemins(g, chemins, bavard=bavard-1)
+        n_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard-1)
+        if bavard >0: print(f"{n_modif} arêtes modifiées")
+        if n_modif == 0:
+            print("Plus de modfications, j’arête l’apprentissage.")
+            break
+
 
 def lecture_jusqu_à_perfection(g, chemins, bavard=0):
     """ Modifie la cyclabilité jusqu'à ce que le chemin trouvé soit le bon pour tous ceux passés dans la liste chemins.
     Parfaitement susceptible de planter : à n'utiliser qu'à des fins de test.
     """
-    n_étapes=0
-    while lecture_plusieurs_chemins(g, chemins, bavard=bavard) > 0 : #La fonction lecture_plusieurs_chemins renvoie le nb d'arêtes modifiées.
+    n_étapes = 0
+    while lecture_plusieurs_chemins(g, chemins, bavard=bavard) > 0:  # La fonction lecture_plusieurs_chemins renvoie le nb d'arêtes modifiées.
         n_étapes += 1
     print(f"Entraînement fini en {n_étapes} étapes.")
 

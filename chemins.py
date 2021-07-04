@@ -122,6 +122,11 @@ def lecture_étape(c):
             raise ValueError(f"chaîne pas correcte : {c}")
 
 
+def normalise(c):
+    """ Utilisé pour normaliser les adresse, pour améliorer le cache. """
+    return c.strip().lower()
+
+
 def nœud_of_étape(c, g, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
@@ -129,7 +134,7 @@ def nœud_of_étape(c, g, bavard=0):
            Si un numéro est indiqué, renvoie le singleton du nœud de la rue le plus proche.
            Sinon renvoie la liste des nœuds de la rue."""
 
-    c = c.strip()
+    c = normalise(c)
     assert c != ""
     
     if c in g.nœud_of_rue:  # Recherche dans le cache
@@ -163,7 +168,7 @@ def nœud_of_étape(c, g, bavard=0):
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
             try:
-                res = module_graphe.nœuds_rue_of_adresse(g.digraphe, rue, ville=ville)
+                res = module_graphe.nœuds_sur_rue(g.digraphe, rue, ville=ville)
                 return renvoie(res)
             except Exception as e:
                 LOG_PB(e)

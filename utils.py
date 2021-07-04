@@ -19,26 +19,6 @@ import récup_données
 import module_graphe
 
 
-def dessine_chemins(chemins, g):
-
-    chemins_directs = []
-    for c in chemins:
-        try:
-            chemins_directs.append(dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour))
-        except dijkstra.PasDeChemin:
-            print(f"Pas de chemin pour {c}")
-
-    chemins_complets = []
-    for c in chemins:
-        try:
-            chemins_complets.append(dijkstra.chemin_étapes_ensembles(g, c))
-        except dijkstra.PasDeChemin as e :
-            print(e)
-            print(f"Pas de chemin avec étapes pour {c}")
-            
-    # chemins_complets = [ dijkstra.chemin_étapes(g, c) for c in chemins ]
-    g.affiche_chemins(chemins_directs+chemins_complets)
-
 
 def cheminsValides(chemins, g):
     """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""

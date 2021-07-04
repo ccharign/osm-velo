@@ -144,4 +144,4 @@ def chemin_étapes_ensembles(g, c):
             reconstruction(chemin, preds_précs[i-1], étapes[i-1].nœuds)
         chemin.reverse()
         return chemin
-        
+
