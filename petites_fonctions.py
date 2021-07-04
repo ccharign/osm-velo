@@ -12,3 +12,10 @@ def distance_euc(c1, c2):
     dx = R_TERRE * (long2-long1) * math.pi / 180
     dy = R_TERRE * (lat2-lat1) * math.pi / 180
     return (dx**2+dy**2)**.5
+
+
+def deuxConséc(t):
+    """ renvoie un itérateur sur les couples d'éléments consécutifs de t."""
+    n = len(t)
+    for i in range(n-1):
+        yield t[i], t[i+1]

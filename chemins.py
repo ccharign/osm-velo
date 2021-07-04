@@ -20,9 +20,14 @@ def sans_guillemets(c):
 
 
 class Étape():
+    """
+    Attributs : 
+        texte (str), adresse de l'étape
+        nœuds (int set) : ensemble de nœuds
+    """
     def __init__(self, adresse, g):
         self.texte = adresse
-        self.nœuds = nœud_of_étape(adresse, g)
+        self.nœuds = set(nœud_of_étape(adresse, g))
 
     def __str__(self):
         return self.texte
