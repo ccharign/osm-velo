@@ -3,17 +3,11 @@
 
 from importlib import reload  # recharger un module après modif
 import networkx as nx  # graphe
-
-from module_graphe import graphe, nœuds_rue_of_adresse  # ma classe de graphe
 from init_graphe import charge_graphe_bbox  # le graphe de Pau par défaut
-#import récup_données as rd
 import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
-from params import *
-import récup_données
 from utils import *
-
 
 
 g = charge_graphe_bbox()
@@ -64,7 +58,11 @@ def test(départ, arrivée, p_détour):
 for c in tous_les_chemins:
     for é in c.étapes:
         try:
-            rien=é.nœuds
+            rien = é.nœuds
         except Exception as e:
             print(e)
             print(c)
+
+
+for i, c in enumerate(tous_les_chemins):
+    print(i, c)

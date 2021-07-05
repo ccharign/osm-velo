@@ -115,7 +115,7 @@ class graphe():
     def rue_of_nœud(self, n):
         """ renvoie le nom de la rue associée dans le cache au nœud n"""
         for c, v in self.nœud_of_rue.items():
-            if v == n:
+            if n in v:
                 return c
         raise KeyError("Le nœud {n} n'est pas dans le cache")
        
@@ -153,7 +153,8 @@ class graphe():
 
     def charge_cycla(self, chemin="données/"):
         entrée = open(os.path.join(chemin, "Cyclabilité.csv"))
-        for s, t, v in entrée:
+        for ligne in entrée:
+            s, t, v = ligne.strip().split(";")
             self.cyclabilité[(s, t)] = v
         entrée.close()
 
@@ -197,7 +198,7 @@ def nœuds_rue_of_nom_et_nœud(g, n, nom):
     raise PasTrouvé(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
 
 
-def nœuds_rue_of_adresse(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
+def nœuds_sur_rue(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
     """ Entrée : g (digraph)
                  nom_rue (str)
         Sortie : liste des nœuds de cette rue, dans l’ordre topologique."""
@@ -225,7 +226,7 @@ def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="
 
     def coords_of_nœud(n):
         return g.nodes[n]["x"], g.nodes[n]["y"]
-    nœuds = nœuds_rue_of_adresse(g, nom_rue, ville=ville, pays=pays, bavard=bavard-1)
+    nœuds = nœuds_sur_rue(g, nom_rue, ville=ville, pays=pays, bavard=bavard-1)
     tab = [ (distance_euc(coords_of_nœud(n),coords), n) for n in nœuds ]
     _, res = min(tab)
     return res
