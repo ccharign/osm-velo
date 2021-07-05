@@ -11,8 +11,8 @@ import re
 
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"
-
 localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
+
 
 def recherche_inversée(coords):
     time.sleep(1)
@@ -34,11 +34,13 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
     """
     try:
+        
         #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
         if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville}, "country":{pays}')
         lieu = localisateur.geocode( {"street":nom_rue, "city":ville, "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
         if lieu is not None:
             return lieu
+        
         else:
             # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
             LOG_PB(f"La recherche structurée a échouée pour {nom_rue, ville}.")
@@ -49,6 +51,7 @@ def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
                 return lieu
             else:
                 raise LieuPasTrouvé
+            
     except Exception as e:
         print(e)
         LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
@@ -159,7 +162,9 @@ def charge_rue_num_coords():
                     res[ville][rue][k].append((int(num), (float(lat), float(lon))))
     return res
 
+
 D_RUE_NUM_COORDS = charge_rue_num_coords()
+
 
 def sauv_rue_nom_coords(d=D_RUE_NUM_COORDS):
     """ Sauvegarde le dico ville -> rue -> parité -> liste des (numéros, coords) dans le fichier CHEMIN_JSON_NUM_COORDS.
@@ -213,6 +218,10 @@ def coords_of_adresse(num, rue, ville=VILLE_DÉFAUT, pays="France"):
         print(f"Pas de données pour {e}")
         return None
 
+
+
+    
+### Rien à voir ### 
 
 
 def kilométrage_piéton():

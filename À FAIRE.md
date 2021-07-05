@@ -8,7 +8,7 @@
 
 - Peut-on se passer complètement du xml ?
 
-- limiter les imports de osmnx (seulement les modules utiles). Notamment le gros ne sert que pour la création du graphe -> ne pas mettre un import pour init_graph mais un subprocess ?
+- limiter les imports de osmnx (seulement les modules utiles). 
 
 À FAIRE (un jour)
 
@@ -23,7 +23,5 @@
 - Accélérer l'apprentissage. Sauvegarder les trajets calculé par Dijkstra ?
 
 - Gestion des transitions entre deux rues.
-
-- Sauvegarde hors de osmnx pour portabilité. Voir la doc de networkx.
 
 

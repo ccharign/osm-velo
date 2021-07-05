@@ -8,8 +8,10 @@ from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from params import VILLE_DÉFAUT, LOG_PB
 from petites_fonctions import distance_euc
 
+
 class PasTrouvé(Exception):
     pass
+
 
 class graphe():
     """
