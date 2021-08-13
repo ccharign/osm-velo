@@ -101,7 +101,7 @@ def commune_of_adresse(adr):
 
 
 def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
-    """ Entrée : fichier xml d’openstreetmap
+    """ Entrée : fichier xml d’openstreetmap (pas la version élaguée)
         Effet : crée un fichier texte associant à chaque rue la list des (numéro connu, coords correspondantes)"""
     
 
@@ -171,3 +171,77 @@ def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
             sortie.write(f"{villerue}:{';'.join([à_écrire(l_pair), à_écrire(l_impair)])}\n")
     sortie.close()
     #return nums_seuls
+
+
+
+    
+############## Lire tout le graphe pour en extraire les nœuds des rues ###############
+
+### À FAIRE :
+## Prendre en compte la ville
+# Méthode bourrin :
+# -> Récupérer la liste des villes
+# -> Avec osmnx prendre le graphe de chacune
+# -> En déduire la ou les ville(s) de chaque nœud...
+
+## Certaines arêtes ont plusieurs noms de rue
+# -> rue_dune_arête va devoir renvoyer une liste...
+
+
+
+def est_sur_rue(g, s, rue):
+    return any( g.rue_dune_arête(s,t) == rue for t in g.voisins_nus(s))
+
+
+def prochaine_sphère(sph, rue, déjàVu, dmax):
+    """ sph est une sphère centrée en s.
+        Renvoie les nœuds de rue qui sont sur la première sphère centrée en s qui contienne un nœud de rue. Recherche effectuée en partant de sph et un augmentant le rayon de 1 en 1 au plus dmax fois."""
+    if dmax==0:return []
+    else:
+        fini = False
+        sph_suivante = []
+        for t in sph:
+            for u in g.voisins_nus(t):
+                if u not in déjàVu:
+                    if est_sur_rue(g, u, rue): fini = True
+                    sph_suivante.append(u)
+                    déjàVu.add(u)
+        if fini:
+            return prochaine_sphère(sph_suivante, rue, déjàVu, dmax-1)
+        else:
+            return ( t for t in sph_suivante if est_sur_rue(g,t,rue) )
+                
+                
+def extrait_nœuds_des_rues(g):
+
+    
+    déjàVu = {} # dico (nom -> set de nœuds). Ne sert que pour le cas d’une rue qui boucle.
+    res = {} # dico (nom -> liste des nœuds dans un ordre topologique )
+
+    
+    def suivre_rue(s, sprec, rue):
+        """ s (int) : sommet actuel
+            sprec (int) : sommet précédent. En entrée de cette fonction, res[rue] doit finir par sprec, s 
+            rue (str) : nom de la rue à suivre 
+           Effet : remplit déjàVu[rue] ainsi que res[rue]
+        """
+
+        # Dans le cas d’une rue qui fourche on aura une branche après l’autre.
+        for t in prochaine_sphère([s], rue, set([s]), 5): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe
+            if t != sprec and t not in déjàVu[rue]:
+                res[rue].append(t)
+                déjàVu[rue].add(t)
+                suivre_rue(sprec,t,rue)
+
+    for s in g.digraphe.nodes:
+        for t in g.voisins_nus(s):
+            rue = g.rue_dune_arête(s,t)
+            print(rue)
+            if rue is not None and rue not in res:
+                
+                res[rue]=[t, s]
+                suivre_rue(s, t, rue)
+                res[rue].reverse()
+                suivre_rue(t, s, rue)
+                print(f"J’ai suivi la rue {rue}. Nœuds trouvés : {res[rue]}")
+

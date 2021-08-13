@@ -7,6 +7,7 @@ import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from params import VILLE_DÉFAUT, LOG_PB
 from petites_fonctions import distance_euc
+from collections import deque
 
 
 class PasTrouvé(Exception):
@@ -38,12 +39,44 @@ class graphe():
         """
         cycla_corrigée = lambda voisin: (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
         return ( ( voisin, données["length"]/cycla_corrigée(voisin) )  for (voisin, données) in self.digraphe[s].items() )
-   
+
+    def voisins_nus(self, s):
+        """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
+        return (t for t in self.digraphe[s].keys())
+    
     def liste_voisins(self, s):
         return list(self.voisins)
    
     def est_arrête(self, s, t):
         return t in self.digraphe[s]
+
+
+    def parcours_largeur(self, départ, dmax=float("inf")):
+        """Itérateur sur les sommets du graphe, selon un parcours en largeur depuis départ. On s’arrête lorsqu’on dépasse la distance dmax depuis départ."""
+        àVisiter = deque()
+        déjàVu = set({})
+        àVisiter.appendleft((départ, 0))
+        fini = False
+        while len(àVisiter) > 0 and not fini:
+            (s, d) = àVisiter.pop()
+            if d > dmax: fini = True
+            else:
+                yield s
+                for t in self.digraphe[s].keys():
+                    if t not in déjàVu:
+                        àVisiter.appendleft((t, d+1))
+                        déjàVu.add(t)
+                    
+            
+
+    def rue_dune_arête(self, s, t, bavard=0):
+        """ Nom de la rue contenant l’arête (s,t)
+            Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
+        try:
+            return self.digraphe[s][t]["name"]
+        except KeyError:
+            if bavard>0:
+                print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
   
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)
@@ -160,6 +193,7 @@ class graphe():
             s, t, v = ligne.strip().split(";")
             self.cyclabilité[(s, t)] = v
         entrée.close()
+    
 
 
 def nœuds_rue_of_arête(g, s, t):
