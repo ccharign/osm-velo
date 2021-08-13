@@ -7,7 +7,7 @@ from init_graphe import charge_graphe_bbox  # le graphe de Pau par défaut
 import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
-from utils import *
+import utils
 
 
 g = charge_graphe_bbox()
@@ -21,20 +21,17 @@ def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
 
 ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
 
-tous_les_chemins = cheminsValides(tous_les_chemins, g)
+tous_les_chemins = utils.cheminsValides(tous_les_chemins, g)
 
 
 
 
 def affiche_avant_après(chemins, g, nb_lectures):
-    chemins_avant = [dijkstra.chemin(g, c.départ(), c.arrivée(), 0) for c in chemins]
+    #chemins_avant = [dijkstra.chemin_entre_deux_ensembles(g, c.départ(), c.arrivée(), 0) for c in chemins]
     #g.réinitialise_cyclabilité()
-    for _ in range(nb_lectures):
-        apprentissage.lecture_plusieurs_chemins(g, chemins, bavard=1)
+    apprentissage.n_lectures(nb_lectures, g, chemins, bavard=2)
 
-    chemins_après = [dijkstra.chemin(g, c.départ(), c.arrivée(), c.p_détour) for c in chemins]
-
-    g.affiche_chemins(chemins_avant+chemins_après, {"route_colors": ['r']*len(chemins_avant)+['b']*len(chemins_après)})
+    utils.dessine_chemins(chemins, g)
 
 
 def test(départ, arrivée, p_détour):

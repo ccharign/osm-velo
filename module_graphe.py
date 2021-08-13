@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import networkx as nx
-from osmnx import plot_graph, get_nearest_node
+from osmnx import plot_graph, nearest_nodes
 import os
 import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
@@ -55,7 +55,7 @@ class graphe():
 
          
     def nœud_le_plus_proche(self, coords):
-        return get_nearest_node(self.multidigraphe, coords)
+        return nearest_nodes(self.multidigraphe, *coords)
  
     def nœud_centre_rue(self, nom_rue, ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie le nœud le plus proche des coords enregistrées dans osm pour la rue.
@@ -128,7 +128,7 @@ class graphe():
         sortie.close()
 
     def charge_cache(self, chemin="données"):
-        print("Chargement du cache nœud_of_rue.""")
+        print("Chargement du cache nœud_of_rue.")
         adresse = os.path.join(chemin, "nœud_of_rue.csv")
         entrée = open(adresse)
         for ligne in entrée:
@@ -138,18 +138,21 @@ class graphe():
         entrée.close()
 
     def vide_cache(self, chemin="données"):
+        print("J’efface le cache nœud_of_rue")
         adresse = os.path.join(chemin, "nœud_of_rue.csv")
         entrée = open(adresse, "w")
         entrée.close()
        
     def sauv_cycla(self, chemin="données/"):
         """ chemin : adresse et nom du fichier, sans l'extension"""
+        print("Sauvegarde de la cyclabilité")
         sortie = open(os.path.join(chemin, "Cyclabilité.csv"), "w")
         for (s, t), v in self.cyclabilité.items():
             sortie.write(f"{s};{t};{v}\n")
         sortie.close()
 
     def charge_cycla(self, chemin="données/"):
+        print("Chargement de la cyclabilité")
         entrée = open(os.path.join(chemin, "Cyclabilité.csv"))
         for ligne in entrée:
             s, t, v = ligne.strip().split(";")

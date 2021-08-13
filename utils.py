@@ -19,6 +19,9 @@ import récup_données
 import module_graphe
 
 
+def ouvre_html(chemin):
+    res = subprocess.run([NAVIGATEUR, chemin], capture_output=True)
+
 
 def cheminsValides(chemins, g):
     """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
@@ -42,7 +45,7 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer="tmp", bavard=0
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
     nom = os.path.join(où_enregistrer, départ+arrivée+".html")
     carte.save(nom)
-    subprocess.run([NAVIGATEUR, nom])
+    ouvre_html(nom)
     #ox.plot_route_folium(g.multidigraphe,c)
 
 
@@ -63,7 +66,7 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
     chemins_directs = []
     for c in chemins:
         try:
-            chemins_directs.append(dijkstra.chemin_étapes_ensembles(g, c.direct()))
+            chemins_directs.append(c.chemin_direct_sans_cycla(g))
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
@@ -81,7 +84,7 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
     
     nom = os.path.join(où_enregistrer, "dessine_chemins.html")
     carte.save(nom)
-    subprocess.run([NAVIGATEUR, nom])
+    ouvre_html(nom)
 
 
 def affiche_sommets(s, g, où_enregistrer="tmp"):
@@ -90,7 +93,7 @@ def affiche_sommets(s, g, où_enregistrer="tmp"):
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
     nom = os.path.join(où_enregistrer, "affiche_sommets.html")
     carte.save(nom)
-    subprocess.run(["firefox", nom])
+    subprocess.run([NAVIGATEUR, nom])
 
 
 def affiche_rue(adresse, g):

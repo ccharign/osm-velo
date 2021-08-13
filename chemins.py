@@ -4,6 +4,7 @@ from récup_données import cherche_lieu, coords_lieu
 import module_graphe
 from params import VILLE_DÉFAUT, LOG_PB
 import re
+import dijkstra
 
 
 #Pour test
@@ -85,8 +86,13 @@ class Chemin():
         assert self.AR, "chemin pas réversible"
         return Chemin(list(reversed(self.étapes)), self.p_détour, self.AR)
 
+    def chemin_direct_sans_cycla(self, g):
+        """ Renvoie le plus court chemin du départ à l’arrivée."""
+        return dijkstra.chemin_entre_deux_ensembles(g, self.départ(), self.arrivée(), 0)
+    
     def direct(self):
         """ Renvoie le chemin sans ses étapes intermédaires."""
+        
         return Chemin([self.départ(), self.arrivée()], self.p_détour, True)
     
     def __str__(self):
@@ -144,6 +150,8 @@ def nœud_of_étape(c, g, bavard=0):
     
     if c in g.nœud_of_rue:  # Recherche dans le cache
         return g.nœud_of_rue[c]
+    else:
+        print(f"Pas dans le cache : {c}")
     
     def renvoie(res):
         assert res != []
@@ -179,7 +187,7 @@ def nœud_of_étape(c, g, bavard=0):
                 LOG_PB(e)
                 coords = coords_lieu(f"{num} {rue}", ville=ville)
                 print(f"Pas réussi à obtenir la liste des nœuds de {rue}. Je vais prendre le nœud le plus proche de {coords}.")
-                return [g.nœud_le_plus_proche(coords)]
+                return renvoie([g.nœud_le_plus_proche(coords)])
                 
     else:  # Numéro de rue ou échec de la fonction préc -> renvoyer un singleton
         coords = coords_lieu(f"{num} {rue}", ville=ville)

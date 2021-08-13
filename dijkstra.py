@@ -211,7 +211,7 @@ def chemin_étapes_ensembles(g, c):
     res=[]
     for t1, t2 in deuxConséc(tronçons):
         res.extend(t1)
-        res.extend(chemin(g, t1[-1], t2[0], g.p_détour))
+        res.extend(chemin(g, t1[-1], t2[0], c.p_détour))
     res.extend(tronçons[-1])
 
     return res
