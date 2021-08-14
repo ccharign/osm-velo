@@ -1,7 +1,7 @@
 
 À FAIRE :
 
-
+- Au chargement du graphe récupérer les villes de chaque nœud
 
 
 - page php

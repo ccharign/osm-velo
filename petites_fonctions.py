@@ -19,3 +19,12 @@ def deuxConséc(t):
     n = len(t)
     for i in range(n-1):
         yield t[i], t[i+1]
+
+        
+def ajouteDico(d, clef, val):
+    """d est un dico de listes.
+       Ajoute val à la liste de clef donnée."""
+    if clef in d:
+        d[clef].append(val)
+    else:
+        d[clef]=[val]

@@ -4,16 +4,18 @@
 
 from module_graphe import graphe  # ma classe de graphe
 import xml.etree.ElementTree as xml  # Manipuler le xml local
-from params import CHEMIN_XML, CHEMIN_XML_COMPLET, CHEMIN_JSON_NUM_COORDS  # Chemin du xml élagué
+from params import CHEMIN_XML, CHEMIN_XML_COMPLET, CHEMIN_JSON_NUM_COORDS, CHEMIN_NŒUDS_VILLES  # Chemin du xml élagué
 import re
 import time
 import osmnx.io
 from récup_données import recherche_inversée
 import subprocess
+import overpy
+from petites_fonctions import ajouteDico
 #ox.config(use_cache=True, log_console=True)
 
 D_MAX_SUITE_RUE = 10  # Nombre max d’arêtes où on va chercher pour trouver la suite d’une rue.
-
+BBOX = -0.4285, 43.2671,-0.2541,43.3403
 
 # Pour la simplification dans osmnx :
 # https://github.com/gboeing/osmnx-examples/blob/master/notebooks/04-simplify-graph-consolidate-nodes.ipynb
@@ -22,6 +24,7 @@ D_MAX_SUITE_RUE = 10  # Nombre max d’arêtes où on va chercher pour trouver l
 # https://stackoverflow.com/questions/63466207/how-to-create-a-filtered-graph-from-an-osm-formatted-xml-file-using-osmnx
 
 
+#################### Récupération du graphe via osmnx ####################
 
 
 def charge_graphe_bbox(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
@@ -42,7 +45,7 @@ def charge_graphe_bbox(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, op
 
 
 
-
+#################### Élaguage ####################
 
 
 def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
@@ -73,6 +76,11 @@ def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
     xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8")
 
 
+
+    
+#################### Récupération des numéros de rues ####################
+    
+
 def coords_of_nœud_xml(c):
     return float(c.attrib["lat"]), float(c.attrib["lon"])
 
@@ -92,7 +100,7 @@ def normalise_ville(ville):
 
 
 def commune_of_adresse(adr):
-    """ Entrée : adresse renvoyée par Nominatim.reveres.
+    """ Entrée : adresse renvoyée par Nominatim.reverse.
         Sortie : la commune (on espère)"""
     à_essayer = ["city", "village", "town"]
     for clef in à_essayer:
@@ -177,15 +185,52 @@ def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
 
 
 
-    
-############## Lire tout le graphe pour en extraire les nœuds des rues ###############
+#################### Rajouter la ville aux données des nœuds ####################
 
-### À FAIRE :
-## Prendre en compte la ville
-# Méthode bourrin :
-# -> Récupérer la liste des villes
-# -> Avec osmnx prendre le graphe de chacune
-# -> En déduire la ou les ville(s) de chaque nœud...
+
+def liste_villes():
+    """ Liste des villes apparaissant dans CHEMIN_JSON_NUM_COORDS."""
+    res = set([])
+    with open(CHEMIN_JSON_NUM_COORDS) as f:
+        for ligne in f:
+            res.add(ligne.split(";")[0])
+    return res
+
+
+api = overpy.Overpass()
+def nœuds_ville(ville):
+    r = api.query(f"""
+    area["name"="{ville}"]
+        ["boundary"="administrative"]
+        {BBOX}->.a;
+    node(area.a);
+    out;
+    """)
+    return r.nodes
+
+
+
+def ajoute_villes(g):
+    """ Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes. Sauvegarde de plus les nœuds de g de chaque ville dans un csv."""
+    sortie = open(CHEMIN_NŒUDS_VILLES,"w")
+    for ville in liste_villes():
+        l = []
+        nœuds = nœuds_ville(ville)
+        for n in nœuds:
+            if n in g.digraphe.nodes:
+                l.append(n) # Pour le csv
+                # Remplissage du graphe
+                for v in g.voisins_nus(n):
+                    if v in nœuds:
+                        ajouteDico( g.digraphe[n][v], "ville", ville )
+                        ajouteDico( g.digraphe[v][n], "ville", ville )
+        ligne = ville + ";" + ",".join(map(str,l))
+        sortie.write(ligne+"\n")
+
+
+
+        
+############## Lire tout le graphe pour en extraire les nœuds des rues ###############
 
 
 
@@ -221,7 +266,7 @@ def prochaine_sphère(sph, rue, déjàVu, dmax):
 
 
 
-def extrait_nœuds_des_rues(g):
+def extrait_nœuds_des_rues(g, bavard = 0):
     
     déjàVu = {} # dico (nom de rue -> set de nœuds). Ne sert que pour le cas d’une rue qui boucle.
     res = {} # dico (nom de rue -> liste des nœuds dans un ordre topologique )
@@ -241,6 +286,7 @@ def extrait_nœuds_des_rues(g):
                 déjàVu[rue].add(t)
                 suivre_rue(t,s,rue)
 
+                
     for s in g.digraphe.nodes:
         for t in g.voisins_nus(s):
             rues = g.rue_dune_arête(s,t)
@@ -252,5 +298,5 @@ def extrait_nœuds_des_rues(g):
                         suivre_rue(s, t, rue)
                         res[rue].reverse()
                         suivre_rue(t, s, rue)
-                        print(f"J’ai suivi la {rue}. Nœuds trouvés : {res[rue]}")
+                        if bavard: print(f"J’ai suivi la {rue}. Nœuds trouvés : {res[rue]}")
     return res
