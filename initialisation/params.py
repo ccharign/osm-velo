@@ -6,7 +6,6 @@ import os.path
 DÉPART="/home/moi/git/osm vélo"
 
 CHEMIN_XML = os.path.join(DÉPART, "données/voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
-
 CHEMIN_XML_COMPLET = os.path.join(DÉPART,"données_inutiles/pau_agglo.osm")
 CHEMIN_JSON_NUM_COORDS = os.path.join(DÉPART,"données/rue_num_coords.json")
 CHEMIN_NŒUDS_VILLES = os.path.join(DÉPART,"données/nœuds_villes.csv")

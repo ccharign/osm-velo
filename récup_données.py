@@ -4,7 +4,7 @@
 
 import geopy
 #, overpy
-from params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
+from initialisation.params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
