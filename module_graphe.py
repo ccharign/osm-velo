@@ -70,10 +70,14 @@ class graphe():
             
 
     def rue_dune_arête(self, s, t, bavard=0):
-        """ Nom de la rue contenant l’arête (s,t)
+        """ Liste des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
             Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
         try:
-            return self.digraphe[s][t]["name"]
+            res = self.digraphe[s][t]["name"]
+            if isinstance(res, str):
+                return res,
+            else:
+                return res
         except KeyError:
             if bavard>0:
                 print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")

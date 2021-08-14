@@ -12,6 +12,9 @@ from récup_données import recherche_inversée
 import subprocess
 #ox.config(use_cache=True, log_console=True)
 
+D_MAX_SUITE_RUE = 10  # Nombre max d’arêtes où on va chercher pour trouver la suite d’une rue.
+
+
 # Pour la simplification dans osmnx :
 # https://github.com/gboeing/osmnx-examples/blob/master/notebooks/04-simplify-graph-consolidate-nodes.ipynb
 
@@ -184,19 +187,23 @@ def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
 # -> Avec osmnx prendre le graphe de chacune
 # -> En déduire la ou les ville(s) de chaque nœud...
 
-## Certaines arêtes ont plusieurs noms de rue
-# -> rue_dune_arête va devoir renvoyer une liste...
-
 
 
 def est_sur_rue(g, s, rue):
-    return any( g.rue_dune_arête(s,t) == rue for t in g.voisins_nus(s))
+    """ Indique si le sommet s est sur la rue rue.
+    Rappel : il peut y avoir plusieurs rues associées à une arête. rue_dune_arête renvoie un tuple (ou liste)"""
+    for t in g.voisins_nus(s):
+        rues = g.rue_dune_arête(s,t)
+        if rues is not None and rue in rues : return True
+    return False
 
 
 def prochaine_sphère(sph, rue, déjàVu, dmax):
     """ sph est une sphère centrée en s.
-        Renvoie les nœuds de rue qui sont sur la première sphère centrée en s qui contienne un nœud de rue. Recherche effectuée en partant de sph et un augmentant le rayon de 1 en 1 au plus dmax fois."""
-    if dmax==0:return []
+        Renvoie les nœuds de rue qui sont sur la première sphère centrée en s qui contienne un nœud de rue. Recherche effectuée en partant de sph et un augmentant le rayon de 1 en 1 au plus dmax fois.
+    La distance utilisée est le nombre d’arêtes."""
+    if dmax==0:
+        return []
     else:
         fini = False
         sph_suivante = []
@@ -206,17 +213,18 @@ def prochaine_sphère(sph, rue, déjàVu, dmax):
                     if est_sur_rue(g, u, rue): fini = True
                     sph_suivante.append(u)
                     déjàVu.add(u)
-        if fini:
+        if not fini:
             return prochaine_sphère(sph_suivante, rue, déjàVu, dmax-1)
         else:
             return ( t for t in sph_suivante if est_sur_rue(g,t,rue) )
                 
-                
-def extrait_nœuds_des_rues(g):
 
+
+
+def extrait_nœuds_des_rues(g):
     
-    déjàVu = {} # dico (nom -> set de nœuds). Ne sert que pour le cas d’une rue qui boucle.
-    res = {} # dico (nom -> liste des nœuds dans un ordre topologique )
+    déjàVu = {} # dico (nom de rue -> set de nœuds). Ne sert que pour le cas d’une rue qui boucle.
+    res = {} # dico (nom de rue -> liste des nœuds dans un ordre topologique )
 
     
     def suivre_rue(s, sprec, rue):
@@ -226,22 +234,23 @@ def extrait_nœuds_des_rues(g):
            Effet : remplit déjàVu[rue] ainsi que res[rue]
         """
 
-        # Dans le cas d’une rue qui fourche on aura une branche après l’autre.
-        for t in prochaine_sphère([s], rue, set([s]), 5): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe
+        # Dans le cas d’une rue qui fourche on aura une branche après l’autre (parcours en profondeur de la rue).
+        for t in prochaine_sphère([s], rue, set([s]), D_MAX_SUITE_RUE): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe. Dans le cas basique, prochaine_sphère renvoie deux sommets, l’un d’eux étant sprec.
             if t != sprec and t not in déjàVu[rue]:
                 res[rue].append(t)
                 déjàVu[rue].add(t)
-                suivre_rue(sprec,t,rue)
+                suivre_rue(t,s,rue)
 
     for s in g.digraphe.nodes:
         for t in g.voisins_nus(s):
-            rue = g.rue_dune_arête(s,t)
-            print(rue)
-            if rue is not None and rue not in res:
-                
-                res[rue]=[t, s]
-                suivre_rue(s, t, rue)
-                res[rue].reverse()
-                suivre_rue(t, s, rue)
-                print(f"J’ai suivi la rue {rue}. Nœuds trouvés : {res[rue]}")
-
+            rues = g.rue_dune_arête(s,t)
+            if rues is not None:
+                for rue in rues:
+                    if rue not in res:
+                        res[rue]=[t, s]
+                        déjàVu[rue] = set((s,t))
+                        suivre_rue(s, t, rue)
+                        res[rue].reverse()
+                        suivre_rue(t, s, rue)
+                        print(f"J’ai suivi la {rue}. Nœuds trouvés : {res[rue]}")
+    return res
