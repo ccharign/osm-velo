@@ -3,14 +3,14 @@
 
 from importlib import reload  # recharger un module après modif
 import networkx as nx  # graphe
-from init_graphe import charge_graphe_bbox  # le graphe de Pau par défaut
+from init_graphe import charge_graphe  # le graphe de Pau par défaut
 import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
 import utils
 
 
-g = charge_graphe_bbox()
+g = charge_graphe()
 
 tous_les_chemins = chemins.chemins_of_csv(g)
 

@@ -4,7 +4,6 @@
 ### À terme devrait être le seul fichier à utiliser osmnx, afin d’éviter de le charger dans les utilisations courantes.
 
 import osmnx as ox
-from initialisation.ajoute_villes import ajoute_villes
 ox.config(use_cache=True, log_console=True)
 
 
@@ -21,9 +20,6 @@ def crée_graphe_bbox(nom_fichier, ouest=-0.4285, sud=43.2671, est=-0.2541, nord
     
     print("conversion en graphe non orienté")
     g = ox.get_undirected(g)
-
-    print("Ajout du nom de ville des arêtes")
-    ajoute_villes(g)
     
     print(f"Chargement fini. Je l'enregistre pour la prochaine fois dans {nom_fichier}.")
     ox.io.save_graphml(g, nom_fichier)
