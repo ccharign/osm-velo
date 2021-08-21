@@ -8,10 +8,11 @@ import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
 import utils
+import initialisation.nœuds_des_rues as nr
 
-
-g = charge_graphe()
-
+g = charge_graphe(bavard=2)
+#nr.sortie_csv(g)
+utils.affiche_rue("boulevard du cami-salié",g, bavard=3)
 tous_les_chemins = chemins.chemins_of_csv(g)
 
 

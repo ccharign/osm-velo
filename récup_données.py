@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
 
-# Ce module regroupe les fonctions de recherche de données géographiques qui n'utilisent pas osmnx
+# Ce module regroupe les fonctions de recherche de données géographiques qui n'utilisent pas osmnx, pour utilisation à chaque utilisation.
+# Les fonctions d’analyse de données plus lentes depuis le .osm qui ont vocation à n’être utilisées qu’une fois (ou lors des mise à jour des données osm) sont dans le dossier initialisation.
 
 import geopy
 #, overpy
 from initialisation.params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
+from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
@@ -14,7 +16,8 @@ geopy.geocoders.options.default_user_agent = "pau à vélo"
 localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
 
 
-def recherche_inversée(coords):
+def recherche_inversée(coords, bavard=0):
+    if bavard>0:print("Pause de 1s avant la recherche inversée")
     time.sleep(1)
     return(localisateur.reverse(coords))
     
@@ -77,6 +80,7 @@ def coord_nœud(id_nœud):
 
 
 def coords_lieu(nom_rue, ville=64000, pays="France", bavard=0):
+    """ Renvoie les coordonnées du lieu obtenues par une recherche Nominatim"""
     lieu = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)[0]
     return lieu.latitude, lieu.longitude
 
@@ -174,11 +178,13 @@ def sauv_rue_nom_coords(d=D_RUE_NUM_COORDS):
     Où liste_pairs et liste_impairs sont des (num, lat, lon) séparés par des |
     """
     sortie = open(CHEMIN_JSON_NUM_COORDS,"w")
-    for rue in d.keys():
-        for ville in d[rue].keys():
-            pairs   = [ str((num,lat,lon))[1:-1] for (num,(lat,lon)) in d[rue][ville][0]]
-            impairs = [ str((num,lat,lon))[1:-1] for (num,(lat,lon)) in d[rue][ville][1]]
-            à_écrire = "|".join(pairs)+";"+"|".join(inpairs)
+    for ville in d.keys():
+        villen = normalise_ville(ville)
+        for rue in d[ville].keys():
+            ruen = normalise_rue(rue)
+            pairs   = [ str((num,lat,lon))[1:-1] for (num,(lat,lon)) in d[ville][rue][0] ]
+            impairs = [ str((num,lat,lon))[1:-1] for (num,(lat,lon)) in d[ville][rue][1] ]
+            à_écrire = f"{villen};{ruen}:" + "|".join(pairs) + ";" + "|".join(impairs)
             sortie.write(à_écrire+"\n")
     
 
@@ -191,8 +197,8 @@ def barycentre(c1, c2, λ):
 
 def coords_of_adresse(num, rue, ville=VILLE_DÉFAUT, pays="France"):
     """ Cherche les coordonnées de l’adresse fournie en interpolant parmi les adresses connues."""
-    
-    nom_ville = re.findall("[0-9]*\ ?([^0-9]*)", ville)[0]
+    assert isinstance(num, int) and num>0
+    nom_ville = normalise_ville( re.findall("[0-9]*\ ?([^0-9]*)", ville)[0])
     try:
         k = num % 2  # parité du numéro
         l = D_RUE_NUM_COORDS[nom_ville][rue][k]

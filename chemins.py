@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 
-from récup_données import cherche_lieu, coords_lieu
+from récup_données import cherche_lieu, coords_lieu, coords_of_adresse
 import module_graphe
 from params import VILLE_DÉFAUT, LOG_PB
 import re
 import dijkstra
-
+from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville
 
 #Pour test
 #import init_graphe
@@ -133,9 +133,6 @@ def lecture_étape(c):
             raise ValueError(f"chaîne pas correcte : {c}")
 
 
-def normalise(c):
-    """ Utilisé pour normaliser les adresse, pour améliorer le cache. """
-    return c.strip().lower()
 
 
 def nœud_of_étape(c, g, bavard=0):
@@ -145,7 +142,7 @@ def nœud_of_étape(c, g, bavard=0):
            Si un numéro est indiqué, renvoie le singleton du nœud de la rue le plus proche.
            Sinon renvoie la liste des nœuds de la rue."""
 
-    c = normalise(c)
+    c = normalise_adresse(c)
     assert c != ""
     
     if c in g.nœud_of_rue:  # Recherche dans le cache
@@ -160,7 +157,8 @@ def nœud_of_étape(c, g, bavard=0):
         print(f"Mis en cache : {res} pour {c}")
         return res
 
-    # Analyse de l’adresse
+    
+    ## Analyse de l’adresse. On récupère les variables num, rue, ville
     e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
     essai = re.findall(e, c)
     if bavard > 0: print(essai)
@@ -171,24 +169,38 @@ def nœud_of_étape(c, g, bavard=0):
     else:
         print(f"Avertissement : plusieurs interprétations de {c} : {essai}.")
         num, rue, _, ville = essai[0]
-    rue = rue.strip()
-    ville = ville.strip()
+    rue = normalise_rue(rue.strip())
+    
     if ville == "": ville = VILLE_DÉFAUT
-
-    # Pas de numéro de rue -> liste de tous les nœuds de la rue
+    ville = normalise_ville(ville.strip())
+    if bavard>0: print(f"analyse de l’adresse : {num} {rue} {ville}")
+    
+    
     if num == "":
+    ## Pas de numéro de rue -> liste de tous les nœuds de la rue
         if rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
             try:
-                res = module_graphe.nœuds_sur_rue(g.digraphe, rue, ville=ville)
-                return renvoie(res)
-            except Exception as e:
-                LOG_PB(e)
-                coords = coords_lieu(f"{num} {rue}", ville=ville)
-                print(f"Pas réussi à obtenir la liste des nœuds de {rue}. Je vais prendre le nœud le plus proche de {coords}.")
-                return renvoie([g.nœud_le_plus_proche(coords)])
-                
-    else:  # Numéro de rue ou échec de la fonction préc -> renvoyer un singleton
-        coords = coords_lieu(f"{num} {rue}", ville=ville)
+                #res = module_graphe.nœuds_sur_rue(g.digraphe, rue, ville=ville)
+                #return renvoie(res)
+                res = g.nœuds[str(ville)][rue]
+                if bavard > 0: print(f"nœuds trouvés dans g.nœuds[{str(ville)}][{rue}] : {res}.")
+                return res
+            except KeyError as e:
+                print(f"rue pas en mémoire : {rue} ({ville}). Je lance une recherche Nominatim.")
+                coords = coords_lieu(f"{rue}", ville=ville.avec_code)
+                print(f"Je vais prendre le nœud le plus proche de {coords}.")
+                n = g.nœud_le_plus_proche(coords)
+                return renvoie([n])
+
+            
+    else:
+        ## Numéro de rue -> renvoyer un singleton
+        try:
+            coords = coords_of_adresse(num, rue, ville=ville)
+        except Exception as e:
+            print(f"Échec dans coords_of_adresse : {e}. Je passe à coords_lieu, càd avec une recherche Nominatim simple.")
+            coords = coords_lieu(f"{num} {rue}", ville=ville.avec_code)
+        
         return renvoie([module_graphe.nœud_sur_rue_le_plus_proche(g.digraphe, coords, rue, ville=ville)])

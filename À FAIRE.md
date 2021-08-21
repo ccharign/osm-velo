@@ -1,7 +1,14 @@
 
 À FAIRE :
 
-- Au chargement du graphe récupérer les villes de chaque nœud
+
+- *Utiliser les données de nœuds_rue.csv.*
+  normalisation des noms de rue/ville
+  Chercher dans g.nœuds[ville][rue] dans l’analyse de l’adresse.
+      dans le cas pas de numéro de rue.
+
+
+À FAIRE (un jour)
 
 
 - page php
@@ -9,8 +16,6 @@
 - Peut-on se passer complètement du xml ?
 
 - limiter les imports de osmnx (seulement les modules utiles). 
-
-À FAIRE (un jour)
 
 - Chargement du XML : passer à une lecture au fur et à mesure. Ou transférer dans une bdd.
   - table voies avec colonnes id, nom, ville. table nœud_sur_rue avec col id_voie, id_nœud

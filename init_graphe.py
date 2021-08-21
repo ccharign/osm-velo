@@ -8,6 +8,7 @@
 from module_graphe import graphe  # ma classe de graphe
 from params import RACINE_PROJET
 from initialisation.ajoute_villes import ajoute_villes
+import initialisation.nœuds_des_rues as nr
 
 import time
 import osmnx.io
@@ -46,7 +47,10 @@ def charge_graphe(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option=
     gr.charge_cycla()
 
     print("Ajout du nom des villes")
-    ajoute_villes(gr)
+    ajoute_villes(gr, bavard=bavard-1)
+
+    print("Ajout de la liste des nœuds de chaque rue")
+    nr.charge_csv(gr)
     
     print("Chargement du graphe fini.\n")
     return gr

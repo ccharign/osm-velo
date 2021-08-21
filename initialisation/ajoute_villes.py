@@ -9,7 +9,7 @@
 from petites_fonctions import ajouteDico
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
-from initialisation.params import CHEMIN_NŒUDS_VILLES
+from initialisation.params import CHEMIN_NŒUDS_VILLES, CHEMIN_JSON_NUM_COORDS
 
 
 def liste_villes():
@@ -57,13 +57,27 @@ def crée_csv():
     sortie.close()
 
 
-def ajoute_villes(g):
-    """ Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes."""
+def charge_csv():
+    """ Renvoie le dico ville -> nœuds d’icelle"""
+    res={}
     with open(CHEMIN_NŒUDS_VILLES) as entrée:
         for ligne in entrée:
 
             ville, suite = ligne.strip().split(";")
-            nœuds = map(int, suite.split(","))
+            nœuds = tuple(map(int, suite.split(",")))
+            res[ville] = nœuds
+    return res
+
+
+def ajoute_villes(g, bavard=0):
+    """ Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes.
+    """
+    compte=0
+    with open(CHEMIN_NŒUDS_VILLES) as entrée:
+        for ligne in entrée:
+
+            ville, suite = ligne.strip().split(";")
+            nœuds = set(map(int, suite.split(",")))
             for n in nœuds:
                 if n in g.digraphe.nodes:
                     # Remplissage du graphe
@@ -71,3 +85,6 @@ def ajoute_villes(g):
                         if v in nœuds:
                             ajouteDico( g.digraphe[n][v], "ville", ville )
                             ajouteDico( g.digraphe[v][n], "ville", ville )
+                            compte+=1
+    if bavard>0:
+        print(f"{compte} noms de ville ajoutés")

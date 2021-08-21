@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 
 from récup_données import recherche_inversée
+from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import re
-
+import xml.etree.ElementTree as xml
     
 #################### Récupération des numéros de rues ####################
     
@@ -83,9 +84,10 @@ def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
     nb=0
     for id_node, num, lat, lon in nums_seuls:
         try:
-            adresse = recherche_inversée((lat, lon)).raw["address"]
+            adresse = recherche_inversée((lat, lon), bavard=bavard-1).raw["address"]
+            print(adresse)
             if bavard>0: print(adresse)
-            villerue = commune_of_adresse(adresse) + ";"+adresse["road"]
+            villerue = normalise_ville( commune_of_adresse(adresse)) + ";" + normalise_rue( adresse["road"] )
             ajoute_dans_res(villerue, (num, lat, lon))
             nb+=1
         except Exception as e:

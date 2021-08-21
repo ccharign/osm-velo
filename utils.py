@@ -49,8 +49,12 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer="tmp", bavard=0
     #ox.plot_route_folium(g.multidigraphe,c)
 
 
+    
+#################### Affichage ####################
 
-### Affichage folium avec couleur
+
+
+# Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
 
@@ -96,10 +100,11 @@ def affiche_sommets(s, g, où_enregistrer="tmp"):
     subprocess.run([NAVIGATEUR, nom])
 
 
-def affiche_rue(adresse, g):
+def affiche_rue(ville, rue, g, bavard=0):
     """
     Entrées : g, graphe
-              adresse, str
+              
     """
-    sommets = chemins.nœud_of_étape(adresse, g, bavard=0)
+    #sommets = chemins.nœud_of_étape(adresse, g, bavard=bavard-1)
+    sommets = g.nœuds[str(ville)][rue]
     affiche_sommets(sommets, g)

@@ -5,7 +5,7 @@ from osmnx import plot_graph, nearest_nodes
 import os
 import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
-from params import VILLE_DÉFAUT, LOG_PB
+from params import VILLE_DÉFAUT, LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
 from petites_fonctions import distance_euc
 from collections import deque
 
@@ -13,13 +13,18 @@ from collections import deque
 class PasTrouvé(Exception):
     pass
 
+class TropLoin(Exception):
+    """ Pour le cas où le nœud de g trouvé serait trop loin de l’emplacement initialement recherché."""
+    pass
+
 
 class graphe():
     """
     Attributs : - multidigraphe : un multidigraph de networkx
                 - digraphe : le digraph correspondant
-                - cyclabilité un dictionnaire (int * int) -> float, qui associe à une arrête (couple des id osm des nœuds) sa cyclabilité. Valeur par défaut : 1. Les distances serot divisées par  (p_détour × cycla + 1 - p_détour).
+                - cyclabilité un dictionnaire (int * int) -> float, qui associe à une arrête (couple des id osm des nœuds) sa cyclabilité. Valeur par défaut : 1. Les distances seront divisées par  (p_détour × cycla + 1 - p_détour).
                 - nœud_of_rue : dictionnaire de type str -> int qui associe à un nom de rue l'identifiant correspondant dans le graphe. Calculé au moyen de la méthode un_nœud_sur_rue. Sert de cache. La clé utilisée est "nom_rue,ville,pays".
+                - nœuds : dictionnaire ville -> rue -> nœuds. Calculé par un parcours de tous le graphe dans initialisation/nœuds_des_rue.py
     """
    
     def __init__(self, g):
@@ -29,6 +34,7 @@ class graphe():
         self.digraphe = nx.DiGraph(g)  # ox.get_digraph(g)
         self.cyclabilité = {}
         self.nœud_of_rue = {}
+        self.nœuds = {}
        
     def voisins(self, s, p_détour):
         """
@@ -81,7 +87,16 @@ class graphe():
         except KeyError:
             if bavard>0:
                 print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
-  
+                
+    def ville_dune_arête(self, s, t, bavard=0):
+        """ Liste des villes contenant l’arête (s,t)
+        """
+        try:
+            return self.digraphe[s][t]["ville"]
+        except KeyError:
+            return []
+
+    
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)
   
@@ -93,8 +108,16 @@ class graphe():
         plot_graph(self.multidigraphe, node_size=10)
 
          
-    def nœud_le_plus_proche(self, coords):
-        return nearest_nodes(self.multidigraphe, *coords)
+    def nœud_le_plus_proche(self, coords, recherche = "", d_max = D_MAX_POUR_NŒUD_LE_PLUS_PROCHE ):
+        """
+        recherche est la recherche initiale qui a eu besoin de cet appel. Uniquement pour compléter l’erreur qui sera levée si le nœud le plus proche est à distance > d_max.
+        """
+        
+        n = nearest_nodes(self.multidigraphe, *coords)
+        if distance_euc(self.coords_of_nœud(n), coords) > d_max:
+            raise TropLoin(recherche)
+        else:
+            return n
  
     def nœud_centre_rue(self, nom_rue, ville=VILLE_DÉFAUT, pays="France"):
         """ Renvoie le nœud le plus proche des coords enregistrées dans osm pour la rue.
@@ -133,7 +156,9 @@ class graphe():
 
                
 
-
+    
+    def coords_of_nœud(self, n):
+        return self.digraphe.nodes[n]["x"], self.digraphe.nodes[n]["y"]
 
        
                
@@ -265,9 +290,7 @@ def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="
              coords ( (float, float) )
     Renvoie le nœud sur la rue nom_rue le plus proche de coords."""
 
-    def coords_of_nœud(n):
-        return g.nodes[n]["x"], g.nodes[n]["y"]
     nœuds = nœuds_sur_rue(g, nom_rue, ville=ville, pays=pays, bavard=bavard-1)
-    tab = [ (distance_euc(coords_of_nœud(n),coords), n) for n in nœuds ]
+    tab = [ (distance_euc(Graphe(g).coords_of_nœud(n),coords), n) for n in nœuds ]
     _, res = min(tab)
     return res
