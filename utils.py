@@ -13,7 +13,8 @@ from module_graphe import graphe  #ma classe de graphe
 import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
-from params import VILLE_DÉFAUT, NAVIGATEUR
+from params import NAVIGATEUR
+from lecture_adresse.normalisation import VILLE_DÉFAUT
 import os
 import récup_données
 import module_graphe
@@ -66,7 +67,7 @@ def flatten(c):
 
 
 def dessine_chemins(chemins, g, où_enregistrer="tmp"):
-
+    """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
     chemins_directs = []
     for c in chemins:
         try:

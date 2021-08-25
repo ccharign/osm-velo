@@ -17,8 +17,9 @@ def est_sur_rueville(g, s, rue, ville):
     return False
 
 
-def prochaine_sphère(g, sph, rue, ville, déjàVu, dmax):
+def prochaine_sphère(g, sph, rue, ville, déjàVu, boule, dmax):
     """ sph est une sphère centrée en s.
+        boule est la boule fermée correspondante.
         Renvoie les nœuds de rue qui sont sur la première sphère centrée en s qui contienne un nœud de rue. Recherche effectuée en partant de sph et en augmentant le rayon de 1 en 1 au plus dmax fois.
     La distance utilisée est le nombre d’arêtes."""
     if dmax==0:
@@ -29,14 +30,14 @@ def prochaine_sphère(g, sph, rue, ville, déjàVu, dmax):
         res_éventuel = []
         for t in sph:
             for u in g.voisins_nus(t):
-                if u not in déjàVu:
-                    if est_sur_rueville(g, u, rue, ville):
+                if u not in boule:
+                    if est_sur_rueville(g, u, rue, ville) and u not in déjàVu[ville][rue]:
                         fini = True
                         res_éventuel.append(u)
                     sph_suivante.append(u)
-                    déjàVu.add(u)
+                    boule.add(u)
         if not fini:
-            return prochaine_sphère(g, sph_suivante, rue, ville, déjàVu, dmax-1)
+            return prochaine_sphère(g, sph_suivante, rue, ville, déjàVu, boule, dmax-1)
         else:
             return res_éventuel
                 
@@ -59,7 +60,7 @@ def extrait_nœuds_des_rues(g, bavard = 0):
         """
 
         # Dans le cas d’une rue qui fourche on aura une branche après l’autre (parcours en profondeur de la rue).
-        for t in prochaine_sphère(g, [s], rue, ville, set([s]), D_MAX_SUITE_RUE): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe. Dans le cas basique, prochaine_sphère renvoie deux sommets, l’un d’eux étant sprec.
+        for t in prochaine_sphère(g, [s], rue, ville, déjàVu, set([s]), D_MAX_SUITE_RUE): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe. Dans le cas basique, prochaine_sphère renvoie deux sommets, l’un d’eux étant sprec.
             if t not in déjàVu[ville][rue]:
                 res[ville][rue].append(t)
                 déjàVu[ville][rue].add(t)

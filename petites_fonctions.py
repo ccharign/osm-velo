@@ -21,6 +21,7 @@ def distance_euc(c1, c2):
 def distance_si_pas_trop(c1, c2):
     d = distance_euc(c1, c2)
     if d > D_MAX_POUR_NŒUD_LE_PLUS_PROCHE:
+        print(f"distance entre {c1} et {c2} supérieure à {D_MAX_POUR_NŒUD_LE_PLUS_PROCHE}")
         raise TropLoin()
     else:
         return d

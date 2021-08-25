@@ -1,5 +1,7 @@
+
 # -*- coding:utf-8 -*-
 import re
+from params import STR_VILLE_DÉFAUT
 
 def normalise_adresse(c):
     """ Utilisé pour normaliser les adresse, pour améliorer le cache.
@@ -8,8 +10,19 @@ def normalise_adresse(c):
 
 
 def normalise_rue(rue):
-    """ Met en minuscules"""
-    return rue.lower()
+    """ 
+    Met en minuscules
+    Supprime les tirets
+    Enlève les accents sur les e
+    Supprime les «de », «du », «de la ».
+    Si deux espaces consécutives, supprime la deuxième.
+    """
+    
+    étape1 = rue.lower().replace("-", " ")
+    étape2 = re.sub("é|è|ê|ë","e", étape1)
+    à_supprimer = [" du ", " de la ", " de ", "  "] #Mettre "de la " avant "de ". Ne pas oublier les espaces.
+    regexp = "|".join(à_supprimer)
+    return re.sub(regexp, " ", étape2)
 
 
 class Ville():
@@ -40,7 +53,9 @@ class Ville():
 def normalise_ville(ville):
     """
     Actuellement transforme la chaîne de car en un objet de la classe Ville.
-
-    À réfléchir. Mettre le code postal devant ? Récupérer la liste des communes. les codes postales sont-ils dans le .osm ? -> À rajouter dans initialisation au moment de la lecture du .osm.
+    La chaîne vide "" est transformée en VILLE_DÉFAUT (défini dans params.py).
     """
-    return Ville(ville)
+    if ville == "": return Ville(STR_VILLE_DÉFAUT)
+    else: return Ville(ville)
+
+VILLE_DÉFAUT = Ville(STR_VILLE_DÉFAUT)

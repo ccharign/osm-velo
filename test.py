@@ -12,9 +12,11 @@ import initialisation.nœuds_des_rues as nr
 
 g = charge_graphe(bavard=2)
 #nr.sortie_csv(g)
-utils.affiche_rue("boulevard du cami-salié",g, bavard=3)
+#utils.affiche_rue("avenue de montardon", g, bavard=3)
 tous_les_chemins = chemins.chemins_of_csv(g)
+len(tous_les_chemins)
 
+chemins.Étape("place georges clémenceau", g , bavard=3)
 
 def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
     tous_les_chemins.append(chemins.Chemin.of_étapes(étapes, pourcentage_détour, AR, g))
@@ -34,6 +36,7 @@ def affiche_avant_après(chemins, g, nb_lectures):
 
     utils.dessine_chemins(chemins, g)
 
+affiche_avant_après(tous_les_chemins, g, 5)
 
 def test(départ, arrivée, p_détour):
     """ départ et arrivée : des adresses (type str)"""
@@ -50,7 +53,7 @@ def test(départ, arrivée, p_détour):
     g.affiche_chemins([chemin_avant, chemin_après], {"route_colors": ["r","b"]})
 
 
-#apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
+apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
 
 # vérif de la structure
 for c in tous_les_chemins:

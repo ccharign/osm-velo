@@ -3,6 +3,7 @@
 from datetime import datetime
 import os.path
 
+
 RACINE_PROJET="/home/moi/git/osm vélo"
 
 CHEMIN_XML = os.path.join(RACINE_PROJET, "données/voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
@@ -12,7 +13,7 @@ CHEMIN_JSON_NUM_COORDS = os.path.join(RACINE_PROJET,"données/rue_num_coords.csv
 CHEMIN_NŒUDS_VILLES = os.path.join(RACINE_PROJET,"données/nœuds_villes.csv")
 CHEMIN_NŒUDS_RUES = os.path.join(RACINE_PROJET,"données/nœuds_rues.csv")
 
-VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
+STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
 NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html
 
 D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres

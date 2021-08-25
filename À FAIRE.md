@@ -7,6 +7,8 @@
   Chercher dans g.nœuds[ville][rue] dans l’analyse de l’adresse.
       dans le cas pas de numéro de rue.
 
+- dans nœud_of_étape : si nom de rue pas dans le dico, lancer l’ancienne fonction pour récup coords des nœuds de la rue.
+
 
 À FAIRE (un jour)
 
