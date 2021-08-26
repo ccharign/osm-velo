@@ -3,24 +3,32 @@
 import re
 from params import STR_VILLE_DÉFAUT
 
+
+def partie_commune(c):
+    """ Appliquée à tout : nom de ville, de rue, et adresse complète
+    Met en minuscules
+    Supprime les tirets
+    Enlève les accents sur les e """
+    étape1 = c.strip().lower().replace("-", " ")
+    étape2 = re.sub("é|è|ê|ë","e", étape1)
+    return étape2
+    
+
 def normalise_adresse(c):
-    """ Utilisé pour normaliser les adresse, pour améliorer le cache.
-    Actuellement met en minuscule."""
-    return c.strip().lower()
+    """ Utilisé pour normaliser les adresses complètes, pour améliorer le cache.
+    Actuellement c’est partie_commune(c)"""
+    return partie_commune(c)
 
 
 def normalise_rue(rue):
     """ 
-    Met en minuscules
-    Supprime les tirets
-    Enlève les accents sur les e
+    après l’étape "partie_commune",
     Supprime les «de », «du », «de la ».
     Si deux espaces consécutives, supprime la deuxième.
     """
     
-    étape1 = rue.lower().replace("-", " ")
-    étape2 = re.sub("é|è|ê|ë","e", étape1)
-    à_supprimer = [" du ", " de la ", " de ", "  "] #Mettre "de la " avant "de ". Ne pas oublier les espaces.
+    étape2 = partie_commune(rue)
+    à_supprimer = [" du ", " de la ", " de ", " d'",  "  "] #Mettre "de la " avant "de ". Ne pas oublier les espaces.
     regexp = "|".join(à_supprimer)
     return re.sub(regexp, " ", étape2)
 
@@ -35,7 +43,7 @@ class Ville():
     def __init__(self, texte):
         e = re.compile("([0-9]{5})? ?([^ 0-9].*)")
         code, nom = re.fullmatch(e, texte).groups()
-        self.nom = nom
+        self.nom = partie_commune(nom)
         if code is None:
             self.code=None
         else:

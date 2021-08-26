@@ -9,25 +9,28 @@ import dijkstra
 import chemins  # classe chemin et lecture du csv
 import utils
 import initialisation.nœuds_des_rues as nr
-
+import lecture_adresse.arbresLex as lex
 g = charge_graphe(bavard=2)
 #nr.sortie_csv(g)
-#utils.affiche_rue("avenue de montardon", g, bavard=3)
-tous_les_chemins = chemins.chemins_of_csv(g)
+
+
+
+tous_les_chemins = chemins.chemins_of_csv(g, bavard=3)
 len(tous_les_chemins)
 
-chemins.Étape("place georges clémenceau", g , bavard=3)
 
 def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
     tous_les_chemins.append(chemins.Chemin.of_étapes(étapes, pourcentage_détour, AR, g))
 
 
-ajoute_chemin( ["1 rue Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
+ajoute_chemin( ["lycée Louis Barthou", "rue Lamothe", "rue Jean Monnet", "rue Galos", "place de la république"], True, 20)
 
 tous_les_chemins = utils.cheminsValides(tous_les_chemins, g)
+len(tous_les_chemins)
 
-
-
+def affiche_texte_chemins(chemins=tous_les_chemins):
+    for i,c in enumerate(chemins):
+        print(f"{i} : {c}\n")
 
 def affiche_avant_après(chemins, g, nb_lectures):
     #chemins_avant = [dijkstra.chemin_entre_deux_ensembles(g, c.départ(), c.arrivée(), 0) for c in chemins]
@@ -36,7 +39,7 @@ def affiche_avant_après(chemins, g, nb_lectures):
 
     utils.dessine_chemins(chemins, g)
 
-affiche_avant_après(tous_les_chemins, g, 5)
+#affiche_avant_après(tous_les_chemins, g, 10)
 
 def test(départ, arrivée, p_détour):
     """ départ et arrivée : des adresses (type str)"""
@@ -52,8 +55,16 @@ def test(départ, arrivée, p_détour):
 
     g.affiche_chemins([chemin_avant, chemin_après], {"route_colors": ["r","b"]})
 
+    
+def affiche_séparément(chemins=tous_les_chemins, g=g):
+    for i, c in enumerate(chemins):
+        print(f"{i} : {c}")
+        utils.dessine_chemin(c, g)
+    
 
-apprentissage.n_lectures(15, g, tous_les_chemins, bavard=1)
+apprentissage.n_lectures(10, g, tous_les_chemins, bavard=1)
+
+affiche_séparément()
 
 # vérif de la structure
 for c in tous_les_chemins:
@@ -65,5 +76,4 @@ for c in tous_les_chemins:
             print(c)
 
 
-for i, c in enumerate(tous_les_chemins):
-    print(i, c)
+

@@ -5,11 +5,12 @@
 
 import geopy
 #, overpy
-from initialisation.params import VILLE_DÉFAUT, LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
-from lecture_adresse.normalisation import normalise_rue, normalise_ville
+from initialisation.params import LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
+from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
+from lecture_adresse.normalisation import normalise_rue, normalise_ville
 
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"
@@ -36,28 +37,24 @@ class LieuPasTrouvé(Exception):
 def cherche_lieu(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
     """
-    try:
         
-        #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
-        if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}')
-        lieu = localisateur.geocode( {"street":nom_rue, "city":ville.avec_code(), "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
+    #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
+    if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}')
+    lieu = localisateur.geocode( {"street":nom_rue, "city":ville.avec_code(), "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
+    if lieu is not None:
+        return lieu
+
+    else:
+        # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
+        LOG_PB(f"La recherche structurée a échouée pour {nom_rue, ville.avec_code()}.")
+        print("Recherche Nominatim non structurée... Attention : résultat pas fiable.")
+        print(f'Essai 2 : "{nom_rue}, {ville.avec_code()}, {pays}" ')
+        lieu = localisateur.geocode(f"{nom_rue}, {ville.avec_code()}, {pays}", exactly_one=False)
         if lieu is not None:
             return lieu
-        
         else:
-            # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
-            LOG_PB(f"La recherche structurée a échouée pour {nom_rue, ville.avec_code()}.")
-            print("Recherche Nominatim non structurée... Attention : résultat pas fiable.")
-            print(f'Essai 2 : "{nom_rue}, {ville.avec_code()}, {pays}" ')
-            lieu = localisateur.geocode(f"{nom_rue}, {ville.avec_code()}, {pays}", exactly_one=False)
-            if lieu is not None:
-                return lieu
-            else:
-                raise LieuPasTrouvé
-            
-    except Exception as e:
-        print(e)
-        LOG_PB(f"{e}\n Lieu non trouvé : {nom_rue} ({ville})")
+            raise LieuPasTrouvé(f"{nom_rue} ({ville})")
+
 
 
 
@@ -155,6 +152,8 @@ def charge_rue_num_coords():
     for ligne in entrée:
         villerue, tmp = ligne.strip().split(":")
         ville, rue = villerue.split(";")
+        ville = str(normalise_ville(ville))
+        rue = normalise_rue(rue)
         données = tmp.split(";")
         if ville not in res: res[ville] = {}
         res[ville][rue] = ([], [])  # numéros pairs, numéros impairs
@@ -200,33 +199,35 @@ class CoordsPasTrouvées(Exception):
 
 def coords_of_adresse(num, rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
     """ Cherche les coordonnées de l’adresse fournie en interpolant parmi les adresses connues."""
-    assert isinstance(num, int) and num>0 and isinstance(ville, Ville)
+    assert isinstance(num, int) and num>0
     #nom_ville = normalise_ville( re.findall("[0-9]*\ ?([^0-9]*)", ville)[0])
-    try:
-        k = num % 2  # parité du numéro
-        l = D_RUE_NUM_COORDS[str(ville)][rue][k]
-        if len(l) < 2:
-            raise CoordsPasTrouvées(f"J’ai {len(l)} numéro en mémoire pour {rue} ({ville}) du côté de parité {k}. Je ne peux pas interpoler.")
-            
+
+    k = num % 2  # parité du numéro
+    l = D_RUE_NUM_COORDS[str(ville)][rue][k]
+    if len(l) < 2:
+        raise CoordsPasTrouvées(f"J’ai {len(l)} numéro en mémoire pour {rue} ({ville}) du côté de parité {k}. Je ne peux pas interpoler.")
+
+    else:
+        deb, c1 = -1, (-1, -1)
+        fin, c2 = -1, (-1, -1)
+        for (n, c) in l:
+            if n <= num:
+                deb, c1 = n, c
+            if n >= num:
+                fin, c2 = n, c
+                break
+        if (deb, c1) == (-1, (-1, -1)):  # num est plus petit que tous les éléments de l
+            ((deb, c1), (fin, c2)) = l[:2]
+        elif (fin, c2) == (-1, (-1, -1)):  # num est plus grand que tous les éléments de l
+            ((deb, c1), (fin, c2)) = l[-2:]
+        if bavard>0: print(f"Je connais les coords des numéros {deb} et {fin} de la rue {rue}")
+        if deb==fin:
+            return c1
         else:
-            deb, c1 = -1, (-1, -1)
-            fin, c2 = -1, (-1, -1)
-            for (n, c) in l:
-                if n <= num:
-                    deb, c1 = n, c
-                if n >= num:
-                    fin, c2 = n, c
-                    break
-            if (deb, c1) == (-1, (-1, -1)):  # num est plus petit que tous les éléments de l
-                ((deb, c1), (fin, c2)) = l[:2]
-            elif (fin, c2) == (-1, (-1, -1)):  # num est plus grand que tous les éléments de l
-                ((deb, c1), (fin, c2)) = l[-2:]
             λ  = (num-fin)/(deb-fin)
             return barycentre(c1, c2, λ)
-    
-    except KeyError as e:
-        raise CoordsPasTrouvées(f"Pas de données pour {rue} ({ville}) : {e}")
-        return None
+
+
 
 
 

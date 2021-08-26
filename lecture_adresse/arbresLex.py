@@ -82,8 +82,8 @@ class ArbreLex():
 
             
     def mots_les_plus_proches(self, mot, d_actuelle=0, d_max = float("inf")):
-        """ Renvoie le couple (liste des mots à distance minimale de mot, la distance minimale elle-même).
-        Renvoie [] si aucun mot à distance <= dmax.
+        """ Renvoie le couple (set des mots à distance minimale de mot, la distance minimale elle-même).
+        Renvoie set([]) si aucun mot à distance <= dmax.
         """
 
         def rassemble_possibs(p1, p2):
@@ -91,7 +91,7 @@ class ArbreLex():
             l1, d1 = p1
             l2, d2 = p2
             if d1==d2:
-                return (l1+l2, d1)
+                return (l1.union(l2), d1)
             elif d1<d2:
                 return p1
             else:
@@ -102,7 +102,7 @@ class ArbreLex():
             Renvoie le couple obtenu en mettant lettre devant chacun des mots.
             """
             mots, d = possib
-            return ([lettre+m for m in mots], d)
+            return (set([lettre+m for m in mots]), d)
         
         
         if d_max == d_actuelle:
@@ -111,10 +111,10 @@ class ArbreLex():
             else: return [], float("inf")
             
         else:
-            res = [], float("inf")
+            res = set([]), float("inf")
             if len(mot)==0:
                 if self.term:
-                    return ([""], d_actuelle)
+                    return (set([""]), d_actuelle)
                 else:
                     #Seule possibilité : ajouter des lettres
                     for lettre, f in self.fils.items():

@@ -23,3 +23,4 @@ def LOG_PB(msg):
     f.write(f"{datetime.now()}   {msg}\n")
     f.close()
     print(msg)
+LOG_PB("nouveau chargement de params.py\n\n")

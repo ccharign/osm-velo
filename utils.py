@@ -21,7 +21,7 @@ import module_graphe
 
 
 def ouvre_html(chemin):
-    res = subprocess.run([NAVIGATEUR, chemin], capture_output=True)
+    res = subprocess.Popen([NAVIGATEUR, chemin])#, capture_output=True)
 
 
 def cheminsValides(chemins, g):
@@ -64,6 +64,23 @@ def flatten(c):
     for x in c:
         res.extend(x)
     return res
+
+
+
+def dessine_chemin(c, g, où_enregistrer="tmp"):
+    """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
+    assert isinstance(c, chemins.Chemin)
+    c_direct = c.chemin_direct_sans_cycla(g)
+    graphe_c_direct = g.multidigraphe.subgraph(c_direct)
+    carte = ox.plot_graph_folium(graphe_c_direct, popup_attribute="name", color="red")
+
+    c_complet = dijkstra.chemin_étapes_ensembles(g, c)
+    graphe_c_complet = g.multidigraphe.subgraph(c_complet)
+    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
+    
+    nom = os.path.join(où_enregistrer, c.texte_court())
+    carte.save(nom)
+    ouvre_html(nom)
 
 
 def dessine_chemins(chemins, g, où_enregistrer="tmp"):

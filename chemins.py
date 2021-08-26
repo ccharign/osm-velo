@@ -7,7 +7,7 @@ from lecture_adresse.normalisation import VILLE_DÉFAUT
 import re
 import dijkstra
 from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville
-
+from lecture_adresse.récup_nœuds import nœuds_of_étape
 #Pour test
 #import init_graphe
 #g = init_graphe.charge_graphe(bavard=1)
@@ -20,7 +20,9 @@ def sans_guillemets(c):
     else:
         return c
 
-
+class ÉchecChemin(Exception):
+    pass
+    
 class Étape():
     """
     Attributs : 
@@ -29,7 +31,7 @@ class Étape():
     """
     def __init__(self, adresse, g, bavard=0):
         self.texte = adresse
-        self.nœuds = set(nœud_of_étape(adresse, g, bavard=bavard-1))
+        self.nœuds = set(nœuds_of_étape(adresse, g, bavard=bavard-1))
         for n in self.nœuds:
             assert n in g.digraphe.nodes, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {adresse} : {n}"
 
@@ -51,19 +53,32 @@ class Chemin():
     
     
     @classmethod
-    def of_ligne(cls, ligne, g):
+    def of_ligne(cls, ligne, g, tol=.25, bavard=0):
         """ Entrée : ligne (str), une ligne de csv du questionnaire. Les colonnes sont séparées par | . Il y a 12 colonnes, les 9 premières sont inutiles.
                      g (Graphe). Utilisé pour déterminer le nœud associé à chaque étape.
+        tol indique la proportion tolérée d’étapes qui n’ont pas pu être trouvées.
         """
         données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
         assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
         print("\n", données)
         p_détour = float(données[1])/100.
+        
         étapes = []
-        for c in données[2].split(";"):
-            étapes.append(Étape(c, g))
+        noms_étapes = données[2].split(";")
+        n_pb = 0
+        for c in noms_étapes:
+            try:
+                étapes.append(Étape(c, g, bavard=bavard-1))
+            except Exception as e:
+                LOG_PB(f"Échec pour l’étape {c}")
+                n_pb+=1
+        if n_pb/len(noms_étapes) > tol:
+            raise ÉchecChemin(f"{n_pb} erreurs pour la lecture de {données}.")
+        
+            
         if données[0] == "oui": AR = True
         else: AR = False
+        
         chemin = cls(étapes, p_détour, AR)
         chemin.texte = (données[2])
         return chemin
@@ -104,14 +119,21 @@ class Chemin():
         else:
             return ";".join(map(str, self.étapes))
 
+    def texte_court(self, n_étapes=4):
+        if len(self.étapes) <= n_étapes:
+            return str(self)
+        else:
+            à_garder = self.étapes[0:-1:len(self.étapes)//n_étapes] + [self.étapes[-1]]
+            return ";".join(map(str, à_garder))
+
    
-def chemins_of_csv(g, adresse_csv="données/chemins.csv"):
+def chemins_of_csv(g, adresse_csv="données/chemins.csv", bavard=0):
     entrée = open(adresse_csv)
     #res=[g.chemin_of_string(ligne) for ligne in entrée ]
     res = []
     for ligne in entrée:
         try:
-            chemin = Chemin.of_ligne(ligne, g)
+            chemin = Chemin.of_ligne(ligne, g, bavard=bavard)
             res.append(chemin)
         except Exception as e:
             LOG_PB( f"{e}\n Chemin abandonné : {ligne}\n" )
@@ -137,77 +159,3 @@ def lecture_étape(c):
 
 
 
-
-def nœud_of_étape(c, g, bavard=0):
-    """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
-        g : graphe.
-        Sortie : liste de nœuds de g associé à cette adresse.
-           Si un numéro est indiqué, renvoie le singleton du nœud de la rue le plus proche.
-           Sinon renvoie la liste des nœuds de la rue."""
-
-    c = normalise_adresse(c)
-    assert c != ""
-    
-    if c in g.nœud_of_rue:  # Recherche dans le cache
-        if bavard : print(f"Adresse dans le cache : {c}")
-        return g.nœud_of_rue[c]
-    else:
-        print(f"Pas dans le cache : {c}")
-    
-    def renvoie(res):
-        assert res != []
-        assert all(isinstance(s, int) and s in g.digraphe.nodes for s in res)
-        g.nœud_of_rue[c] = res
-        print(f"Mis en cache : {res} pour {c}")
-        return res
-
-    
-    ## Analyse de l’adresse. On récupère les variables num, rue, ville
-    e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
-    essai = re.findall(e, c)
-    if bavard > 1: print(f"Résultat de la regexp : {essai}")
-    if len(essai) == 1:
-        num, rue, _, ville = essai[0]
-    elif len(essai) == 0:
-        raise SyntaxError(f"adresse mal formée : {c}")
-    else:
-        print(f"Avertissement : plusieurs interprétations de {c} : {essai}.")
-        num, rue, _, ville = essai[0]
-    rue = normalise_rue(rue.strip())
-    
-    #if ville == "": ville = VILLE_DÉFAUT
-    ville = normalise_ville(ville.strip())
-    if bavard>0: print(f"analyse de l’adresse : {num} {rue}, {ville.avec_code()}")
-    
-    
-    if num == "":
-    ## Pas de numéro de rue -> liste de tous les nœuds de la rue
-        if bavard > 0 : print("Pas de numéro de rue, je vais renvoyer une liste de nœuds")
-        if rue == "":
-            raise SyntaxError(f"adresse mal formée : {c}")
-        else:
-            try:
-                #res = module_graphe.nœuds_sur_rue(g.digraphe, rue, ville=ville)
-                #return renvoie(res)
-                res = g.nœuds[str(ville)][rue]
-                if bavard > 0: print(f"nœuds trouvés dans g.nœuds[{str(ville)}][{rue}] : {res}.")
-                return res
-            except KeyError as e:
-                print(f"rue pas en mémoire : {rue} ({ville.avec_code()}). Je lance module_graphe.nœuds_sur_rue.")
-                res = module_graphe.nœuds_sur_rue(g, rue, ville=VILLE_DÉFAUT, pays="France", bavard=1)
-                #coords = coords_lieu(f"{rue}", ville=ville, bavard=bavard-1)
-                #print(f"Je vais prendre le nœud le plus proche de {coords}.")
-                #n = g.nœud_le_plus_proche(coords)
-                return renvoie(res)
-
-            
-    else:
-        ## Numéro de rue -> renvoyer un singleton
-        if bavard >0 : print("Numéro de rue présent : je vais renvoyer un seul nœud")
-        try:
-            coords = coords_of_adresse(num, rue, ville=ville)
-        except Exception as e:
-            print(f"Échec dans coords_of_adresse : {e}. Je passe à coords_lieu, càd avec une recherche Nominatim simple.")
-            coords = coords_lieu(f"{num} {rue}", ville=ville)
-        
-        return renvoie([module_graphe.nœud_sur_rue_le_plus_proche(g, coords, rue, ville=ville)])

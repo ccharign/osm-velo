@@ -9,6 +9,7 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
 from petites_fonctions import distance_euc
 from collections import deque
+from lecture_adresse.récup_nœuds import tous_les_nœuds
 
 class PasTrouvé(Exception):
     pass
@@ -35,7 +36,13 @@ class graphe():
         self.cyclabilité = {}
         self.nœud_of_rue = {}
         self.nœuds = {}
-       
+
+        
+    def __contains__(self, n):
+        """ Indique si le nœud n est dans g"""
+        return n in self.digraphe.nodes
+
+    
     def voisins(self, s, p_détour):
         """
         La méthode utilisée par dijkstra.
@@ -112,10 +119,11 @@ class graphe():
     def nœud_le_plus_proche(self, coords, recherche = "", d_max = D_MAX_POUR_NŒUD_LE_PLUS_PROCHE ):
         """
         recherche est la recherche initiale qui a eu besoin de cet appel. Uniquement pour compléter l’erreur qui sera levée si le nœud le plus proche est à distance > d_max.
+        Les coords doivent être dans l’ordre (lon, lat).
         """
         
-        n = nearest_nodes(self.multidigraphe, *coords)
-        if distance_euc(self.coords_of_nœud(n), coords) > d_max:
+        n, d = nearest_nodes(self.multidigraphe, *coords, return_dist = True)
+        if d > d_max:
             print(f" Distance entre {self.coords_of_nœud(n)} et {coords} supérieure à {d_max}.")
             raise TropLoin(recherche)
         else:
@@ -162,6 +170,9 @@ class graphe():
 
     
     def coords_of_nœud(self, n):
+        """ Renvoie le couple (lat, lon)
+        Au fait, attention : dans osm l’ordre est inversé : x=lon, y=lat.
+        """
         return self.digraphe.nodes[n]["y"], self.digraphe.nodes[n]["x"]
 
        
@@ -210,6 +221,7 @@ class graphe():
         adresse = os.path.join(chemin, "nœud_of_rue.csv")
         entrée = open(adresse, "w")
         entrée.close()
+        self.nœud_of_rue={}
        
     def sauv_cycla(self, chemin="données/"):
         """ chemin : adresse et nom du fichier, sans l'extension"""
@@ -228,93 +240,6 @@ class graphe():
         entrée.close()
     
 
-
-def nœuds_rue_of_arête(g, s, t):
-    """Entrée : g (digraph)
-                s, t : deux sommets adjacents
-       Sortie : liste des nœuds de la rue contenant l’arête (s, t). La rue est identifiée par le paramètre "name" dans le graphe."""
-
-    déjàVu = {}  # En cas d’une rue qui bouclerait...
-    nom = g[s][t]["name"]
-    
-    def nœud_dans_direction(g, s, t, res):
-        """ Mêmes entrées, ainsi que res, tableau où mettre le résultat.
-        t sera mis dans res et noté déjÀVu, mais pas s.
-
-        Renvoie les nœuds uniquement dans la direction (s,t), càd ceux auxquels on accède via t et non via s."""
-
-        res.append(t)
-        déjàVu[t] = True
-        voisins = [v for v in g[t] if v not in déjàVu and v!=s and g[t][v].get("name", "") == nom]
-        if len(voisins) == 0:
-            return res
-        elif len(voisins) == 1:
-            return nœud_dans_direction(g, t, voisins[0], res)
-        else:
-            print(f"Trop de voisins pour le nœud {t} dans la rue {nom}.")
-            return nœud_dans_direction(g, t, voisins[0], res)
-       
-    return list(reversed(nœud_dans_direction(g, s, t, []))) + nœud_dans_direction(g, t, s, [])
-
-
-def nœuds_rue_of_nom_et_nœud(g, n, nom):
-    """ Entrée : n (int) un nœud de la rue
-                 nom (str) le nom de la rue. Doit être le nom exact utilisé par osm et reporté dans le graphe.
-        Sortie : liste des nœuds de la rue, dans l’ordre topologique."""
-
-    for v in g[n]:
-        if g[n][v].get("name", "") == nom:
-            return nœuds_rue_of_arête(g, n, v)
-    raise PasTrouvé(f"Pas trouvé de voisin pour le nœud {n} dans la rue {nom}")
-
-
-def nœuds_sur_rue(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=1):
-    """ Entrée : g (graphe)
-                 nom_rue (str)
-        Sortie : liste des nœuds de cette rue, dans l’ordre topologique.
-
-
-    Méthode actuelle :
-       - essayer dans g.nœuds[str(ville)][rue]
-       - recherche Nominatim pour trouver le nom de la rue dans osm
-       - deuxième essai dans g.nœuds avec ce nouveau nom
-       - dernier essai en suivant la rue par un parcours en profondeur du graphe.
-    """
-
-    try:
-        return g.nœuds[str(ville)][normalise_rue(nom_rue)]
-    except KeyError as e :
-        print(f"(nœuds_sur_rue) Rue pas en mémoire : {nom_rue} ({ville})  ({e}).")
-        lieu = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard-1)
-
-        for tronçon in lieu:
-            if tronçon.raw["osm_type"] == "way":
-                nom = lieu[0].raw["display_name"].split(",")[0]  # est-ce bien fiable ?
-                print(f"nom trouvé : {nom}")
-                try:
-                    return g.nœuds[str(ville)][normalise_rue(nom_rue)]
-                except KeyError as e :
-                    print(f"(nœuds_sur_rue) Rue pas en mémoire : {nom_rue} ({ville}) ({e}).")
-
-                    id_rue = tronçon.raw["osm_id"]
-                    nœuds = nœuds_sur_tronçon_local(id_rue)
-                    for n in nœuds:
-                        if n in g.digraphe.nodes:
-                            return nœuds_rue_of_nom_et_nœud(g.digraphe, n, nom)
-        raise PasTrouvé(f"Pas réussi à trouver la rue et un nœud dessus : {nom_rue} ({ville})")
-
-
-def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
-    """ 
-    Entrée : g (graphe)
-             nom_rue (str)
-             coords ( (float, float) )
-    Renvoie le nœud sur la rue nom_rue le plus proche de coords."""
-
-    nœuds = nœuds_sur_rue(g, nom_rue, ville=ville, pays=pays, bavard=bavard-1)
-    tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]
-    _, res = min(tab)
-    return res
 
 
 def vérif_arêtes(g):
