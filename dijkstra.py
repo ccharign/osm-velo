@@ -69,15 +69,17 @@ def chemin_étapes(g, c):
 #######################################################################
 
 
-def vers_une_étape(g, départ, arrivée, p_détour, dist, pred):
+def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étape):
     """
     Entrées : g, graphe avec méthode voisins qui prend un sommet et un p_détour et qui renvoie une liste de (voisin, longueur de l’arête)
               départ et arrivée, ensembles de sommets
               p_détour ∈ [0,1]
               dist : dictionnaire donnant la distance initiale à prendre pour chaque élément de départ (utile quand départ sera juste une étape intermédiaire)
               pred : dictionnaire des prédécesseurs déjà calculés.
+              première_étape (bool) : indique si on en est à la première étape du trajet final.
 
     Effet : pred et dist sont remplis de manière à fournir tous les plus courts chemins d’un sommet de départ vers un sommet d’arrivée, en prenant compte des bonus/malus liés aux valeurs initiales de dist.
+    Sauf si première_étape, on impose de passer par au moins une arête de départ.
     """
 
     àVisiter = []
@@ -96,10 +98,11 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred):
             fini = len(sommetsFinalsTraités) == len(arrivée)
             
         for t, l in g.voisins(s, p_détour):
-            if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
-                dist[t] = dist[s]+l
-                heappush(àVisiter, (dist[t], t))
-                pred[t] = s
+            #if t in départ or s not in départ or pred[s] not in départ or première_étape : # Pour forcer à passer par au moins une arête de départ (sauf pour la première étape da trajet).
+                if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
+                    dist[t] = dist[s]+l
+                    heappush(àVisiter, (dist[t], t))
+                    pred[t] = s
 
 
 def reconstruction(chemin, pred, départ):
@@ -107,7 +110,7 @@ def reconstruction(chemin, pred, départ):
                   départ, sommets de départ de l’étape (structure permettant un «in»)
                   arrivée, sommets d’arrivée de l’étape. Doit être itérable
                   dist, le dictionnaire sommet -> dist min à un sommet de départ, créé par Dijkstra.
-        Effet : rempli chemin avec un plus court trajet de chmin[-1] vers un sommet de départ.
+        Effet : remplit chemin avec un plus court trajet de chemin[-1] vers un sommet de départ.
     """  
     s = chemin[-1]
     while s not in départ:
@@ -117,10 +120,10 @@ def reconstruction(chemin, pred, départ):
 
 def chemin_étapes_ensembles(g, c):
     """
-    Obsolète : nouvelle version ci-dessous
+   
     Entrées : départ et arrivée, deux sommets
               c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds.)
-    Sortie : plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins un sommet de chaque étape intéremédiaire.
+    Sortie : plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins une arête de chaque étape intéremédiaire.
     """
     
     étapes = c.étapes
@@ -132,10 +135,10 @@ def chemin_étapes_ensembles(g, c):
     preds_précs = []
 
     for i in range(1, len(étapes)):
-        vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred)
+        vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred, i==1)
         preds_précs.append(copy.deepcopy(pred))  # pour la reconstruction finale
         # preds_précs[k] contient les données pour aller de étapes[k] vers étapes[k+1], k==i-1
-        dist = {s: d for (s, d) in dist.items() if s in étapes[i].nœuds}  # On efface tout sauf les sommet de l’étape qu’on vient d’atteindre
+        dist = {s: d for (s, d) in dist.items() if s in étapes[i].nœuds}  # On efface tout sauf les sommets de l’étape qu’on vient d’atteindre
 
     if all(s not in dist for s in arrivée):
         raise PasDeChemin(f"Pas de chemin trouvé pour {c} (sommets non atteint : {e}).")
@@ -153,6 +156,7 @@ def chemin_étapes_ensembles(g, c):
     
     ############################################################
     ########## Troisième version : les étapes sont des ensembles, on les relie par des plus court chemins, et on relie ces plus court chemins entre eux (a priori dans l'ensemble)##########
+    # plus utilisée : je l’ai renommé en chemin_étapes_ensembles2
     ############################################################
 
     
@@ -197,7 +201,7 @@ def chemin_entre_deux_ensembles(g, départ, arrivée, p_détour):
 
 
 
-def chemin_étapes_ensembles(g, c):
+def chemin_étapes_ensembles2(g, c):
     """
     Entrées : g, graphe
               c, instance de Chemin
