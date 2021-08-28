@@ -15,7 +15,7 @@ g = charge_graphe(bavard=2)
 
 
 
-tous_les_chemins = chemins.chemins_of_csv(g, bavard=3)
+tous_les_chemins = chemins.chemins_of_csv(g, bavard=1)
 len(tous_les_chemins)
 
 
@@ -32,28 +32,6 @@ def affiche_texte_chemins(chemins=tous_les_chemins):
     for i,c in enumerate(chemins):
         print(f"{i} : {c}\n")
 
-def affiche_avant_après(chemins, g, nb_lectures):
-    #chemins_avant = [dijkstra.chemin_entre_deux_ensembles(g, c.départ(), c.arrivée(), 0) for c in chemins]
-    #g.réinitialise_cyclabilité()
-    apprentissage.n_lectures(nb_lectures, g, chemins, bavard=2)
-
-    utils.dessine_chemins(chemins, g)
-
-#affiche_avant_après(tous_les_chemins, g, 10)
-
-def test(départ, arrivée, p_détour):
-    """ départ et arrivée : des adresses (type str)"""
-    g.réinitialise_cyclabilité()
-    id_d = g.nœud_centre_rue(départ)
-    id_a = g.nœud_centre_rue(arrivée)
-
-    chemin_avant = g.chemin(id_d, id_a, p_détour)
-
-    apprentissage.n_lectures(10, g, tous_les_chemins, bavard=1)
-
-    chemin_après = g.chemin(id_d, id_a, p_détour)
-
-    g.affiche_chemins([chemin_avant, chemin_après], {"route_colors": ["r","b"]})
 
     
 def affiche_séparément(chemins=tous_les_chemins, g=g):

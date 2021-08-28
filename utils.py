@@ -14,14 +14,15 @@ import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
 from params import NAVIGATEUR
-from lecture_adresse.normalisation import VILLE_DÉFAUT
+from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
 import récup_données
 import module_graphe
-
+import webbrowser
 
 def ouvre_html(chemin):
-    res = subprocess.Popen([NAVIGATEUR, chemin])#, capture_output=True)
+    webbrowser.open(chemin)
+    #res = subprocess.Popen([NAVIGATEUR, chemin])#, capture_output=True)
 
 
 def cheminsValides(chemins, g):
@@ -70,11 +71,15 @@ def flatten(c):
 def dessine_chemin(c, g, où_enregistrer="tmp"):
     """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
     assert isinstance(c, chemins.Chemin)
-    c_direct = c.chemin_direct_sans_cycla(g)
+
+    c_complet = dijkstra.chemin_étapes_ensembles(g, c)
+    départ, arrivée = c_complet[0], c_complet[-1]
+    
+    c_direct = dijkstra.chemin(g,départ,arrivée,0)
     graphe_c_direct = g.multidigraphe.subgraph(c_direct)
     carte = ox.plot_graph_folium(graphe_c_direct, popup_attribute="name", color="red")
 
-    c_complet = dijkstra.chemin_étapes_ensembles(g, c)
+    
     graphe_c_complet = g.multidigraphe.subgraph(c_complet)
     carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
@@ -124,5 +129,5 @@ def affiche_rue(ville, rue, g, bavard=0):
               
     """
     #sommets = chemins.nœud_of_étape(adresse, g, bavard=bavard-1)
-    sommets = g.nœuds[str(ville)][rue]
+    sommets = g.nœuds[str(normalise_ville(ville))][normalise_rue(rue)]
     affiche_sommets(sommets, g)

@@ -236,6 +236,7 @@ class graphe():
         entrée = open(os.path.join(chemin, "Cyclabilité.csv"))
         for ligne in entrée:
             s, t, v = ligne.strip().split(";")
+            s=int(s); t=int(t); v=float(v)
             self.cyclabilité[(s, t)] = v
         entrée.close()
     
