@@ -6,3 +6,4 @@ matplotlib==3.4.2
 geopy==2.1.0
 branca==0.4.2
 folium==0.12.1
+scikit-learn==0.24.2
