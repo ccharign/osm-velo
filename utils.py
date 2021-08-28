@@ -21,7 +21,7 @@ import module_graphe
 import webbrowser
 
 def ouvre_html(chemin):
-    print(f"url à ouvrir : https://hub.gke2.mybinder.org/user/ccharign-osm-velo-be1ya7fg/view/{chemin[1:]}")
+    print(f"url à ouvrir : https://hub.gke2.mybinder.org/user/ccharign-osm-velo-be1ya7fg/view{chemin[1:]}")
     webbrowser.open(chemin)
     #res = subprocess.Popen([NAVIGATEUR, chemin])#, capture_output=True)
 
@@ -46,7 +46,7 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0):
     res = g.chemin_étapes_ensembles(c)
     graphe_c = g.multidigraphe.subgraph(res)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, départ+arrivée+".html")
+    nom = os.path.join(où_enregistrer, (départ+arrivée).replac(" ","")+".html")
     carte.save(nom)
     ouvre_html(nom)
     #ox.plot_route_folium(g.multidigraphe,c)
