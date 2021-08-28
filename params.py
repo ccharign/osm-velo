@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 
 from datetime import datetime
-import os.path
-
+import os
 
 RACINE_PROJET="."
+
 
 CHEMIN_XML = os.path.join(RACINE_PROJET, "données/voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
 
@@ -18,6 +18,8 @@ NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html
 
 D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres
 
+
+os.makedirs(os.path.join(RACINE_PROJET, "log"), exist_ok=True)
 def LOG_PB(msg):
     f = open(os.path.join(RACINE_PROJET,"log/pb.log"), "a")
     f.write(f"{datetime.now()}   {msg}\n")

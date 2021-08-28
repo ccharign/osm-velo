@@ -5,7 +5,7 @@
 
 import geopy
 #, overpy
-from initialisation.params import LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
+from params import LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
 from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
