@@ -21,7 +21,7 @@ import module_graphe
 import webbrowser
 
 def ouvre_html(chemin):
-    print(f"url à ouvrir :{chemin}")
+    print(f"url à ouvrir : https://hub.gke2.mybinder.org/user/ccharign-osm-velo-be1ya7fg/view/{chemin[1:]}")
     webbrowser.open(chemin)
     #res = subprocess.Popen([NAVIGATEUR, chemin])#, capture_output=True)
 
