@@ -9,7 +9,7 @@
 from petites_fonctions import ajouteDico
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
-from initialisation.params import CHEMIN_NŒUDS_VILLES, CHEMIN_JSON_NUM_COORDS
+from params import CHEMIN_NŒUDS_VILLES, CHEMIN_JSON_NUM_COORDS
 
 
 def liste_villes():
