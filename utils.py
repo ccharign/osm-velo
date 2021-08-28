@@ -13,7 +13,7 @@ from module_graphe import graphe  #ma classe de graphe
 import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
-from params import NAVIGATEUR
+from params import NAVIGATEUR, TMP
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
 import récup_données
@@ -38,7 +38,7 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, p_détour, g, où_enregistrer="tmp", bavard=0):
+def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0):
     d = chemins.Étape(départ, g)
     a = chemins.Étape(arrivée, g)
     c = chemins.Chemin([d, a], p_détour, False)
@@ -68,7 +68,7 @@ def flatten(c):
 
 
 
-def dessine_chemin(c, g, où_enregistrer="tmp"):
+def dessine_chemin(c, g, où_enregistrer=TMP):
     """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
     assert isinstance(c, chemins.Chemin)
 
@@ -88,7 +88,7 @@ def dessine_chemin(c, g, où_enregistrer="tmp"):
     ouvre_html(nom)
 
 
-def dessine_chemins(chemins, g, où_enregistrer="tmp"):
+def dessine_chemins(chemins, g, où_enregistrer=TMP):
     """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
     chemins_directs = []
     for c in chemins:
@@ -114,7 +114,7 @@ def dessine_chemins(chemins, g, où_enregistrer="tmp"):
     ouvre_html(nom)
 
 
-def affiche_sommets(s, g, où_enregistrer="tmp"):
+def affiche_sommets(s, g, où_enregistrer=TMP):
     """ Entrée : s, liste de sommets """
     graphe_c = g.multidigraphe.subgraph(s)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")

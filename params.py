@@ -13,6 +13,9 @@ CHEMIN_JSON_NUM_COORDS = os.path.join(RACINE_PROJET,"données/rue_num_coords.csv
 CHEMIN_NŒUDS_VILLES = os.path.join(RACINE_PROJET,"données/nœuds_villes.csv")
 CHEMIN_NŒUDS_RUES = os.path.join(RACINE_PROJET,"données/nœuds_rues.csv")
 
+TMP = os.path.join(RACINE_PROJET, "tmp/")
+os.makedirs(TMP, exist_ok=True)
+
 STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
 NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html
 
