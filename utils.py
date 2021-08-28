@@ -46,7 +46,7 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0):
     res = g.chemin_étapes_ensembles(c)
     graphe_c = g.multidigraphe.subgraph(res)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, (départ+arrivée).replac(" ","")+".html")
+    nom = os.path.join(où_enregistrer, (départ+arrivée).replace(" ","")+".html")
     carte.save(nom)
     ouvre_html(nom)
     #ox.plot_route_folium(g.multidigraphe,c)
