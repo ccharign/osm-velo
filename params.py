@@ -4,7 +4,7 @@ from datetime import datetime
 import os.path
 
 
-RACINE_PROJET="/home/moi/git/osm vélo"
+RACINE_PROJET="."
 
 CHEMIN_XML = os.path.join(RACINE_PROJET, "données/voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
 
