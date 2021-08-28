@@ -17,5 +17,11 @@
 
  Pour l'instant, seule la ville de Pau et son agglomération est en mémoire, mais les fonctions dans init_graphe et dans récup_données permettent de charger n'inporte quelle zone.
 
- Pour contribuer en fournissant des trajets c'est ici https://framaforms.org/entrainement-du-calculateur-participatif-ditineraires-version-clic-1618406941
+ Ce projet ne pourra devenir pertinent que lorsque j’aurai récupérer disons une centaine de trajets ! Je compte sur vous pour m’en fournir un ou deux,  c'est ici https://framaforms.org/entrainement-du-calculateur-participatif-ditineraires-version-clic-1618406941
+
+ Je compte également sur vous pour m’indiquer les erreurs et les problèmes que vous aurez détectés.
+
+
+ Limitations connues :
+ - Il y a très peu de numéros de rue sur openstreetmap. Ainsi lorsque vous indiquez un tel numéro dans l’adresse, il y des chances que je ne puisse pas le prendre en compte, et l’algo vous aménera au point de la rue d’arrivée le plus proche de la rue de départ. (Ceci a des conséquences subtiles sur l’apprentissage ; au vu des choix que j’ai fait il y aura plutôt sous-apprentissage dans ce genre de cas, si vous voulez les détails payez moi une bière.)
   
