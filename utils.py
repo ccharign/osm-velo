@@ -21,6 +21,7 @@ import module_graphe
 import webbrowser
 
 def ouvre_html(chemin):
+    print(f"url à ouvrir :{chemin}")
     webbrowser.open(chemin)
     #res = subprocess.Popen([NAVIGATEUR, chemin])#, capture_output=True)
 
