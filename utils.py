@@ -19,6 +19,7 @@ import os
 import récup_données
 import module_graphe
 import webbrowser
+from matplotlib import cm
 
 def ouvre_html(chemin):
     webbrowser.open(chemin)
@@ -119,7 +120,7 @@ def affiche_sommets(s, g, où_enregistrer=TMP):
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
     nom = os.path.join(où_enregistrer, "affiche_sommets.html")
     carte.save(nom)
-    subprocess.run([NAVIGATEUR, nom])
+    ouvre_html(nom)
 
 
 def affiche_rue(ville, rue, g, bavard=0):
@@ -130,3 +131,63 @@ def affiche_rue(ville, rue, g, bavard=0):
     #sommets = chemins.nœud_of_étape(adresse, g, bavard=bavard-1)
     sommets = g.nœuds[str(normalise_ville(ville))][normalise_rue(rue)]
     affiche_sommets(sommets, g)
+
+
+# Pour utiliser folium sans passer par osmnx regarder :
+# https://stackoverflow.com/questions/57903223/how-to-have-colors-based-polyline-on-folium
+def dessine_cycla(g, où_enregistrer=TMP, bavard=0 ):
+   
+    list_colors = [# Du vert au rouge
+        "#00FF00",        "#12FF00",        "#24FF00",        "#35FF00",
+        "#47FF00",        "#58FF00",        "#6AFF00",        "#7CFF00",
+        "#8DFF00",        "#9FFF00",        "#B0FF00",        "#C2FF00",
+        #"#D4FF00",        "#E5FF00",        #"#F7FF00",        "#FFF600",
+        #"#FFE400",        "#FFD300",
+        "#FFC100",        "#FFAF00",
+        "#FF9E00",        "#FF8C00",        "#FF7B00",        "#FF6900",
+        "#FF5700",        "#FF4600",        "#FF3400",        "#FF2300",
+        "#FF1100",        "#FF0000",    ]
+    list_colors.reverse() # maintenant du rouge au vert
+    color_dict = {i: list_colors[i] for i in range(len(list_colors))}
+    
+    n_coul = len(list_colors) 
+    mini, maxi = min(g.cyclabilité.values()), max(g.cyclabilité.values())
+    if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
+    
+    def num_paquet(val):
+        """Renvoie un entier dans [|0, n_coul[|. 1 est associé à n_coul//2, mini à 0, maxi à 1."""
+
+        if val==maxi:
+            return n_coul-1
+        elif val <= 1.:
+            return int((val-mini)/(1-mini)*n_coul/2)  # dans [|0, n_coul/2 |]
+        else:
+            return int((val-1)/(maxi-1)*n_coul/2+n_coul/2)
+
+        
+
+    nœuds_par_cycla = [ set([]) for i in range(n_coul)]
+    
+
+    for s in g.digraphe.nodes:
+        for t in g.voisins_nus(s):
+            if (s,t) in g.cyclabilité:
+                i=num_paquet(g.cyclabilité[(s,t)])
+                nœuds_par_cycla[i].add(s)
+                nœuds_par_cycla[i].add(t)
+
+
+    début=True
+    for i, nœuds in enumerate(nœuds_par_cycla):
+        if len(nœuds) > 0:
+            print(len(nœuds))
+            à_rajouter = g.multidigraphe.subgraph(list(nœuds))
+            if début:
+                carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i])
+                début=False
+            else:
+                carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
+        
+    nom = os.path.join(où_enregistrer, "cycla.html")
+    carte.save(nom)
+    ouvre_html(nom)
