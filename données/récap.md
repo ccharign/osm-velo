@@ -1,2 +1,0 @@
-- rue_num_coords : donne les coordonnées gps des numéros de rue connus
-- nœud_of_rue.csv : sert de cache pour les recherches de lieux effectuées. Pour une rue, il y a tous les nœuds trouvés, pour une adresse précise il y en a un seul.
