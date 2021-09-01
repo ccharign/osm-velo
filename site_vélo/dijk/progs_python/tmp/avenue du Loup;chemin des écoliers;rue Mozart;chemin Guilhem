@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_9cca2a3d4c9c4d868faf37ac0c38a6dd {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_9cca2a3d4c9c4d868faf37ac0c38a6dd" ></div>
+        
+</body>
+<script>    
+    
+            var map_9cca2a3d4c9c4d868faf37ac0c38a6dd = L.map(
+                "map_9cca2a3d4c9c4d868faf37ac0c38a6dd",
+                {
+                    center: [43.31772171531238, -0.347276917979044],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 1,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_cb2c8d35c841458488b7ef0bfc51ab40 = L.tileLayer(
+                "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"http://cartodb.com/attributions\"\u003eCartoDB\u003c/a\u003e, CartoDB \u003ca href =\"http://cartodb.com/attributions\"\u003eattributions\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+            var poly_line_865ae7fd14094a9c9907a270b5fad235 = L.polyline(
+                [[43.3178895, -0.3440692], [43.3178505, -0.3439478]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_de31c7b1c3d74fc2bcc6acee63ab1063 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_59a2d540819e4cd592bf75596cf1631c = $(`<div id="html_59a2d540819e4cd592bf75596cf1631c" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_de31c7b1c3d74fc2bcc6acee63ab1063.setContent(html_59a2d540819e4cd592bf75596cf1631c);
+        
+
+        poly_line_865ae7fd14094a9c9907a270b5fad235.bindPopup(popup_de31c7b1c3d74fc2bcc6acee63ab1063)
+        ;
+
+        
+    
+    
+            var poly_line_e56f34370c3a49b4bdb1ab1feb0a9d50 = L.polyline(
+                [[43.3175721, -0.3431634], [43.3176396, -0.3433476], [43.3177728, -0.3437111], [43.3177937, -0.3437684], [43.3178505, -0.3439478]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_325fba0df31b4741842500812028a9a6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_82266786105f4fdfb3735f216f0388c0 = $(`<div id="html_82266786105f4fdfb3735f216f0388c0" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_325fba0df31b4741842500812028a9a6.setContent(html_82266786105f4fdfb3735f216f0388c0);
+        
+
+        poly_line_e56f34370c3a49b4bdb1ab1feb0a9d50.bindPopup(popup_325fba0df31b4741842500812028a9a6)
+        ;
+
+        
+    
+    
+            var poly_line_8bf5c64b302542789c074d5dda1da842 = L.polyline(
+                [[43.3148648, -0.3543845], [43.3147658, -0.3544965]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_95d7fa972e0f4868b26ade3f47c26e19 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d97b5ed93cec44f3bc1c34f12bf305ab = $(`<div id="html_d97b5ed93cec44f3bc1c34f12bf305ab" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_95d7fa972e0f4868b26ade3f47c26e19.setContent(html_d97b5ed93cec44f3bc1c34f12bf305ab);
+        
+
+        poly_line_8bf5c64b302542789c074d5dda1da842.bindPopup(popup_95d7fa972e0f4868b26ade3f47c26e19)
+        ;
+
+        
+    
+    
+            var poly_line_b5ee819dc84f405687112fe7642b6645 = L.polyline(
+                [[43.3191507, -0.3491697], [43.3191235, -0.3492159]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_8e457d95a7814248b910023894072130 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d7a9d91feb754a41b3af292fbeb938e8 = $(`<div id="html_d7a9d91feb754a41b3af292fbeb938e8" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_8e457d95a7814248b910023894072130.setContent(html_d7a9d91feb754a41b3af292fbeb938e8);
+        
+
+        poly_line_b5ee819dc84f405687112fe7642b6645.bindPopup(popup_8e457d95a7814248b910023894072130)
+        ;
+
+        
+    
+    
+            var poly_line_f8d049a1bf8b4179a112425cc47aed77 = L.polyline(
+                [[43.3191507, -0.3491697], [43.3193285, -0.3488677]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_1f1cce39dc74445d8f85470bc185c8b8 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_dc52d44c241646219215f6386e34fac5 = $(`<div id="html_dc52d44c241646219215f6386e34fac5" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_1f1cce39dc74445d8f85470bc185c8b8.setContent(html_dc52d44c241646219215f6386e34fac5);
+        
+
+        poly_line_f8d049a1bf8b4179a112425cc47aed77.bindPopup(popup_1f1cce39dc74445d8f85470bc185c8b8)
+        ;
+
+        
+    
+    
+            var poly_line_63ae43fa4bdb4361b53120409e3254fc = L.polyline(
+                [[43.3193285, -0.3488677], [43.319306, -0.3490589], [43.3192206, -0.3492145], [43.319206, -0.3492232], [43.3191923, -0.3492191], [43.3191507, -0.3491697]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_2246e5c909824ae38dba7f569e7f139d = L.popup({"maxWidth": "100%"});
+
+        
+            var html_1f9bb6bc4cb64dd7911cf3aeac7f993c = $(`<div id="html_1f9bb6bc4cb64dd7911cf3aeac7f993c" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_2246e5c909824ae38dba7f569e7f139d.setContent(html_1f9bb6bc4cb64dd7911cf3aeac7f993c);
+        
+
+        poly_line_63ae43fa4bdb4361b53120409e3254fc.bindPopup(popup_2246e5c909824ae38dba7f569e7f139d)
+        ;
+
+        
+    
+    
+            var poly_line_664ec44308ed4c2f89c9d40a492401dd = L.polyline(
+                [[43.3189001, -0.3463419], [43.3188353, -0.3461826], [43.3187607, -0.3460073]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_2ab4f637ec5f479cb04deb007c4fe781 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ee559633baea430d9dd859980a29ef7c = $(`<div id="html_ee559633baea430d9dd859980a29ef7c" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_2ab4f637ec5f479cb04deb007c4fe781.setContent(html_ee559633baea430d9dd859980a29ef7c);
+        
+
+        poly_line_664ec44308ed4c2f89c9d40a492401dd.bindPopup(popup_2ab4f637ec5f479cb04deb007c4fe781)
+        ;
+
+        
+    
+    
+            var poly_line_1be9ee7579564ba181c1e46ca55ce650 = L.polyline(
+                [[43.3189001, -0.3463419], [43.3189461, -0.3464649]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_e9187a5f9ca1430c8f5fb0d5264b245e = L.popup({"maxWidth": "100%"});
+
+        
+            var html_9e6c1912463b4d33936f9f0fb7373c7b = $(`<div id="html_9e6c1912463b4d33936f9f0fb7373c7b" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_e9187a5f9ca1430c8f5fb0d5264b245e.setContent(html_9e6c1912463b4d33936f9f0fb7373c7b);
+        
+
+        poly_line_1be9ee7579564ba181c1e46ca55ce650.bindPopup(popup_e9187a5f9ca1430c8f5fb0d5264b245e)
+        ;
+
+        
+    
+    
+            var poly_line_4ce477dd3d57449986faef34115048f2 = L.polyline(
+                [[43.3192472, -0.3475189], [43.3190374, -0.3467736]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_ffde3db1557f437e8cd1e595041d5355 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0a85de117bd345d39f90e3e61116dbcd = $(`<div id="html_0a85de117bd345d39f90e3e61116dbcd" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_ffde3db1557f437e8cd1e595041d5355.setContent(html_0a85de117bd345d39f90e3e61116dbcd);
+        
+
+        poly_line_4ce477dd3d57449986faef34115048f2.bindPopup(popup_ffde3db1557f437e8cd1e595041d5355)
+        ;
+
+        
+    
+    
+            var poly_line_94fd0e2390744f2ab3d93f09873a5c55 = L.polyline(
+                [[43.3194223, -0.3481096], [43.3192472, -0.3475189]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_5fa49d14490f4cc39de0b8544a1b0533 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8ac3281df74c4e3db6b0772cb0b5b6ad = $(`<div id="html_8ac3281df74c4e3db6b0772cb0b5b6ad" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_5fa49d14490f4cc39de0b8544a1b0533.setContent(html_8ac3281df74c4e3db6b0772cb0b5b6ad);
+        
+
+        poly_line_94fd0e2390744f2ab3d93f09873a5c55.bindPopup(popup_5fa49d14490f4cc39de0b8544a1b0533)
+        ;
+
+        
+    
+    
+            var poly_line_17d3fa1303884d919dbf2b71f3565d47 = L.polyline(
+                [[43.3168988, -0.3411124], [43.3169402, -0.341235], [43.3171746, -0.3419722]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_3dd64c2599674b01b4a6dd73404a454a = L.popup({"maxWidth": "100%"});
+
+        
+            var html_031dbf19080e4876b50f4387736c848b = $(`<div id="html_031dbf19080e4876b50f4387736c848b" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_3dd64c2599674b01b4a6dd73404a454a.setContent(html_031dbf19080e4876b50f4387736c848b);
+        
+
+        poly_line_17d3fa1303884d919dbf2b71f3565d47.bindPopup(popup_3dd64c2599674b01b4a6dd73404a454a)
+        ;
+
+        
+    
+    
+            var poly_line_852ccce7a69546f79b7fe3f608df631c = L.polyline(
+                [[43.3175721, -0.3431634], [43.3174681, -0.3428572], [43.3172113, -0.3420845], [43.3171746, -0.3419722]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_ba6ec2f5c0424aa8a7978bc39c91ae93 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_fec37ee37a4b47028db9ffc86e0cf05b = $(`<div id="html_fec37ee37a4b47028db9ffc86e0cf05b" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_ba6ec2f5c0424aa8a7978bc39c91ae93.setContent(html_fec37ee37a4b47028db9ffc86e0cf05b);
+        
+
+        poly_line_852ccce7a69546f79b7fe3f608df631c.bindPopup(popup_ba6ec2f5c0424aa8a7978bc39c91ae93)
+        ;
+
+        
+    
+    
+            var poly_line_e2d9714940464fe18ce7d1c75199d46d = L.polyline(
+                [[43.3181391, -0.3510339], [43.3183008, -0.350746], [43.3185195, -0.3503564], [43.3187333, -0.3499821], [43.3187936, -0.3498605]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_161c408480e24e25b3dad35f7192e54b = L.popup({"maxWidth": "100%"});
+
+        
+            var html_cde9a562d98b4502ade3ce5faefeac18 = $(`<div id="html_cde9a562d98b4502ade3ce5faefeac18" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_161c408480e24e25b3dad35f7192e54b.setContent(html_cde9a562d98b4502ade3ce5faefeac18);
+        
+
+        poly_line_e2d9714940464fe18ce7d1c75199d46d.bindPopup(popup_161c408480e24e25b3dad35f7192e54b)
+        ;
+
+        
+    
+    
+            var poly_line_78fe449ef3894e799c132ffbd9021a98 = L.polyline(
+                [[43.3181391, -0.3510339], [43.3179447, -0.3513801]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_537063a15c1f46db99551c84f442fe48 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_b7bb5256a4a54931b7ac43cb20da3eff = $(`<div id="html_b7bb5256a4a54931b7ac43cb20da3eff" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_537063a15c1f46db99551c84f442fe48.setContent(html_b7bb5256a4a54931b7ac43cb20da3eff);
+        
+
+        poly_line_78fe449ef3894e799c132ffbd9021a98.bindPopup(popup_537063a15c1f46db99551c84f442fe48)
+        ;
+
+        
+    
+    
+            var poly_line_3767ad149f034377b700acb03544a475 = L.polyline(
+                [[43.3153705, -0.3537626], [43.3153412, -0.3537995]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_47c9588390884a5498c42a1d8d98b1e0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_6915068d4fa547e8bfcf937e7157ad20 = $(`<div id="html_6915068d4fa547e8bfcf937e7157ad20" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_47c9588390884a5498c42a1d8d98b1e0.setContent(html_6915068d4fa547e8bfcf937e7157ad20);
+        
+
+        poly_line_3767ad149f034377b700acb03544a475.bindPopup(popup_47c9588390884a5498c42a1d8d98b1e0)
+        ;
+
+        
+    
+    
+            var poly_line_c1471423f1844506ab8d504bb12b1385 = L.polyline(
+                [[43.3153705, -0.3537626], [43.3154144, -0.3537103]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_7b6fb204ea534cdbb3740fb0df41804d = L.popup({"maxWidth": "100%"});
+
+        
+            var html_4988e99aedab42658a53b183d7797fdc = $(`<div id="html_4988e99aedab42658a53b183d7797fdc" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_7b6fb204ea534cdbb3740fb0df41804d.setContent(html_4988e99aedab42658a53b183d7797fdc);
+        
+
+        poly_line_c1471423f1844506ab8d504bb12b1385.bindPopup(popup_7b6fb204ea534cdbb3740fb0df41804d)
+        ;
+
+        
+    
+    
+            var poly_line_a6bb815c38424ceb8b48868f8203a00d = L.polyline(
+                [[43.3154144, -0.3537103], [43.3154891, -0.3536231], [43.3155486, -0.3535654], [43.3156544, -0.353485], [43.3157603, -0.353424], [43.3158837, -0.3533709], [43.3164491, -0.3531449], [43.3164832, -0.3531313]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_7b74de32263345ef9be9c02ce8609176 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_452a6a18518f4ff0b50b907796a8ded8 = $(`<div id="html_452a6a18518f4ff0b50b907796a8ded8" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_7b74de32263345ef9be9c02ce8609176.setContent(html_452a6a18518f4ff0b50b907796a8ded8);
+        
+
+        poly_line_a6bb815c38424ceb8b48868f8203a00d.bindPopup(popup_7b74de32263345ef9be9c02ce8609176)
+        ;
+
+        
+    
+    
+            var poly_line_00facee122d2473693268319dd984593 = L.polyline(
+                [[43.3190098, -0.3466802], [43.3190374, -0.3467736]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_dddd232104204e67bd788750b7cccb18 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_30422347d8f044778833b428ed94578f = $(`<div id="html_30422347d8f044778833b428ed94578f" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_dddd232104204e67bd788750b7cccb18.setContent(html_30422347d8f044778833b428ed94578f);
+        
+
+        poly_line_00facee122d2473693268319dd984593.bindPopup(popup_dddd232104204e67bd788750b7cccb18)
+        ;
+
+        
+    
+    
+            var poly_line_ec10b298050f4cdf953e5cdc67e4c571 = L.polyline(
+                [[43.3191235, -0.3492159], [43.3189685, -0.3494898]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_3325960b802e423495b2481b990e6ba6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0a89a1b93d0b42d791f1551b5c02995e = $(`<div id="html_0a89a1b93d0b42d791f1551b5c02995e" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_3325960b802e423495b2481b990e6ba6.setContent(html_0a89a1b93d0b42d791f1551b5c02995e);
+        
+
+        poly_line_ec10b298050f4cdf953e5cdc67e4c571.bindPopup(popup_3325960b802e423495b2481b990e6ba6)
+        ;
+
+        
+    
+    
+            var poly_line_9745a85fcfd4446bbef129dde92daee0 = L.polyline(
+                [[43.3187936, -0.3498605], [43.3189685, -0.3494898]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_a3281bfa410f43fcb7c7ba3f4988e637 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c6ef7e5dc2b7453198b6cad4f3885aaa = $(`<div id="html_c6ef7e5dc2b7453198b6cad4f3885aaa" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_a3281bfa410f43fcb7c7ba3f4988e637.setContent(html_c6ef7e5dc2b7453198b6cad4f3885aaa);
+        
+
+        poly_line_9745a85fcfd4446bbef129dde92daee0.bindPopup(popup_a3281bfa410f43fcb7c7ba3f4988e637)
+        ;
+
+        
+    
+    
+            var poly_line_6f89767cf3f64213b531bd514663995b = L.polyline(
+                [[43.3164905, -0.3398715], [43.3165096, -0.3399299], [43.3167253, -0.3405862], [43.316789, -0.3407804], [43.3168988, -0.3411124]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_f58e6aed28af417fbd53261db8b7e8cf = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0360bbc8fca04d2398fc967e147be450 = $(`<div id="html_0360bbc8fca04d2398fc967e147be450" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_f58e6aed28af417fbd53261db8b7e8cf.setContent(html_0360bbc8fca04d2398fc967e147be450);
+        
+
+        poly_line_6f89767cf3f64213b531bd514663995b.bindPopup(popup_f58e6aed28af417fbd53261db8b7e8cf)
+        ;
+
+        
+    
+    
+            var poly_line_41c0527d9ea24bedb17203505f945f6e = L.polyline(
+                [[43.316788, -0.3394946], [43.3165574, -0.3396422], [43.3165146, -0.3396696], [43.3164905, -0.3398715]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_f7b3595600d344eda49714836148dd59 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_57894210dce549b8be05516c714b9911 = $(`<div id="html_57894210dce549b8be05516c714b9911" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_f7b3595600d344eda49714836148dd59.setContent(html_57894210dce549b8be05516c714b9911);
+        
+
+        poly_line_41c0527d9ea24bedb17203505f945f6e.bindPopup(popup_f7b3595600d344eda49714836148dd59)
+        ;
+
+        
+    
+    
+            var poly_line_5e39013a93384e5397529f471c648162 = L.polyline(
+                [[43.316788, -0.3394946], [43.3172293, -0.3394289], [43.3173081, -0.3394091]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_301b7f52ec764ed0a8742fc13440d6ac = L.popup({"maxWidth": "100%"});
+
+        
+            var html_7e398409e5734682a53916cfb9d91503 = $(`<div id="html_7e398409e5734682a53916cfb9d91503" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_301b7f52ec764ed0a8742fc13440d6ac.setContent(html_7e398409e5734682a53916cfb9d91503);
+        
+
+        poly_line_5e39013a93384e5397529f471c648162.bindPopup(popup_301b7f52ec764ed0a8742fc13440d6ac)
+        ;
+
+        
+    
+    
+            var poly_line_e519c073fec74c51b9c0dc2a92eb1ba1 = L.polyline(
+                [[43.3150066, -0.354206], [43.3152866, -0.3538591], [43.3153412, -0.3537995]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_122b621a07ff4c5b945e5b13eabaf6ff = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c4c58a45d65d46a881c92f876a05c126 = $(`<div id="html_c4c58a45d65d46a881c92f876a05c126" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_122b621a07ff4c5b945e5b13eabaf6ff.setContent(html_c4c58a45d65d46a881c92f876a05c126);
+        
+
+        poly_line_e519c073fec74c51b9c0dc2a92eb1ba1.bindPopup(popup_122b621a07ff4c5b945e5b13eabaf6ff)
+        ;
+
+        
+    
+    
+            var poly_line_875084f9cfae4bbe9342310bcef78529 = L.polyline(
+                [[43.3148648, -0.3543845], [43.3150066, -0.354206]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_a11f7345e74840a6ace2d36142109353 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_9dadee5b0202414399187359205ad5a7 = $(`<div id="html_9dadee5b0202414399187359205ad5a7" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_a11f7345e74840a6ace2d36142109353.setContent(html_9dadee5b0202414399187359205ad5a7);
+        
+
+        poly_line_875084f9cfae4bbe9342310bcef78529.bindPopup(popup_a11f7345e74840a6ace2d36142109353)
+        ;
+
+        
+    
+    
+            var poly_line_d315432f941b499786448c7a4c20376c = L.polyline(
+                [[43.3169023, -0.3529615], [43.3167928, -0.353008]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_6d6f8457d3144ffcadf22805a332379f = L.popup({"maxWidth": "100%"});
+
+        
+            var html_6c8785271b3a4091a0aef2852354ecd6 = $(`<div id="html_6c8785271b3a4091a0aef2852354ecd6" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_6d6f8457d3144ffcadf22805a332379f.setContent(html_6c8785271b3a4091a0aef2852354ecd6);
+        
+
+        poly_line_d315432f941b499786448c7a4c20376c.bindPopup(popup_6d6f8457d3144ffcadf22805a332379f)
+        ;
+
+        
+    
+    
+            var poly_line_2ac120dd51344bfdbd5fb67996574e39 = L.polyline(
+                [[43.3169023, -0.3529615], [43.3171128, -0.3528576]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_0129502278774211b03c02055012c543 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8820359388474bca82968ab195550b11 = $(`<div id="html_8820359388474bca82968ab195550b11" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_0129502278774211b03c02055012c543.setContent(html_8820359388474bca82968ab195550b11);
+        
+
+        poly_line_2ac120dd51344bfdbd5fb67996574e39.bindPopup(popup_0129502278774211b03c02055012c543)
+        ;
+
+        
+    
+    
+            var poly_line_e6a2d95492ee4568b3ed6abc4e9f442f = L.polyline(
+                [[43.3190098, -0.3466802], [43.3189461, -0.3464649]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_8f918a4cb74c43cb9adb323a50405ab7 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_b4731939f78c4108923a051a45a90cd6 = $(`<div id="html_b4731939f78c4108923a051a45a90cd6" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_8f918a4cb74c43cb9adb323a50405ab7.setContent(html_b4731939f78c4108923a051a45a90cd6);
+        
+
+        poly_line_e6a2d95492ee4568b3ed6abc4e9f442f.bindPopup(popup_8f918a4cb74c43cb9adb323a50405ab7)
+        ;
+
+        
+    
+    
+            var poly_line_4053d59649654d63bce7f03a355eb250 = L.polyline(
+                [[43.3187345, -0.3459458], [43.3187607, -0.3460073]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_de157edd4b7944699b4168fe7f06d02a = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0b9aeea6753c438b93c4e6a0478b8fd4 = $(`<div id="html_0b9aeea6753c438b93c4e6a0478b8fd4" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_de157edd4b7944699b4168fe7f06d02a.setContent(html_0b9aeea6753c438b93c4e6a0478b8fd4);
+        
+
+        poly_line_4053d59649654d63bce7f03a355eb250.bindPopup(popup_de157edd4b7944699b4168fe7f06d02a)
+        ;
+
+        
+    
+    
+            var poly_line_7607a20eecd1481789556b91e003cd9c = L.polyline(
+                [[43.3171128, -0.3528576], [43.3172887, -0.352726]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_465936dcf2824519b005bec3a1fc44d6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_f2b8c6514e114cffbd1f181af41cb434 = $(`<div id="html_f2b8c6514e114cffbd1f181af41cb434" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_465936dcf2824519b005bec3a1fc44d6.setContent(html_f2b8c6514e114cffbd1f181af41cb434);
+        
+
+        poly_line_7607a20eecd1481789556b91e003cd9c.bindPopup(popup_465936dcf2824519b005bec3a1fc44d6)
+        ;
+
+        
+    
+    
+            var poly_line_468152f4d4d6437b871dfb28c5e35121 = L.polyline(
+                [[43.3174828, -0.3521991], [43.3173591, -0.352422], [43.3172995, -0.3525972], [43.3172887, -0.352726]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_635a3b58a5094bfbbc8d1461e19a9cb9 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_bf27d458f5794565b520ee65f024d4ca = $(`<div id="html_bf27d458f5794565b520ee65f024d4ca" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_635a3b58a5094bfbbc8d1461e19a9cb9.setContent(html_bf27d458f5794565b520ee65f024d4ca);
+        
+
+        poly_line_468152f4d4d6437b871dfb28c5e35121.bindPopup(popup_635a3b58a5094bfbbc8d1461e19a9cb9)
+        ;
+
+        
+    
+    
+            var poly_line_2f0a02661b514bbe998e6f1e0d7605bb = L.polyline(
+                [[43.3179447, -0.3513801], [43.3177537, -0.3517181], [43.3174828, -0.3521991]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_5e1be505bd6947d48e90fade5b024534 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8c065bd6ce744f83a7858c9758d42890 = $(`<div id="html_8c065bd6ce744f83a7858c9758d42890" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_5e1be505bd6947d48e90fade5b024534.setContent(html_8c065bd6ce744f83a7858c9758d42890);
+        
+
+        poly_line_2f0a02661b514bbe998e6f1e0d7605bb.bindPopup(popup_5e1be505bd6947d48e90fade5b024534)
+        ;
+
+        
+    
+    
+            var poly_line_3c05b52b6cae4ccf91bc8955f86881ec = L.polyline(
+                [[43.3164832, -0.3531313], [43.3165377, -0.3531121], [43.3166355, -0.3530722], [43.3167928, -0.353008]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_e1d643121d044090b51ff68629c6309f = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2e7c48cabcbf417fbde484d75faf6dd0 = $(`<div id="html_2e7c48cabcbf417fbde484d75faf6dd0" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_e1d643121d044090b51ff68629c6309f.setContent(html_2e7c48cabcbf417fbde484d75faf6dd0);
+        
+
+        poly_line_3c05b52b6cae4ccf91bc8955f86881ec.bindPopup(popup_e1d643121d044090b51ff68629c6309f)
+        ;
+
+        
+    
+    
+            var poly_line_74eb555d31954604b8dc002f79919227 = L.polyline(
+                [[43.3181864, -0.3447185], [43.318357, -0.3450916], [43.3184091, -0.3452057], [43.3184735, -0.3453466]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_799aab303616441ea021ae3c6b91ecb5 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_47a04adeb1b34d189720f9bddd1d2b4a = $(`<div id="html_47a04adeb1b34d189720f9bddd1d2b4a" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_799aab303616441ea021ae3c6b91ecb5.setContent(html_47a04adeb1b34d189720f9bddd1d2b4a);
+        
+
+        poly_line_74eb555d31954604b8dc002f79919227.bindPopup(popup_799aab303616441ea021ae3c6b91ecb5)
+        ;
+
+        
+    
+    
+            var poly_line_b5f3c5fae0cb4a1cbad966179f43318b = L.polyline(
+                [[43.3181864, -0.3447185], [43.317919, -0.3441334], [43.3178895, -0.3440692]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_33a3dca4ef864cb0ab113550ff5acb17 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_4980f346823948f689c7d7e42a821d39 = $(`<div id="html_4980f346823948f689c7d7e42a821d39" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_33a3dca4ef864cb0ab113550ff5acb17.setContent(html_4980f346823948f689c7d7e42a821d39);
+        
+
+        poly_line_b5f3c5fae0cb4a1cbad966179f43318b.bindPopup(popup_33a3dca4ef864cb0ab113550ff5acb17)
+        ;
+
+        
+    
+    
+            var poly_line_ff153641470f4ecd8e2832c55baefb50 = L.polyline(
+                [[43.3186396, -0.3457228], [43.3185827, -0.3455893], [43.3185067, -0.3454203], [43.3184735, -0.3453466]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_c65c302c37194cc2b17b63b0a73c1e97 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_40cfc4e02b444bd4ab09d4cbf97edcb4 = $(`<div id="html_40cfc4e02b444bd4ab09d4cbf97edcb4" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_c65c302c37194cc2b17b63b0a73c1e97.setContent(html_40cfc4e02b444bd4ab09d4cbf97edcb4);
+        
+
+        poly_line_ff153641470f4ecd8e2832c55baefb50.bindPopup(popup_c65c302c37194cc2b17b63b0a73c1e97)
+        ;
+
+        
+    
+    
+            var poly_line_4f9573282f63475cb5ea5aa9047572d3 = L.polyline(
+                [[43.3187345, -0.3459458], [43.3186396, -0.3457228]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_054b23aada0641f7b6646648ad7a909c = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2edf6ac65a7c4db7a238bfbb41a2b1ff = $(`<div id="html_2edf6ac65a7c4db7a238bfbb41a2b1ff" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_054b23aada0641f7b6646648ad7a909c.setContent(html_2edf6ac65a7c4db7a238bfbb41a2b1ff);
+        
+
+        poly_line_4f9573282f63475cb5ea5aa9047572d3.bindPopup(popup_054b23aada0641f7b6646648ad7a909c)
+        ;
+
+        
+    
+    
+            var poly_line_2180ad11b5e141659b1aa2524cb6bdd1 = L.polyline(
+                [[43.3194223, -0.3481096], [43.3194923, -0.3483464], [43.3195008, -0.3483753], [43.3195479, -0.3486041]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_137e2e8b1b334d63966d3d36ca41aea4 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8f6a181789204507b7c7edca829721c3 = $(`<div id="html_8f6a181789204507b7c7edca829721c3" style="width: 100.0%; height: 100.0%;">"Boulevard de la Paix"</div>`)[0];
+            popup_137e2e8b1b334d63966d3d36ca41aea4.setContent(html_8f6a181789204507b7c7edca829721c3);
+        
+
+        poly_line_2180ad11b5e141659b1aa2524cb6bdd1.bindPopup(popup_137e2e8b1b334d63966d3d36ca41aea4)
+        ;
+
+        
+    
+    
+            var poly_line_7691df18aa304ce28e7c3a1833ced619 = L.polyline(
+                [[43.3194488, -0.348713], [43.3194701, -0.3486902], [43.3195479, -0.3486041]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_118e9dd1fabd4822b43af6fc0655be77 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_38b7ec7189a84c4ea0085ecdf1c6c6d3 = $(`<div id="html_38b7ec7189a84c4ea0085ecdf1c6c6d3" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_118e9dd1fabd4822b43af6fc0655be77.setContent(html_38b7ec7189a84c4ea0085ecdf1c6c6d3);
+        
+
+        poly_line_7691df18aa304ce28e7c3a1833ced619.bindPopup(popup_118e9dd1fabd4822b43af6fc0655be77)
+        ;
+
+        
+    
+    
+            var poly_line_d97eb78a2ce549d696c8e08e1a244705 = L.polyline(
+                [[43.3193285, -0.3488677], [43.3193457, -0.3488385], [43.3194488, -0.348713]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_d2975e0fc4c54b65b337d8bfa9de5cd0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_858edbd76e034af28c336cc687215fea = $(`<div id="html_858edbd76e034af28c336cc687215fea" style="width: 100.0%; height: 100.0%;">"Avenue du Loup"</div>`)[0];
+            popup_d2975e0fc4c54b65b337d8bfa9de5cd0.setContent(html_858edbd76e034af28c336cc687215fea);
+        
+
+        poly_line_d97eb78a2ce549d696c8e08e1a244705.bindPopup(popup_d2975e0fc4c54b65b337d8bfa9de5cd0)
+        ;
+
+        
+    
+    
+            map_9cca2a3d4c9c4d868faf37ac0c38a6dd.fitBounds(
+                [[43.3147658, -0.3544965], [43.3195479, -0.3394091]],
+                {}
+            );
+        
+    
+            var poly_line_3efc6580c2204d1a89a3faf45f1776c3 = L.polyline(
+                [[43.3147358, -0.3544184], [43.3147658, -0.3544965]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_682e6091a3db4d74a1f35817981226ff = L.popup({"maxWidth": "100%"});
+
+        
+            var html_b99d61d1a4314c7a8ae390b76eb5f7b6 = $(`<div id="html_b99d61d1a4314c7a8ae390b76eb5f7b6" style="width: 100.0%; height: 100.0%;">"Rue Joseph de Pesquidoux"</div>`)[0];
+            popup_682e6091a3db4d74a1f35817981226ff.setContent(html_b99d61d1a4314c7a8ae390b76eb5f7b6);
+        
+
+        poly_line_3efc6580c2204d1a89a3faf45f1776c3.bindPopup(popup_682e6091a3db4d74a1f35817981226ff)
+        ;
+
+        
+    
+    
+            var poly_line_c0ff29ea635d49158d52dfad71292651 = L.polyline(
+                [[43.3137531, -0.3480484], [43.3135802, -0.3474489]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_3dfbd6ea99a749c7964a4c6ebb359c71 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_a33bd6e5665342ab93d6dbc076cf4804 = $(`<div id="html_a33bd6e5665342ab93d6dbc076cf4804" style="width: 100.0%; height: 100.0%;">"Rue Mozart"</div>`)[0];
+            popup_3dfbd6ea99a749c7964a4c6ebb359c71.setContent(html_a33bd6e5665342ab93d6dbc076cf4804);
+        
+
+        poly_line_c0ff29ea635d49158d52dfad71292651.bindPopup(popup_3dfbd6ea99a749c7964a4c6ebb359c71)
+        ;
+
+        
+    
+    
+            var poly_line_cded54ef13f643ed9ec41c3db9710a19 = L.polyline(
+                [[43.3133943, -0.3483693], [43.3134296, -0.3482673], [43.3137531, -0.3480484]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_3751351e2c8143849e2735b63b4ea4dc = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c3e9ac9e660a4f8298d841ad82366fce = $(`<div id="html_c3e9ac9e660a4f8298d841ad82366fce" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_3751351e2c8143849e2735b63b4ea4dc.setContent(html_c3e9ac9e660a4f8298d841ad82366fce);
+        
+
+        poly_line_cded54ef13f643ed9ec41c3db9710a19.bindPopup(popup_3751351e2c8143849e2735b63b4ea4dc)
+        ;
+
+        
+    
+    
+            var poly_line_a2f0266493374132963539aa5c8765e4 = L.polyline(
+                [[43.3133672, -0.3498103], [43.3132185, -0.3498061]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_12864d7dce514abebdcdb853aeeaf2f3 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8c37e02b025e4baaa6bdab61a5fb1929 = $(`<div id="html_8c37e02b025e4baaa6bdab61a5fb1929" style="width: 100.0%; height: 100.0%;">"Avenue de Buros"</div>`)[0];
+            popup_12864d7dce514abebdcdb853aeeaf2f3.setContent(html_8c37e02b025e4baaa6bdab61a5fb1929);
+        
+
+        poly_line_a2f0266493374132963539aa5c8765e4.bindPopup(popup_12864d7dce514abebdcdb853aeeaf2f3)
+        ;
+
+        
+    
+    
+            var poly_line_f6a9064109e94177a8cd95c81cc9175c = L.polyline(
+                [[43.3133672, -0.3498103], [43.3133713, -0.3499411], [43.3142544, -0.3523744]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_e46d362c1e8843ddb200fa8f94b346b2 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_7bde8553c3d448daaa8170a0ed017911 = $(`<div id="html_7bde8553c3d448daaa8170a0ed017911" style="width: 100.0%; height: 100.0%;">"Chemin des \u00c9coliers"</div>`)[0];
+            popup_e46d362c1e8843ddb200fa8f94b346b2.setContent(html_7bde8553c3d448daaa8170a0ed017911);
+        
+
+        poly_line_f6a9064109e94177a8cd95c81cc9175c.bindPopup(popup_e46d362c1e8843ddb200fa8f94b346b2)
+        ;
+
+        
+    
+    
+            var poly_line_ad9611edc25440aba73c7627e779e0f1 = L.polyline(
+                [[43.3138164, -0.3443487], [43.3138453, -0.3445091]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_2e8c96640f4a46c3a359da9a4f12d3fc = L.popup({"maxWidth": "100%"});
+
+        
+            var html_333d2ac7f76f41e38109027fb700ba8d = $(`<div id="html_333d2ac7f76f41e38109027fb700ba8d" style="width: 100.0%; height: 100.0%;">"Avenue Stravinsky"</div>`)[0];
+            popup_2e8c96640f4a46c3a359da9a4f12d3fc.setContent(html_333d2ac7f76f41e38109027fb700ba8d);
+        
+
+        poly_line_ad9611edc25440aba73c7627e779e0f1.bindPopup(popup_2e8c96640f4a46c3a359da9a4f12d3fc)
+        ;
+
+        
+    
+    
+            var poly_line_1e12cdc56bbb482f9fa72bfb5c0103c0 = L.polyline(
+                [[43.3138099, -0.3443126], [43.3138164, -0.3443487]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_fd870a29e5424d3f8b5727346e644467 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_48ae4eab246a44eb915f10b6a8188c8c = $(`<div id="html_48ae4eab246a44eb915f10b6a8188c8c" style="width: 100.0%; height: 100.0%;">"Avenue Stravinsky"</div>`)[0];
+            popup_fd870a29e5424d3f8b5727346e644467.setContent(html_48ae4eab246a44eb915f10b6a8188c8c);
+        
+
+        poly_line_1e12cdc56bbb482f9fa72bfb5c0103c0.bindPopup(popup_fd870a29e5424d3f8b5727346e644467)
+        ;
+
+        
+    
+    
+            var poly_line_bbf76e5ceadc4f0bbba4befa05da99e4 = L.polyline(
+                [[43.3130308, -0.3455738], [43.3130723, -0.3457165], [43.3135802, -0.3474489]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_a2ca9c2634f343879e87f963a04aa40c = L.popup({"maxWidth": "100%"});
+
+        
+            var html_9d4d5c86ac9143afbec851157e4419de = $(`<div id="html_9d4d5c86ac9143afbec851157e4419de" style="width: 100.0%; height: 100.0%;">"Rue Mozart"</div>`)[0];
+            popup_a2ca9c2634f343879e87f963a04aa40c.setContent(html_9d4d5c86ac9143afbec851157e4419de);
+        
+
+        poly_line_bbf76e5ceadc4f0bbba4befa05da99e4.bindPopup(popup_a2ca9c2634f343879e87f963a04aa40c)
+        ;
+
+        
+    
+    
+            var poly_line_a8cfce7f5f18450ca8f248b6d8443d32 = L.polyline(
+                [[43.3133943, -0.3483693], [43.3133582, -0.3484713], [43.3133235, -0.3488183], [43.3132561, -0.3491836], [43.3132294, -0.3494205]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_df7301f69bd04cff9dd994693cafd930 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_6a2439f950fd43c0adb2536892a6ae4a = $(`<div id="html_6a2439f950fd43c0adb2536892a6ae4a" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_df7301f69bd04cff9dd994693cafd930.setContent(html_6a2439f950fd43c0adb2536892a6ae4a);
+        
+
+        poly_line_a8cfce7f5f18450ca8f248b6d8443d32.bindPopup(popup_df7301f69bd04cff9dd994693cafd930)
+        ;
+
+        
+    
+    
+            var poly_line_def19a00bd9548e5a8d60cf302402513 = L.polyline(
+                [[43.3142544, -0.3523744], [43.3142047, -0.3524275], [43.3142241, -0.3525312]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_b9c8b29051b94238a277d5aa170d9e0f = L.popup({"maxWidth": "100%"});
+
+        
+            var html_332b4d99febe4f21a03b5c929f11b011 = $(`<div id="html_332b4d99febe4f21a03b5c929f11b011" style="width: 100.0%; height: 100.0%;">"Chemin des \u00c9coliers"</div>`)[0];
+            popup_b9c8b29051b94238a277d5aa170d9e0f.setContent(html_332b4d99febe4f21a03b5c929f11b011);
+        
+
+        poly_line_def19a00bd9548e5a8d60cf302402513.bindPopup(popup_b9c8b29051b94238a277d5aa170d9e0f)
+        ;
+
+        
+    
+    
+            var poly_line_541dfbc42fdb474abf9b4cb066f148fd = L.polyline(
+                [[43.3135578, -0.3407917], [43.3132581, -0.341129], [43.3131585, -0.3412201]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_28fd63c6766849a699dbbd9cfa4e066d = L.popup({"maxWidth": "100%"});
+
+        
+            var html_602d7e8f8a8d4038aef90aba23c4d322 = $(`<div id="html_602d7e8f8a8d4038aef90aba23c4d322" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_28fd63c6766849a699dbbd9cfa4e066d.setContent(html_602d7e8f8a8d4038aef90aba23c4d322);
+        
+
+        poly_line_541dfbc42fdb474abf9b4cb066f148fd.bindPopup(popup_28fd63c6766849a699dbbd9cfa4e066d)
+        ;
+
+        
+    
+    
+            var poly_line_cf21a197d2c742b48f8d7b6830be0cbd = L.polyline(
+                [[43.3138267, -0.3404973], [43.3135578, -0.3407917]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_fbd34d71b822450fbd2532bc79841f43 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_86afd69f077442889666aa8f3842fc67 = $(`<div id="html_86afd69f077442889666aa8f3842fc67" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_fbd34d71b822450fbd2532bc79841f43.setContent(html_86afd69f077442889666aa8f3842fc67);
+        
+
+        poly_line_cf21a197d2c742b48f8d7b6830be0cbd.bindPopup(popup_fbd34d71b822450fbd2532bc79841f43)
+        ;
+
+        
+    
+    
+            var poly_line_7e07fb39260c4e3da21b31b92209e166 = L.polyline(
+                [[43.3138267, -0.3404973], [43.3139006, -0.3404163]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_dce221766bda48af86c5258a9816a443 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_34a75b2a22a84674b0e81754da954d10 = $(`<div id="html_34a75b2a22a84674b0e81754da954d10" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_dce221766bda48af86c5258a9816a443.setContent(html_34a75b2a22a84674b0e81754da954d10);
+        
+
+        poly_line_7e07fb39260c4e3da21b31b92209e166.bindPopup(popup_dce221766bda48af86c5258a9816a443)
+        ;
+
+        
+    
+    
+            var poly_line_4974e0de54f34edc857a9381ad17de92 = L.polyline(
+                [[43.3151739, -0.3399714], [43.314695, -0.3401316], [43.3140628, -0.3403263], [43.3139006, -0.3404163]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_a7772b329d07453f8e7e317e0d237beb = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8dadf0caa5d342a482fa60d646a39b5d = $(`<div id="html_8dadf0caa5d342a482fa60d646a39b5d" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_a7772b329d07453f8e7e317e0d237beb.setContent(html_8dadf0caa5d342a482fa60d646a39b5d);
+        
+
+        poly_line_4974e0de54f34edc857a9381ad17de92.bindPopup(popup_a7772b329d07453f8e7e317e0d237beb)
+        ;
+
+        
+    
+    
+            var poly_line_2135e6d8f7224040a4fa56fe7b96ed0d = L.polyline(
+                [[43.3132718, -0.341572], [43.3132156, -0.3413098], [43.3131585, -0.3412201]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_defbc56fc5d040aa8e96410c95f75bdd = L.popup({"maxWidth": "100%"});
+
+        
+            var html_38de12a8d9ff4880a509237f2c9a3e20 = $(`<div id="html_38de12a8d9ff4880a509237f2c9a3e20" style="width: 100.0%; height: 100.0%;">"Avenue Stravinsky"</div>`)[0];
+            popup_defbc56fc5d040aa8e96410c95f75bdd.setContent(html_38de12a8d9ff4880a509237f2c9a3e20);
+        
+
+        poly_line_2135e6d8f7224040a4fa56fe7b96ed0d.bindPopup(popup_defbc56fc5d040aa8e96410c95f75bdd)
+        ;
+
+        
+    
+    
+            var poly_line_a6fc069e34894d39b2fe56336128c9e8 = L.polyline(
+                [[43.316788, -0.3394946], [43.3165068, -0.3395365], [43.3164609, -0.3395469], [43.316389, -0.3395729]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_cf533888158048faa155d29293fbefef = L.popup({"maxWidth": "100%"});
+
+        
+            var html_3685bc74cc9240a2b7348595f0dfa95a = $(`<div id="html_3685bc74cc9240a2b7348595f0dfa95a" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_cf533888158048faa155d29293fbefef.setContent(html_3685bc74cc9240a2b7348595f0dfa95a);
+        
+
+        poly_line_a6fc069e34894d39b2fe56336128c9e8.bindPopup(popup_cf533888158048faa155d29293fbefef)
+        ;
+
+        
+    
+    
+            var poly_line_d6f2cec3e09f48b1a9c70a1881ed7e82 = L.polyline(
+                [[43.316788, -0.3394946], [43.3172293, -0.3394289], [43.3173081, -0.3394091]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_6f3cb6ea35a64914852238abbad37bfb = L.popup({"maxWidth": "100%"});
+
+        
+            var html_a5e87000d0814fb3a63dfda3ce059371 = $(`<div id="html_a5e87000d0814fb3a63dfda3ce059371" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_6f3cb6ea35a64914852238abbad37bfb.setContent(html_a5e87000d0814fb3a63dfda3ce059371);
+        
+
+        poly_line_d6f2cec3e09f48b1a9c70a1881ed7e82.bindPopup(popup_6f3cb6ea35a64914852238abbad37bfb)
+        ;
+
+        
+    
+    
+            var poly_line_19db13e441ec4f0c8b4a148a990dc729 = L.polyline(
+                [[43.3132294, -0.3494205], [43.3132181, -0.3497384], [43.3132185, -0.3498061]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_41257966f0bb4a12a048e55d5e030387 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_5e69b0b21d2b4afab2e32dd9455820a1 = $(`<div id="html_5e69b0b21d2b4afab2e32dd9455820a1" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_41257966f0bb4a12a048e55d5e030387.setContent(html_5e69b0b21d2b4afab2e32dd9455820a1);
+        
+
+        poly_line_19db13e441ec4f0c8b4a148a990dc729.bindPopup(popup_41257966f0bb4a12a048e55d5e030387)
+        ;
+
+        
+    
+    
+            var poly_line_cbc674ae8655456995e5956b2f0d84e6 = L.polyline(
+                [[43.3130641, -0.3454955], [43.3130636, -0.3455199], [43.3130574, -0.3455426], [43.313046, -0.3455613], [43.3130308, -0.3455738]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_bfd0bcb212ae48d68fb2371bdf80a870 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0ffd3476afc84123b35f3720d64150b8 = $(`<div id="html_0ffd3476afc84123b35f3720d64150b8" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_bfd0bcb212ae48d68fb2371bdf80a870.setContent(html_0ffd3476afc84123b35f3720d64150b8);
+        
+
+        poly_line_cbc674ae8655456995e5956b2f0d84e6.bindPopup(popup_bfd0bcb212ae48d68fb2371bdf80a870)
+        ;
+
+        
+    
+    
+            var poly_line_1da19796a79e4056b394f84388f0296d = L.polyline(
+                [[43.3130641, -0.3454955], [43.3131625, -0.3454615], [43.3135691, -0.3453065], [43.3138084, -0.3452293], [43.3139574, -0.3451775]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_d441d2abab8b4c3a9c03e43121bd7094 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8bb2bfb08caa4370bcd67064bd3993ec = $(`<div id="html_8bb2bfb08caa4370bcd67064bd3993ec" style="width: 100.0%; height: 100.0%;">"Rue Berlioz"</div>`)[0];
+            popup_d441d2abab8b4c3a9c03e43121bd7094.setContent(html_8bb2bfb08caa4370bcd67064bd3993ec);
+        
+
+        poly_line_1da19796a79e4056b394f84388f0296d.bindPopup(popup_d441d2abab8b4c3a9c03e43121bd7094)
+        ;
+
+        
+    
+    
+            var poly_line_75bc2d4a9fec4cf3bbf61c0ffd11fddb = L.polyline(
+                [[43.3144707, -0.3532245], [43.3143448, -0.3525992], [43.3143119, -0.3525463], [43.3142695, -0.3525219], [43.3142241, -0.3525312]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_38b4e0ed251a4cf5bdfebd08245f4a42 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_dbe5945f6a7a4838a5dbf7e018197bde = $(`<div id="html_dbe5945f6a7a4838a5dbf7e018197bde" style="width: 100.0%; height: 100.0%;">"Rue Joseph de Pesquidoux"</div>`)[0];
+            popup_38b4e0ed251a4cf5bdfebd08245f4a42.setContent(html_dbe5945f6a7a4838a5dbf7e018197bde);
+        
+
+        poly_line_75bc2d4a9fec4cf3bbf61c0ffd11fddb.bindPopup(popup_38b4e0ed251a4cf5bdfebd08245f4a42)
+        ;
+
+        
+    
+    
+            var poly_line_30277540d266435fac8fc0900ca62991 = L.polyline(
+                [[43.3144707, -0.3532245], [43.3145167, -0.3534526], [43.3145706, -0.3537104], [43.314597, -0.353837], [43.3146887, -0.3542758], [43.3147358, -0.3544184]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_d4456a66e9df43f185d362166faf589a = L.popup({"maxWidth": "100%"});
+
+        
+            var html_3f3e0d33062e4788af7065e91e6bb044 = $(`<div id="html_3f3e0d33062e4788af7065e91e6bb044" style="width: 100.0%; height: 100.0%;">"Rue Joseph de Pesquidoux"</div>`)[0];
+            popup_d4456a66e9df43f185d362166faf589a.setContent(html_3f3e0d33062e4788af7065e91e6bb044);
+        
+
+        poly_line_30277540d266435fac8fc0900ca62991.bindPopup(popup_d4456a66e9df43f185d362166faf589a)
+        ;
+
+        
+    
+    
+            var poly_line_11fdb59362c545f78980f5059afde7d0 = L.polyline(
+                [[43.316163, -0.3396459], [43.3163143, -0.3395961], [43.316389, -0.3395729]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_1639c81772734585bd473e2d1498efac = L.popup({"maxWidth": "100%"});
+
+        
+            var html_7632f8b480874f1594217f9de3deea90 = $(`<div id="html_7632f8b480874f1594217f9de3deea90" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_1639c81772734585bd473e2d1498efac.setContent(html_7632f8b480874f1594217f9de3deea90);
+        
+
+        poly_line_11fdb59362c545f78980f5059afde7d0.bindPopup(popup_1639c81772734585bd473e2d1498efac)
+        ;
+
+        
+    
+    
+            var poly_line_77a535cb147f47f3b0c84b4c393eadde = L.polyline(
+                [[43.3138099, -0.3443126], [43.3136101, -0.3432027], [43.3135824, -0.3430623], [43.3135503, -0.3430021]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_6782142bfa73412096a897ae74937361 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_47437c73270047ea8053e53aaa50caea = $(`<div id="html_47437c73270047ea8053e53aaa50caea" style="width: 100.0%; height: 100.0%;">"Avenue Stravinsky"</div>`)[0];
+            popup_6782142bfa73412096a897ae74937361.setContent(html_47437c73270047ea8053e53aaa50caea);
+        
+
+        poly_line_77a535cb147f47f3b0c84b4c393eadde.bindPopup(popup_6782142bfa73412096a897ae74937361)
+        ;
+
+        
+    
+    
+            var poly_line_fd32d726401145f8870c836a4429c6cf = L.polyline(
+                [[43.3132718, -0.341572], [43.3134866, -0.3428392], [43.3135044, -0.3429284], [43.3135503, -0.3430021]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_147f10cd4e8c4cb58a61064dca7ae44a = L.popup({"maxWidth": "100%"});
+
+        
+            var html_4672f5dd122d4648a69f4e4a430430b0 = $(`<div id="html_4672f5dd122d4648a69f4e4a430430b0" style="width: 100.0%; height: 100.0%;">"Avenue Stravinsky"</div>`)[0];
+            popup_147f10cd4e8c4cb58a61064dca7ae44a.setContent(html_4672f5dd122d4648a69f4e4a430430b0);
+        
+
+        poly_line_fd32d726401145f8870c836a4429c6cf.bindPopup(popup_147f10cd4e8c4cb58a61064dca7ae44a)
+        ;
+
+        
+    
+    
+            var poly_line_c0d5576c17e54c5a8765f50bbb2620c3 = L.polyline(
+                [[43.316163, -0.3396459], [43.3151739, -0.3399714]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_731660803e2a4449a4d83c7297f00d01 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_32a4b250db1248e4bbacd60babc78893 = $(`<div id="html_32a4b250db1248e4bbacd60babc78893" style="width: 100.0%; height: 100.0%;">"Avenue des Lilas"</div>`)[0];
+            popup_731660803e2a4449a4d83c7297f00d01.setContent(html_32a4b250db1248e4bbacd60babc78893);
+        
+
+        poly_line_c0d5576c17e54c5a8765f50bbb2620c3.bindPopup(popup_731660803e2a4449a4d83c7297f00d01)
+        ;
+
+        
+    
+    
+            var poly_line_55cbcabbaa014f0ea98cd5ecb9bb16b9 = L.polyline(
+                [[43.3138453, -0.3445091], [43.3139402, -0.3450701], [43.3139574, -0.3451775]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_9cca2a3d4c9c4d868faf37ac0c38a6dd);
+        
+    
+        var popup_34591f77cc604a3fab3280b12b452bc8 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_51edb7e9e7fc487798f3abf1de9dab64 = $(`<div id="html_51edb7e9e7fc487798f3abf1de9dab64" style="width: 100.0%; height: 100.0%;">"Avenue Stravinsky"</div>`)[0];
+            popup_34591f77cc604a3fab3280b12b452bc8.setContent(html_51edb7e9e7fc487798f3abf1de9dab64);
+        
+
+        poly_line_55cbcabbaa014f0ea98cd5ecb9bb16b9.bindPopup(popup_34591f77cc604a3fab3280b12b452bc8)
+        ;
+
+        
+    
+    
+            map_9cca2a3d4c9c4d868faf37ac0c38a6dd.fitBounds(
+                [[43.3130308, -0.3544965], [43.3173081, -0.3394091]],
+                {}
+            );
+        
+</script>

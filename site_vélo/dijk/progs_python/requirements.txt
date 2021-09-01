@@ -1,0 +1,9 @@
+networkx==2.5.1
+osmnx==1.1.1
+overpy==0.4
+requests==2.25.1
+matplotlib==3.4.2
+geopy==2.1.0
+branca==0.4.2
+folium==0.12.1
+scikit-learn==0.24.2
