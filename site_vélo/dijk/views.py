@@ -19,4 +19,9 @@ def vue_itinéraire_direct(requête, départ, arrivée, pourcentage_détour):
 
 def vue_itinéraire(requête):
     """ Celle-ci doit récupérer le résultat du formulaire via un post."""
-    pass
+    d=requête.POST["départ"]
+    a=requête.POST["arrivée"]
+    p_détour= int(requête.POST["pourcentage_détour"])/100
+    print(f"Recherche d’itinéraire entre {d} et {a}.")
+    itinéraire(d, a, p_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk" )
+    return render(requête, "dijk/résultat_itinéraire.html", {})

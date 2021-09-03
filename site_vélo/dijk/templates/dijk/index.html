@@ -4,11 +4,28 @@
     <meta charset="utf-8">
     <title>Recherche d’itinéraire</title>
   </head>
+  
   <body>
-    <p>Page d’entrée. </p>
+    
+    <p>Rentrez votre itinéraire. </p>
 
+
+    
     <form action = "{% url 'itinéraire' %}" method="post">
-      
+      {% csrf_token %}
+      <label for="départ">Départ : </label><br>
+      <input type="text" id="départ" name="départ"><br><br>
+
+      <label for="arrivée"> Arrivée </label><br>
+      <input type="text" id="arrivée" name="arrivée"><br><br>
+
+      <label for="pourcentage_détour"> Pourcentage détour </label><br>
+      <input type="text" id="pourcentage_détour" name="pourcentage_détour"><br><br>
+
+
+      <input type="submit" value="C’est parti!">
     </form>
+
+    
   </body>
 </html>
