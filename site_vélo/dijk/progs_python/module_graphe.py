@@ -3,9 +3,10 @@
 import networkx as nx
 from osmnx import plot_graph, nearest_nodes
 import os
+
+from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA
 import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
-from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
 from petites_fonctions import distance_euc
 from collections import deque
@@ -95,6 +96,7 @@ class graphe():
         except KeyError:
             if bavard>0:
                 print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
+
                 
     def ville_dune_arête(self, s, t, bavard=0):
         """ Liste des villes contenant l’arête (s,t)
@@ -108,9 +110,9 @@ class graphe():
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)
   
-    def chemin_étapes_ensembles(self, c):
+    def chemin_étapes_ensembles(self, c, bavard=0):
         """ Entrée : c, objet de la classe Chemin"""
-        return dijkstra.chemin_étapes_ensembles(self, c)
+        return dijkstra.chemin_étapes_ensembles(self, c, bavard=bavard)
 
     def affiche(self):
         plot_graph(self.multidigraphe, node_size=10)
@@ -196,44 +198,41 @@ class graphe():
                 return c
         raise KeyError("Le nœud {n} n'est pas dans le cache")
        
-    def sauv_cache(self, chemin="données"):
-        """ chemin est le chemin du répertoire. Le nom du fichier sera  "nœud_of_rue.csv"."""
-        adresse = os.path.join(chemin, "nœud_of_rue.csv")
-        sortie = open(adresse, "w")
+    def sauv_cache(self):
+        """ L’adresse du fichier csv est dans CHEMIN_CACHE."""
+        sortie = open(CHEMIN_CACHE, "w")
         
         for c, v in self.nœud_of_rue.items():
             à_écrire = ",".join(map(str, v))
             sortie.write(f"{c}:{à_écrire}\n")
         sortie.close()
 
-    def charge_cache(self, chemin="données"):
+    def charge_cache(self):
         print("Chargement du cache nœud_of_rue.")
-        adresse = os.path.join(chemin, "nœud_of_rue.csv")
-        entrée = open(adresse)
+        entrée = open(CHEMIN_CACHE)
         for ligne in entrée:
             c, v = ligne.strip().split(":")
             l = list(map(int, v.split(",")))
             self.nœud_of_rue[c] = l
         entrée.close()
 
-    def vide_cache(self, chemin="données"):
-        print("J’efface le cache nœud_of_rue")
-        adresse = os.path.join(chemin, "nœud_of_rue.csv")
-        entrée = open(adresse, "w")
+    def vide_cache(self):
+        print("J’efface le cache des adresses")
+        entrée = open(CHEMIN_CACHE, "w")
         entrée.close()
         self.nœud_of_rue={}
        
-    def sauv_cycla(self, chemin="données/"):
+    def sauv_cycla(self):
         """ chemin : adresse et nom du fichier, sans l'extension"""
         print("Sauvegarde de la cyclabilité")
-        sortie = open(os.path.join(chemin, "Cyclabilité.csv"), "w")
+        sortie = open(CHEMIN_CYCLA, "w")
         for (s, t), v in self.cyclabilité.items():
             sortie.write(f"{s};{t};{v}\n")
         sortie.close()
 
-    def charge_cycla(self, chemin="données/"):
+    def charge_cycla(self):
         print("Chargement de la cyclabilité")
-        entrée = open(os.path.join(chemin, "Cyclabilité.csv"))
+        entrée = open(CHEMIN_CYCLA)
         for ligne in entrée:
             s, t, v = ligne.strip().split(";")
             s=int(s); t=int(t); v=float(v)

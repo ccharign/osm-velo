@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_fff8487245ee4dd8aa0eb039d81cf94f {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_fff8487245ee4dd8aa0eb039d81cf94f" ></div>
+        
+</body>
+<script>    
+    
+            var map_fff8487245ee4dd8aa0eb039d81cf94f = L.map(
+                "map_fff8487245ee4dd8aa0eb039d81cf94f",
+                {
+                    center: [43.29800288271369, -0.35683079813506796],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 1,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_47064ddf623e45a0984d6b85a4a4a87c = L.tileLayer(
+                "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"http://cartodb.com/attributions\"\u003eCartoDB\u003c/a\u003e, CartoDB \u003ca href =\"http://cartodb.com/attributions\"\u003eattributions\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+            var poly_line_3d343715919d49709f0c9b62901ddcf3 = L.polyline(
+                [[43.2988795, -0.3556763], [43.2989943, -0.3552022]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_9eb5cb23a5164e298ee09345c67fbd90 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d0052983bc864deb8f8f41a2961b8a7f = $(`<div id="html_d0052983bc864deb8f8f41a2961b8a7f" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_9eb5cb23a5164e298ee09345c67fbd90.setContent(html_d0052983bc864deb8f8f41a2961b8a7f);
+        
+
+        poly_line_3d343715919d49709f0c9b62901ddcf3.bindPopup(popup_9eb5cb23a5164e298ee09345c67fbd90)
+        ;
+
+        
+    
+    
+            var poly_line_88b66cf2215c414fab8e786ba903e1aa = L.polyline(
+                [[43.2988795, -0.3556763], [43.2988267, -0.3558944]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_4c144696682f46c186c9800420ea2170 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ac2edf3fe07b48a38bd442b49c62b79f = $(`<div id="html_ac2edf3fe07b48a38bd442b49c62b79f" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_4c144696682f46c186c9800420ea2170.setContent(html_ac2edf3fe07b48a38bd442b49c62b79f);
+        
+
+        poly_line_88b66cf2215c414fab8e786ba903e1aa.bindPopup(popup_4c144696682f46c186c9800420ea2170)
+        ;
+
+        
+    
+    
+            var poly_line_acc3e8548c154298b8a7d70d474cfb65 = L.polyline(
+                [[43.2988267, -0.3558944], [43.2987259, -0.3563184], [43.2986156, -0.3567579]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_df440390bcdb43b095f512af35442eba = L.popup({"maxWidth": "100%"});
+
+        
+            var html_58c6c746e032486886effb8dd6b0d9e4 = $(`<div id="html_58c6c746e032486886effb8dd6b0d9e4" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_df440390bcdb43b095f512af35442eba.setContent(html_58c6c746e032486886effb8dd6b0d9e4);
+        
+
+        poly_line_acc3e8548c154298b8a7d70d474cfb65.bindPopup(popup_df440390bcdb43b095f512af35442eba)
+        ;
+
+        
+    
+    
+            var poly_line_5df215bbacce424ca8dd886d2f7531cc = L.polyline(
+                [[43.2987464, -0.3447038], [43.298773, -0.3448697], [43.2987852, -0.3449651], [43.2988016, -0.3450751]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_6f6c3339489b4de69477e1d6856c18c0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_a0c6dcb0a51b4b21880b139ec8d85f8d = $(`<div id="html_a0c6dcb0a51b4b21880b139ec8d85f8d" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_6f6c3339489b4de69477e1d6856c18c0.setContent(html_a0c6dcb0a51b4b21880b139ec8d85f8d);
+        
+
+        poly_line_5df215bbacce424ca8dd886d2f7531cc.bindPopup(popup_6f6c3339489b4de69477e1d6856c18c0)
+        ;
+
+        
+    
+    
+            var poly_line_b9e97385af0d4b07a9db441fcf8664ae = L.polyline(
+                [[43.2986218, -0.3437337], [43.2987464, -0.3447038]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_06424512ca32451fb7bb5eadc4d6448b = L.popup({"maxWidth": "100%"});
+
+        
+            var html_522fa125c96f4321ab60b21cdecb8937 = $(`<div id="html_522fa125c96f4321ab60b21cdecb8937" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_06424512ca32451fb7bb5eadc4d6448b.setContent(html_522fa125c96f4321ab60b21cdecb8937);
+        
+
+        poly_line_b9e97385af0d4b07a9db441fcf8664ae.bindPopup(popup_06424512ca32451fb7bb5eadc4d6448b)
+        ;
+
+        
+    
+    
+            var poly_line_eca2722feaab42749b419d0f75053166 = L.polyline(
+                [[43.2962884, -0.3649773], [43.2962975, -0.3648471], [43.2964446, -0.3643935], [43.2964645, -0.3643236], [43.2964782, -0.3642004], [43.2967155, -0.3634595], [43.2969657, -0.3626782], [43.2970327, -0.3626253]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_9893266fccd5405a96e10dea61bec377 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_3fadd2f77b88480aa921cc14af05e795 = $(`<div id="html_3fadd2f77b88480aa921cc14af05e795" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_9893266fccd5405a96e10dea61bec377.setContent(html_3fadd2f77b88480aa921cc14af05e795);
+        
+
+        poly_line_eca2722feaab42749b419d0f75053166.bindPopup(popup_9893266fccd5405a96e10dea61bec377)
+        ;
+
+        
+    
+    
+            var poly_line_52bf9ffac4d64ee3830b0d17103e31bf = L.polyline(
+                [[43.2966826, -0.3637021], [43.2967501, -0.3634829], [43.2970327, -0.3626253]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_b7b13c9a0e5c4791ad978e37347496fa = L.popup({"maxWidth": "100%"});
+
+        
+            var html_921309cda9934f8cae0e1ace87a92d89 = $(`<div id="html_921309cda9934f8cae0e1ace87a92d89" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_b7b13c9a0e5c4791ad978e37347496fa.setContent(html_921309cda9934f8cae0e1ace87a92d89);
+        
+
+        poly_line_52bf9ffac4d64ee3830b0d17103e31bf.bindPopup(popup_b7b13c9a0e5c4791ad978e37347496fa)
+        ;
+
+        
+    
+    
+            var poly_line_951ef7a7406d483ea54a74cd62533614 = L.polyline(
+                [[43.2970327, -0.3626253], [43.297043, -0.3625922], [43.2971004, -0.3624053]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_36a228314a944f028d2ed8e06f469962 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ae6115f64c744596a04ebb5b1ba9cd6e = $(`<div id="html_ae6115f64c744596a04ebb5b1ba9cd6e" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_36a228314a944f028d2ed8e06f469962.setContent(html_ae6115f64c744596a04ebb5b1ba9cd6e);
+        
+
+        poly_line_951ef7a7406d483ea54a74cd62533614.bindPopup(popup_36a228314a944f028d2ed8e06f469962)
+        ;
+
+        
+    
+    
+            var poly_line_39630f1db8ec478395f5c37aebe1e082 = L.polyline(
+                [[43.2989821, -0.3539519], [43.2990188, -0.354164], [43.2990429, -0.3543153], [43.2990679, -0.3546028], [43.2990638, -0.35486], [43.2990456, -0.3550051], [43.2989943, -0.3552022]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_163af59a47ec48aebc6f19e1416f2fd1 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_96f92959dbb0404985f65cc0dd86fb27 = $(`<div id="html_96f92959dbb0404985f65cc0dd86fb27" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_163af59a47ec48aebc6f19e1416f2fd1.setContent(html_96f92959dbb0404985f65cc0dd86fb27);
+        
+
+        poly_line_39630f1db8ec478395f5c37aebe1e082.bindPopup(popup_163af59a47ec48aebc6f19e1416f2fd1)
+        ;
+
+        
+    
+    
+            var poly_line_fd11fbc2a19b48d9934195535b719029 = L.polyline(
+                [[43.2988623, -0.3529622], [43.2988973, -0.353432], [43.2989235, -0.3536094], [43.29895, -0.3537616], [43.2989821, -0.3539519]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_14f7bdd361e54b0aa2cbf7bfddd53ac0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_a174fbb0a3154846aed9569ef497e2e4 = $(`<div id="html_a174fbb0a3154846aed9569ef497e2e4" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_14f7bdd361e54b0aa2cbf7bfddd53ac0.setContent(html_a174fbb0a3154846aed9569ef497e2e4);
+        
+
+        poly_line_fd11fbc2a19b48d9934195535b719029.bindPopup(popup_14f7bdd361e54b0aa2cbf7bfddd53ac0)
+        ;
+
+        
+    
+    
+            var poly_line_9321c7bcc15345b5ab35e35e7f6b7d5e = L.polyline(
+                [[43.2988358, -0.3522654], [43.2988623, -0.3529622]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_c325708dd06e490fbd51a063c5941855 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_7ebab7fbb60b45dc94cd1ff8d4257bac = $(`<div id="html_7ebab7fbb60b45dc94cd1ff8d4257bac" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_c325708dd06e490fbd51a063c5941855.setContent(html_7ebab7fbb60b45dc94cd1ff8d4257bac);
+        
+
+        poly_line_9321c7bcc15345b5ab35e35e7f6b7d5e.bindPopup(popup_c325708dd06e490fbd51a063c5941855)
+        ;
+
+        
+    
+    
+            var poly_line_a28999f84c8a4781a30d644f5ef53982 = L.polyline(
+                [[43.2984165, -0.370472], [43.2983483, -0.3704037]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_7b6984170aa24e1ca22c93951f43650f = L.popup({"maxWidth": "100%"});
+
+        
+            var html_9bc18b15d1214ed3a93bf8be020ec80b = $(`<div id="html_9bc18b15d1214ed3a93bf8be020ec80b" style="width: 100.0%; height: 100.0%;">"Rue Serviez"</div>`)[0];
+            popup_7b6984170aa24e1ca22c93951f43650f.setContent(html_9bc18b15d1214ed3a93bf8be020ec80b);
+        
+
+        poly_line_a28999f84c8a4781a30d644f5ef53982.bindPopup(popup_7b6984170aa24e1ca22c93951f43650f)
+        ;
+
+        
+    
+    
+            var poly_line_750f42bd670a44f899b625f26e6bed29 = L.polyline(
+                [[43.2980646, -0.3701304], [43.2983483, -0.3704037]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_f33e661912c349c3bb0909fec5d504f1 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ae4f879afb51466aa10c128e8a77f1a0 = $(`<div id="html_ae4f879afb51466aa10c128e8a77f1a0" style="width: 100.0%; height: 100.0%;">"Rue Serviez"</div>`)[0];
+            popup_f33e661912c349c3bb0909fec5d504f1.setContent(html_ae4f879afb51466aa10c128e8a77f1a0);
+        
+
+        poly_line_750f42bd670a44f899b625f26e6bed29.bindPopup(popup_f33e661912c349c3bb0909fec5d504f1)
+        ;
+
+        
+    
+    
+            var poly_line_cd24651792b04703b4cee66c94cd09e7 = L.polyline(
+                [[43.2987724, -0.3503224], [43.2988014, -0.3501012], [43.2988479, -0.3497636], [43.2988945, -0.3494314]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_656734f980b641b8bd87bfd5fee3e5aa = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c235136d0264470fa5f8e5b7e6caba91 = $(`<div id="html_c235136d0264470fa5f8e5b7e6caba91" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_656734f980b641b8bd87bfd5fee3e5aa.setContent(html_c235136d0264470fa5f8e5b7e6caba91);
+        
+
+        poly_line_cd24651792b04703b4cee66c94cd09e7.bindPopup(popup_656734f980b641b8bd87bfd5fee3e5aa)
+        ;
+
+        
+    
+    
+            var poly_line_f311691529f14da6a96294261c02c271 = L.polyline(
+                [[43.2988945, -0.3494314], [43.2990093, -0.3494371], [43.2995064, -0.3494426], [43.2995062, -0.3496605], [43.2995062, -0.3497255], [43.299506, -0.3500707], [43.299506, -0.350132], [43.299505, -0.3503289], [43.2987724, -0.3503224]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_e0b932a0bd4b4e2db6f3619538aeef79 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c805f8ccedec4b01ad3d94446f93f8d0 = $(`<div id="html_c805f8ccedec4b01ad3d94446f93f8d0" style="width: 100.0%; height: 100.0%;">["Rue du Roi Soleil", "Rue du Panache Blanc", "Rue du Vert Galant"]</div>`)[0];
+            popup_e0b932a0bd4b4e2db6f3619538aeef79.setContent(html_c805f8ccedec4b01ad3d94446f93f8d0);
+        
+
+        poly_line_f311691529f14da6a96294261c02c271.bindPopup(popup_e0b932a0bd4b4e2db6f3619538aeef79)
+        ;
+
+        
+    
+    
+            var poly_line_8cabab4a421d451ca48f0f38e8527a17 = L.polyline(
+                [[43.2988223, -0.3519168], [43.2988187, -0.3518057], [43.2988151, -0.3517243], [43.2987645, -0.3505966], [43.2987724, -0.3503224]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_fdb8954998bd41909a0afa8d7b1e9ea6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_b7221737897e4dd6bdf2caaaaed74fa5 = $(`<div id="html_b7221737897e4dd6bdf2caaaaed74fa5" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_fdb8954998bd41909a0afa8d7b1e9ea6.setContent(html_b7221737897e4dd6bdf2caaaaed74fa5);
+        
+
+        poly_line_8cabab4a421d451ca48f0f38e8527a17.bindPopup(popup_fdb8954998bd41909a0afa8d7b1e9ea6)
+        ;
+
+        
+    
+    
+            var poly_line_55a92fac9f4340caa7767390bc2a61c3 = L.polyline(
+                [[43.2989691, -0.3486097], [43.2989296, -0.3490434], [43.2989235, -0.3491114], [43.2988945, -0.3494314]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_30fd70739c774aad9957a0971b3aa286 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2275baffa7ff4f7885a028eecbe41251 = $(`<div id="html_2275baffa7ff4f7885a028eecbe41251" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_30fd70739c774aad9957a0971b3aa286.setContent(html_2275baffa7ff4f7885a028eecbe41251);
+        
+
+        poly_line_55a92fac9f4340caa7767390bc2a61c3.bindPopup(popup_30fd70739c774aad9957a0971b3aa286)
+        ;
+
+        
+    
+    
+            var poly_line_7241b01ecf83499db4c5a63c64fc4636 = L.polyline(
+                [[43.2988636, -0.3455743], [43.2989169, -0.3459951], [43.2989661, -0.3464107], [43.2989946, -0.3466636], [43.2989948, -0.3467725], [43.2989949, -0.3468156]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_6eb911d7e9ed4b0da907bf262a3d3fb0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_5d9d4125d9a041b6aad0feaad774bbc0 = $(`<div id="html_5d9d4125d9a041b6aad0feaad774bbc0" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_6eb911d7e9ed4b0da907bf262a3d3fb0.setContent(html_5d9d4125d9a041b6aad0feaad774bbc0);
+        
+
+        poly_line_7241b01ecf83499db4c5a63c64fc4636.bindPopup(popup_6eb911d7e9ed4b0da907bf262a3d3fb0)
+        ;
+
+        
+    
+    
+            var poly_line_db3d17c27c6b4818831c6fd9e8a4a74d = L.polyline(
+                [[43.2990254, -0.3479708], [43.2990233, -0.3475189], [43.2989976, -0.3469721], [43.2989949, -0.3468156]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_5dc74390ba9f47ac99448e1d81748227 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_09e0b14186be423d955c058ff7e2841a = $(`<div id="html_09e0b14186be423d955c058ff7e2841a" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_5dc74390ba9f47ac99448e1d81748227.setContent(html_09e0b14186be423d955c058ff7e2841a);
+        
+
+        poly_line_db3d17c27c6b4818831c6fd9e8a4a74d.bindPopup(popup_5dc74390ba9f47ac99448e1d81748227)
+        ;
+
+        
+    
+    
+            var poly_line_23e4ad3bbfb644f9bb3c1237f069bc1c = L.polyline(
+                [[43.2982163, -0.3405589], [43.2982283, -0.3406336]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_04130954be30443495e51faf78ee6ed1 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_4e0c405a2a5e4c8fbee741dd97580026 = $(`<div id="html_4e0c405a2a5e4c8fbee741dd97580026" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_04130954be30443495e51faf78ee6ed1.setContent(html_4e0c405a2a5e4c8fbee741dd97580026);
+        
+
+        poly_line_23e4ad3bbfb644f9bb3c1237f069bc1c.bindPopup(popup_04130954be30443495e51faf78ee6ed1)
+        ;
+
+        
+    
+    
+            var poly_line_9d23d13e0e4a4297871fddb59d7646cc = L.polyline(
+                [[43.2982802, -0.3410595], [43.2982283, -0.3406336]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_ff2131e4369545be8a68768ea9a172aa = L.popup({"maxWidth": "100%"});
+
+        
+            var html_200ce63be8f44ddca9b1605281aee1cf = $(`<div id="html_200ce63be8f44ddca9b1605281aee1cf" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_ff2131e4369545be8a68768ea9a172aa.setContent(html_200ce63be8f44ddca9b1605281aee1cf);
+        
+
+        poly_line_9d23d13e0e4a4297871fddb59d7646cc.bindPopup(popup_ff2131e4369545be8a68768ea9a172aa)
+        ;
+
+        
+    
+    
+            var poly_line_ebd2e3f4e0ee486faea3ba7ef3726e20 = L.polyline(
+                [[43.296309, -0.3684267], [43.2972415, -0.3693318]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_3becc4e7bd084035ae6b2570286098bf = L.popup({"maxWidth": "100%"});
+
+        
+            var html_941e054f10de428dad11511d2b4d0f5a = $(`<div id="html_941e054f10de428dad11511d2b4d0f5a" style="width: 100.0%; height: 100.0%;">"Rue Serviez"</div>`)[0];
+            popup_3becc4e7bd084035ae6b2570286098bf.setContent(html_941e054f10de428dad11511d2b4d0f5a);
+        
+
+        poly_line_ebd2e3f4e0ee486faea3ba7ef3726e20.bindPopup(popup_3becc4e7bd084035ae6b2570286098bf)
+        ;
+
+        
+    
+    
+            var poly_line_b0c345b9b4214219b40d321c9c3b0ec4 = L.polyline(
+                [[43.2963141, -0.3682749], [43.296309, -0.3684267]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_af64c59c87f349399f8cd9fb57f39d1c = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d12748b3aaf64e398ee518106fd8f9ef = $(`<div id="html_d12748b3aaf64e398ee518106fd8f9ef" style="width: 100.0%; height: 100.0%;">"Rue du Mar\u00e9chal Foch"</div>`)[0];
+            popup_af64c59c87f349399f8cd9fb57f39d1c.setContent(html_d12748b3aaf64e398ee518106fd8f9ef);
+        
+
+        poly_line_b0c345b9b4214219b40d321c9c3b0ec4.bindPopup(popup_af64c59c87f349399f8cd9fb57f39d1c)
+        ;
+
+        
+    
+    
+            var poly_line_c6c408d346704883a56ee2dd83fbe60d = L.polyline(
+                [[43.2982802, -0.3410595], [43.2983177, -0.3413666], [43.2983371, -0.3415099], [43.2984225, -0.3421827], [43.2984711, -0.3425129]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_3cbcfe745aff45eaa64e45a880ed0c21 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_fdcea39df6a340f99797338809c26732 = $(`<div id="html_fdcea39df6a340f99797338809c26732" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_3cbcfe745aff45eaa64e45a880ed0c21.setContent(html_fdcea39df6a340f99797338809c26732);
+        
+
+        poly_line_c6c408d346704883a56ee2dd83fbe60d.bindPopup(popup_3cbcfe745aff45eaa64e45a880ed0c21)
+        ;
+
+        
+    
+    
+            var poly_line_6f516c44bd3b4a5f9cabcbac25d34c70 = L.polyline(
+                [[43.2986218, -0.3437337], [43.2985521, -0.3431692], [43.2984711, -0.3425129]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_890a46bc652f4f3789ccead0faed9c34 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_f9c766c3b55244618c7a4c18b98adc56 = $(`<div id="html_f9c766c3b55244618c7a4c18b98adc56" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_890a46bc652f4f3789ccead0faed9c34.setContent(html_f9c766c3b55244618c7a4c18b98adc56);
+        
+
+        poly_line_6f516c44bd3b4a5f9cabcbac25d34c70.bindPopup(popup_890a46bc652f4f3789ccead0faed9c34)
+        ;
+
+        
+    
+    
+            var poly_line_03d3331371cb46da8f97a66b926ad2cb = L.polyline(
+                [[43.2972415, -0.3693318], [43.2976961, -0.369773], [43.2977469, -0.3698221], [43.2980646, -0.3701304]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_c3cb28411f1c4dce93b72e53a00031a1 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_84b32657d02d44fc9a3d56c42c3c4504 = $(`<div id="html_84b32657d02d44fc9a3d56c42c3c4504" style="width: 100.0%; height: 100.0%;">"Rue Serviez"</div>`)[0];
+            popup_c3cb28411f1c4dce93b72e53a00031a1.setContent(html_84b32657d02d44fc9a3d56c42c3c4504);
+        
+
+        poly_line_03d3331371cb46da8f97a66b926ad2cb.bindPopup(popup_c3cb28411f1c4dce93b72e53a00031a1)
+        ;
+
+        
+    
+    
+            var poly_line_1e597a258348449ba010643eaa41dddd = L.polyline(
+                [[43.299767, -0.3700036], [43.2996796, -0.3700455]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_b70254ed82dc45f0b8a543e0e601778c = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d834787f49e2418dbb2db5f223cd99cb = $(`<div id="html_d834787f49e2418dbb2db5f223cd99cb" style="width: 100.0%; height: 100.0%;">"Rue Carnot"</div>`)[0];
+            popup_b70254ed82dc45f0b8a543e0e601778c.setContent(html_d834787f49e2418dbb2db5f223cd99cb);
+        
+
+        poly_line_1e597a258348449ba010643eaa41dddd.bindPopup(popup_b70254ed82dc45f0b8a543e0e601778c)
+        ;
+
+        
+    
+    
+            var poly_line_7dcd29ea13bd4f0db1d25952cb5c2045 = L.polyline(
+                [[43.2963141, -0.3682749], [43.2963712, -0.3680504]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_a0ffd51c6dc74beebdaaeac6282acbdb = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2e1b0faa44fd4144a46a7e21d6f8685c = $(`<div id="html_2e1b0faa44fd4144a46a7e21d6f8685c" style="width: 100.0%; height: 100.0%;">"Rue du Mar\u00e9chal Foch"</div>`)[0];
+            popup_a0ffd51c6dc74beebdaaeac6282acbdb.setContent(html_2e1b0faa44fd4144a46a7e21d6f8685c);
+        
+
+        poly_line_7dcd29ea13bd4f0db1d25952cb5c2045.bindPopup(popup_a0ffd51c6dc74beebdaaeac6282acbdb)
+        ;
+
+        
+    
+    
+            var poly_line_2eb8a1d05ca148c1b2f437acf9d33578 = L.polyline(
+                [[43.2988358, -0.3522654], [43.2988312, -0.3521334], [43.2988282, -0.3520463], [43.2988223, -0.3519168]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_01a13804b2da4aa78094b3fbb0fd57f7 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_8b079f589f7d4d1c89efb4b9f83c266d = $(`<div id="html_8b079f589f7d4d1c89efb4b9f83c266d" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_01a13804b2da4aa78094b3fbb0fd57f7.setContent(html_8b079f589f7d4d1c89efb4b9f83c266d);
+        
+
+        poly_line_2eb8a1d05ca148c1b2f437acf9d33578.bindPopup(popup_01a13804b2da4aa78094b3fbb0fd57f7)
+        ;
+
+        
+    
+    
+            var poly_line_a0fdfb9eba854fa0bed29ca8f5577f86 = L.polyline(
+                [[43.2988016, -0.3450751], [43.2988636, -0.3455743]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_1a088bb2032e4f7794a3b98b0e76cde2 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_55be453f7de84cae80d7e9b9cdb55c90 = $(`<div id="html_55be453f7de84cae80d7e9b9cdb55c90" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_1a088bb2032e4f7794a3b98b0e76cde2.setContent(html_55be453f7de84cae80d7e9b9cdb55c90);
+        
+
+        poly_line_a0fdfb9eba854fa0bed29ca8f5577f86.bindPopup(popup_1a088bb2032e4f7794a3b98b0e76cde2)
+        ;
+
+        
+    
+    
+            var poly_line_5038102d1c0345c4aa78241a60e6c7b1 = L.polyline(
+                [[43.2971004, -0.3624053], [43.2973648, -0.361663]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_ebc4ab7302f44f658e646fb6352bc132 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ad31ae1a83734843a02d5c15f138eb30 = $(`<div id="html_ad31ae1a83734843a02d5c15f138eb30" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_ebc4ab7302f44f658e646fb6352bc132.setContent(html_ad31ae1a83734843a02d5c15f138eb30);
+        
+
+        poly_line_5038102d1c0345c4aa78241a60e6c7b1.bindPopup(popup_ebc4ab7302f44f658e646fb6352bc132)
+        ;
+
+        
+    
+    
+            var poly_line_556fcec9e97c4d9c911c3b651cd0ca92 = L.polyline(
+                [[43.2973648, -0.361663], [43.2973765, -0.3616342], [43.2974042, -0.3615149]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_8910180b968842a0a3a388ae92eb6215 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_6771311ef33c4c449588f93eee79ae49 = $(`<div id="html_6771311ef33c4c449588f93eee79ae49" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_8910180b968842a0a3a388ae92eb6215.setContent(html_6771311ef33c4c449588f93eee79ae49);
+        
+
+        poly_line_556fcec9e97c4d9c911c3b651cd0ca92.bindPopup(popup_8910180b968842a0a3a388ae92eb6215)
+        ;
+
+        
+    
+    
+            var poly_line_70cc21d3febb46a5a6c71884f0dc6332 = L.polyline(
+                [[43.2960384, -0.3660932], [43.295843, -0.3660425]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_14f9f7fe10fa4801a529305a8bc15223 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c2994f3d671c40cdb8e53f92b895ab29 = $(`<div id="html_c2994f3d671c40cdb8e53f92b895ab29" style="width: 100.0%; height: 100.0%;">"Rue Gambetta"</div>`)[0];
+            popup_14f9f7fe10fa4801a529305a8bc15223.setContent(html_c2994f3d671c40cdb8e53f92b895ab29);
+        
+
+        poly_line_70cc21d3febb46a5a6c71884f0dc6332.bindPopup(popup_14f9f7fe10fa4801a529305a8bc15223)
+        ;
+
+        
+    
+    
+            var poly_line_e1a99ec9bc7e46e892bbf73de6808424 = L.polyline(
+                [[43.2960384, -0.3660932], [43.2960687, -0.3663144], [43.2963712, -0.3680504]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_4cada75afb7540368edb324e342815fb = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ee9de49bb1ae4ca199260ca7fc986aa0 = $(`<div id="html_ee9de49bb1ae4ca199260ca7fc986aa0" style="width: 100.0%; height: 100.0%;">"Rue Valery Meunier"</div>`)[0];
+            popup_4cada75afb7540368edb324e342815fb.setContent(html_ee9de49bb1ae4ca199260ca7fc986aa0);
+        
+
+        poly_line_e1a99ec9bc7e46e892bbf73de6808424.bindPopup(popup_4cada75afb7540368edb324e342815fb)
+        ;
+
+        
+    
+    
+            var poly_line_5e4671d55f3a461f81b1d6b3c772a50e = L.polyline(
+                [[43.2985893, -0.3706249], [43.2984854, -0.3704406]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_910b7b43638941479c1917148ffd0106 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_72c79687659d475b81ddf6c980d177bc = $(`<div id="html_72c79687659d475b81ddf6c980d177bc" style="width: 100.0%; height: 100.0%;">"Rue Montpensier"</div>`)[0];
+            popup_910b7b43638941479c1917148ffd0106.setContent(html_72c79687659d475b81ddf6c980d177bc);
+        
+
+        poly_line_5e4671d55f3a461f81b1d6b3c772a50e.bindPopup(popup_910b7b43638941479c1917148ffd0106)
+        ;
+
+        
+    
+    
+            var poly_line_b0c88a3151ec45d9af244c886aa88935 = L.polyline(
+                [[43.2989963, -0.3703437], [43.2988911, -0.3704221], [43.2986733, -0.3705201], [43.298653, -0.3705454], [43.2985893, -0.3706249]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_120d539f4b3d475eb80e025d9549d76e = L.popup({"maxWidth": "100%"});
+
+        
+            var html_3e7d140c7b6d41d5834b67ef9076e844 = $(`<div id="html_3e7d140c7b6d41d5834b67ef9076e844" style="width: 100.0%; height: 100.0%;">"Rue Carnot"</div>`)[0];
+            popup_120d539f4b3d475eb80e025d9549d76e.setContent(html_3e7d140c7b6d41d5834b67ef9076e844);
+        
+
+        poly_line_b0c88a3151ec45d9af244c886aa88935.bindPopup(popup_120d539f4b3d475eb80e025d9549d76e)
+        ;
+
+        
+    
+    
+            var poly_line_bc7fcd34dbc84c3db0432ce4b563258e = L.polyline(
+                [[43.2974277, -0.3587685], [43.2974146, -0.3585884], [43.2974085, -0.3584912]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_5152044053b94c11b84636de0f5a4cf1 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_50840e78268044fead97178d400606b8 = $(`<div id="html_50840e78268044fead97178d400606b8" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_5152044053b94c11b84636de0f5a4cf1.setContent(html_50840e78268044fead97178d400606b8);
+        
+
+        poly_line_bc7fcd34dbc84c3db0432ce4b563258e.bindPopup(popup_5152044053b94c11b84636de0f5a4cf1)
+        ;
+
+        
+    
+    
+            var poly_line_b9e6571c7b5f41ec8b3a5073eb03aa95 = L.polyline(
+                [[43.2974277, -0.3587685], [43.2974598, -0.359348], [43.297466, -0.3595077]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_ac92a80c2359486b951cfcf0a5f4d7c4 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_666359d6a7bb43068fb4fc954ed367f5 = $(`<div id="html_666359d6a7bb43068fb4fc954ed367f5" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_ac92a80c2359486b951cfcf0a5f4d7c4.setContent(html_666359d6a7bb43068fb4fc954ed367f5);
+        
+
+        poly_line_b9e6571c7b5f41ec8b3a5073eb03aa95.bindPopup(popup_ac92a80c2359486b951cfcf0a5f4d7c4)
+        ;
+
+        
+    
+    
+            var poly_line_7ba52f25c5854fe0995eb409e235e838 = L.polyline(
+                [[43.2982771, -0.3583692], [43.2981815, -0.3583821], [43.2975487, -0.3584679], [43.2974085, -0.3584912]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_ed6650b211e84abfbe21ad1754e44472 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_19441f8c9b4544cda809b1d0c07e02fe = $(`<div id="html_19441f8c9b4544cda809b1d0c07e02fe" style="width: 100.0%; height: 100.0%;">"Avenue \u00c9douard VII"</div>`)[0];
+            popup_ed6650b211e84abfbe21ad1754e44472.setContent(html_19441f8c9b4544cda809b1d0c07e02fe);
+        
+
+        poly_line_7ba52f25c5854fe0995eb409e235e838.bindPopup(popup_ed6650b211e84abfbe21ad1754e44472)
+        ;
+
+        
+    
+    
+            var poly_line_8b7987716f6b4d59acc91c8a4afa3721 = L.polyline(
+                [[43.298411, -0.3576697], [43.2983011, -0.3581313], [43.2982927, -0.3581687], [43.2982823, -0.3582311], [43.2982779, -0.3582888], [43.2982771, -0.3583692]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_7546a88d92524d59a477b02bfdf42b77 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_5959da7b1bd449fa84b680a8b76ad633 = $(`<div id="html_5959da7b1bd449fa84b680a8b76ad633" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_7546a88d92524d59a477b02bfdf42b77.setContent(html_5959da7b1bd449fa84b680a8b76ad633);
+        
+
+        poly_line_8b7987716f6b4d59acc91c8a4afa3721.bindPopup(popup_7546a88d92524d59a477b02bfdf42b77)
+        ;
+
+        
+    
+    
+            var poly_line_81773b5ceecc43a38633ec94ce99b64b = L.polyline(
+                [[43.2984165, -0.370472], [43.2984854, -0.3704406]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_612d847330c84f92881883f6a0d33000 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_4112ed19d22d421eb0b6c60a1e273077 = $(`<div id="html_4112ed19d22d421eb0b6c60a1e273077" style="width: 100.0%; height: 100.0%;">NaN</div>`)[0];
+            popup_612d847330c84f92881883f6a0d33000.setContent(html_4112ed19d22d421eb0b6c60a1e273077);
+        
+
+        poly_line_81773b5ceecc43a38633ec94ce99b64b.bindPopup(popup_612d847330c84f92881883f6a0d33000)
+        ;
+
+        
+    
+    
+            var poly_line_5d5a33d347934080a2a4fd45bdfabcb3 = L.polyline(
+                [[43.2986156, -0.3567579], [43.298411, -0.3576697]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_e24c855e63424c1a9a93e31fbd0222a6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_926dbb55ab234b918ded70bd80a103ba = $(`<div id="html_926dbb55ab234b918ded70bd80a103ba" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_e24c855e63424c1a9a93e31fbd0222a6.setContent(html_926dbb55ab234b918ded70bd80a103ba);
+        
+
+        poly_line_5d5a33d347934080a2a4fd45bdfabcb3.bindPopup(popup_e24c855e63424c1a9a93e31fbd0222a6)
+        ;
+
+        
+    
+    
+            var poly_line_27ddb996f38849d09532a332028c1e57 = L.polyline(
+                [[43.2990254, -0.3479708], [43.2989691, -0.3486097]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_b4b40bf227234d23970e942ddb586550 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_5b64497411d349a48683e97d0b67684f = $(`<div id="html_5b64497411d349a48683e97d0b67684f" style="width: 100.0%; height: 100.0%;">"Avenue Trespoey"</div>`)[0];
+            popup_b4b40bf227234d23970e942ddb586550.setContent(html_5b64497411d349a48683e97d0b67684f);
+        
+
+        poly_line_27ddb996f38849d09532a332028c1e57.bindPopup(popup_b4b40bf227234d23970e942ddb586550)
+        ;
+
+        
+    
+    
+            var poly_line_0650134fbcea4101a569d34da14a0a9c = L.polyline(
+                [[43.2996796, -0.3700455], [43.2994267, -0.3701552], [43.2991654, -0.3702649], [43.2989963, -0.3703437]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_12d0c49faae84fb699cc81aac967f0c8 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_84716b16cec647248aea74e1a2b6546d = $(`<div id="html_84716b16cec647248aea74e1a2b6546d" style="width: 100.0%; height: 100.0%;">"Rue Carnot"</div>`)[0];
+            popup_12d0c49faae84fb699cc81aac967f0c8.setContent(html_84716b16cec647248aea74e1a2b6546d);
+        
+
+        poly_line_0650134fbcea4101a569d34da14a0a9c.bindPopup(popup_12d0c49faae84fb699cc81aac967f0c8)
+        ;
+
+        
+    
+    
+            var poly_line_13ea89e9a4344a53802dd13b6d665a5e = L.polyline(
+                [[43.2975019, -0.3600184], [43.2975327, -0.360446], [43.2975361, -0.3605995], [43.2975327, -0.3607269], [43.2975268, -0.3608248], [43.2975, -0.3610314], [43.2974841, -0.3611254], [43.2974452, -0.3613306], [43.2974042, -0.3615149]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_fd257261b7354554945924b19cf5a126 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0b7fbff5aec84b88a874dcbf8abaa5ea = $(`<div id="html_0b7fbff5aec84b88a874dcbf8abaa5ea" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_fd257261b7354554945924b19cf5a126.setContent(html_0b7fbff5aec84b88a874dcbf8abaa5ea);
+        
+
+        poly_line_13ea89e9a4344a53802dd13b6d665a5e.bindPopup(popup_fd257261b7354554945924b19cf5a126)
+        ;
+
+        
+    
+    
+            var poly_line_90a196137e77448fa97be07c6833d7f3 = L.polyline(
+                [[43.2975019, -0.3600184], [43.2974781, -0.3596778], [43.297466, -0.3595077]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_8363c64000144b949844ae293be9d646 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_760b3ff1095741adb7a65dab9f6b98b7 = $(`<div id="html_760b3ff1095741adb7a65dab9f6b98b7" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_8363c64000144b949844ae293be9d646.setContent(html_760b3ff1095741adb7a65dab9f6b98b7);
+        
+
+        poly_line_90a196137e77448fa97be07c6833d7f3.bindPopup(popup_8363c64000144b949844ae293be9d646)
+        ;
+
+        
+    
+    
+            var poly_line_1476b2347f4c47de995405a9020958bc = L.polyline(
+                [[43.295843, -0.3660425], [43.2960481, -0.3657389]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_56ae79a83cbb4946babe9c023835f5a0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_115642c0f99c4b8bb59ec958819c4673 = $(`<div id="html_115642c0f99c4b8bb59ec958819c4673" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_56ae79a83cbb4946babe9c023835f5a0.setContent(html_115642c0f99c4b8bb59ec958819c4673);
+        
+
+        poly_line_1476b2347f4c47de995405a9020958bc.bindPopup(popup_56ae79a83cbb4946babe9c023835f5a0)
+        ;
+
+        
+    
+    
+            var poly_line_dd67e987a6b24d24943325d6c397ea04 = L.polyline(
+                [[43.2960481, -0.3657389], [43.2962884, -0.3649773]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_923df357dc8d4174b1efcddbeb91857e = L.popup({"maxWidth": "100%"});
+
+        
+            var html_e0d1c3eae5a24079be9e32a27d80cc0a = $(`<div id="html_e0d1c3eae5a24079be9e32a27d80cc0a" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_923df357dc8d4174b1efcddbeb91857e.setContent(html_e0d1c3eae5a24079be9e32a27d80cc0a);
+        
+
+        poly_line_dd67e987a6b24d24943325d6c397ea04.bindPopup(popup_923df357dc8d4174b1efcddbeb91857e)
+        ;
+
+        
+    
+    
+            var poly_line_89b6fbaeb77849c6be9d83e331cc3d34 = L.polyline(
+                [[43.2962884, -0.3649773], [43.2964723, -0.3644085], [43.2966826, -0.3637021]],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_fff8487245ee4dd8aa0eb039d81cf94f);
+        
+    
+        var popup_179b57821e5c40b48dcdcbcac4ddf354 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c45c19f5ef1f4374af6e080221c55fb2 = $(`<div id="html_c45c19f5ef1f4374af6e080221c55fb2" style="width: 100.0%; height: 100.0%;">"Boulevard Barban\u00e8gre"</div>`)[0];
+            popup_179b57821e5c40b48dcdcbcac4ddf354.setContent(html_c45c19f5ef1f4374af6e080221c55fb2);
+        
+
+        poly_line_89b6fbaeb77849c6be9d83e331cc3d34.bindPopup(popup_179b57821e5c40b48dcdcbcac4ddf354)
+        ;
+
+        
+    
+    
+            map_fff8487245ee4dd8aa0eb039d81cf94f.fitBounds(
+                [[43.295843, -0.3706249], [43.299767, -0.3405589]],
+                {}
+            );
+        
+</script>

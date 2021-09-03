@@ -165,6 +165,8 @@ def chemin_étapes_ensembles(g, c, bavard=0):
     preds_précs = []
 
     for i in range(1, len(étapes)):
+        if bavard>0:
+            print(f"Recherche d’un chemin de {étapes[i-1]} à {étapes[i]}.")
         vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred, i==1)
         if bavard>0: print(f"Je suis arrivé à {étapes[i]}")
         preds_précs.append(copy.deepcopy(pred))  # pour la reconstruction finale

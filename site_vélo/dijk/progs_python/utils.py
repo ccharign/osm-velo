@@ -2,7 +2,7 @@
 
 ### Fonctions diverses pour utiliser le logiciel
 
-
+from dijk.progs_python.params import NAVIGATEUR, TMP
 from importlib import reload  # recharger un module après modif
 import subprocess
 import networkx as nx  # graphe
@@ -13,7 +13,7 @@ from module_graphe import graphe  #ma classe de graphe
 import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
-from params import NAVIGATEUR, TMP
+
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
 import récup_données
@@ -38,16 +38,27 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0):
+def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0, ouvrir=False):
+    """ Crée une page html contenant l’itinéraire demandé, et renvoie son adresse.
+    Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
+    """
     d = chemins.Étape(départ, g)
+    if bavard>0:
+        print(f"Départ trouvé : {d}, {d.nœuds}")
+        print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
     a = chemins.Étape(arrivée, g)
+    if bavard>0:
+        print(f"Arrivée trouvé : {a}")
     c = chemins.Chemin([d, a], p_détour, False)
-    res = g.chemin_étapes_ensembles(c)
+    res = g.chemin_étapes_ensembles(c, bavard = bavard-1)
+    if bavard>0:
+        print(f"J’ai obtenu l’itinéraire suivant : {res}")
     graphe_c = g.multidigraphe.subgraph(res)
     carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, (départ+arrivée).replace(" ","")+".html")
+    nom = os.path.join(où_enregistrer, "résultat_itinéraire.html")
     carte.save(nom)
-    ouvre_html(nom)
+    return nom
+    #ouvre_html(nom)
     #ox.plot_route_folium(g.multidigraphe,c)
 
 
@@ -191,3 +202,5 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0 ):
     nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)
     ouvre_html(nom)
+
+

@@ -14,14 +14,16 @@ class Ville(models.Model):
 class Rue(models.Model):
     nom_complet = models.CharField(max_length=200)
     nom_norm = models.CharField(max_length=200)
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
     def __str__(self):
-        return self.nom_complet
+        return f"{self.nom_complet} ({self.ville})"
     
 
 class Sommet(models.Model):
     
     id_osm = models.IntegerField()
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    lon = models.FloatField()
+    lat = models.FloatField()
     
     def __str__(self):
         return str(self.id_osm)
@@ -29,6 +31,21 @@ class Sommet(models.Model):
     def voisins(self):
         arêtes = Arête.objects.get(départ=self.id)
         return [(a.arrivée.id_osm, a.longueur) for a in arêtes]
+
+    
+class Ville_of_Sommet(models.Model):
+    """ Table d’association sommet -> ville (il peut y avoir plusieurs villes par sommet)"""
+    sommet = models.ForeignKey(Sommet, on_delete=models.CASCADE )
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
+    
+
+class Nœud_of_Rue(models.Model):
+    """ table d'association ville -> rue -> nœud """
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
+    nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.ville}, {self.rue}, {self.nœud}"
 
     
 class Arête(models.Model):
@@ -41,13 +58,7 @@ class Arête(models.Model):
         return f"({self.départ}, {self.arrivée})"
 
     
-class Nœud_of_Rue(models.Model):
-    """ table d'association ville -> rue -> nœud """
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
-    rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
-    nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
-    def __str__(self):
-        return f"{self.ville}, {self.rue}, {self.nœud}"
+
 
     
 class Cache_Adresse(models.Model):

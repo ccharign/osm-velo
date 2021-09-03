@@ -15,6 +15,8 @@ CHEMIN_XML_COMPLET = os.path.join(RACINE_PROJET,"données_inutiles/pau_agglo.osm
 CHEMIN_JSON_NUM_COORDS = os.path.join(RACINE_PROJET,"données/rue_num_coords.csv")
 CHEMIN_NŒUDS_VILLES = os.path.join(RACINE_PROJET,"données/nœuds_villes.csv")
 CHEMIN_NŒUDS_RUES = os.path.join(RACINE_PROJET,"données/nœuds_rues.csv")
+CHEMIN_CACHE = os.path.join(RACINE_PROJET,"données/cache_adresses.csv")
+CHEMIN_CYCLA = os.path.join(RACINE_PROJET,"données/Cyclabilité.csv")
 
 TMP = os.path.join(RACINE_PROJET, "tmp/")
 os.makedirs(TMP, exist_ok=True)

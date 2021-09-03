@@ -8,7 +8,7 @@
 #from récup_données import localisateur
 from params import CHEMIN_NŒUDS_VILLES, CHEMIN_JSON_NUM_COORDS
 from petites_fonctions import ajouteDico
-from dijk.models import Ville, Sommet
+#from dijk.models import Ville, Sommet
 from lecture_adresse.normalisation import normalise_ville
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
@@ -23,21 +23,8 @@ def liste_villes():
             res.add(ligne.split(";")[0])
     return res
 
-code_postal = {
-    "Pau":64000,
-    "Jurançon":64110,
-    "Gelos":64110,
-    "Mazère-Lezons":64110,
-    "Bizanos":64320,
-    "Lons":64348,
-    "Billère":64140,
-    "Montardon":64121
-}
 
-def villes_vers_django():
-    for nom, code in code_postal.items():
-        v = Ville(nom_complet=nom, nom_norm=str(normalise_ville(nom)), code=code)
-        v.save()
+
 
 # pour test : id de Pau 162431
 
@@ -86,6 +73,9 @@ def charge_csv():
 
 
 def vérif_unicité_ville():
+    """
+    La réponse était False comme on pouvait s’en douter : certains nœuds sont dans plusieurs sommets.
+    """
     déjà_vus = set([])
     for ville, nœuds in charge_csv().items():
         for n in nœuds:
@@ -94,13 +84,10 @@ def vérif_unicité_ville():
         déjà_vus.update(nœuds)
     return True
 
-def nœuds_vers_django():
-    for ville, nœuds in charge_csv().items():
-        v = Ville.objects.get(nom_norm = str(normalise_ville(ville)))
-        for n in nœuds:
-            pass
 
-        
+
+
+
 def ajoute_villes(g, bavard=0):
     """ Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes.
     """

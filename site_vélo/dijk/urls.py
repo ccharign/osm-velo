@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("itinéraire/<str:départ>/<str:arrivée>/", views.itinéraire),
+    path("itinéraireDirect/<str:départ>/<str:arrivée>/<int:pourcentage_détour>", views.vue_itinéraire_direct),
+    path("itinéraire", views.vue_itinéraire, name="itinéraire"),
     path('', views.index, name='index'), # Création d'une url pointant vers la vue « index »
 ]

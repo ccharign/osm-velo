@@ -4,9 +4,9 @@
 
 
 #import networkx as nx
-
-from module_graphe import graphe  # ma classe de graphe
 from params import RACINE_PROJET
+from module_graphe import graphe  # ma classe de graphe
+
 from initialisation.ajoute_villes import ajoute_villes
 import initialisation.nœuds_des_rues as nr
 
