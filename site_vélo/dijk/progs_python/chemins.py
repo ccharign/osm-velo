@@ -46,6 +46,7 @@ class Chemin():
                     - texte (None ou str), texte d'où vient le chemin (pour déboguage)
     """
     def __init__(self, étapes, p_détour, AR):
+        assert p_détour>=0 and p_détour<=2, "Y aurait-il confusion entre la proportion et le pourcentage de détour?"
         self.étapes = étapes
         self.p_détour = p_détour
         self.AR = AR

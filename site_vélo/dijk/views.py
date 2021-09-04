@@ -10,6 +10,7 @@ def index(requête):
     return render(requête, "dijk/index.html", {})
 
 
+
 def vue_itinéraire_direct(requête, départ, arrivée, pourcentage_détour):
     print(f"Recherche d’itinéraire entre {départ} et {arrivée}.")
     res = itinéraire(départ, arrivée, pourcentage_détour/100, g, bavard=4, où_enregistrer="dijk/templates/dijk" )
@@ -25,3 +26,8 @@ def vue_itinéraire(requête):
     print(f"Recherche d’itinéraire entre {d} et {a}.")
     itinéraire(d, a, p_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk" )
     return render(requête, "dijk/résultat_itinéraire.html", {})
+
+
+def contribution(requête):
+    """ Page du formulaire pour ajouter un chemin."""
+    return render(requête, "dijk/contribution.html", {})
