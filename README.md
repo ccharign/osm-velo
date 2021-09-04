@@ -8,16 +8,17 @@
 
  Les sens interdits sont gérés uniquement au niveau de l'IA : en pratique si un tronçon n'est jamais emprunté dans un sens, il sera rarement proposé dans ce sens.
 
- Dans les différentes fonction, pourcentage_détour est le pourcentage de détour accepté par le cycliste. 0 signifie aucun détour, 100 signifie qu'un trajet deux fois plus long serait accepté pour remplacer entièrement une rue non aménagée (réérence : rue Faisans) par une piste cyclable (référence : celle du Fébus).
+ Dans les différentes fonctions, pourcentage_détour est le pourcentage de détour accepté par le cycliste. 0 signifie aucun détour, 100 signifie qu'un trajet deux fois plus long serait accepté pour remplacer entièrement une rue non aménagée (réérence : rue Faisans) par une piste cyclable (référence : celle du Fébus).
 
- Le notebook démo.ipynb ou test.py montrent le fonctionnement. Le notebook est testable en ligne grâce à Binder :
- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ccharign/osm-velo/HEAD?filepath=d%C3%A9mo.ipynb)
+ Le fichier test.py dans site_vélo/dijk/progs_python montre le fonctionnement.
 
- Les trajet calculés sont affichés dans une page web interactive.
+ Notebook testable en ligne grâce à Binder : plus à jour...
+ [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ccharign/osm-velo/HEAD?filepath=site_v%C3%A9lo%2Fd%C3%A9mo.ipynb)
+
 
  Pour l'instant, seule la ville de Pau et son agglomération est en mémoire, mais les fonctions dans init_graphe et dans récup_données permettent de charger n'inporte quelle zone.
 
- Ce projet ne pourra devenir pertinent que lorsque j’aurai récupérer disons une centaine de trajets ! Je compte sur vous pour m’en fournir un ou deux,  c'est ici https://framaforms.org/entrainement-du-calculateur-participatif-ditineraires-version-clic-1618406941
+ Ce projet ne pourra devenir pertinent que lorsque j’aurai récupéré disons une centaine de trajets ! Je compte sur vous pour m’en fournir un ou deux,  c'est ici https://framaforms.org/entrainement-du-calculateur-participatif-ditineraires-version-clic-1618406941
 
  Je compte également sur vous pour m’indiquer les erreurs et les problèmes que vous aurez détectés.
 
