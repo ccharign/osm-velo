@@ -19,7 +19,7 @@ def dico_arêtes(liste_nœuds):
 
 
 def lecture_meilleur_chemin(g, chemin, bavard=0):
-    """ Entrée : le chemin à suivre, donné par une liste d'étapes.
+    """ Entrée : le chemin à suivre, instance de Chemin.
         Effet : Compare chemin avec le chemin renvoyé par g.chemin. Augmente de ETA la cyclabilité de chaque arrête présente dans chemin mais pas dans l'autre et diminue de ETA chaque arrête présente dans l'autre et pas dans chemin."""
     
     #vieux_chemin = g.chemin_étapes_ensembles(chemin.direct())
@@ -62,7 +62,7 @@ def n_lectures(n, g, chemins, bavard=0):
     print(f"Début de l'apprentissage. C'est parti pour {n} lectures.")
     for i in range(n):
         n_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard-1)
-        if bavard >0: print(f" ----- Étape {i}, {n_modif} arêtes modifiées -----")
+        if bavard > 0: print(f" ----- Étape {i}, {n_modif} arêtes modifiées -----")
         if n_modif == 0:
             print("Plus de modifications, j’arrête l’apprentissage.")
             break

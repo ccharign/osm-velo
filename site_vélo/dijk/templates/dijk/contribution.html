@@ -11,7 +11,7 @@
 
 
     
-    <form action = "{% url 'nouveau chemin' %}" method="post">
+    <form action = "{% url 'vérif nouveau chemin' %}" method="post">
       {% csrf_token %}
       <label for="départ">Départ : </label><br>
       <input type="text" id="départ" name="départ"><br><br>
@@ -25,7 +25,9 @@
       <label for="pourcentage_détour"> Pourcentage détour </label><br>
       <input type="text" id="pourcentage_détour" name="pourcentage_détour"><br><br>
 
-
+      <label for="AR"> Valable aussi pour le retour ? </label><br>
+      <input type="checkbox" id="AR" name="AR">
+      
       <input type="submit" value="C’est parti!">
     </form>
 

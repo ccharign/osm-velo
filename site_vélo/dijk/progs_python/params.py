@@ -17,6 +17,8 @@ CHEMIN_NŒUDS_VILLES = os.path.join(RACINE_PROJET,"données/nœuds_villes.csv")
 CHEMIN_NŒUDS_RUES = os.path.join(RACINE_PROJET,"données/nœuds_rues.csv")
 CHEMIN_CACHE = os.path.join(RACINE_PROJET,"données/cache_adresses.csv")
 CHEMIN_CYCLA = os.path.join(RACINE_PROJET,"données/Cyclabilité.csv")
+CHEMIN_CHEMINS = os.path.join(RACINE_PROJET,"données/chemins.csv")
+DONNÉES = os.path.join(RACINE_PROJET,"données")
 
 TMP = os.path.join(RACINE_PROJET, "tmp/")
 os.makedirs(TMP, exist_ok=True)

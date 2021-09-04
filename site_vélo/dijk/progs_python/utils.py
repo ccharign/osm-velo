@@ -79,9 +79,10 @@ def flatten(c):
 
 
 
-def dessine_chemin(c, g, où_enregistrer=TMP):
-    """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
-    assert isinstance(c, chemins.Chemin)
+def dessine_chemin(c, g, où_enregistrer=TMP, ouvrir=False, bavard=0):
+    """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
+    Le nom du fichier html créé est nouveau_chemin.html.
+    """
 
     c_complet = dijkstra.chemin_étapes_ensembles(g, c)
     départ, arrivée = c_complet[0], c_complet[-1]
@@ -94,9 +95,11 @@ def dessine_chemin(c, g, où_enregistrer=TMP):
     graphe_c_complet = g.multidigraphe.subgraph(c_complet)
     carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
-    nom = os.path.join(où_enregistrer, c.texte_court())
+    nom = os.path.join(où_enregistrer, "nouveau_chemin.html")
     carte.save(nom)
-    ouvre_html(nom)
+    if bavard>0:
+        print(f"fichier html enregistré dans {nom}.")
+    if ouvrir : ouvre_html(nom)
 
 
 def dessine_chemins(chemins, g, où_enregistrer=TMP):

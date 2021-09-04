@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 
+from dijk.progs_python.params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
 from récup_données import cherche_lieu, coords_lieu, coords_of_adresse
 import module_graphe
-from params import LOG_PB
+import os
 from lecture_adresse.normalisation import VILLE_DÉFAUT
 import re
 import dijkstra
@@ -30,6 +31,7 @@ class Étape():
         nœuds (int set) : ensemble de nœuds
     """
     def __init__(self, adresse, g, bavard=0):
+        if bavard>0:print(adresse)
         self.texte = adresse
         self.nœuds = set(nœuds_of_étape(adresse, g, bavard=bavard-1))
         for n in self.nœuds:
@@ -55,44 +57,51 @@ class Chemin():
     
     @classmethod
     def of_ligne(cls, ligne, g, tol=.25, bavard=0):
-        """ Entrée : ligne (str), une ligne de csv du questionnaire. Les colonnes sont séparées par | . Il y a 12 colonnes, les 9 premières sont inutiles.
+        """ Entrée : ligne (str), une ligne du csv de chemins. Format AR|pourcentage_détour|étapes.
                      g (Graphe). Utilisé pour déterminer le nœud associé à chaque étape.
         tol indique la proportion tolérée d’étapes qui n’ont pas pu être trouvées.
         """
-        données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
-        assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
-        print("\n", données)
-        p_détour = float(données[1])/100.
+
+        AR_t, pourcentage_détour_t, étapes_t = ligne.strip().split("|")
+        p_détour = int(pourcentage_détour_t)/100.
+        AR = bool(AR_t)
         
-        étapes = []
-        noms_étapes = données[2].split(";")
+        noms_étapes = étapes_t.split(";")
         n_pb = 0
+        étapes=[]
         for c in noms_étapes:
             try:
-                étapes.append(Étape(c, g, bavard=bavard-1))
+                étapes.append(Étape(c.strip(), g, bavard=bavard-1))
             except Exception as e:
-                LOG_PB(f"Échec pour l’étape {c}")
+                LOG_PB(f"Échec pour l’étape {c} : {e}")
                 n_pb+=1
         if n_pb/len(noms_étapes) > tol:
-            raise ÉchecChemin(f"{n_pb} erreurs pour la lecture de {données}.")
-        
-            
-        if données[0] == "oui": AR = True
-        else: AR = False
+            raise ÉchecChemin(f"{n_pb} erreurs pour la lecture de {ligne}.")
         
         chemin = cls(étapes, p_détour, AR)
-        chemin.texte = (données[2])
+        chemin.texte = étapes_t
         return chemin
 
+    
+    def sauv(self, adresse=CHEMIN_CHEMINS):
+        """ Ajoute le chemin dans le csv"""
+            
+        ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }\n"
+        with open(adresse, "a") as sortie:
+            sortie.write(ligne)
+    
     @classmethod
-    def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g):
-        """Plutôt pour rentrer à la main un chemin.
+    def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, bavard=0):
+        """
+        Plutôt pour rentrer à la main un chemin.
         Entrées : noms_étapes (str list).
                   pourcentage_détour (int)
                   AR (bool)
                   g (Graphe)
         """
         étapes = [Étape(é, g) for é in noms_étapes]
+        if bavard>0:
+            print(f"List des étapes obtenues : {étapes}")
         return cls(étapes, pourcentage_détour/100, AR)
     
     
@@ -128,7 +137,10 @@ class Chemin():
             return ";".join(map(str, à_garder))
 
    
-def chemins_of_csv(g, adresse_csv="données/chemins.csv", bavard=0):
+def chemins_of_csv(g, adresse_csv=CHEMIN_CHEMINS, bavard=0):
+    """
+    Renvoie la liste des chemins contenus dans le csv.
+    """
     entrée = open(adresse_csv)
     #res=[g.chemin_of_string(ligne) for ligne in entrée ]
     res = []
@@ -140,6 +152,30 @@ def chemins_of_csv(g, adresse_csv="données/chemins.csv", bavard=0):
             LOG_PB( f"{e}\n Chemin abandonné : {ligne}\n" )
     entrée.close()
     return res
+
+
+def formulaire_vers_csv(ad_entrée=os.path.join(DONNÉES,"chemins_form.csv"), ad_sortie = CHEMIN_CHEMINS ):
+    """ 
+    Entrées : adresse d’un csv issu du framaform
+              autre adresse
+    Effet : copie une version nettoyée du csv initial dans l’adresse de sortie. Format utilisé : AR|pourcentage_détour|étapes séparées par des ;
+    """
+    def bool_of_text(t):
+        if t=="oui":
+            return True
+        elif t=="non":
+            return False
+        else:
+            raise ValueError(f"J’attendais 'oui' ou 'non' mai j’ai eu {t}.")
+    entrée = open(ad_entrée)
+    sortie = open(ad_sortie,"w")
+    for ligne in entrée:
+        données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
+        assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
+        données[0]=str(bool_of_text(données[0]))
+        ligne = "|".join(données)
+        print("\n", ligne)
+        sortie.write(ligne+"\n")
 
 
 def lecture_étape(c):

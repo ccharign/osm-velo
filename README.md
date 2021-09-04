@@ -12,7 +12,7 @@
 
  Le fichier test.py dans site_vélo/dijk/progs_python montre le fonctionnement.
 
- Notebook testable en ligne grâce à Binder : plus à jour...
+ Notebook testable en ligne grâce à Binder : 
  [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ccharign/osm-velo/HEAD?filepath=site_v%C3%A9lo%2Fd%C3%A9mo.ipynb)
 
 
