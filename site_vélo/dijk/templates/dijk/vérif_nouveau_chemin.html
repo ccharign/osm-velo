@@ -8,13 +8,13 @@
   <body>
     
     <p>Le lien ci-dessous mène à votre itinéraire tel qu'il à été compris par le logiciel : </p>
-    <a href="{% url 'visu nv chemin' %}"> ici </a>
+    <a href="{% url 'visu nv chemin' %}"> ici. </a>
     (Rappel : pour ouvrir un lien dans un nouvel onglet, utiliser ctrl-clic)<br>
     
     En rouge le chemin direct, en bleu le chemin tenant compte des étapes indiquées, et des données déjà présentes dans la base.
 
 
-    <p>Pour confirmer et le rentrer dans la base : </p>
+    <p>Pour confirmer et le rentrer dans la base : <a href="{% url 'confirme nv chemin' %}"> là </a>. </p>
 
     <p>Pour le modifier (ajouter, changer ou préciser des étapes) : </p>
     <a href = "{% url 'contribution' %}"> retour </a>

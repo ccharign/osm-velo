@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Merci</title>
+  </head>
+  
+  <body>
+    Contribution enregistrée, merci !<br><br>
+    
+
+    <a href="{% url 'index' %}"> Retour à l’entrée </a><br><br>
+
+    Liste des chemins connus :<br>
+    <ul>
+      {% for c in chemins %}
+      <li> {{c}}  </li>
+      {% endfor %}
+    </ul>
+  </body>
+
+</html>>

@@ -84,9 +84,16 @@ class Chemin():
 
     
     def sauv(self, adresse=CHEMIN_CHEMINS):
-        """ Ajoute le chemin dans le csv"""
+        """ Ajoute le chemin dans le csv, après avoir vérifié qu’il n’y est pas déjà."""
             
         ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }\n"
+        
+        with open(adresse) as entrée:
+            for ligne_e in entrée:
+                if ligne_e==ligne:
+                    print(f"Ligne déjà présente : {ligne}")
+                    return None
+                
         with open(adresse, "a") as sortie:
             sortie.write(ligne)
     

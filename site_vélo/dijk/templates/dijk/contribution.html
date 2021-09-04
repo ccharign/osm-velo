@@ -9,6 +9,19 @@
     
     <p>Cette page permet de rentrer un itinéraire que vous validez en tant que cyliste. Il sera inclus dans la base de données et servira à entraîner l'IA. </p>
 
+    <p>
+      Quelques points techniques:
+      <ul>
+	<li> Entre deux étapes indiquées, l’algo prend le meilleur chemin en l’état actuel de ses connaissances. Il est donc inutile d’indiquer la moindre rue empruntée : seulement les les étapes marquantes, celles qui distinguent votre itinéraire du plus court chemin.</li>
+	<li> Si vous indiquez une adresse précise (soit un bâtiment, soit en précisant un numéro de rue) l’algo fera passer le chemin exactement par ce point. Toutefois openstreet map contient très peu de numéros de rue, il est donc fréquent que l’algo les ignore.
+
+	Si une rue est indiquée comme étape, l’algo fera en sorte d’emprunter au moins un tronçon de cette rue. Dans des cas extrêmes, il pourrait faire un allr-retour sur cette rue. De manière générale, il ne faut pas indiquer une rue que l’on ne fait que traverser.</li>
+      </ul>
+    </p>
+
+    <p>
+      Quand vous aurez validé votre entrée, le site vous laissera la possibilité de vérifier si votre trajet a bien été compris par l’algo avant de le valider pour de bon.
+    </p>
 
     
     <form action = "{% url 'vérif nouveau chemin' %}" method="post">
@@ -20,13 +33,13 @@
       <input type="text" id="arrivée" name="arrivée"><br><br>
 
       <label for="étapes"> Étapes, séparées par des point-virgules </label><br>
-      <input type="text" id="étapes" name="étapes"><br><br>
+      <input type="text" id="étapes" name="étapes" size=100><br><br>
 
       <label for="pourcentage_détour"> Pourcentage détour </label><br>
       <input type="text" id="pourcentage_détour" name="pourcentage_détour"><br><br>
 
       <label for="AR"> Valable aussi pour le retour ? </label><br>
-      <input type="checkbox" id="AR" name="AR">
+      <input type="checkbox" id="AR" name="AR"><br>
       
       <input type="submit" value="C’est parti!">
     </form>
