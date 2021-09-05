@@ -87,7 +87,7 @@ class ArbreLex():
         """
 
         def rassemble_possibs(p1, p2):
-            """ p1 et p2 sont des couples (liste d’éléments de l’arbre, distance à mot)"""
+            """ p1 et p2 sont des couples (set d’éléments de l’arbre, distance à mot)"""
             l1, d1 = p1
             l2, d2 = p2
             if d1==d2:
@@ -102,13 +102,13 @@ class ArbreLex():
             Renvoie le couple obtenu en mettant lettre devant chacun des mots.
             """
             mots, d = possib
-            return (set([lettre+m for m in mots]), d)
+            return (set(lettre+m for m in mots), d)
         
         
         if d_max == d_actuelle:
             # Seule possibilité : le mot lui-même
-            if mot in self: return [mot], d_actuelle
-            else: return [], float("inf")
+            if mot in self: return set([mot]), d_actuelle
+            else: return set([]), float("inf")
             
         else:
             res = set([]), float("inf")

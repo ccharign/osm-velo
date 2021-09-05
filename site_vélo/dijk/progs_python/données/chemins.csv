@@ -12,6 +12,6 @@ False|30|place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place 
 False|20|rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset
 True|30|Rue du barthouil (64320 ousse);allée de l’église (64320 lee);Avenue beau soleil; Avenue trespoey;Avenue edouard VII;allée alfred de Musset;rue Louis Barthou
 True|30|rue des écoles (64140 Lons);Chemin des vignes (64140 Lons); Rue du Mohedan (Billère); rue des Muses ( Billère); Avenue de la République (64140 Billère); Rue Jeanne Lassansaa (64140 Billère); Rue Claverie (64140 Billère); Rue des Marnières (64140 Billère); Rue des Marnières (64000 Pau); Boulevard Edouard Herriot; 50 Boulevard Alsace Lorraine;Avenue Edouard VII
-False|30|rue des veroniques, pau, France;rue regina, pau, France;parc beaumont, pau, France
-False|10|parc beaumont, pau, France;allee anna de noailles, pau, France;le galway, pau, France
-False|30|rue des veroniques, pau, France;avenue de l’yser , bizanos, France;avenue de la paix , gelos, France;route des coteaux de guindalos , jurançon, France
+False|30|rue des veroniques;rue regina;parc beaumont
+False|10|parc beaumont;allee anna de noailles;le galway
+True|30|rue des veroniques;avenue de l’yser (bizanos);avenue de la paix (gelos);route des coteaux de guindalos (jurançon)

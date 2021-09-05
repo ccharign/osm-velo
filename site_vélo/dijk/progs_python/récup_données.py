@@ -53,8 +53,8 @@ def cherche_lieu(adresse, bavard=0):
         # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
         LOG_PB(f"La recherche structurée a échouée pour {adresse}.")
         print("Recherche Nominatim non structurée... Attention : résultat pas fiable.")
-        print(f'Essai 2 : "{adresse}" ')
-        lieu = localisateur.geocode(f"{adresse}", exactly_one=False)
+        print(f'Essai 2 : "{adresse.pour_nominatim()}" ')
+        lieu = localisateur.geocode(f"{adresse.pour_nominatim()}", exactly_one=False)
         if lieu is not None:
             return lieu
         else:
@@ -157,17 +157,18 @@ def charge_rue_num_coords():
     for ligne in entrée:
         villerue, tmp = ligne.strip().split(":")
         ville, rue = villerue.split(";")
-        ville = str(normalise_ville(ville))
-        rue = normalise_rue(rue)
+        ville = normalise_ville(ville)
+        rue = normalise_rue(rue, ville)
         données = tmp.split(";")
-        if ville not in res: res[ville] = {}
-        res[ville][rue] = ([], [])  # numéros pairs, numéros impairs
+        ville_n=ville.nom
+        if ville_n not in res: res[ville_n] = {}
+        res[ville_n][rue] = ([], [])  # numéros pairs, numéros impairs
 
         for k in range(2):
             if données[k] != "":
                 for x in données[k].split("|"):
                     num, lat, lon = x.split(",")
-                    res[ville][rue][k].append((int(num), (float(lat), float(lon))))
+                    res[ville_n][rue][k].append((int(num), (float(lat), float(lon))))
     return res
 
 

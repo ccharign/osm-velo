@@ -7,6 +7,9 @@ from petites_fonctions import distance_euc
 from params import LOG_PB
 
 
+### Module pour associer une liste de nœuds à une adresse. ###
+
+
 class PasTrouvé(Exception):
     pass
 

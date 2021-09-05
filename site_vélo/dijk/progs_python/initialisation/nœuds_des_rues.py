@@ -3,7 +3,7 @@
 ############## Lire tout le graphe pour en extraire les nœuds des rues ###############
 
 from params import CHEMIN_NŒUDS_RUES
-from lecture_adresse.normalisation import normalise_rue, normalise_ville
+from lecture_adresse.normalisation import normalise_rue, normalise_ville, prétraitement_rue
 D_MAX_SUITE_RUE = 10  # Nombre max d’arêtes où on va chercher pour trouver la suite d’une rue.
 
 
@@ -111,10 +111,11 @@ def charge_csv(g):
     with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
         for ligne in entrée:
             ville, rue, nœuds_à_découper = ligne.strip().split(";")
-            ville = str(normalise_ville(ville))
-            rue = normalise_rue(rue)
+            ville = normalise_ville(ville)
+            ville_n=ville.nom
+            rue = prétraitement_rue(rue) # Il ne devrait pas y avoir de faute de frappe dans le csv : je saute la recherche dans l’arbre lex.
             nœuds = list(map(int, nœuds_à_découper.split(",")))
-            if ville not in g.nœuds : g.nœuds[ville]={}
-            g.nœuds[ville][rue] = nœuds
+            if ville_n not in g.nœuds : g.nœuds[ville_n]={}
+            g.nœuds[ville_n][rue] = nœuds
     print("Chargement de la liste des nœuds de chaque rue finie.")
             
