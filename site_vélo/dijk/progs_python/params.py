@@ -24,6 +24,7 @@ TMP = os.path.join(RACINE_PROJET, "tmp/")
 os.makedirs(TMP, exist_ok=True)
 
 STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
+PAYS_DÉFAUT = "France"
 NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html
 
 D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import module_graphe
-from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville
+from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville, Adresse
 import re
 from récup_données import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local
 from petites_fonctions import distance_euc
@@ -15,52 +15,44 @@ class PasTrouvé(Exception):
 def nœuds_of_étape(c, g, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
-        Sortie : liste de nœuds de g associé à cette adresse.
-           Si un numéro est indiqué, renvoie le singleton du nœud de la rue le plus proche.
-           Sinon renvoie la liste des nœuds de la rue."""
+        Sortie : (liste de nœuds de g associé à cette adresse, l’adresse de type Adresse)
+           Si un numéro est indiqué, la liste de nœuds est le singleton du nœud de la rue le plus proche.
+           Sinon c’est la liste de tous les nœuds connus de la rue.
+    """
 
+
+
+    # Lecture de l’adresse
     c = normalise_adresse(c)
     assert c != ""
+    ad = Adresse(c, bavard=bavard-1)
     
-    if c in g.nœud_of_rue:  # Recherche dans le cache
+    # Recherche dans le cache
+    if c in g.nœud_of_rue:  
         if bavard > 1 : print(f"Adresse dans le cache : {c}")
-        return g.nœud_of_rue[c]
+        return g.nœud_of_rue[c], ad
     else:
         if bavard > 0 :print(f"Pas dans le cache : {c}")
-    
+
+    # Fonction de mise en cache
     def renvoie(res):
         assert res != []
         assert all(isinstance(s, int) and s in g.digraphe.nodes for s in res)
         g.nœud_of_rue[c] = res
         print(f"Mis en cache : {res} pour {c}")
-        return res
+        return res, ad
 
     
-    ## Analyse de l’adresse. On récupère les variables num, rue, ville
-    e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
-    essai = re.findall(e, c)
-    if bavard > 1: print(f"Résultat de la regexp : {essai}")
-    if len(essai) == 1:
-        num, rue, _, ville = essai[0]
-    elif len(essai) == 0:
-        raise SyntaxError(f"adresse mal formée : {c}")
-    else:
-        print(f"Avertissement : plusieurs interprétations de {c} : {essai}.")
-        num, rue, _, ville = essai[0]
-    rue = normalise_rue(rue)
-    
-    #if ville == "": ville = VILLE_DÉFAUT
-    ville = normalise_ville(ville.strip())
-    if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville.avec_code()}")
+
     
     
-    if num == "":
+    if ad.num is None:
     ## Pas de numéro de rue -> liste de tous les nœuds de la rue
         if bavard > 0 : print("Pas de numéro de rue, je vais renvoyer une liste de nœuds")
-        if rue == "":
+        if ad.rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
-            res = tous_les_nœuds(g, rue, ville=ville, pays="France", bavard=bavard-1)
+            res = tous_les_nœuds(g, ad, bavard=bavard-1)
             #coords = coords_lieu(f"{rue}", ville=ville, bavard=bavard-1)
             #print(f"Je vais prendre le nœud le plus proche de {coords}.")
             #n = g.nœud_le_plus_proche(coords)
@@ -69,18 +61,16 @@ def nœuds_of_étape(c, g, bavard=0):
             
     else:
         ## Numéro de rue -> renvoyer un singleton
-        num = int(num)
         if bavard > 0 : print("Numéro de rue présent : je vais renvoyer un seul nœud")
-
         
-        return renvoie(un_seul_nœud(g, num, rue, ville=ville, bavard=bavard-1))
+        return renvoie(un_seul_nœud(g, ad, bavard=bavard-1))
 
 
 
 
-def tous_les_nœuds(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
+def tous_les_nœuds(g, adresse, bavard=0):
     """ Entrée : g (graphe)
-                 nom_rue (str)
+                 adresse : instance de Adresse
         Sortie : liste des nœuds de cette rue, dans l’ordre topologique si possible.
 
 
@@ -95,13 +85,13 @@ def tous_les_nœuds(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
     ## Essai 1
     try:
-        return g.nœuds[str(ville)][normalise_rue(nom_rue)]
+        return g.nœuds[str(adresse.ville)][adresse.rue_norm]
     except KeyError as e :
-        print(f"(nœuds_sur_rue) Rue pas en mémoire : {nom_rue} ({ville})  ({e}).")
+        print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}  ({e}).")
 
 
         ## recherche Nominatim
-        lieu = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard-1)
+        lieu = cherche_lieu(adresse, bavard=bavard-1)
         if bavard > 0 : print(f"La recherche Nominatim a donné {lieu}.")
         
         nœuds_osm = [] #Ne servira que si on ne trouve pas de way dans lieu
@@ -116,22 +106,23 @@ def tous_les_nœuds(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
         if len(way_osm)>0:
             tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
             nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
-            if bavard >0: print(f"nom trouvé : {nom}")
+            print(f"nom trouvé : {nom}")
+            adresse.rue_osm = nom
 
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
-            if normalise_rue(nom) in g.nœuds[str(ville)] :
-                return g.nœuds[str(ville)][normalise_rue(nom)]
+            if normalise_rue(nom) in g.nœuds[str(adresse.ville)] :
+                return g.nœuds[str(adresse.ville)][normalise_rue(nom)]
             else:
-                if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {normalise_rue(nom)} ({ville}).")
+                if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {normalise_rue(nom)} ({adresse.ville}).")
 
                 ## Essai 3, prendre les nœuds dans le fichier .osm
                 nœuds=[]
                 for tronçon in way_osm:
                     id_rue = tronçon["osm_id"]
                     nœuds.extend(nœuds_sur_tronçon_local(id_rue)) # Pourrait être géré par overpass
-                if bavard >0: print(f"Dans mon fichier osm local, j’ai trouvé les nœuds suivants : {nœuds}")
+                LOG_PB(f"Dans mon fichier osm local, j’ai trouvé les nœuds suivants : {nœuds}")
                 nœuds_de_g = [n for n in nœuds if n in g]
-                if bavard >0: print(f"Parmi ces nœuds, voici ceux qui sont dans g : {nœuds_de_g}.")
+                LOG_PB(f"Parmi ces nœuds, voici ceux qui sont dans g : {nœuds_de_g}.")
                 if len(nœuds_de_g) > 0:
                     return nœuds_de_g
                 #else:
@@ -147,15 +138,17 @@ def tous_les_nœuds(g, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
         ## Essai 4, avec les nodes trouvés
         if nœuds_osm != []:
             nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g]
-            if nœuds_de_g != []:
+            if len(nœuds_de_g) > 0:
                 return nœuds_de_g
 
             
-        ## Essai 5 : en se basant sur les coords enregistrées dans osm pour le premier way trouvé.
+        ## Essai 5 : en se basant sur les coords enregistrées dans osm pour le premier élément renvoyé par Nominatim
+        ## Ce devrait la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, commerce...)
         if len(lieu)>0:
             truc = lieu[0].raw
+            adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0]
             if bavard>0: print(f"Je vais chercher le nœud de g le plus proche de {truc}.")
-            return [g.nœud_le_plus_proche( (float(truc["lon"]), float(truc["lat"])), recherche=f"Depuis tous_les_nœuds pour {nom_rue} ({ville})" )]
+            return [g.nœud_le_plus_proche( (float(truc["lon"]), float(truc["lat"])), recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
 
     
         raise PasTrouvé(f"Pas réussi à trouver de nœud pour {nom_rue} ({ville}).")
@@ -176,12 +169,12 @@ def filtre_nœuds(nœuds, g):
 
     
 
-def un_seul_nœud(g, num, rue, ville=VILLE_DÉFAUT, bavard=0):
+def un_seul_nœud(g, adresse, bavard=0):
     """ Renvoie un singleton si on dispose d’assez de données pour localiser le numéro. Sinon renvoie tous les nœuds de la rue."""
     try:
-        if bavard > 0: print(f"le lance coords_of_adresse pour {num}, {rue}, {ville.avec_code()}.")
-        coords = coords_of_adresse(num, rue, ville=ville)
-        return [nœud_sur_rue_le_plus_proche(g, coords, rue, ville=ville)]
+        if bavard > 0: print(f"le lance coords_of_adresse pour {adresse}.")
+        coords = coords_of_adresse(adresse)
+        return [nœud_sur_rue_le_plus_proche(g, coords, adresse)]
     except Exception as e:
         raise e
         LOG_PB(f"Échec dans coords_of_adresse : {e}. Je vais renvoyer tous les nœuds pour {rue} ({ville.avec_code()}).")
@@ -237,14 +230,14 @@ def nœuds_rue_of_nom_et_nœud(g, n, nom):
 
 
 
-def nœud_sur_rue_le_plus_proche(g, coords, nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
+def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
     """ 
     Entrée : g (graphe)
-             nom_rue (str)
+             adresse (instance de Adresse)
              coords ( (float, float) )
     Renvoie le nœud sur la rue nom_rue le plus proche de coords."""
 
-    nœuds = tous_les_nœuds(g, nom_rue, ville=ville, pays=pays, bavard=bavard-1)
+    nœuds = tous_les_nœuds(g, adresse, bavard=bavard-1)
     tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]
     _, res = min(tab)
     return res
