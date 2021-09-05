@@ -149,7 +149,7 @@ def affiche_rue(ville, rue, g, bavard=0):
 
 # Pour utiliser folium sans passer par osmnx regarder :
 # https://stackoverflow.com/questions/57903223/how-to-have-colors-based-polyline-on-folium
-def dessine_cycla(g, où_enregistrer=TMP, bavard=0 ):
+def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
    
     list_colors = [# Du vert au rouge
         "#00FF00",        "#12FF00",        "#24FF00",        "#35FF00",
@@ -204,6 +204,6 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0 ):
         
     nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)
-    ouvre_html(nom)
+    if ouvrir : ouvre_html(nom)
 
 

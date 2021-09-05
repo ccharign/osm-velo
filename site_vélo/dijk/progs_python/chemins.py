@@ -39,7 +39,7 @@ class Étape():
             assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
 
     def __str__(self):
-        return str(self.Adresse)
+        return str(self.adresse)
 
 
 class Chemin():

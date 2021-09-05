@@ -12,10 +12,10 @@
     <p>
       Quelques points techniques:
       <ul>
-	<li> Entre deux étapes indiquées, l’algo prend le meilleur chemin en l’état actuel de ses connaissances. Il est donc inutile d’indiquer la moindre rue empruntée : seulement les les étapes marquantes, celles qui distinguent votre itinéraire du plus court chemin.</li>
-	<li> Si vous indiquez une adresse précise (soit un bâtiment, soit en précisant un numéro de rue) l’algo fera passer le chemin exactement par ce point. Toutefois openstreet map contient très peu de numéros de rue, il est donc fréquent que l’algo les ignore.
+	<li> Entre deux étapes indiquées, l’algo prend le meilleur chemin en l’état actuel de ses connaissances. Il est donc inutile d’indiquer la moindre rue empruntée : seulement les étapes marquantes.</li>
+	<li> Si vous indiquez une adresse précise (soit un bâtiment, soit en précisant un numéro de rue) l’algo fera passer le chemin exactement par ce point. Toutefois openstreet map contient très peu de numéros de rue ; si vous indiquez un numéro dans une rue pour lequel on ne dispose pas de deux numéros de la bonne parité, il sera ignoré.</li>
 
-	Si une rue est indiquée comme étape, l’algo fera en sorte d’emprunter au moins un tronçon de cette rue. Dans des cas extrêmes, il pourrait faire un allr-retour sur cette rue. De manière générale, il ne faut pas indiquer une rue que l’on ne fait que traverser.</li>
+	<li>Si une rue est indiquée comme étape sans préciser de numéro, l’algo fera en sorte d’emprunter au moins un tronçon de cette rue. Dans des cas extrêmes, il pourrait faire un aller-retour sur cette rue. De manière générale, il ne faut pas indiquer une rue que l’on ne fait que traverser.</li>
       </ul>
     </p>
 
@@ -38,8 +38,7 @@
       <label for="pourcentage_détour"> Pourcentage détour </label><br>
       <input type="text" id="pourcentage_détour" name="pourcentage_détour"><br><br>
 
-      <label for="AR"> Valable aussi pour le retour ? </label><br>
-      <input type="checkbox" id="AR" name="AR"><br>
+      <label for="AR"> Valable aussi pour le retour ? </label>       <input type="checkbox" id="AR" name="AR"><br><br>
       
       <input type="submit" value="C’est parti!">
     </form>

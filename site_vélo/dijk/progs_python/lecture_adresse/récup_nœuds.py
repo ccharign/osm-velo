@@ -20,8 +20,6 @@ def nœuds_of_étape(c, g, bavard=0):
            Sinon c’est la liste de tous les nœuds connus de la rue.
     """
 
-
-
     # Lecture de l’adresse
     c = normalise_adresse(c)
     assert c != ""
@@ -43,9 +41,6 @@ def nœuds_of_étape(c, g, bavard=0):
         return res, ad
 
     
-
-    
-    
     if ad.num is None:
     ## Pas de numéro de rue -> liste de tous les nœuds de la rue
         if bavard > 0 : print("Pas de numéro de rue, je vais renvoyer une liste de nœuds")
@@ -53,16 +48,11 @@ def nœuds_of_étape(c, g, bavard=0):
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
             res = tous_les_nœuds(g, ad, bavard=bavard-1)
-            #coords = coords_lieu(f"{rue}", ville=ville, bavard=bavard-1)
-            #print(f"Je vais prendre le nœud le plus proche de {coords}.")
-            #n = g.nœud_le_plus_proche(coords)
             return renvoie(res)
 
-            
     else:
         ## Numéro de rue -> renvoyer un singleton
         if bavard > 0 : print("Numéro de rue présent : je vais renvoyer un seul nœud")
-        
         return renvoie(un_seul_nœud(g, ad, bavard=bavard-1))
 
 
@@ -172,13 +162,13 @@ def filtre_nœuds(nœuds, g):
 def un_seul_nœud(g, adresse, bavard=0):
     """ Renvoie un singleton si on dispose d’assez de données pour localiser le numéro. Sinon renvoie tous les nœuds de la rue."""
     try:
-        if bavard > 0: print(f"le lance coords_of_adresse pour {adresse}.")
+        if bavard > 0: print(f"Je lance coords_of_adresse pour {adresse}.")
         coords = coords_of_adresse(adresse)
         return [nœud_sur_rue_le_plus_proche(g, coords, adresse)]
     except Exception as e:
-        raise e
-        LOG_PB(f"Échec dans coords_of_adresse : {e}. Je vais renvoyer tous les nœuds pour {rue} ({ville.avec_code()}).")
-        return tous_les_nœuds(g, rue, ville=ville, bavard=bavard)
+        LOG_PB(f"Échec dans coords_of_adresse : {e}. Je vais renvoyer tous les nœuds pour {adresse}). J’efface le numéro de l’adresse.")
+        adresse.num=None
+        return tous_les_nœuds(g, adresse, bavard=bavard)
         
 
     

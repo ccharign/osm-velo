@@ -105,7 +105,7 @@ class Adresse():
         Utilisé en particulier pour la recherche Nominatim non structurée (si échec de la recherche structurée) et pour l’affichage pour vérification à l’utilisateur.
         """
         if self.num is not None:
-            déb=f"{num} "
+            déb=f"{self.num} "
         else:
             déb=""
         if self.rue_osm is not None:

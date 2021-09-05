@@ -211,6 +211,8 @@ def coords_of_adresse(adresse, bavard=0):
     rue=adresse.rue_norm
     
     k = num % 2  # parité du numéro
+    if rue not in D_RUE_NUM_COORDS[str(ville)]:
+        raise CoordsPasTrouvées(f"Rue inconnue : {adresse.rue} (normalisé en {rue}).")
     l = D_RUE_NUM_COORDS[str(ville)][rue][k]
     if len(l) < 2:
         raise CoordsPasTrouvées(f"J’ai {len(l)} numéro en mémoire pour {rue} ({ville}) du côté de parité {k}. Je ne peux pas interpoler.")
