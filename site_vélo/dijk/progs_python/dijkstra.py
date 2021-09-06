@@ -1,12 +1,14 @@
 #! usr/bin/python3
 # -*- coding:utf-8 -*-
 
-from petites_fonctions import distance_euc, deuxConséc  # pour A*
+from petites_fonctions import deuxConséc
 from heapq import heappush, heappop  # pour faire du type List une structure de tas-min
 import copy
 
 class PasDeChemin(Exception):
     pass
+
+## Pour passer à A* il faut connaître la cycla max.
 
 
 

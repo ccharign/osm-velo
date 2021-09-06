@@ -1,8 +1,6 @@
 
 À FAIRE :
 
-Intégrer les arbres lex
-
 Récupérer la liste de tous les codes postaux de France
 
 À FAIRE (un jour)
