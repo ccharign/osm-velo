@@ -105,13 +105,13 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
              if v1 in départ and (v2 not in dist or dist[s]+d1+d2 < dist[v2]):  # Passer par v1,v2 vaut le coup
                  dist[v2] = dist[s]+d1+d2
                  pred[v2] = (v1,s)
-                 heappush(àVisiter, (dist[v2], v2))
+                 heappush(àVisiter, (dist[v2]+g.d_euc(départ, v2)/g.cycla_max , v2)) # A*
 
     def boucle_simple(s):
         for t, l in g.voisins(s, p_détour):
                 if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
                     dist[t] = dist[s]+l
-                    heappush(àVisiter, (dist[t], t))
+                    heappush(àVisiter, (dist[t]+g.d_euc(départ, v2)/g.cycla_max, t)) # A*
                     pred[t] = s
 
     

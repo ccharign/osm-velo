@@ -58,7 +58,7 @@ def affiche_séparément(chemins=tous_les_chemins, g=g):
         utils.dessine_chemin(c, g)
     
 
-apprentissage.n_lectures(10, g, tous_les_chemins, bavard=1)
+apprentissage.n_lectures(2, g, tous_les_chemins, bavard=1)
 
 affiche_séparément()
 

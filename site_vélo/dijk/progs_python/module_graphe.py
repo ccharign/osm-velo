@@ -231,13 +231,17 @@ class graphe():
         sortie.close()
 
     def charge_cycla(self):
+        """ Charge la  cycla depuis le csv, et enregistre le max en attribut du graphe."""
         print("Chargement de la cyclabilité")
         entrée = open(CHEMIN_CYCLA)
+        maxi=0
         for ligne in entrée:
             s, t, v = ligne.strip().split(";")
             s=int(s); t=int(t); v=float(v)
+            maxi=max(v, maxi)
             self.cyclabilité[(s, t)] = v
         entrée.close()
+        self.cycla_max = maxi
     
 
 

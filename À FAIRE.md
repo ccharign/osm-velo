@@ -1,11 +1,7 @@
 
 À FAIRE :
 
-Django:
-	- charger le graphe dans la base
-	- créer une nouvelle classe de graphe pour compatibilité avec le module dijkstra
-	- créer la vue itinéraire
-	- utiliser folium directement depuis la base ?
+Mettre dans le cache les noms osm de lieux récupérés via nominatim
 
 Récupérer la liste de tous les codes postaux de France
 
