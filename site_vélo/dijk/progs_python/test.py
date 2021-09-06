@@ -15,8 +15,10 @@ import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
 import utils
-import initialisation.nœuds_des_rues as nr
-import lecture_adresse.arbresLex as lex
+#import initialisation.nœuds_des_rues as nr
+#import lecture_adresse.arbresLex as lex
+from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT
+
 g = charge_graphe(bavard=2)
 #nr.sortie_csv(g)
 

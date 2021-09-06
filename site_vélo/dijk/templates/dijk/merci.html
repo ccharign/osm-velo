@@ -6,17 +6,14 @@
   </head>
   
   <body>
-    Contribution enregistrée, merci !<br><br>
+    Contribution enregistrée, un grand merci !<br><br>
+
+    <p><a href="{% url 'carte cycla'%}"> Pour visualiser la cyclabilité enregistrée par l’IA.</a></p>
     
-
-    <a href="{% url 'index' %}"> Retour à l’entrée </a><br><br>
-
-    Liste des chemins connus :<br>
-    <ul>
-      {% for c in chemins %}
-      <li> {{c}}  </li>
-      {% endfor %}
-    </ul>
+    <p><a href="{% url 'contribution' %}"> Une autre contribution ?</a></p>
+    
+    <p><a href="{% url 'index' %}"> Retour à l’entrée </a></p>
+    
   </body>
 
 </html>>

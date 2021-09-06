@@ -27,18 +27,19 @@ class ÉchecChemin(Exception):
 class Étape():
     """
     Attributs : 
-        texte (str), adresse de l'étape
+        texte (str), adresse de l'étape. 
+        adresse (instance de Adresse)
         nœuds (int set) : ensemble de nœuds
     """
-    def __init__(self, adresse, g, bavard=0):
-        if bavard>0:print(adresse)
-        self.texte = adresse
-        self.nœuds = set(nœuds_of_étape(adresse, g, bavard=bavard-1))
+    def __init__(self, texte, g, bavard=0):
+        self.texte = texte
+        n, self.adresse = nœuds_of_étape(texte, g, bavard=bavard-1)
+        self.nœuds = set(n)
         for n in self.nœuds:
-            assert n in g.digraphe.nodes, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {adresse} : {n}"
+            assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
 
     def __str__(self):
-        return self.texte
+        return str(self.adresse)
 
 
 class Chemin():

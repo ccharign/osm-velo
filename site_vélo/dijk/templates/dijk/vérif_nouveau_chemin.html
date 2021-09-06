@@ -6,18 +6,29 @@
   </head>
   
   <body>
+
+    <p>
+      Liste des étapes rentrées :
+      <ul>
+      {% for é in chemin.étapes %}
+      <li> {{é}}</li>
+      {% endfor %}
+      </ul>
+    </p>
     
-    <p>Le lien ci-dessous mène à votre itinéraire tel qu'il à été compris par le logiciel : </p>
-    <a href="{% url 'visu nv chemin' %}"> ici. </a>
-    (Rappel : pour ouvrir un lien dans un nouvel onglet, utiliser ctrl-clic)<br>
-    
-    En rouge le chemin direct, en bleu le chemin tenant compte des étapes indiquées, et des données déjà présentes dans la base.
+    <p>
+    <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire tel qu'il à été compris par le logiciel </a>
+    (S’ouvre dans un nouvel onglet par défaut.)
 
+    En rouge le chemin le plus court et en bleu le chemin tenant compte des étapes indiquées, et des données déjà présentes dans la base.
+    </p>
+    <br>
 
-    <p>Pour confirmer et le rentrer dans la base : <a href="{% url 'confirme nv chemin' %}"> là </a>. </p>
+    <p> <a href="{% url 'confirme nv chemin' %}"> Confirmer et le rentrer dans la base </a>. Un peu de patience : ça va faire tourner le programme d’apprentissage. </p>
 
-    <p>Pour le modifier (ajouter, changer ou préciser des étapes) : </p>
-    <a href = "{% url 'contribution' %}"> retour </a>
+    <p>Pour le modifier (ajouter, changer ou préciser des étapes) : 
+      <a href = "{% url 'contribution' %}"> retour </a>
+    </p>
     
     
   </body>

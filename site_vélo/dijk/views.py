@@ -11,11 +11,14 @@ g=charge_graphe()
 def index(requête):
     return render(requête, "dijk/index.html", {})
 
-def bool_of_checkbox(res):
+def bool_of_checkbox(dico, clef):
     """transforme la valeur venue d’une checxbox via un POST en un brave booléen."""
-    if res=="on":
-        return True
-    else:
+    try:
+        if dico[clef]=="on":
+            return True
+        else:
+            return False
+    except KeyError:
         return False
     
 
@@ -54,7 +57,7 @@ def vérif_nv_chemin(requête):
     a=requête.POST["arrivée"]
     pourcent_détour= int(requête.POST["pourcentage_détour"])
     étapes = requête.POST["étapes"].split(";")
-    AR = bool_of_checkbox(requête.POST["AR"])
+    AR = bool_of_checkbox(requête.POST, "AR")
     print(AR)
 
     c = Chemin.of_étapes([d]+étapes+[a], pourcent_détour,  AR, g, bavard=2)
