@@ -65,6 +65,9 @@ class graphe():
     def est_arrête(self, s, t):
         return t in self.digraphe[s]
 
+    def d_euc(self, n1, n2):
+        """ distance euclidienne entre n1 et n2."""
+        return distance_euc(self.coords_of_nœud(n1), self.coords_of_nœud(n2))
 
     def parcours_largeur(self, départ, dmax=float("inf")):
         """Itérateur sur les sommets du graphe, selon un parcours en largeur depuis départ. On s’arrête lorsqu’on dépasse la distance dmax depuis départ."""
