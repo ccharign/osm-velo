@@ -12,7 +12,7 @@ def index(requête):
     return render(requête, "dijk/index.html", {})
 
 def bool_of_checkbox(dico, clef):
-    """transforme la valeur venue d’une checxbox via un POST en un brave booléen."""
+    """transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
     try:
         if dico[clef]=="on":
             return True
@@ -27,7 +27,7 @@ def bool_of_checkbox(dico, clef):
 def vue_itinéraire_direct(requête, départ, arrivée, pourcentage_détour):
     """ Plus pour test a priori"""
     print(f"Recherche d’itinéraire entre {départ} et {arrivée}.")
-    res = itinéraire(départ, arrivée, pourcentage_détour/100, g, bavard=4, où_enregistrer="dijk/templates/dijk" )
+    res = itinéraire(départ, arrivée, pourcentage_détour/100, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
     print(f"fichier enregistré dans {res}")
     return render(requête, "dijk/résultat_itinéraire.html", {})
 
@@ -38,7 +38,7 @@ def vue_itinéraire(requête):
     a=requête.POST["arrivée"]
     p_détour= int(requête.POST["pourcentage_détour"])/100
     print(f"Recherche d’itinéraire entre {d} et {a}.")
-    itinéraire(d, a, p_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk" )
+    itinéraire(d, a, p_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
     return render(requête, "dijk/résultat_itinéraire.html", {})
 
 
@@ -61,7 +61,7 @@ def vérif_nv_chemin(requête):
     print(AR)
 
     c = Chemin.of_étapes([d]+étapes+[a], pourcent_détour,  AR, g, bavard=2)
-    dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk", bavard=2)
+    dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/vérif_nouveau_chemin.html", bavard=2)
     requête.session["chemin_à_valider"] = ([d]+étapes+[a], pourcent_détour, AR) # session est un dictionnaire pour stocker du bazar propre à un utilisateur.
     return render(requête, "dijk/vérif_nouveau_chemin.html", {"chemin":c})
 

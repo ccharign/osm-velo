@@ -6,7 +6,7 @@
 import geopy
 #, overpy
 from params import LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
-from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT
+from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT, Adresse
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
@@ -171,7 +171,7 @@ def charge_rue_num_coords():
                     res[ville_n][rue][k].append((int(num), (float(lat), float(lon))))
     return res
 
-
+print("Chargement du dictionnaire ville -> rue -> parité -> liste des (numéros, coords).")
 D_RUE_NUM_COORDS = charge_rue_num_coords()
 
 

@@ -66,11 +66,8 @@ class graphe():
         return t in self.digraphe[s]
 
     def d_euc(self, n1, n2):
-        """ Distance euc entre les deux nœuds n1 et n2."""
-        c1=self.coords_of_nœud(n1)
-        c2=self.coords_of_nœud(n2)
-        return distance_euc(c1, c2)
-
+        """ distance euclidienne entre n1 et n2."""
+        return distance_euc(self.coords_of_nœud(n1), self.coords_of_nœud(n2))
 
     def parcours_largeur(self, départ, dmax=float("inf")):
         """Itérateur sur les sommets du graphe, selon un parcours en largeur depuis départ. On s’arrête lorsqu’on dépasse la distance dmax depuis départ."""
@@ -105,11 +102,12 @@ class graphe():
 
                 
     def ville_dune_arête(self, s, t, bavard=0):
-        """ Liste des villes contenant l’arête (s,t)
+        """ Liste des villes contenant l’arête (s,t).
         """
         try:
             return self.digraphe[s][t]["ville"]
         except KeyError:
+            print(f"Pas de ville en mémoire pour l’arête {s,t}.")
             return []
 
     
@@ -237,13 +235,17 @@ class graphe():
         sortie.close()
 
     def charge_cycla(self):
+        """ Charge la  cycla depuis le csv, et enregistre le max en attribut du graphe."""
         print("Chargement de la cyclabilité")
         entrée = open(CHEMIN_CYCLA)
+        maxi=0
         for ligne in entrée:
             s, t, v = ligne.strip().split(";")
             s=int(s); t=int(t); v=float(v)
+            maxi=max(v, maxi)
             self.cyclabilité[(s, t)] = v
         entrée.close()
+        self.cycla_max = maxi
     
 
 

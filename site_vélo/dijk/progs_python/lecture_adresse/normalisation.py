@@ -48,11 +48,18 @@ class Ville():
             self.code = int(code)
 
     def __str__(self):
+        """ Renvoie le nom normalisé."""
         return self.nom
 
     def avec_code(self):
-        return f"{self.code} {self.nom}"
+        if self.code is not None:
+            c=str(self.code) + " "
+        else:
+            c=""
+        return f"{c}{self.nom}"
 
+
+    
 VILLE_DÉFAUT = Ville(STR_VILLE_DÉFAUT)
            
 def normalise_ville(ville):
@@ -85,6 +92,7 @@ def créationArbre():
     rema : dans le csv, les noms des rues et des villes sont supposées avoir l’orthographe d’osm.
     """
     res = {}
+    print(f"Chargement de l’arbre des rues depuis {CHEMIN_NŒUDS_RUES}.")
     with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
         for ligne in entrée:
             ville, rue, _ = ligne.strip().split(";")
@@ -94,9 +102,10 @@ def créationArbre():
     return res
 
 
+
 ARBRE_DES_RUES = créationArbre()
 
-def normalise_rue(rue, ville, tol=3, bavard=0):
+def normalise_rue(rue, ville, tol=2, bavard=0):
     """
     Entrées : 
       - ville (instance de Ville)
@@ -105,7 +114,7 @@ def normalise_rue(rue, ville, tol=3, bavard=0):
     Fonction finale de normalisation d’un nom de rue. Applique partie_commune puis prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue), auquel cas c’est ce nom qui sera renvoyé.
     """
     étape1 = prétraitement_rue(rue)
-    res, d=  ARBRE_DES_RUES[ville.nom].mots_les_plus_proches(étape1, d_max=tol)
+    res, d =  ARBRE_DES_RUES[ville.nom].mots_les_plus_proches(étape1, d_max=tol)
     if len(res)==1:
         if bavard>0:
             print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}")
@@ -150,12 +159,12 @@ class Adresse():
         else:
             print(f"Avertissement : plusieurs interprétations de {texte} : {essai}.")
             num, rue, _, ville = essai[0]
+            rue=rue.strip()
 
-        if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville.avec_code()}")
-        
-        
+        if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville}")
         ville_n = normalise_ville(ville)
         rue_n = normalise_rue(rue, ville_n)
+        if bavard>0: print(f"arpès normalisation : num={num}, rue_n={rue_n}, ville_n={ville_n}")
         if num=="":
             self.num=None
         else:
@@ -166,6 +175,7 @@ class Adresse():
         self.ville = ville_n
         self.pays=PAYS_DÉFAUT
 
+        
     def __str__(self):
         """
         Utilisé en particulier pour l’enregistrement dans chemins.csv et pour l’affichage pour vérification à l’utilisateur.
@@ -175,9 +185,9 @@ class Adresse():
         else:
             déb=""
         if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm} ({self.ville.avec_code})"
+            return f"{déb}{self.rue_osm} ({self.ville.avec_code()})"
         else:
-            return f"{déb}{self.rue}, {self.ville.avec_code}"
+            return f"{déb}{self.rue} ({self.ville.avec_code()})"
 
         
     def pour_nominatim(self):
@@ -189,8 +199,8 @@ class Adresse():
         else:
             déb=""
         if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm}, {self.ville.avec_code}, {self.pays}"
+            return f"{déb}{self.rue_osm}, {self.ville.avec_code()}, {self.pays}"
         else:
-            return f"{déb}{self.rue}, {self.ville.avec_code}, {self.pays}"
+            return f"{déb}{self.rue}, {self.ville.avec_code()}, {self.pays}"
 
 

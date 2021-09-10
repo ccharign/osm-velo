@@ -62,7 +62,7 @@ def n_lectures(n, g, chemins, bavard=0):
     print(f"Début de l'apprentissage. C'est parti pour {n} lectures.")
     for i in range(n):
         n_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard-1)
-        if bavard > 0: print(f" ----- Étape {i}, {n_modif} arêtes modifiées -----")
+        print(f" ----- Étape {i}, {n_modif} arêtes modifiées -----")
         if n_modif == 0:
             print("Plus de modifications, j’arrête l’apprentissage.")
             break

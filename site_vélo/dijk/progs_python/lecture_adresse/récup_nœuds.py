@@ -103,10 +103,11 @@ def tous_les_nœuds(g, adresse, bavard=0):
             adresse.rue_osm = nom
 
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
-            if normalise_rue(nom) in g.nœuds[str(adresse.ville)] :
-                return g.nœuds[str(adresse.ville)][normalise_rue(nom)]
+            nom_n = normalise_rue(nom, adresse.ville) 
+            if nom_n in g.nœuds[str(adresse.ville)] :
+                return g.nœuds[str(adresse.ville)][nom_n]
             else:
-                if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {normalise_rue(nom)} ({adresse.ville}).")
+                if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
 
                 ## Essai 3, prendre les nœuds dans le fichier .osm
                 nœuds=[]

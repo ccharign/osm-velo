@@ -29,8 +29,8 @@ len(tous_les_chemins)
 
 
 def ajoute_chemin(étapes, AR=True, pourcentage_détour=30):
-    c = Chemin.of_étapes(étapes, pourcentage_détour, AR, g)
-    utils.dessine_chemin(c,g)
+    c = chemins.Chemin.of_étapes(étapes, pourcentage_détour, AR, g)
+    utils.dessine_chemin(c, g, ouvrir=True)
     confirme = input("Est-ce-que le chemin est correct ? (O/n)")
     if confirme in ["","o","O"]:
         tous_les_chemins.append(c)
@@ -58,7 +58,7 @@ def affiche_séparément(chemins=tous_les_chemins, g=g):
         utils.dessine_chemin(c, g)
     
 
-apprentissage.n_lectures(10, g, tous_les_chemins, bavard=1)
+apprentissage.n_lectures(5, g, tous_les_chemins, bavard=0)
 
 affiche_séparément()
 
