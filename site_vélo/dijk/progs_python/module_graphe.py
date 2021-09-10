@@ -102,11 +102,12 @@ class graphe():
 
                 
     def ville_dune_arête(self, s, t, bavard=0):
-        """ Liste des villes contenant l’arête (s,t)
+        """ Liste des villes contenant l’arête (s,t).
         """
         try:
             return self.digraphe[s][t]["ville"]
         except KeyError:
+            print(f"Pas de ville en mémoire pour l’arête {s,t}.")
             return []
 
     

@@ -4,7 +4,7 @@
 #################### Rajouter la ville aux données des nœuds ####################
 
 
-#import overpy
+import overpy
 #from récup_données import localisateur
 from params import CHEMIN_NŒUDS_VILLES, CHEMIN_JSON_NUM_COORDS
 from petites_fonctions import ajouteDico
@@ -46,10 +46,23 @@ def liste_villes():
 
 
 # Deuxième essai : avec osmnx
+# Il manque certains nœuds !
+# La simplification dans graph_from_place serait plus forte que celle lors de la création du graphe initial dans crée_graphe ?
 def nœuds_ville(ville):
-    g = ox.graph_from_place({"city":ville, "country":"France"})
+    g = ox.graph_from_place({"city":ville, "country":"France", "network_type":"all"})
     return g.nodes
 
+## https://stackoverflow.com/questions/58844414/what-is-a-correct-overpass-turbo-query-for-getting-all-streets-in-a-city
+#https://overpass-api.de/command_line.html
+#wget "https://overpass-api.de/api/interpreter?data=node[name=\"Gielgen\"];out;"
+def nœuds_ville2(ville, bavard=0):
+    """ Ne fonctionne pas."""
+    #requête = f"""area[name = "{ville}"]; (way(area)[highway]; ); (._;>;); out;"""
+    requête = f"""area[name = "{ville}"]; node(area); out;"""
+    if bavard>0: print(requête)
+    api=overpy.Overpass()
+    res = api.query(requête)
+    return set(res.nodes)
 
 ### Création du csv ###
 

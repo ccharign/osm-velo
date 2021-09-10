@@ -38,7 +38,7 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0, ouvrir=False):
+def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
     """ Crée une page html contenant l’itinéraire demandé, et renvoie son adresse.
     Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
     """
@@ -50,15 +50,19 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=TMP, bavard=0, 
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
     c = chemins.Chemin([d, a], p_détour, False)
-    res = g.chemin_étapes_ensembles(c, bavard = bavard-1)
-    if bavard>0:
-        print(f"J’ai obtenu l’itinéraire suivant : {res}")
-    graphe_c = g.multidigraphe.subgraph(res)
-    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, "résultat_itinéraire.html")
-    carte.save(nom)
-    return nom
-    #ouvre_html(nom)
+
+    dessine_chemin(c, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    
+    #res = g.chemin_étapes_ensembles(c, bavard = bavard-1)
+    #if bavard>0:
+    #    print(f"J’ai obtenu l’itinéraire suivant : {res}")
+        
+    #graphe_c = g.multidigraphe.subgraph(res)
+    #carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
+    #nom = os.path.join(où_enregistrer, "résultat_itinéraire.html")
+    #carte.save(nom)
+    #return nom
+    #if ouvrir: ouvre_html(nom)
     #ox.plot_route_folium(g.multidigraphe,c)
 
 
@@ -79,26 +83,27 @@ def flatten(c):
 
 
 
-def dessine_chemin(c, g, où_enregistrer=TMP, ouvrir=False, bavard=0):
-    """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
+def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
+    """ Affiche le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
     Le nom du fichier html créé est nouveau_chemin.html.
     """
 
     c_complet = dijkstra.chemin_étapes_ensembles(g, c)
     départ, arrivée = c_complet[0], c_complet[-1]
     
-    c_direct = dijkstra.chemin(g,départ,arrivée,0)
+    c_direct = dijkstra.chemin(g, départ, arrivée, 0)
     graphe_c_direct = g.multidigraphe.subgraph(c_direct)
     carte = ox.plot_graph_folium(graphe_c_direct, popup_attribute="name", color="red")
 
+    if bavard>0:
+        print(f"Chemin direct: {c_direct}\n Chemin avec détour : {c_complet}.")
     
     graphe_c_complet = g.multidigraphe.subgraph(c_complet)
     carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
-    nom = os.path.join(où_enregistrer, "nouveau_chemin.html")
-    carte.save(nom)
+    carte.save(où_enregistrer)
     if bavard>0:
-        print(f"fichier html enregistré dans {nom}.")
+        print(f"fichier html enregistré dans {où_enregistrer}.")
     if ouvrir : ouvre_html(nom)
 
 

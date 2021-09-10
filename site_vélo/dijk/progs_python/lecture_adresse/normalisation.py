@@ -187,7 +187,7 @@ class Adresse():
         if self.rue_osm is not None:
             return f"{déb}{self.rue_osm} ({self.ville.avec_code()})"
         else:
-            return f"{déb}{self.rue}, {self.ville.avec_code()}"
+            return f"{déb}{self.rue} ({self.ville.avec_code()})"
 
         
     def pour_nominatim(self):
