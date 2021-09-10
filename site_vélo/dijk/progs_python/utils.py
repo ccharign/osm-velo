@@ -74,6 +74,8 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=os.path.join(TM
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
+# Gestion de plusieurs p_détour ?
+# arg facultatif autres_p_détour
 
 def flatten(c):
     res = []
@@ -82,33 +84,54 @@ def flatten(c):
     return res
 
 
+list_colors = [# Du vert au rouge
+        "#00FF00",        "#12FF00",        "#24FF00",        "#35FF00",
+        "#47FF00",        "#58FF00",        "#6AFF00",        "#7CFF00",
+        "#8DFF00",        "#9FFF00",        "#B0FF00",        "#C2FF00",
+        #"#D4FF00",        "#E5FF00",        #"#F7FF00",        "#FFF600",
+        #"#FFE400",        "#FFD300",
+        "#FFC100",        "#FFAF00",
+        "#FF9E00",        "#FF8C00",        "#FF7B00",        "#FF6900",
+        "#FF5700",        "#FF4600",        "#FF3400",        "#FF2300",
+        "#FF1100",        "#FF0000",    ]
+list_colors.reverse() # maintenant du rouge au vert
+color_dict = {i: list_colors[i] for i in range(len(list_colors))}
+n_coul = len(list_colors)
 
-def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
-    """ Affiche le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
-    Le nom du fichier html créé est nouveau_chemin.html.
+
+
+def dessine_chemin(c, g, autres_p_détour=[], où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
+    """ 
+    Crée une carte html avec le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
+    Entrée:
+       - c (instance de Chemin)
+       - g (instance de Graphe)
+       - autres_p_détour (float list) : liste des autres p_détour pour lesquels lancer et afficher le calcul.
+       - où_enregistrer : adresse où enregistrer le html produit.
+       - ouvrir (bool) : Si True, lance le navigateur sur la page créée.
     """
 
+    # Calcul des chemins
     c_complet = dijkstra.chemin_étapes_ensembles(g, c)
     départ, arrivée = c_complet[0], c_complet[-1]
-    
     c_direct = dijkstra.chemin(g, départ, arrivée, 0)
+
+    # Création de la carte
     graphe_c_direct = g.multidigraphe.subgraph(c_direct)
     carte = ox.plot_graph_folium(graphe_c_direct, popup_attribute="name", color="red")
-
-    if bavard>0:
-        print(f"Chemin direct: {c_direct}\n Chemin avec détour : {c_complet}.")
-    
     graphe_c_complet = g.multidigraphe.subgraph(c_complet)
     carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
-    
+
     carte.save(où_enregistrer)
-    if bavard>0:
-        print(f"fichier html enregistré dans {où_enregistrer}.")
+    if bavard>0: print(f"fichier html enregistré dans {où_enregistrer}.")
     if ouvrir : ouvre_html(nom)
 
 
 def dessine_chemins(chemins, g, où_enregistrer=TMP):
-    """ Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu."""
+    """ 
+    Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
+    Peu pertinent dès qu’il y a trop de chemins.
+    """
     chemins_directs = []
     for c in chemins:
         try:
@@ -156,20 +179,6 @@ def affiche_rue(ville, rue, g, bavard=0):
 # https://stackoverflow.com/questions/57903223/how-to-have-colors-based-polyline-on-folium
 def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
    
-    list_colors = [# Du vert au rouge
-        "#00FF00",        "#12FF00",        "#24FF00",        "#35FF00",
-        "#47FF00",        "#58FF00",        "#6AFF00",        "#7CFF00",
-        "#8DFF00",        "#9FFF00",        "#B0FF00",        "#C2FF00",
-        #"#D4FF00",        "#E5FF00",        #"#F7FF00",        "#FFF600",
-        #"#FFE400",        "#FFD300",
-        "#FFC100",        "#FFAF00",
-        "#FF9E00",        "#FF8C00",        "#FF7B00",        "#FF6900",
-        "#FF5700",        "#FF4600",        "#FF3400",        "#FF2300",
-        "#FF1100",        "#FF0000",    ]
-    list_colors.reverse() # maintenant du rouge au vert
-    color_dict = {i: list_colors[i] for i in range(len(list_colors))}
-    
-    n_coul = len(list_colors) 
     mini, maxi = min(g.cyclabilité.values()), max(g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
     
