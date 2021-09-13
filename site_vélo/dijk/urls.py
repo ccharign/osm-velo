@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("itinéraireDirect/<str:départ>/<str:arrivée>/<int:pourcentage_détour>", views.vue_itinéraire_direct),
+    #path("itinéraireDirect/<str:départ>/<str:arrivée>/<int:pourcentage_détour>", views.vue_itinéraire_direct),
     path("itinéraire", views.vue_itinéraire, name="itinéraire"),
     
     path("contribution", views.contribution, name="contribution"), # Formulaire pour rentrer un nv chemin

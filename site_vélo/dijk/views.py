@@ -24,21 +24,14 @@ def bool_of_checkbox(dico, clef):
 
 ### Recherche d’itinéraire simple ###
 
-def vue_itinéraire_direct(requête, départ, arrivée, pourcentage_détour):
-    """ Plus pour test a priori"""
-    print(f"Recherche d’itinéraire entre {départ} et {arrivée}.")
-    res = itinéraire(départ, arrivée, pourcentage_détour/100, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
-    print(f"fichier enregistré dans {res}")
-    return render(requête, "dijk/résultat_itinéraire.html", {})
-
 
 def vue_itinéraire(requête):
     """ Celle-ci doit récupérer le résultat du formulaire via un post."""
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
-    p_détour= int(requête.POST["pourcentage_détour"])/100
+    ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
     print(f"Recherche d’itinéraire entre {d} et {a}.")
-    itinéraire(d, a, p_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
+    itinéraire(d, a, ps_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
     return render(requête, "dijk/résultat_itinéraire.html", {})
 
 

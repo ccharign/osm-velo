@@ -21,6 +21,14 @@ import module_graphe
 import webbrowser
 from matplotlib import cm
 
+def flatten(c):
+    """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
+    res = []
+    for x in c:
+        res.extend(x)
+    return res
+
+
 def ouvre_html(chemin):
     webbrowser.open(chemin)
 
@@ -38,37 +46,39 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
-    """ Crée une page html contenant l’itinéraire demandé, et renvoie son adresse.
-    Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
+def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
+    """ 
+    Entrées :
+      - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
+      - départ, arrivée : chaîne de caractère décrivant le départ et l’arrivée. Seront lues par chemins.Étape.
+
+    Effet :  Crée une page html contenant l’itinéraire demandé, et renvoie son adresse.
+             Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
     """
     d = chemins.Étape(départ, g)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
-        print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
+        #print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
     a = chemins.Étape(arrivée, g)
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
-    c = chemins.Chemin([d, a], p_détour, False)
 
-    dessine_chemin(c, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    np = len(ps_détour)
+    à_dessiner = []
+    for i, p in enumerate( ps_détour):
+        c = chemins.Chemin([d, a], p, False)
+        iti = dijkstra.chemin_étapes_ensembles(g, c ,bavard=bavard-1)
+        coul = color_dict[ (i*n_coul)//np ]
+        à_dessiner.append( (iti, coul))
+    dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
     
-    #res = g.chemin_étapes_ensembles(c, bavard = bavard-1)
-    #if bavard>0:
-    #    print(f"J’ai obtenu l’itinéraire suivant : {res}")
-        
-    #graphe_c = g.multidigraphe.subgraph(res)
-    #carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    #nom = os.path.join(où_enregistrer, "résultat_itinéraire.html")
-    #carte.save(nom)
-    #return nom
-    #if ouvrir: ouvre_html(nom)
-    #ox.plot_route_folium(g.multidigraphe,c)
 
 
     
 #################### Affichage ####################
 
+# Pour utiliser folium sans passer par osmnx regarder :
+# https://stackoverflow.com/questions/57903223/how-to-have-colors-based-polyline-on-folium
 
 
 # Affichage folium avec couleur
@@ -77,11 +87,24 @@ def itinéraire(départ, arrivée, p_détour, g, où_enregistrer=os.path.join(TM
 # Gestion de plusieurs p_détour ?
 # arg facultatif autres_p_détour
 
-def flatten(c):
-    res = []
-    for x in c:
-        res.extend(x)
-    return res
+def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
+    """
+    Entrées :
+      - listes_sommets : liste de couples (liste de sommets, couleur)
+      - g (instance de Graphe)
+      - où_enregistrer : adresse du fichier html à créer
+    Effet:
+      Crée le fichier html de la carte superposant tous les itinéraires fournis.
+    """
+
+    l, coul = listes_sommets[0]
+    sous_graphe = g.multidigraphe.subgraph(l)
+    carte = ox.plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
+    for l, coul in listes_sommets[1:]:
+        sous_graphe = g.multidigraphe.subgraph(l)
+        carte = ox.plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
+    carte.save(où_enregistrer)
+    if ouvrir : ouvre_html(où_enregistrer)
 
 
 list_colors = [# Du vert au rouge
@@ -100,15 +123,16 @@ n_coul = len(list_colors)
 
 
 
-def dessine_chemin(c, g, autres_p_détour=[], où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
+def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
     """ 
-    Crée une carte html avec le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
-    Entrée:
+    Entrées :
        - c (instance de Chemin)
        - g (instance de Graphe)
-       - autres_p_détour (float list) : liste des autres p_détour pour lesquels lancer et afficher le calcul.
+       - p_détour (float ou float list) : liste des autres p_détour pour lesquels lancer et afficher le calcul.
        - où_enregistrer : adresse où enregistrer le html produit.
        - ouvrir (bool) : Si True, lance le navigateur sur la page créée.
+
+    Effet : Crée une carte html avec le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
     """
 
     # Calcul des chemins
@@ -116,17 +140,10 @@ def dessine_chemin(c, g, autres_p_détour=[], où_enregistrer=os.path.join(TMP, 
     départ, arrivée = c_complet[0], c_complet[-1]
     c_direct = dijkstra.chemin(g, départ, arrivée, 0)
 
-    # Création de la carte
-    graphe_c_direct = g.multidigraphe.subgraph(c_direct)
-    carte = ox.plot_graph_folium(graphe_c_direct, popup_attribute="name", color="red")
-    graphe_c_complet = g.multidigraphe.subgraph(c_complet)
-    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
-
-    carte.save(où_enregistrer)
-    if bavard>0: print(f"fichier html enregistré dans {où_enregistrer}.")
-    if ouvrir : ouvre_html(nom)
+    dessine([(c_complet, "blue"), (c_direct,"red")], g, où_enregistrer, ouvrir=ouvrir)
 
 
+    
 def dessine_chemins(chemins, g, où_enregistrer=TMP):
     """ 
     Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
@@ -156,13 +173,9 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
     ouvre_html(nom)
 
 
-def affiche_sommets(s, g, où_enregistrer=TMP):
+def affiche_sommets(s, g, où_enregistrer=TMP, ouvrir = True):
     """ Entrée : s, liste de sommets """
-    graphe_c = g.multidigraphe.subgraph(s)
-    carte = ox.plot_graph_folium(graphe_c, popup_attribute="name")
-    nom = os.path.join(où_enregistrer, "affiche_sommets.html")
-    carte.save(nom)
-    ouvre_html(nom)
+    dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
 
 
 def affiche_rue(ville, rue, g, bavard=0):
@@ -175,9 +188,10 @@ def affiche_rue(ville, rue, g, bavard=0):
     affiche_sommets(sommets, g)
 
 
-# Pour utiliser folium sans passer par osmnx regarder :
-# https://stackoverflow.com/questions/57903223/how-to-have-colors-based-polyline-on-folium
 def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
+    """
+    Crée la carte de la cyclabilité.
+    """
    
     mini, maxi = min(g.cyclabilité.values()), max(g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
