@@ -54,20 +54,20 @@ def vérif_nv_chemin(requête):
     print(AR)
 
     c = Chemin.of_étapes([d]+étapes+[a], pourcent_détour,  AR, g, bavard=2)
-    dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/vérif_nouveau_chemin.html", bavard=2)
+    dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/nouveau_chemin.html", bavard=2)
     requête.session["chemin_à_valider"] = ([d]+étapes+[a], pourcent_détour, AR) # session est un dictionnaire pour stocker du bazar propre à un utilisateur.
     return render(requête, "dijk/vérif_nouveau_chemin.html", {"chemin":c})
 
         
 def confirme_nv_chemin(requête):
-    nb_lectures=3
+    nb_lectures=10
     (étapes, p_détour, AR) = requête.session["chemin_à_valider"]
     print(étapes, p_détour, AR, "\n")
     c = Chemin.of_étapes(étapes, p_détour, AR, g)
     c.sauv()
     n_lectures(nb_lectures, g, [c], bavard=1)
     tousLesChemins = chemins_of_csv(g, bavard=1)
-    n_lectures(nb_lectures, g, tousLesChemins, bavard=1)
+    #n_lectures(nb_lectures, g, tousLesChemins, bavard=1) # Trop long... À mettre ailleurs ? Dans un cron ?
     g.sauv_cache()
     g.sauv_cycla()
     return render(requête, "dijk/merci.html", {"chemins":tousLesChemins})

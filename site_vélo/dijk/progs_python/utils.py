@@ -173,18 +173,19 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
     ouvre_html(nom)
 
 
-def affiche_sommets(s, g, où_enregistrer=TMP, ouvrir = True):
+def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
     """ Entrée : s, liste de sommets """
     dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
 
 
-def affiche_rue(ville, rue, g, bavard=0):
+def affiche_rue(nom_ville, rue, g, bavard=0):
     """
     Entrées : g, graphe
               
     """
     #sommets = chemins.nœud_of_étape(adresse, g, bavard=bavard-1)
-    sommets = g.nœuds[str(normalise_ville(ville))][normalise_rue(rue)]
+    ville=normalise_ville(nom_ville)
+    sommets = g.nœuds[ville.nom][normalise_rue(rue, ville)]
     affiche_sommets(sommets, g)
 
 
