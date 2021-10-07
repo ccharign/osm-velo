@@ -58,11 +58,21 @@ def nœuds_ville(ville):
 def nœuds_ville2(ville, bavard=0):
     """ Ne fonctionne pas."""
     #requête = f"""area[name = "{ville}"]; (way(area)[highway]; ); (._;>;); out;"""
-    requête = f"""area[name = "{ville}"]; node(area); out;"""
+    requête = f"""area[name = "{ville}"][boundary=administrative]; way(area)[highway]; out;"""
     if bavard>0: print(requête)
     api=overpy.Overpass()
-    res = api.query(requête)
-    return set(res.nodes)
+    res=set()
+    res_ways = api.query(requête)
+    for w in res_ways.ways:
+        res.update(w._node_ids)
+    return res
+
+def test_overpass(id, bavard=0):
+    #requête = f"""area[name = "{ville}"]; (way(area)[highway]; ); (._;>;); out;"""
+    requête = f"""area[id = "{id}"]; way(area)[highway][name]; out;"""
+    if bavard>0: print(requête)
+    api=overpy.Overpass()
+    return  api.query(requête)
 
 ### Création du csv ###
 
@@ -87,7 +97,7 @@ def charge_csv():
 
 def vérif_unicité_ville():
     """
-    La réponse était False comme on pouvait s’en douter : certains nœuds sont dans plusieurs sommets.
+    La réponse était False comme on pouvait s’en douter : certains nœuds sont dans plusieurs villes.
     """
     déjà_vus = set([])
     for ville, nœuds in charge_csv().items():
