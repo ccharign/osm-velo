@@ -3,7 +3,7 @@
 import re
 from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES
 from dijk.progs_python.lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
-
+from initialisation.ajoute_villes import liste_villes
 
 
 
@@ -25,7 +25,27 @@ def normalise_adresse(c):
 
 ### Villes ###
 
+print("Création du dico et de l’arbre lex de toutes villes.")
+TOUTES_LES_VILLES={
+    "Gelos": 64110,
+    "Lée": 64320,
+    "Pau": 64000,
+    "Lescar": 64230,
+    "Billère": 64140,
+    "Jurançon":64110,
+    "Ousse": 64320,
+    "Idron": 64320,
+    "Lons": 64140 ,
+    "Bizanos": 64320,
+    "Artigueloutan": 64420
+}
+ARBRE_VILLES=ArbreLex()
+for nom in TOUTES_LES_VILLES.keys():
+    ARBRE_VILLES.insère(nom)
 
+class VillePasTrouvée(Exception):
+    pass
+    
 class Ville():
     """
     Attributs :
@@ -34,18 +54,30 @@ class Ville():
       - nom_initial (str) : le nom pas encore normalisé
     """
     
-    def __init__(self, texte):
+    def __init__(self, texte, tol=3):
         """
-        Entrée : chaîne de car au format "code_postal? nom_ville".
+        Entrée : chaîne de car au format "(code_postal)? nom_ville". Par exemple  ’64000 Pau’ ou ’Bizanos’.
         """
+
+        # Découpage de la chaîne
         e = re.compile("([0-9]{5})? ?([^ 0-9].*)")
         code, nom = re.fullmatch(e, texte.strip()).groups()
         self.nom_initial = nom
-        self.nom = partie_commune(nom)
-        if code is None:
-            self.code=None
+
+        # Récupération du nom de la ville dans l’arbre
+        noms_proches=ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)
+        if len(noms_proches)==0:
+            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {TOUTES_LES_VILLES}.")
+        elif len(noms_proches)>1:
+            raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
         else:
-            self.code = int(code)
+            nom_corrigé = noms_proches[0]
+            code_corrigé = TOUTES_LES_VILLES[nom_corrigé]
+            if code is not None and code!= code_corrigé:
+                LOG_PB(f"Avertissement : j’ai corrigé le code postal de {code} à {code_corrigé} pour la ville {nom_corrigé}. Chaîne initiale {texte}")
+        
+        self.nom = partie_commune(nom_corrigé)
+        self.code = code_corrigé
 
     def __str__(self):
         """ Renvoie le nom normalisé."""
@@ -61,14 +93,19 @@ class Ville():
 
     
 VILLE_DÉFAUT = Ville(STR_VILLE_DÉFAUT)
-           
+
+
+
+
 def normalise_ville(ville):
     """
     Actuellement transforme la chaîne de car en un objet de la classe Ville.
     La chaîne vide "" est transformée en VILLE_DÉFAUT (défini dans params.py).
     """
-    if ville == "": return Ville(STR_VILLE_DÉFAUT)
-    else: return Ville(ville)
+    if ville == "":
+        return Ville(STR_VILLE_DÉFAUT)
+    else:
+        return Ville(ville)
 
 
 ### Rue ###
