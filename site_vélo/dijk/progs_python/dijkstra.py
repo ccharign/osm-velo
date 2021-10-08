@@ -190,5 +190,5 @@ def chemin_étapes_ensembles(g, c, bavard=0):
         for i in range(len(étapes)-1, 0, -1):
             reconstruction(chemin, preds_précs[i-1], étapes[i-1].nœuds)
         chemin.reverse()
-        return chemin
+        return chemin, dist[fin]
 

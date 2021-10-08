@@ -67,10 +67,11 @@ def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(T
     à_dessiner = []
     for i, p in enumerate( ps_détour):
         c = chemins.Chemin([d, a], p, False)
-        iti = dijkstra.chemin_étapes_ensembles(g, c ,bavard=bavard-1)
+        iti, longueur = dijkstra.chemin_étapes_ensembles(g, c ,bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti, coul))
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    return longueur
     
 
 

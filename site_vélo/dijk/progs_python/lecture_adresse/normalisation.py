@@ -36,7 +36,8 @@ TOUTES_LES_VILLES={
     "Idron": 64320,
     "Lons": 64140 ,
     "Bizanos": 64320,
-    "Artigueloutan": 64420
+    "Artigueloutan": 64420,
+    "Mazères-Lezons":64110
 }
 ARBRE_VILLES=ArbreLex()
 for nom in TOUTES_LES_VILLES.keys():

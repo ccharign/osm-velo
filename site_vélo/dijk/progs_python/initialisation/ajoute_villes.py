@@ -104,7 +104,7 @@ def crée_csv():
                 print("Pause pour ne pas surcharger overpass")
                 début=False
                 time.sleep(10)
-            print(f"Recherche des nœuds de {ville}")
+            print(f"\n\nRecherche des nœuds de {ville}")
             nœuds[str(ville)]=nœuds_ville(ville)
         else:
             print(f"J’avais déjà {len(nœuds[str(ville)])} nœuds pour {ville}.")
@@ -143,7 +143,8 @@ def vérif_unicité_ville():
 
 
 def ajoute_villes(g, bavard=0):
-    """ Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes.
+    """ 
+    Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes.
     """
     compte=0
     with open(CHEMIN_NŒUDS_VILLES) as entrée:

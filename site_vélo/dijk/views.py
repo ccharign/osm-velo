@@ -31,7 +31,7 @@ def vue_itinéraire(requête):
     a=requête.POST["arrivée"]
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
     print(f"Recherche d’itinéraire entre {d} et {a}.")
-    itinéraire(d, a, ps_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
+    longueur=itinéraire(d, a, ps_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
     return render(requête, "dijk/résultat_itinéraire.html", {})
 
 
