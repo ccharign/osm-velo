@@ -92,7 +92,7 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
     Entrées : g, graphe avec méthode voisins qui prend un sommet et un p_détour et qui renvoie une liste de (voisin, longueur de l’arête)
               départ et arrivée, ensembles de sommets
               p_détour ∈ [0,1]
-              dist : dictionnaire donnant la distance initiale à prendre pour chaque élément de départ (utile quand départ sera juste une étape intermédiaire)
+              dist : dictionnaire donnant la distance initiale à prendre pour chaque élément de départ (utile quand départ sera une étape intermédiaire)
               pred : dictionnaire des prédécesseurs déjà calculés.
               première_étape (bool) : indique si on en est à la première étape du trajet final.
 
