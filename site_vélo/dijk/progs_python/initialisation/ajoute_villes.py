@@ -12,16 +12,17 @@ from petites_fonctions import ajouteDico
 from lecture_adresse.normalisation import normalise_ville
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
-
+import time
 
 
 def liste_villes():
     """ Liste des villes apparaissant dans CHEMIN_JSON_NUM_COORDS."""
-    res = set([])
+    noms = set([])
     with open(CHEMIN_JSON_NUM_COORDS) as f:
         for ligne in f:
-            res.add(ligne.split(";")[0])
-    return res
+            noms.add(ligne.split(";")[0])
+            
+    return (normalise_ville(n) for n in noms)
 
 
 
@@ -49,16 +50,21 @@ def liste_villes():
 # Il manque certains nœuds !
 # La simplification dans graph_from_place serait plus forte que celle lors de la création du graphe initial dans crée_graphe ?
 def nœuds_ville(ville):
-    g = ox.graph_from_place({"city":ville, "country":"France", "network_type":"all"})
+    g = ox.graph_from_place({"city":str(ville), "country":"France"}, simplify=False, retain_all=True,  network_type="all")
     return g.nodes
+
 
 ## https://stackoverflow.com/questions/58844414/what-is-a-correct-overpass-turbo-query-for-getting-all-streets-in-a-city
 #https://overpass-api.de/command_line.html
 #wget "https://overpass-api.de/api/interpreter?data=node[name=\"Gielgen\"];out;"
 def nœuds_ville2(ville, bavard=0):
-    """ Ne fonctionne pas."""
+    """
+    Entrée : ville, instance de Ville
+    Sortie : liste des nodes de cette ville
+    Cette méthode n’est pas acceptée par overpass...
+    """
     #requête = f"""area[name = "{ville}"]; (way(area)[highway]; ); (._;>;); out;"""
-    requête = f"""area[name = "{ville}"][boundary=administrative]; way(area)[highway]; out;"""
+    requête = f"""area[name = "{ville.nom_complet}"][boundary=administrative][postal_code={ville.code}]; way(area)[highway]; out;"""
     if bavard>0: print(requête)
     api=overpy.Overpass()
     res=set()
@@ -67,6 +73,7 @@ def nœuds_ville2(ville, bavard=0):
         res.update(w._node_ids)
     return res
 
+
 def test_overpass(id, bavard=0):
     #requête = f"""area[name = "{ville}"]; (way(area)[highway]; ); (._;>;); out;"""
     requête = f"""area[id = "{id}"]; way(area)[highway][name]; out;"""
@@ -74,14 +81,38 @@ def test_overpass(id, bavard=0):
     api=overpy.Overpass()
     return  api.query(requête)
 
+
+
+
+
 ### Création du csv ###
 
+
+
 def crée_csv():
+    """
+    Argument facultatif : nœuds, dico nom_de_ville -> nœuds d’icelle. Pour le cas où une précédente tentative aurait partiellement réussi.
+    """
     sortie = open(CHEMIN_NŒUDS_VILLES, "w")
+    début=True
+    nœuds={}
+    #try:
     for ville in liste_villes():
-        print("\n\n"+ville)
-        sortie.write( ville + ";" + ",".join(map(str, nœuds_ville(ville))) + "\n")
+        if str(ville) not in nœuds or len(nœuds[str(ville)])==0:
+
+            if not début :
+                print("Pause pour ne pas surcharger overpass")
+                début=False
+                time.sleep(10)
+            print(f"Recherche des nœuds de {ville}")
+            nœuds[str(ville)]=nœuds_ville(ville)
+        else:
+            print(f"J’avais déjà {len(nœuds[str(ville)])} nœuds pour {ville}.")
+        sortie.write( str(ville) + ";" + ",".join(map(str, nœuds[str(ville)] )) + "\n")
     sortie.close()
+    #except Exception as e:
+    #    print(e)
+    #    return nœuds
 
 
 def charge_csv():

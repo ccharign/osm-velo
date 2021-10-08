@@ -12,7 +12,7 @@ def index(requête):
     return render(requête, "dijk/index.html", {})
 
 def bool_of_checkbox(dico, clef):
-    """transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
+    """Transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
     try:
         if dico[clef]=="on":
             return True

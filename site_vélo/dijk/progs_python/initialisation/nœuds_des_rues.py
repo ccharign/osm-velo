@@ -112,7 +112,7 @@ def charge_csv(g):
         for ligne in entrée:
             ville, rue, nœuds_à_découper = ligne.strip().split(";")
             ville = normalise_ville(ville)
-            ville_n=ville.nom
+            ville_n=ville.nom_norm
             rue = prétraitement_rue(rue) # Il ne devrait pas y avoir de faute de frappe dans le csv : je saute la recherche dans l’arbre lex.
             nœuds = list(map(int, nœuds_à_découper.split(",")))
             if ville_n not in g.nœuds : g.nœuds[ville_n]={}

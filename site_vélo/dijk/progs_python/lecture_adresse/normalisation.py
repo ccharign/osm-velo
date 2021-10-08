@@ -1,9 +1,8 @@
 
 # -*- coding:utf-8 -*-
 import re
-from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES
+from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB
 from dijk.progs_python.lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
-from initialisation.ajoute_villes import liste_villes
 
 
 
@@ -50,8 +49,8 @@ class Ville():
     """
     Attributs :
       - code (int ou None)
-      - nom (str) : nom, normalisé par la fonction partie_commune
-      - nom_initial (str) : le nom pas encore normalisé
+      - nom_norm (str) : nom, normalisé par la fonction partie_commune
+      - nom_complet (str) : le nom pas encore normalisé
     """
     
     def __init__(self, texte, tol=3):
@@ -62,33 +61,34 @@ class Ville():
         # Découpage de la chaîne
         e = re.compile("([0-9]{5})? ?([^ 0-9].*)")
         code, nom = re.fullmatch(e, texte.strip()).groups()
-        self.nom_initial = nom
+        
 
         # Récupération du nom de la ville dans l’arbre
-        noms_proches=ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)
+        noms_proches=ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)[0]
         if len(noms_proches)==0:
             raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {TOUTES_LES_VILLES}.")
         elif len(noms_proches)>1:
             raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
         else:
-            nom_corrigé = noms_proches[0]
+            nom_corrigé, = noms_proches
             code_corrigé = TOUTES_LES_VILLES[nom_corrigé]
-            if code is not None and code!= code_corrigé:
+            if code is not None and int(code)!= code_corrigé:
                 LOG_PB(f"Avertissement : j’ai corrigé le code postal de {code} à {code_corrigé} pour la ville {nom_corrigé}. Chaîne initiale {texte}")
-        
-        self.nom = partie_commune(nom_corrigé)
+        # Enregistrement des données
+        self.nom_complet = nom_corrigé
+        self.nom_norm= partie_commune(nom_corrigé)
         self.code = code_corrigé
 
     def __str__(self):
-        """ Renvoie le nom normalisé."""
-        return self.nom
+        """ Renvoie le nom non normalisé."""
+        return self.nom_complet
 
     def avec_code(self):
         if self.code is not None:
             c=str(self.code) + " "
         else:
             c=""
-        return f"{c}{self.nom}"
+        return f"{c}{self}"
 
 
     
@@ -151,7 +151,7 @@ def normalise_rue(rue, ville, tol=2, bavard=0):
     Fonction finale de normalisation d’un nom de rue. Applique partie_commune puis prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue), auquel cas c’est ce nom qui sera renvoyé.
     """
     étape1 = prétraitement_rue(rue)
-    res, d =  ARBRE_DES_RUES[ville.nom].mots_les_plus_proches(étape1, d_max=tol)
+    res, d =  ARBRE_DES_RUES[ville.nom_complet].mots_les_plus_proches(étape1, d_max=tol)
     if len(res)==1:
         if bavard>0:
             print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}")
