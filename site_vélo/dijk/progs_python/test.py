@@ -13,8 +13,7 @@ import dijk.progs_python.params
 from init_graphe import charge_graphe  # le graphe de Pau par défaut
 import apprentissage
 import dijkstra
-import chemins  # classe chemin et lecture du csv
-import utils
+import chemins  # classe chemin et lecture du csvimport utils
 #import initialisation.nœuds_des_rues as nr
 #import lecture_adresse.arbresLex as lex
 from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT

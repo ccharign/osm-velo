@@ -134,15 +134,16 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
        - ouvrir (bool) : Si True, lance le navigateur sur la page créée.
 
     Effet : Crée une carte html avec le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
+    Sortie : Longueur du chemin, du chemin direct.
     """
 
     # Calcul des chemins
-    c_complet = dijkstra.chemin_étapes_ensembles(g, c)
+    c_complet, longueur = dijkstra.chemin_étapes_ensembles(g, c)
     départ, arrivée = c_complet[0], c_complet[-1]
-    c_direct = dijkstra.chemin(g, départ, arrivée, 0)
+    c_direct, longueur_direct = dijkstra.chemin(g, départ, arrivée, 0)
 
     dessine([(c_complet, "blue"), (c_direct,"red")], g, où_enregistrer, ouvrir=ouvrir)
-
+    return longueur, longueur_direct
 
     
 def dessine_chemins(chemins, g, où_enregistrer=TMP):

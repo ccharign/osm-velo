@@ -51,7 +51,7 @@ def chemin(g, départ, arrivée, p_détour):
             s = pred[s]
             chemin.append(s)
         chemin.reverse()
-        return chemin
+        return chemin, dist[arrivée]
     else:
         raise PasDeChemin(f"Pas de chemin trouvé de {départ} à {arrivée}")
 

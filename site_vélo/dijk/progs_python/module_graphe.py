@@ -116,7 +116,7 @@ class graphe():
         try:
             return self.digraphe[s][t]["ville"] 
         except KeyError:
-            print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
+            if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
             return []
 
     

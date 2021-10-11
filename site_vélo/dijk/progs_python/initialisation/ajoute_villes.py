@@ -144,7 +144,7 @@ def vérif_unicité_ville():
 
 def ajoute_villes(g, bavard=0):
     """ 
-    Ajoute un champ "ville" à chaque arête de g qui contient une liste de villes.
+    Ajoute un champ "ville" à chaque arête de g, qui contient une liste de villes.
     """
     compte=0
     with open(CHEMIN_NŒUDS_VILLES) as entrée:
