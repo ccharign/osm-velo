@@ -1,24 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Recherche d’itinéraire</title>
-  </head>
-  
-  <body>
+    {% extends "base.html" %}
     
-    <p>Bienvenue dans le routeur vélo participatif ! </p>
-
-    <p>
-      Remplissez le formulaire ci-dessous pour calculer un trajet ou suivez <a href="{% url 'contribution' %}">ce lien </a> pour participer à l’entraînement de l’IA en rentrant les trajets que vous connaissez et préconisez.
-    </p>
-
-    <p>
-      Voici encore <a href="{% url 'carte cycla'%}"> la carte de la cyclabilité </a> déduite des données dont je dispose. Un tronçon vert est un troçon qui est préféré à ses voisins, un tronçon rouge est un tronçon évité par les cyclistes. Attention : ceci n’indique pas le carcatère agréable et sécurisé d’un tronçon dans l’absolu mais uniquement en comparaison à ses voisins. En gros, un tronçon est vert si c’est ce qu’on a de mieux dans le quartier. Par ailleurs je n’ai pas pris en compte dans cet affichage les tronçons qui sont utilisés dans un sens mais pas dans l’autre (les sens interdits notamment !). Ils sont cependant bien pris en compte dans l’algo de calcul d’itinéraires.
-    </p>
-
-
-    
+    {% block contenu %}
     <form action = "{% url 'itinéraire' %}" method="post">
       {% csrf_token %}
       <label for="départ">Départ : </label><br>
@@ -34,6 +16,4 @@
       <input type="submit" value="C’est parti!">
     </form>
 
-    
-  </body>
-</html>
+	{% endblock %}

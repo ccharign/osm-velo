@@ -1,0 +1,24 @@
+<html>
+  {% load static %}
+  <head>
+    <meta charset="utf-8">
+    <title>{% block titre %}Recherche d’itinéraire{% endblock %}</title>
+    <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/>
+  </head>
+
+  <body>
+
+
+<header>
+<nav> <a href="{% url 'carte cycla'%}"> la carte de la cyclabilité </a> | <a href="{% url 'contribution' %}">contribution</a> </nav>
+</header>
+</br>
+
+<section>
+
+  {% block contenu %} {% endblock %}
+
+</section>
+
+  </body>
+</html>
