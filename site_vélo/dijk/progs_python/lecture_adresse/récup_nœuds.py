@@ -68,7 +68,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
 
     Méthode actuelle :
-       - essai 1 :  dans g.nœuds[str(ville)][rue]
+       - essai 1 :  dans g.nœuds[ville.nom_norm][rue]
        - recherche Nominatim pour trouver le nom de la rue dans osm
        - essai 2 : dans g.nœuds avec ce nouveau nom
        - essai 3 : récupérer les nodes osm des way trouvées, et garder ceux qui sont dans g

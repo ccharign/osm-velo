@@ -51,12 +51,12 @@ def vérif_nv_chemin(requête, debug=0):
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
     pourcent_détour= int(requête.POST["pourcentage_détour"])
-    étapes = requête.POST["étapes"].split(";")
+    étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
     AR = bool_of_checkbox(requête.POST, "AR")
     if debug>0: print(AR)
 
     c = Chemin.of_étapes([d]+étapes+[a], pourcent_détour,  AR, g, bavard=2)
-    longueur,longueur_direct = dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/nouveau_chemin.html", bavard=2)
+    longueur, longueur_direct = dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/nouveau_chemin.html", bavard=2)
     requête.session["chemin_à_valider"] = ([d]+étapes+[a], pourcent_détour, AR) # session est un dictionnaire pour stocker du bazar propre à un utilisateur.
     return render(requête, "dijk/vérif_nouveau_chemin.html", {"chemin":c, "longueurs":(longueur, longueur_direct)})
 

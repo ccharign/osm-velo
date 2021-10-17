@@ -9,7 +9,9 @@ Renvoyer la longueur des chemins
 
 Afficher dans une sous-page internet.
 
-
+Il existe des rues qui figurent dans rue_num_coord, donc qui étaient dans le .osm, mais qui ne sont pas dans nœuds_rue. Ce dernier est créé par nœuds_des_rues.py. Par exemple place reine marguerite, dont le nœud du graphe est 339262446.
+Problème lorsqu’une rue ne contient qu’un sommet de g, donc aucune arête.
+-> Il faut mettre le nom de la rue et de la ville dans le nœud plutôt que l’arête, et reprendre extrait_nœuds_des_rues
 
 À FAIRE (un jour)
 

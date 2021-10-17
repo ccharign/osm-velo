@@ -18,9 +18,10 @@
     
     <p>
     <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire tel qu'il à été compris par le logiciel </a>
-    (S’ouvre dans un nouvel onglet par défaut.)
+    (S’ouvre dans un nouvel onglet par défaut.)</br>
 
-    Longueur du chemin direct : {{longueurs}}. Et du chemin proposé : {{longeurs}}
+    Longueur du chemin proposé : {{longueurs.0}}</br>
+    Longueur du chemin direct : {{longueurs.1}}
 
     <!-- >En rouge le chemin le plus court et en bleu le chemin tenant compte des étapes indiquées, et des données déjà présentes dans la base.
     <div>
