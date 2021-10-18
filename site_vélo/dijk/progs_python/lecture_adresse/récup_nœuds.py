@@ -68,7 +68,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
 
     Méthode actuelle :
-       - essai 1 :  dans g.nœuds[str(ville)][rue]
+       - essai 1 :  dans g.nœuds[ville.nom_norm][rue]
        - recherche Nominatim pour trouver le nom de la rue dans osm
        - essai 2 : dans g.nœuds avec ce nouveau nom
        - essai 3 : récupérer les nodes osm des way trouvées, et garder ceux qui sont dans g
@@ -78,7 +78,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
     ## Essai 1
     try:
-        return g.nœuds[str(adresse.ville)][adresse.rue_norm]
+        return g.nœuds[adresse.ville.nom_norm][adresse.rue_norm]
     except KeyError as e :
         print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}  ({e}).")
 
@@ -104,8 +104,8 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
             nom_n = normalise_rue(nom, adresse.ville) 
-            if nom_n in g.nœuds[str(adresse.ville)] :
-                return g.nœuds[str(adresse.ville)][nom_n]
+            if nom_n in g.nœuds[adresse.ville.nom_norm] :
+                return g.nœuds[adresse.ville.nom_norm][nom_n]
             else:
                 if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
 

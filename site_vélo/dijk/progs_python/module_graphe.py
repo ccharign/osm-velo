@@ -65,6 +65,15 @@ class graphe():
     def est_arrête(self, s, t):
         return t in self.digraphe[s]
 
+    def nb_arêtes(self):
+        return sum(len(self.digraphe[s]) for s in self.digraphe.nodes)
+
+    def nb_arêtes_avec_ville(self):
+        return sum(
+            len([t for t in self.digraphe[s] if "ville" in self.digraphe[s][t]])
+            for s in self.digraphe.nodes 
+        )
+
     def d_euc(self, n1, n2):
         """ distance euclidienne entre n1 et n2."""
         return distance_euc(self.coords_of_nœud(n1), self.coords_of_nœud(n2))
@@ -88,7 +97,7 @@ class graphe():
             
 
     def rue_dune_arête(self, s, t, bavard=0):
-        """ Liste des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
+        """ Tuple des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
             Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
         try:
             res = self.digraphe[s][t]["name"]
@@ -105,9 +114,9 @@ class graphe():
         """ Liste des villes contenant l’arête (s,t).
         """
         try:
-            return self.digraphe[s][t]["ville"]
+            return self.digraphe[s][t]["ville"] 
         except KeyError:
-            print(f"Pas de ville en mémoire pour l’arête {s,t}.")
+            if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
             return []
 
     

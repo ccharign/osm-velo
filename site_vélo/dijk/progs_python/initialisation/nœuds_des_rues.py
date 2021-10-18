@@ -78,6 +78,7 @@ def extrait_nœuds_des_rues(g, bavard = 0):
             villes = g.ville_dune_arête(s,t)
             for ville in villes :
                 if ville not in déjàVu:
+                    print(f"Nouvelle ville rencontrée : {ville}")
                     déjàVu[ville] = {}
                     res[ville] = {}
                 if rues is not None:
@@ -86,17 +87,19 @@ def extrait_nœuds_des_rues(g, bavard = 0):
                             res[ville][rue] = [t, s]
                             déjàVu[ville][rue] = set((s,t))
                             partir_dune_arête(s,t,ville,rue)
-                        if s not in déjàVu[ville][rue] or t not in déjàVu[ville][rue]: #Cas d’un nouveau tronçon d’une ancienne rue
+                        if s not in déjàVu[ville][rue] or t not in déjàVu[ville][rue]:  # Cas d’un nouveau tronçon d’une ancienne rue
                             partir_dune_arête(s,t,ville,rue)
                             
                             if bavard>1: print(f"J’ai suivi la {rue} à {ville}. Nœuds trouvés : {res[ville][rue]}")
     return res
 
 
-def sortie_csv(g):
-    """ Met le dictionnaire ville -> rue -> nœuds dans un csv.
-    Structure d’une ligne : ville;rue;nœuds séparés par virgule."""
-    res = extrait_nœuds_des_rues(g)
+def sortie_csv(g, bavard=0):
+    """ 
+    Met le dictionnaire ville -> rue -> nœuds dans un csv.
+    Structure d’une ligne : ville;rue;nœuds séparés par virgule.
+    """
+    res = extrait_nœuds_des_rues(g, bavard=bavard)
     with open(CHEMIN_NŒUDS_RUES, "w") as sortie:
         for ville, d in res.items():
             for rue, nœuds in d.items():

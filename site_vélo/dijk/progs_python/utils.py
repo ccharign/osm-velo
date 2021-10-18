@@ -67,10 +67,11 @@ def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(T
     à_dessiner = []
     for i, p in enumerate( ps_détour):
         c = chemins.Chemin([d, a], p, False)
-        iti = dijkstra.chemin_étapes_ensembles(g, c ,bavard=bavard-1)
+        iti, longueur = dijkstra.chemin_étapes_ensembles(g, c ,bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti, coul))
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    return longueur
     
 
 
@@ -133,15 +134,16 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
        - ouvrir (bool) : Si True, lance le navigateur sur la page créée.
 
     Effet : Crée une carte html avec le chemin direct en rouge, et le chemin compte tenu de la cyclabilité en bleu.
+    Sortie : Longueur du chemin, du chemin direct.
     """
 
     # Calcul des chemins
-    c_complet = dijkstra.chemin_étapes_ensembles(g, c)
+    c_complet, longueur = dijkstra.chemin_étapes_ensembles(g, c)
     départ, arrivée = c_complet[0], c_complet[-1]
-    c_direct = dijkstra.chemin(g, départ, arrivée, 0)
+    c_direct, longueur_direct = dijkstra.chemin(g, départ, arrivée, 0)
 
     dessine([(c_complet, "blue"), (c_direct,"red")], g, où_enregistrer, ouvrir=ouvrir)
-
+    return longueur, longueur_direct
 
     
 def dessine_chemins(chemins, g, où_enregistrer=TMP):

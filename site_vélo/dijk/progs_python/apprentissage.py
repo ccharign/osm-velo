@@ -23,11 +23,11 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
         Effet : Compare chemin avec le chemin renvoyé par g.chemin. Augmente de ETA la cyclabilité de chaque arrête présente dans chemin mais pas dans l'autre et diminue de ETA chaque arrête présente dans l'autre et pas dans chemin."""
     
     #vieux_chemin = g.chemin_étapes_ensembles(chemin.direct())
-    chemin_complet = g.chemin_étapes_ensembles(chemin)
+    chemin_complet, _ = g.chemin_étapes_ensembles(chemin)
     # Pour vieux chemin, je prends le chemin qui utilise le même nœud de départ et d’arrivée que chemin_complet (pour éviter de biaiser l’apprentissage dans le cas de gros ensemble)
     départ = chemin_complet[0]
     arrivée = chemin_complet[-1]
-    vieux_chemin = dijkstra.chemin(g, départ, arrivée, chemin.p_détour)
+    vieux_chemin, _ = dijkstra.chemin(g, départ, arrivée, chemin.p_détour)
     arêtes_chemin = dico_arêtes(chemin_complet)
     arêtes_vieux_chemin = dico_arêtes(vieux_chemin)
     n_modif = 0
