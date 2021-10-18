@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Merci</title>
-  </head>
-  
-  <body>
+{% block title %} Merci {% endblock %}
+
+{% block contenu %}
     Contribution enregistrée, un grand merci !<br><br>
 
     <p><a href="{% url 'carte cycla'%}"> Pour visualiser la cyclabilité enregistrée par l’IA.</a></p>
@@ -14,6 +9,4 @@
     
     <p><a href="{% url 'index' %}"> Retour à l’entrée </a></p>
     
-  </body>
-
-</html>>
+{% endblock %}
