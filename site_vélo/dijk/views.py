@@ -24,15 +24,38 @@ def bool_of_checkbox(dico, clef):
 
 ### Recherche d’itinéraire simple ###
 
+def récup_head_body_script(chemin):
+    """ Entrée : adresse d’un fichier html
+        Sortie : la partie body de celui-ci
+    """
+    with open(chemin) as entrée:
+        tout=entrée.read()
+        
+        head, suite = tout.split("</head>")
+        head = head.split("<head>")[1]
+        
+        body, suite = suite.split("</body>")
+        body = body.split("<body>")[1]
 
+        script = suite.split("<script>")[1].split("</script>")[0]
+    return head, body, script
+    
+    
 def vue_itinéraire(requête):
-    """ Celle-ci doit récupérer le résultat du formulaire via un post."""
+    """ Doit récupérer le résultat du formulaire via un post."""
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
     print(f"Recherche d’itinéraire entre {d} et {a}.")
-    longueur=itinéraire(d, a, ps_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/résultat_itinéraire.html" )
-    return render(requête, "dijk/résultat_itinéraire.html", {})
+    longueurs, couleurs = itinéraire(d, a, ps_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html" )
+    head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
+    with open("dijk/templates/dijk/résultat_itinéraire.html", "w") as sortie:
+        sortie.write(f"""
+        {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
+        {{% block head_suite %}}  {head}  {{% endblock %}}
+        {{% block carte %}} {body}\n <script> {script} </script> {{% endblock %}}
+        """)
+    return render(requête, "dijk/résultat_itinéraire.html", {"longueurs_et_couleurs": zip(longueurs, couleurs) })
 
 
 

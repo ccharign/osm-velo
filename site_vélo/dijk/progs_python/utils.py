@@ -52,8 +52,9 @@ def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(T
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
       - départ, arrivée : chaîne de caractère décrivant le départ et l’arrivée. Seront lues par chemins.Étape.
 
-    Effet :  Crée une page html contenant l’itinéraire demandé, et renvoie son adresse.
+    Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
              Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
+    Sorie : liste des longueurs des itinéraires calculés, liste des couleurs utilisées
     """
     d = chemins.Étape(départ, g)
     if bavard>0:
@@ -65,13 +66,17 @@ def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(T
 
     np = len(ps_détour)
     à_dessiner = []
+    longueurs = []
+    couleurs = []
     for i, p in enumerate( ps_détour):
         c = chemins.Chemin([d, a], p, False)
-        iti, longueur = dijkstra.chemin_étapes_ensembles(g, c ,bavard=bavard-1)
+        iti, longueur = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti, coul))
+        longueurs.append(g.longueur_itinéraire(iti))
+        couleurs.append(coul)
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
-    return longueur
+    return longueurs, couleurs
     
 
 

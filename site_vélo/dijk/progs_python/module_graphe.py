@@ -8,7 +8,7 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN
 import dijkstra
 from récup_données import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
-from petites_fonctions import distance_euc
+from petites_fonctions import distance_euc, deuxConséc
 from collections import deque
 from lecture_adresse.récup_nœuds import tous_les_nœuds
 
@@ -58,12 +58,23 @@ class graphe():
     def voisins_nus(self, s):
         """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
         return (t for t in self.digraphe[s].keys())
+
+    def longueur_itinéraire(self, iti):
+        """
+        Entrée : un itinéraire (liste de sommets)
+        Sortie : sa « vraie » longueur.
+        """
+        return int(sum(self.longueur_arête(s,t) for s,t in deuxConséc(iti)))
+        
     
     def liste_voisins(self, s):
         return list(self.voisins)
    
-    def est_arrête(self, s, t):
+    def est_arête(self, s, t):
         return t in self.digraphe[s]
+
+    def longueur_arête(self, s, t):
+        return self.digraphe[s][t]["length"]
 
     def nb_arêtes(self):
         return sum(len(self.digraphe[s]) for s in self.digraphe.nodes)

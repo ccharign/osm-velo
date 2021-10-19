@@ -1,6 +1,5 @@
-
-        {% extends "dijk/résultat_itinéraire_sans_carte.html" %}
-        {% block head_suite %}      
+<!DOCTYPE html>
+<head>    
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     
         <script>
@@ -33,13 +32,13 @@
                 }
             </style>
         
-  {% endblock %}
-        {% block carte %}     
+</head>
+<body>    
     
             <div class="folium-map" id="map_83bd75ccd1e64e2da34cb89615a5d7d1" ></div>
         
-
- <script>     
+</body>
+<script>    
     
             var map_83bd75ccd1e64e2da34cb89615a5d7d1 = L.map(
                 "map_83bd75ccd1e64e2da34cb89615a5d7d1",
@@ -8420,5 +8419,4 @@
                 {}
             );
         
- </script> {% endblock %}
-        
+</script>
