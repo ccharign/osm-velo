@@ -12,7 +12,7 @@ RACINE_PROJET="dijk/progs_python/"
 CHEMIN_XML = os.path.join(RACINE_PROJET, "données/voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
 
 CHEMIN_XML_COMPLET = os.path.join(RACINE_PROJET,"données_inutiles/pau_agglo.osm")
-CHEMIN_JSON_NUM_COORDS = os.path.join(RACINE_PROJET,"données/rue_num_coords.csv")
+CHEMIN_RUE_NUM_COORDS = os.path.join(RACINE_PROJET,"données/rue_num_coords.csv")
 CHEMIN_NŒUDS_VILLES = os.path.join(RACINE_PROJET,"données/nœuds_villes.csv")
 CHEMIN_NŒUDS_RUES = os.path.join(RACINE_PROJET,"données/nœuds_rues.csv")
 CHEMIN_CACHE = os.path.join(RACINE_PROJET,"données/cache_adresses.csv")
@@ -25,7 +25,7 @@ os.makedirs(TMP, exist_ok=True)
 
 STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
 PAYS_DÉFAUT = "France"
-NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html
+#NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html # Plus utilisé : utilisation de la commande Python idoine à la place à savoir webbrowser
 
 D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres
 

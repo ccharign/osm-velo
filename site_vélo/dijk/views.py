@@ -20,7 +20,7 @@ def bool_of_checkbox(dico, clef):
             return False
     except KeyError:
         return False
-    
+ 
 
 ### Recherche d’itinéraire simple ###
 
@@ -43,11 +43,18 @@ def récup_head_body_script(chemin):
     
 def vue_itinéraire(requête):
     """ Doit récupérer le résultat du formulaire via un post."""
+
+    # Récupération des données du post
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
+    noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
-    print(f"Recherche d’itinéraire entre {d} et {a}.")
-    longueurs, couleurs = itinéraire(d, a, ps_détour, g, bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html" )
+    print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes}.")
+
+    # Calcul des itinéraires
+    longueurs, couleurs = itinéraire(d, a, ps_détour, g, noms_étapes=noms_étapes, bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html" )
+
+    # Création du template
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
     with open("dijk/templates/dijk/résultat_itinéraire.html", "w") as sortie:
         sortie.write(f"""
@@ -55,7 +62,9 @@ def vue_itinéraire(requête):
         {{% block head_suite %}}  {head}  {{% endblock %}}
         {{% block carte %}} {body}\n <script> {script} </script> {{% endblock %}}
         """)
-    return render(requête, "dijk/résultat_itinéraire.html", {"longueurs_et_couleurs": zip(longueurs, couleurs) })
+
+    # Chargement du template
+    return render(requête, "dijk/résultat_itinéraire.html", {"longueurs_et_couleurs": zip(longueurs, couleurs), "départ":d, "arrivée":a, "étapes":noms_étapes })
 
 
 

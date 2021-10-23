@@ -4,9 +4,10 @@
 #################### Élaguage ####################
 
 import xml.etree.ElementTree as xml  # Manipuler le xml local
+from params import CHEMIN_XML_COMPLET, CHEMIN_XML
 
 
-def élague_xml(chemin="données_inutiles/pau_agglo.osm"):
+def élague_xml(chemin=CHEMIN_XML_COMPLET):
     """
     Entrée : chemin, chemin vers un fichier .osm
              chemin_sortie, autre chemin

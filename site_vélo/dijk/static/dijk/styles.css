@@ -5,3 +5,11 @@ nav{
     margin-right:5px;
     margin-left:5px;
 }
+aside{
+    width:10%;
+    float:right;
+    margin-left:10px;
+}
+section{
+    width:90%;
+}

@@ -2,7 +2,7 @@ True|30|rue des Véroniques; rue Voltaire; rue Sambre et Meuse;cours Bosquet; pl
 True|30|rue des réparatrices; avenue San Carlos;avenue des acacias;avenue de Montebello;avenue Bié-Moulié;rue Gutenberg
 True|30|avenue du Loup;chemin des écoliers;rue Mozart;chemin Guilhem
 True|30|Rond-Point Éric Tabarly; Chemin Labriart; Rue Cassiopée; Rue Blanqui; Rue Paul Bert; Rue Marx Dormoy; CSTJF
-True|20|rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros
+False|20|rue d'étigny; place gramont; rue tran; place de la libération; rue gassiot; rue carnot; rue cazaubon norbert; boulevard d'alsace-lorraine; cours lyautey; avenue de saragosse; avenue de buros; 84 avenue de buros
 True|20|véloroute V81 (64320 mazères-lezons) ; véloroute V81 (64320 bizanos)  ; 13 rue de verdun (64320 bizanos) ; avenue albert 1er (64320 bizanos) ; 69 rue pasteur (64320 bizanos) ; 58 rue pasteur (64320 bizanos) ; 35 rue pasteur (64320 bizanos) ; 11 rue pasteur (64320 bizanos) ; 13 avenue de barèges (64000 PAU) ; avenue léon say (64000 PAU) ; rue léon daran ; place saint-louis de gonzague ; rue valéry meunier ; 24 rue du maréchal foch ; rue serviez ; rue carnot ; rue cazaubon norbert ; cours lyautey ; 62 avenue louis sallenave ; 88 avenue louis sallenave ; 145 avenue philippon ; 347 Boulevard du Cami Salié
 True|20|rue de Lagardère ; avenue Trespoey ; place Clémenceau ; rue Serviez ; place des sept cantons; rue Bernadotte ; rue de Liège ; rue Lapouble
 True|40|4 rue Mourot; rue Montpensier; rond-point du souvenir français; avenue de montardon; boulevard du cami salié; allée buffon; chemin de la forêt bastard
@@ -17,5 +17,5 @@ False|10|parc beaumont;allee anna de noailles;le galway
 True|30|rue des veroniques;avenue de l’yser (bizanos);avenue de la paix (gelos);route des coteaux de guindalos (jurançon)
 True|30|rue ramond de carbonnieres;rue du marechal joffre;rue des cordeliers;rue marca
 True|20|rue serviez (64000 pau);rue jean jacques de monaix (64000 pau);avenue de buros (64000 pau)
-True|20|rue des veroniques (64000 Pau);chemin des ecoliers (64000 Pau);allee françois truffaut (64000 Pau);avenue de la malsence (64000 Pau);avenue de lons  (64140 Billère);chemin du lacaou  (64140 Billère);europub  (64140 Billère)
 True|20|rue des veroniques (64000 Pau);chemin des ecoliers (64000 Pau);allee françois truffaut (64000 Pau);avenue de la malsence (64000 Pau);avenue de lons  (64140 Billère);Rue du Lacaou (64140 Billère);Europub (64140 Billère)
+False|20|palais des sports (64000 Pau);allee cordorcet (64000 Pau);avenue duffau (64000 Pau);place royale (64000 Pau)

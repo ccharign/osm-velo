@@ -4,6 +4,8 @@ from récup_données import recherche_inversée
 from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import re
 import xml.etree.ElementTree as xml
+from params import CHEMIN_RUE_NUM_COORDS, CHEMIN_XML_COMPLET
+
     
 #################### Récupération des numéros de rues ####################
     
@@ -40,7 +42,7 @@ def commune_of_adresse(adr):
 
 def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
     """ Entrée : fichier xml d’openstreetmap (pas la version élaguée)
-        Effet : crée un fichier texte associant à chaque rue la list des (numéro connu, coords correspondantes)"""
+        Effet : crée un fichier csv associant à chaque rue la list des (numéro connu, coords correspondantes)"""
     
 
     print("Chargement du xml")
@@ -95,7 +97,7 @@ def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
     print(f"{nb} adresses collectées")
         
     print("Écriture du fichier")
-    sortie = open(CHEMIN_JSON_NUM_COORDS, "w")
+    sortie = open(CHEMIN_RUE_NUM_COORDS, "w")
     for villerue, l in res.items():
         if len(l) > 1:  # Une seule adresse dans la rue ça ne permet pas d’interpoler.
             l_pair = [x for x in l if x[0]%2 == 0]

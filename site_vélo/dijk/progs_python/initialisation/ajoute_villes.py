@@ -6,7 +6,7 @@
 
 import overpy
 #from récup_données import localisateur
-from params import CHEMIN_NŒUDS_VILLES, CHEMIN_JSON_NUM_COORDS
+from params import CHEMIN_NŒUDS_VILLES, CHEMIN_RUE_NUM_COORDS
 from petites_fonctions import ajouteDico
 #from dijk.models import Ville, Sommet
 from lecture_adresse.normalisation import normalise_ville
@@ -16,9 +16,9 @@ import time
 
 
 def liste_villes():
-    """ Liste des villes apparaissant dans CHEMIN_JSON_NUM_COORDS."""
+    """ Liste des villes apparaissant dans CHEMIN_RUE_NUM_COORDS."""
     noms = set([])
-    with open(CHEMIN_JSON_NUM_COORDS) as f:
+    with open(CHEMIN_RUE_NUM_COORDS) as f:
         for ligne in f:
             noms.add(ligne.split(";")[0])
             

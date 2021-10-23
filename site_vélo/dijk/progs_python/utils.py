@@ -2,7 +2,7 @@
 
 ### Fonctions diverses pour utiliser le logiciel
 
-from dijk.progs_python.params import NAVIGATEUR, TMP
+from dijk.progs_python.params import TMP
 from importlib import reload  # recharger un module après modif
 import subprocess
 import networkx as nx  # graphe
@@ -20,6 +20,7 @@ import récup_données
 import module_graphe
 import webbrowser
 from matplotlib import cm
+import folium
 
 def flatten(c):
     """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
@@ -46,11 +47,12 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
+def itinéraire(départ, arrivée, ps_détour, g, noms_étapes=[], où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
       - départ, arrivée : chaîne de caractère décrivant le départ et l’arrivée. Seront lues par chemins.Étape.
+      - noms_étapes : liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
              Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
@@ -63,14 +65,16 @@ def itinéraire(départ, arrivée, ps_détour, g, où_enregistrer=os.path.join(T
     a = chemins.Étape(arrivée, g)
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
+    étapes = [chemins.Étape(é, g) for é in noms_étapes]
+    
 
     np = len(ps_détour)
     à_dessiner = []
     longueurs = []
     couleurs = []
     for i, p in enumerate( ps_détour):
-        c = chemins.Chemin([d, a], p, False)
-        iti, longueur = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
+        c = chemins.Chemin([d]+étapes+[a], p, False)
+        iti, _ = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti, coul))
         longueurs.append(g.longueur_itinéraire(iti))
@@ -109,7 +113,10 @@ def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
     for l, coul in listes_sommets[1:]:
         sous_graphe = g.multidigraphe.subgraph(l)
         carte = ox.plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
+    
     carte.save(où_enregistrer)
+    print(g.coords_of_nœud(l[0]))
+    folium.CircleMarker(location=g.coords_of_nœud(l[0])).add_to(carte)
     if ouvrir : ouvre_html(où_enregistrer)
 
 
@@ -143,9 +150,12 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
     """
 
     # Calcul des chemins
-    c_complet, longueur = dijkstra.chemin_étapes_ensembles(g, c)
+    c_complet, _ = dijkstra.chemin_étapes_ensembles(g, c)
+    longueur = g.longueur_itinéraire(c_complet)
+    
     départ, arrivée = c_complet[0], c_complet[-1]
-    c_direct, longueur_direct = dijkstra.chemin(g, départ, arrivée, 0)
+    c_direct, _ = dijkstra.chemin(g, départ, arrivée, 0)
+    longueur_direct = g.longueur_itinéraire(c_direct)
 
     dessine([(c_complet, "blue"), (c_direct,"red")], g, où_enregistrer, ouvrir=ouvrir)
     return longueur, longueur_direct
