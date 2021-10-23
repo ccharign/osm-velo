@@ -35,6 +35,7 @@ for f in (CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, CHEMI
 
 ### Réglages divers ###
 
+BBOX_DÉFAUT = (-0.45, 43.2671, -0.2541, 43.3403) # la bbox de la zone prise en charge # Convention overpass : sud, ouest, nord, est
 STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
 PAYS_DÉFAUT = "France"
 #NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html # Plus utilisé : utilisation de la commande Python idoine à la place à savoir webbrowser

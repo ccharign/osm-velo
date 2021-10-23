@@ -100,7 +100,7 @@ def sortie_csv(g, bavard=0):
     Structure d’une ligne : ville;rue;nœuds séparés par virgule.
     """
     res = extrait_nœuds_des_rues(g, bavard=bavard)
-    print(f"Enregistrement des nœuds des rues dans {CHEMIN_RUE_NUM_COORDS}")
+    print(f"Enregistrement des nœuds des rues dans {CHEMIN_NŒUDS_RUES}")
     with open(CHEMIN_NŒUDS_RUES, "w") as sortie:
         for ville, d in res.items():
             for rue, nœuds in d.items():

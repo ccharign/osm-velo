@@ -11,6 +11,7 @@ from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
 from petites_fonctions import distance_euc, deuxConséc
 from collections import deque
 from lecture_adresse.récup_nœuds import tous_les_nœuds
+from graphe_minimal import Graphe_minimaliste
 
 class PasTrouvé(Exception):
     pass
@@ -20,7 +21,7 @@ class TropLoin(Exception):
     pass
 
 
-class graphe():
+class graphe(Graphe_minimaliste):
     """
     Attributs : - multidigraphe : un multidigraph de networkx
                 - digraphe : le digraph correspondant
@@ -30,7 +31,7 @@ class graphe():
     """
    
     def __init__(self, g):
-        """ g, MultiDiGraph"""
+        """ Entrée : g, MultiDiGraph de networkx"""
         self.multidigraphe = g
         print("Calcul de la version sans multiarêtes")
         self.digraphe = nx.DiGraph(g)  # ox.get_digraph(g)
@@ -39,11 +40,6 @@ class graphe():
         self.nœuds = {}
 
         
-    def __contains__(self, n):
-        """ Indique si le nœud n est dans g"""
-        return n in self.digraphe.nodes
-
-    
     def voisins(self, s, p_détour):
         """
         La méthode utilisée par dijkstra.
@@ -55,9 +51,6 @@ class graphe():
         cycla_corrigée = lambda voisin: (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
         return ( ( voisin, données["length"]/cycla_corrigée(voisin) )  for (voisin, données) in self.digraphe[s].items() )
 
-    def voisins_nus(self, s):
-        """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
-        return (t for t in self.digraphe[s].keys())
 
     def longueur_itinéraire(self, iti):
         """
@@ -70,42 +63,17 @@ class graphe():
     def liste_voisins(self, s):
         return list(self.voisins)
    
-    def est_arête(self, s, t):
-        return t in self.digraphe[s]
 
     def longueur_arête(self, s, t):
         return self.digraphe[s][t]["length"]
 
-    def nb_arêtes(self):
-        return sum(len(self.digraphe[s]) for s in self.digraphe.nodes)
 
     def nb_arêtes_avec_ville(self):
         return sum(
             len([t for t in self.digraphe[s] if "ville" in self.digraphe[s][t]])
             for s in self.digraphe.nodes 
         )
-
-    def d_euc(self, n1, n2):
-        """ distance euclidienne entre n1 et n2."""
-        return distance_euc(self.coords_of_nœud(n1), self.coords_of_nœud(n2))
-
-    def parcours_largeur(self, départ, dmax=float("inf")):
-        """Itérateur sur les sommets du graphe, selon un parcours en largeur depuis départ. On s’arrête lorsqu’on dépasse la distance dmax depuis départ."""
-        àVisiter = deque()
-        déjàVu = set({})
-        àVisiter.appendleft((départ, 0))
-        fini = False
-        while len(àVisiter) > 0 and not fini:
-            (s, d) = àVisiter.pop()
-            if d > dmax: fini = True
-            else:
-                yield s
-                for t in self.digraphe[s].keys():
-                    if t not in déjàVu:
-                        àVisiter.appendleft((t, d+1))
-                        déjàVu.add(t)
-                    
-            
+    
 
     def rue_dune_arête(self, s, t, bavard=0):
         """ Tuple des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
@@ -194,15 +162,6 @@ class graphe():
 
                
 
-    
-    def coords_of_nœud(self, n):
-        """ Renvoie le couple (lat, lon)
-        Au fait, attention : dans osm l’ordre est inversé : x=lon, y=lat.
-        """
-        return self.digraphe.nodes[n]["y"], self.digraphe.nodes[n]["x"]
-
-       
-               
     def incr_cyclabilité(self, a, dc):
         """ Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
         Formule appliquée : *= (1+dc)
@@ -211,6 +170,7 @@ class graphe():
         if a in self.cyclabilité: self.cyclabilité[a] *= (1+dc)
         else: self.cyclabilité[a] = 1. + dc
 
+        
     def réinitialise_cyclabilité(self):
         self.cyclabilité = {}
 

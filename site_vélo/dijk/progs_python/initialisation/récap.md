@@ -8,6 +8,7 @@
 
 
 - Dans nœuds_des_rues.py:
+       Besoin que les villes aient été rentrées dans g. Précisément : ajoute_villes dans ajoute_villes.py a besoin de CHEMIN_NŒUDS_VILLE
        sortie_csv(g) -> CHEMIN_NŒUDS_RUES
            Lequel contient Ville;rue;nœuds
 

@@ -7,9 +7,6 @@ import osmnx as ox
 ox.config(use_cache=True, log_console=True)
 
 
-D_MAX_SUITE_RUE = 10  # Nombre max d’arêtes où on va chercher pour trouver la suite d’une rue.
-BBOX = 43.2671, -0.4285, 43.3403, -0.2541 # Convention overpass : sud, ouest, nord, est
-
 
 
 def crée_graphe_bbox(nom_fichier, ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
