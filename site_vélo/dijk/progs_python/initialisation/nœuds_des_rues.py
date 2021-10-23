@@ -96,10 +96,11 @@ def extrait_nœuds_des_rues(g, bavard = 0):
 
 def sortie_csv(g, bavard=0):
     """ 
-    Met le dictionnaire ville -> rue -> nœuds dans un csv.
+    Met le dictionnaire ville -> rue -> nœuds dans le csv situé à CHEMIN_NŒUDS_RUES
     Structure d’une ligne : ville;rue;nœuds séparés par virgule.
     """
     res = extrait_nœuds_des_rues(g, bavard=bavard)
+    print(f"Enregistrement des nœuds des rues dans {CHEMIN_RUE_NUM_COORDS}")
     with open(CHEMIN_NŒUDS_RUES, "w") as sortie:
         for ville, d in res.items():
             for rue, nœuds in d.items():

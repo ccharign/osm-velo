@@ -93,6 +93,7 @@ def crée_csv():
     """
     Argument facultatif : nœuds, dico nom_de_ville -> nœuds d’icelle. Pour le cas où une précédente tentative aurait partiellement réussi.
     """
+    print(f"Enregistrement dans le fichier {CHEMIN_NŒUDS_VILLES}.")
     sortie = open(CHEMIN_NŒUDS_VILLES, "w")
     début=True
     nœuds={}

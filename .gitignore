@@ -8,3 +8,4 @@ tests
 tmp/**
 !tmp/
 log
+sit_vélo/dijk/tmp/**

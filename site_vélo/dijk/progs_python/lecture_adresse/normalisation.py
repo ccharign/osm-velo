@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import re
 from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB
-from dijk.progs_python.lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
+from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 
 
 

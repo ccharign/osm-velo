@@ -4,7 +4,7 @@
 
 
 #import networkx as nx
-from params import RACINE_PROJET
+from params import RACINE_PROJET, DONNÉES
 from module_graphe import graphe  # ma classe de graphe
 
 from initialisation.ajoute_villes import ajoute_villes
@@ -30,7 +30,7 @@ BBOX = 43.2671, -0.4285, 43.3403, -0.2541 # Convention overpass : sud, ouest, no
 
 
 def charge_graphe(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
-    nom_fichier = f'{RACINE_PROJET}/données/{ouest}{sud}{est}{nord}.graphml'
+    nom_fichier = f'{DONNÉES}/{ouest}{sud}{est}{nord}.graphml'
     try:
         g = osmnx.io.load_graphml(nom_fichier)
         if bavard: print("Graphe en mémoire !")

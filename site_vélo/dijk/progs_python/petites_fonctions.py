@@ -1,10 +1,28 @@
 # -*- coding:utf-8 -*-
 
+
+
+"""
+Ces petites fonctions ne doivent pas dépendre d’autres modules, à part params.py, pour ne pas créer de pbde dépendance.
+
+"""
+
+
 import math
 from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
+import geopy
+import time
+
+
+geopy.geocoders.options.default_user_agent = "pau à vélo"
+localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
+def recherche_inversée(coords, bavard=0):
+    if bavard>0:print("Pause de 1s avant la recherche inversée")
+    time.sleep(1)
+    return(localisateur.reverse(coords))
+
 
 R_TERRE = 6378137  # en mètres
-
 
 def distance_euc(c1, c2):
     """ 

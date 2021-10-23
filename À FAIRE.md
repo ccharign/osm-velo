@@ -5,9 +5,8 @@ Mettre dans le cache les noms osm de lieux récupérés via nominatim
 
 Afficher les étapes sur la carte
 
-Renvoyer la longueur des chemins
+Ne pas renvoyer la longueur des chemins dans Dijkstra
 
-Afficher dans une sous-page internet.
 
 Il existe des rues qui figurent dans rue_num_coord, donc qui étaient dans le .osm, mais qui ne sont pas dans nœuds_rue. Ce dernier est créé par nœuds_des_rues.py. Par exemple place reine marguerite, dont le nœud du graphe est 339262446.
 Problème lorsqu’une rue ne contient qu’un sommet de g, donc aucune arête.
@@ -15,7 +14,7 @@ Problème lorsqu’une rue ne contient qu’un sommet de g, donc aucune arête.
 
 À FAIRE (un jour)
 
-  - Liste de toutes les villes de France ? Pour l’instant dans normalisation.py il y a une variable globale avec la liste des (noms, code)
+ - Liste de toutes les villes de France ? Pour l’instant dans normalisation.py il y a une variable globale avec la liste des (noms, code)
 
  - ergonomie :
      - case pour les villes avec menu déroulant

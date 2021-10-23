@@ -5,7 +5,7 @@
 
 import geopy
 #, overpy
-from params import LOG_PB, CHEMIN_XML, CHEMIN_JSON_NUM_COORDS
+from params import LOG_PB, CHEMIN_XML, CHEMIN_RUE_NUM_COORDS
 from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT, Adresse
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
@@ -17,10 +17,7 @@ geopy.geocoders.options.default_user_agent = "pau à vélo"
 localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
 
 
-def recherche_inversée(coords, bavard=0):
-    if bavard>0:print("Pause de 1s avant la recherche inversée")
-    time.sleep(1)
-    return(localisateur.reverse(coords))
+
     
 #api = overpy.Overpass()
 
@@ -100,9 +97,12 @@ def coords_lieu(nom_rue, ville= VILLE_DÉFAUT, pays="France", bavard=0):
 ###################################################
 
 
-print(f"Chargement du xml {CHEMIN_XML}")
-root = xml.parse(CHEMIN_XML).getroot()
-print("fini\n")
+try:
+    print(f"Chargement du xml {CHEMIN_XML}")
+    root = xml.parse(CHEMIN_XML).getroot()
+    print("fini\n")
+except Exception as e:
+    print(f"Le chargement du fichier osm élagué a échoué, {e}.")
 
 
 def nœuds_sur_tronçon_local(id_rue):
@@ -152,7 +152,7 @@ def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
 def charge_rue_num_coords():
     """ Renvoie le dictionnaire ville -> rue -> parité -> liste des (numéros, coords)"""
-    entrée = open(CHEMIN_JSON_NUM_COORDS)
+    entrée = open(CHEMIN_RUE_NUM_COORDS)
     res = {}
     for ligne in entrée:
         villerue, tmp = ligne.strip().split(":")

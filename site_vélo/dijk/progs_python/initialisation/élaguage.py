@@ -4,13 +4,14 @@
 #################### Élaguage ####################
 
 import xml.etree.ElementTree as xml  # Manipuler le xml local
-from params import CHEMIN_XML_COMPLET, CHEMIN_XML
+from params import CHEMIN_XML
 
 
-def élague_xml(chemin=CHEMIN_XML_COMPLET):
+def élague_xml(chemin):
     """
     Entrée : chemin, chemin vers un fichier .osm
              chemin_sortie, autre chemin
+            
     Effet : enregistre dans CHEMIN_XML (défini dans params.py) un .osm contenant uniquement les voies, leur id, leur nom et les ref des nœuds qui la composent du .osm initial.
     """
 
@@ -31,6 +32,6 @@ def élague_xml(chemin=CHEMIN_XML_COMPLET):
                     petit_fils = xml.SubElement(fils, "tag")
                     petit_fils.attrib["k"] = "name"
                     petit_fils.attrib["v"] = d.attrib["v"]
-    print("Enregistrement du xml simplifié")
+    print(f"Enregistrement du xml simplifié dans {CHEMIN_XML}")
     xml.ElementTree(res).write(CHEMIN_XML, encoding="utf-8")
 
