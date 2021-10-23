@@ -9,20 +9,15 @@ import overpy
 from params import CHEMIN_NŒUDS_VILLES, CHEMIN_RUE_NUM_COORDS
 from petites_fonctions import ajouteDico
 #from dijk.models import Ville, Sommet
-from lecture_adresse.normalisation import normalise_ville
+from lecture_adresse.normalisation import normalise_ville, TOUTES_LES_VILLES
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
 import time
 
 
 def liste_villes():
-    """ Liste des villes apparaissant dans CHEMIN_RUE_NUM_COORDS."""
-    noms = set([])
-    with open(CHEMIN_RUE_NUM_COORDS) as f:
-        for ligne in f:
-            noms.add(ligne.split(";")[0])
-            
-    return (normalise_ville(n) for n in noms)
+    """ Liste des villes apparaissant dans TOUTES_LES_VILLES."""
+    return (normalise_ville(n) for n in TOUTES_LES_VILLES.keys())
 
 
 
@@ -91,7 +86,7 @@ def test_overpass(id, bavard=0):
 
 def crée_csv():
     """
-    Argument facultatif : nœuds, dico nom_de_ville -> nœuds d’icelle. Pour le cas où une précédente tentative aurait partiellement réussi.
+    
     """
     print(f"Enregistrement dans le fichier {CHEMIN_NŒUDS_VILLES}.")
     sortie = open(CHEMIN_NŒUDS_VILLES, "w")

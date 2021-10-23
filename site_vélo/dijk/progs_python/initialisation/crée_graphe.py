@@ -9,15 +9,14 @@ ox.config(use_cache=True, log_console=True)
 
 
 
-def crée_graphe_bbox(nom_fichier, ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
+def crée_graphe_bbox(nom_fichier, bbox, option={"network_type":"all"}, bavard=1):
     """ 
     nom_fichier : nom du fichier où enregistrer le fichier xml du graphe.
     Effet : création du fichier graphml
     Sortie : le graphe, au format networkx non dirigé
     """
-    
-    print(f"Graphe pas en mémoire à {nom_fichier}. Chargement depuis osm.")
-    g = ox.graph_from_bbox(nord, sud, est, ouest, **option)
+    s,o,n,e = bbox
+    g = ox.graph_from_bbox(n, s, e, o, **option)
     
     print("conversion en graphe non orienté")
     g = ox.get_undirected(g)
@@ -38,7 +37,9 @@ charge_graphe = crée_graphe_bbox
 
 if __name__ == "main":
     nom_fichier = subprocess.argv[1]
-    charge_graphe_bbox(nom_fichier)
+    bbox = map(float, subprocess.argv[2].split(","))
+    print(f"bbox reçue : {bbox}")
+    charge_graphe_bbox(nom_fichier, bbox)
 
 
     

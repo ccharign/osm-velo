@@ -4,20 +4,23 @@
 import os
 import shutil
 import subprocess
+from datetime import datetime
 
-try:
-    os.chdir("site_vélo/dijk/progs_python/")
-except FileNotFoundError :
+if os.getcwd()=="/home/moi/git/osm vélo":
+    os.chdir("site_vélo/")
+else :
     print(f"Dossier actuel: {os.getcwd()}")
+    
+import osmnx.io
 
-from params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES
+from dijk.progs_python.params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, DONNÉES, BBOX_DÉFAUT
 from initialisation.crée_graphe import crée_graphe_bbox
 from initialisation.élaguage import élague_xml
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.nœuds_des_rues import sortie_csv as csv_nœud_des_rues
-from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes
-from module_graphe import graphe
-from datetime import datetime
+from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes
+from graphe_minimal import Graphe_minimaliste
+
 
 """
 Script pour tout initialiser, càd:
@@ -40,7 +43,7 @@ Il ne crée aucun objet Python, seulement des fichiers : peut être utilisé ind
 
 ## À FAIRE :
 # Quid du fichier osm élaguée ? Peut-on le tirer directement du graphe networkx ? Peut-on s’en passer entièrement ?
-# list des villes : utiliser overpass cette fois ?
+# liste des villes : utiliser overpass cette fois ?
 
 def sauv_fichier(chemin):
     """
@@ -56,37 +59,42 @@ def sauv_fichier(chemin):
     )
 
 
-def initialisation_sans_overpass(bbox=(-0.45, 43.2671, -0.2541, 43.3403), bavard=1):
+def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
     """
     Entrée : bbox : (o, s, e, n) bounding box de la zone de laquelle récupérer les données.
     
     Effet :
-       initialise les données qui ne nécessitent pas un gros téléchargement depuis openstreetmap mais qui passent uniquement par osmnx.
-       rema : Il faudra que je voie comment s’y prend osmnx !
+       Initialise les données qui ne nécessitent pas un gros téléchargement depuis openstreetmap mais qui passent uniquement par osmnx.
+       rema : Il faudra voir comment s’y prend osmnx !
 
        Précisément, cette procédure crée :
              - le graphe au format graphml
-             - rue_num_coords.csv (CHEMIN_RUE_NUM_COORDS) qui permet de retrouver les coords gps d’un numéro de rue
-             - nœuds_rues.csv (CHEMIN_NŒUDS_RUES) qui donne les nœuds de chaque rue 
              - nœuds_ville.csv (CHEMIN_NŒUDS_VILLES) qui donne les nœuds de chaque ville
-
+             - nœuds_rues.csv (CHEMIN_NŒUDS_RUES) qui donne les nœuds de chaque rue
     """
 
-    (o, s, e, n)=bbox
-    
-    print("Création du graphe via osmnx.")
-    g = graphe(crée_graphe_bbox(f'{DONNÉES}/{o}{s}{e}{n}.graphml', ouest=o, est=e, nord=n, sud=s))
-
-    print("Création de la liste des nœuds de chaque rue.")
-    sauv_fichier(CHEMIN_NŒUDS_RUES)
-    csv_nœud_des_rues(g)
-
+    (o, s, e, n) = bbox
+    nom_fichier=f'{DONNÉES}/{o}{s}{e}{n}.graphml'
+    try:
+        gr = osmnx.io.load_graphml(nom_fichier)
+        if bavard: print("Graphe en mémoire !")
+    except FileNotFoundError:
+        print("Création du graphe via osmnx.")
+        gr = crée_graphe_bbox(nom_fichier, ouest=o, est=e, nord=n, sud=s)
+    g=Graphe_minimaliste(gr)
     
     #print("Création de la liste des nœuds de chaque ville.")
     #sauv_fichier(CHEMIN_NŒUDS_VILLES)
     #csv_nœuds_des_villes()
+    
+    print("Ajout des villes dans le graphe")
+    ajoute_villes(g)
+    
+    print("Création de la liste des nœuds de chaque rue.")
+    sauv_fichier(CHEMIN_NŒUDS_RUES)
+    csv_nœud_des_rues(g)
 
-
+    return g
 
 
 def rajoute_donnée(bbox, garder_le_osm_complet=True):

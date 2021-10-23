@@ -4,7 +4,7 @@
 
 
 #import networkx as nx
-from params import RACINE_PROJET, DONNÉES
+from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
 from module_graphe import graphe  # ma classe de graphe
 
 from initialisation.ajoute_villes import ajoute_villes
@@ -16,7 +16,7 @@ import subprocess
 import os
 #ox.config(use_cache=True, log_console=True)
 
-BBOX = 43.2671, -0.4285, 43.3403, -0.2541 # Convention overpass : sud, ouest, nord, est
+
 
 
 # Pour la simplification dans osmnx :
@@ -29,13 +29,20 @@ BBOX = 43.2671, -0.4285, 43.3403, -0.2541 # Convention overpass : sud, ouest, no
 #################### Récupération du graphe via osmnx ####################
 
 
-def charge_graphe(ouest=-0.4285, sud=43.2671, est=-0.2541, nord=43.3403, option={"network_type":"all"}, bavard=1):
-    nom_fichier = f'{DONNÉES}/{ouest}{sud}{est}{nord}.graphml'
-    try:
+def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
+    """
+    Renvoie le graphe (instance de graphe) correspondant à la bbox indiquée.
+    """
+    
+    s,o,n,e = bbox 
+    nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
+    if bavard>0:print(bbox, nom_fichier)
+    if os.path.exists(nom_fichier):
         g = osmnx.io.load_graphml(nom_fichier)
-        if bavard: print("Graphe en mémoire !")
-    except FileNotFoundError:
-        sortie = subprocess.run(["python3", os.path.join(RACINE_PROJET, "initialisation/crée_graphe.py"), nom_fichier], capture_output=True)
+        if bavard>0: print("Graphe en mémoire !")
+    else:
+        print(f"\nGraphe pas en mémoire à {nom_fichier}, je le charge via osmnx.")
+        sortie = subprocess.run(["python3", os.path.join(RACINE_PROJET, "progs_python/initialisation/crée_graphe.py"), nom_fichier, str(bbox)], capture_output=True)
         print(sortie.stdout)
         print(sortie.stderr)
         g = osmnx.io.load_graphml(nom_fichier)

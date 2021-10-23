@@ -68,36 +68,6 @@ class graphe(Graphe_minimaliste):
         return self.digraphe[s][t]["length"]
 
 
-    def nb_arêtes_avec_ville(self):
-        return sum(
-            len([t for t in self.digraphe[s] if "ville" in self.digraphe[s][t]])
-            for s in self.digraphe.nodes 
-        )
-    
-
-    def rue_dune_arête(self, s, t, bavard=0):
-        """ Tuple des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
-            Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
-        try:
-            res = self.digraphe[s][t]["name"]
-            if isinstance(res, str):
-                return res,
-            else:
-                return res
-        except KeyError:
-            if bavard>0:
-                print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
-
-                
-    def ville_dune_arête(self, s, t, bavard=0):
-        """ Liste des villes contenant l’arête (s,t).
-        """
-        try:
-            return self.digraphe[s][t]["ville"] 
-        except KeyError:
-            if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
-            return []
-
     
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)

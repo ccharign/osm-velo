@@ -109,7 +109,8 @@ def sortie_csv(g, bavard=0):
 
                 
 def charge_csv(g):
-    """ Charge le dictionnaire depuis le csv et le met dans l’attribut nœuds du graphe g.
+    """ 
+    Charge le dictionnaire depuis le csv et le met dans l’attribut nœuds du graphe g.
     Les clefs (ville et rue) sont traitées via les fonctions de normalisation de lecture_adresse.normalisation.
     """
     with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
