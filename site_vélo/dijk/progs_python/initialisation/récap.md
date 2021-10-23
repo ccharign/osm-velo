@@ -8,13 +8,13 @@
 
 
 - Dans nœuds_des_rues.py:
-       Besoin que les villes aient été rentrées dans g. Précisément : ajoute_villes dans ajoute_villes.py a besoin de CHEMIN_NŒUDS_VILLE
-       sortie_csv(g) -> CHEMIN_NŒUDS_RUES
+       Besoin que les villes aient été rentrées dans g via ajoute_villes dans ajoute_villes.py, qui a besoin de CHEMIN_NŒUDS_VILLE
+       sortie_csv(g:grapheMinimaliste) -> CHEMIN_NŒUDS_RUES
            Lequel contient Ville;rue;nœuds
 
 
 - Dans ajoute_villes.py:
-       liste_villes() : CHEMIN_RUE_NUM_COORDS -> liste des villes
+       liste_villes() : variable globale avec liste des villes -> liste des villes
        crée_csv() : CHEMIN_RUE_NUM_COORDS -> CHEMIN_NŒUDS_VILLES   (contient ville;nœuds)
 
 

@@ -41,9 +41,12 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
         g = osmnx.io.load_graphml(nom_fichier)
         if bavard>0: print("Graphe en mémoire !")
     else:
-        print(f"\nGraphe pas en mémoire à {nom_fichier}, je le charge via osmnx.")
-        sortie = subprocess.run(["python3", os.path.join(RACINE_PROJET, "progs_python/initialisation/crée_graphe.py"), nom_fichier, str(bbox)], capture_output=True)
-        print(sortie.stdout)
+        print(f"\nGraphe pas en mémoire à {nom_fichier}, je le charge via osmnx.\\")
+
+        à_exécuter = ["python3", os.path.join(RACINE_PROJET, "progs_python/initialisation/crée_graphe.py"), nom_fichier, str(tuple(bbox))]
+        if bavard>0:print(à_exécuter)
+        sortie = subprocess.run(à_exécuter)
+        if bavard>1:print(sortie.stdout)
         print(sortie.stderr)
         g = osmnx.io.load_graphml(nom_fichier)
 

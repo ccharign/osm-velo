@@ -5,7 +5,7 @@
 
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
-
+import sys
 
 
 
@@ -32,14 +32,14 @@ charge_graphe = crée_graphe_bbox
 
 # Pour télécharger une carte avec overpass : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.4285,43.2671,-0.2541,43.3403]"
 #Agglo : wget -O pau.osm "https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox=-0.48,43.26,-0.25,43.35]"
+#Ne semble fonctionner que pour des petites zones.
 
-
-
-if __name__ == "main":
-    nom_fichier = subprocess.argv[1]
-    bbox = map(float, subprocess.argv[2].split(","))
+if __name__ == "__main__":
+    print(f"\ncrée_graphe.py lancé avec arguments {sys.argv}")
+    nom_fichier = sys.argv[1]
+    bbox = tuple(map(float, sys.argv[2][1:-1].split(",")))
     print(f"bbox reçue : {bbox}")
-    charge_graphe_bbox(nom_fichier, bbox)
+    crée_graphe_bbox(nom_fichier, bbox)
 
 
     
