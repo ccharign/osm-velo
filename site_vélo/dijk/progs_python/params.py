@@ -18,7 +18,7 @@ os.makedirs(TMP, exist_ok=True)
 os.makedirs(DONNÉES, exist_ok=True)
 
 CHEMIN_XML = os.path.join(DONNÉES, "voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
-#CHEMIN_XML_COMPLET = os.path.join(TMP,"pau_agglo.osm") # le .osm complet. Mis dans TMP pour ne pas être transféré sur github. # Ne devrait puls servir : seul le script initialisation.py crée et manipule le fichier
+#CHEMIN_XML_COMPLET = os.path.join(TMP,"pau_agglo.osm") # le .osm complet. Mis dans TMP pour ne pas être transféré sur github. # Ne devrait plus servir : seul le script initialisation.py crée et manipule le fichier
 CHEMIN_RUE_NUM_COORDS = os.path.join(DONNÉES,"rue_num_coords.csv")
 CHEMIN_NŒUDS_VILLES = os.path.join(DONNÉES,"nœuds_villes.csv")
 CHEMIN_NŒUDS_RUES = os.path.join(DONNÉES,"nœuds_rues.csv")

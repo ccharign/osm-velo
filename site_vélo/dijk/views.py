@@ -123,16 +123,17 @@ def confirme_nv_chemin(requête):
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
     pourcentage_détour = int(requête.POST["pourcentage_détour"])
     AR = bool_of_checkbox(requête.POST, "AR")
-    print("données reçues : ", noms_étapes, pourcentage_détour, AR, "\n")
+    rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
+    print(f"étapes : {noms_étapes}, pourcentage détour : {pourcentage_détour}, AR : {AR}, rues interdites : {rues_interdites}\n")
     
-    c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, bavard=2)
-    c.sauv()
+    c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
+    c.sauv(bavard=1)
     n_lectures(nb_lectures, g, [c], bavard=1)
-    tousLesChemins = chemins_of_csv(g, bavard=1)
+    #tousLesChemins = chemins_of_csv(g, bavard=1)
     #n_lectures(nb_lectures, g, tousLesChemins, bavard=1) # Trop long... À mettre ailleurs ? Dans un cron ?
     g.sauv_cache()
     g.sauv_cycla()
-    return render(requête, "dijk/merci.html", {"chemins":tousLesChemins, "chemin":c})
+    return render(requête, "dijk/merci.html", {"chemin":c})
 
 
 

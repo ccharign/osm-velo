@@ -72,29 +72,37 @@ class Chemin():
     """ Attributs : - p_détour (float)
                     - étapes (Étape list), liste de nœuds
                     - interdites : arêtes interdites. dico s->sommets interdits depuis s
+                    - noms_rues_interdites : str, noms des rues interdites séparées par ; (pour l’enregistrement en csv)
                     - AR (bool), indique si le retour est valable aussi.
                     - texte (None ou str), texte d'où vient le chemin (pour déboguage)
     """
-    def __init__(self, étapes, p_détour, AR, interdites={}):
+    def __init__(self, étapes, p_détour, AR, interdites={}, texte_interdites=""):
         assert p_détour>=0 and p_détour<=2, "Y aurait-il confusion entre la proportion et le pourcentage de détour?"
         self.étapes = étapes
         self.p_détour = p_détour
         self.AR = AR
         self.texte = None
         self.interdites=interdites
+        self.noms_rues_interdites=texte_interdites
     
     
     @classmethod
     def of_ligne(cls, ligne, g, tol=.25, bavard=0):
-        """ Entrée : ligne (str), une ligne du csv de chemins. Format AR|pourcentage_détour|étapes.
+        """ Entrée : ligne (str), une ligne du csv de chemins. Format AR|pourcentage_détour|étapes|rues interdites.
                      g (Graphe). Utilisé pour déterminer le nœud associé à chaque étape.
         tol indique la proportion tolérée d’étapes qui n’ont pas pu être trouvées.
         """
 
-        AR_t, pourcentage_détour_t, étapes_t = ligne.strip().split("|")
+        ## Extraction des données
+        AR_t, pourcentage_détour_t, étapes_t,rues_interdites_t = ligne.strip().split("|")
         p_détour = int(pourcentage_détour_t)/100.
         AR = bool(AR_t)
+
+        #rues interdites
+        noms_rues = rues_interdites_t.split(";")
+        interdites = arêtes_interdites(g, noms_rues, bavard=bavard)
         
+        # étapes 
         noms_étapes = étapes_t.split(";")
         n_pb = 0
         étapes=[]
@@ -106,16 +114,18 @@ class Chemin():
                 n_pb+=1
         if n_pb/len(noms_étapes) > tol:
             raise ÉchecChemin(f"{n_pb} erreurs pour la lecture de {ligne}.")
+
         
-        chemin = cls(étapes, p_détour, AR)
+        ## Création de l’objet Chemin
+        chemin = cls(étapes, p_détour, AR, interdites=interdites, texte_interdites=rues_interdites_t)
         chemin.texte = étapes_t
         return chemin
 
     
-    def sauv(self, adresse=CHEMIN_CHEMINS):
+    def sauv(self, adresse=CHEMIN_CHEMINS, bavard=0):
         """ Ajoute le chemin dans le csv, après avoir vérifié qu’il n’y est pas déjà."""
             
-        ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }\n"
+        ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }|{self.noms_rues_interdites}\n"
         
         with open(adresse) as entrée:
             for ligne_e in entrée:
@@ -125,6 +135,8 @@ class Chemin():
                 
         with open(adresse, "a") as sortie:
             sortie.write(ligne)
+        if bavard>0:
+            print("Chemin {self} enregistré dans {adress}.")
     
     @classmethod
     def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
@@ -140,7 +152,8 @@ class Chemin():
             print(f"List des étapes obtenues : {étapes}")
         
         return cls(étapes, pourcentage_détour/100, AR,
-                   interdites=arêtes_interdites(g, noms_rues_interdites)
+                   interdites=arêtes_interdites(g, noms_rues_interdites),
+                   texte_interdites=";".join(noms_rues_interdites)
                    )
     
     
@@ -166,7 +179,7 @@ class Chemin():
         if self.texte is not None:
             return self.texte
         else:
-            return ";".join(map(str, self.étapes))
+            return "étapes : " + ";".join(map(str, self.étapes)) + "rues interdites : " + self.noms_rues_interdites
 
     def texte_court(self, n_étapes=4):
         if len(self.étapes) <= n_étapes:
