@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 # -*- coding:utf-8 -*-
 
 ### À terme devrait être le seul fichier à utiliser osmnx, afin d’éviter de le charger dans les utilisations courantes.
@@ -6,7 +6,6 @@
 import osmnx as ox
 ox.config(use_cache=True, log_console=True)
 import sys
-
 
 
 def crée_graphe_bbox(nom_fichier, bbox, option={"network_type":"all"}, bavard=1):
@@ -38,7 +37,7 @@ if __name__ == "__main__":
     print(f"\ncrée_graphe.py lancé avec arguments {sys.argv}")
     nom_fichier = sys.argv[1]
     bbox = tuple(map(float, sys.argv[2][1:-1].split(",")))
-    print(f"bbox reçue : {bbox}")
+    print(f"nom_fichier={nom_fichier}, bbox reçue : {bbox}\n")
     crée_graphe_bbox(nom_fichier, bbox)
 
 

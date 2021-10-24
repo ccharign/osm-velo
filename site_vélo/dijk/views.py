@@ -48,7 +48,12 @@ def vue_itinéraire(requête):
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
+    if len(noms_étapes)>1:
+        texte_étapes = ",".join(noms_étapes[:-1])+" et "+noms_étapes[-1]
+    else:
+        texte_étapes = requête.POST["étapes"]
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
+    p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
     print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes}.")
 
     # Calcul des itinéraires
@@ -64,7 +69,9 @@ def vue_itinéraire(requête):
         """)
 
     # Chargement du template
-    return render(requête, "dijk/résultat_itinéraire.html", {"longueurs_et_couleurs": zip(longueurs, couleurs), "départ":d, "arrivée":a, "étapes":noms_étapes })
+    return render(requête, "dijk/résultat_itinéraire.html",
+                  {"longueurs_et_couleurs": zip(longueurs, couleurs), "départ":d, "arrivée":a, "étapes":texte_étapes, "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen }
+                  )
 
 
 
@@ -76,35 +83,41 @@ def contribution(requête):
 
 
 def visualisation_nv_chemin(requête):
-    return render(requête, "dijk/nouveau_chemin.html", {})
+    return render(requête, "dijk/iti_folium.html", {})
 
 
-def vérif_nv_chemin(requête, debug=0):
-    d=requête.POST["départ"]
-    a=requête.POST["arrivée"]
-    pourcent_détour= int(requête.POST["pourcentage_détour"])
-    étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
-    AR = bool_of_checkbox(requête.POST, "AR")
-    if debug>0: print(AR)
+# def vérif_nv_chemin(requête, debug=0):
+#     d=requête.POST["départ"]
+#     a=requête.POST["arrivée"]
+#     pourcent_détour= int(requête.POST["pourcentage_détour"])
+#     étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
+#     AR = bool_of_checkbox(requête.POST, "AR")
+#     if debug>0: print(AR)
 
-    c = Chemin.of_étapes([d]+étapes+[a], pourcent_détour,  AR, g, bavard=2)
-    longueur, longueur_direct = dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/nouveau_chemin.html", bavard=2)
-    requête.session["chemin_à_valider"] = ([d]+étapes+[a], pourcent_détour, AR) # session est un dictionnaire pour stocker du bazar propre à un utilisateur.
-    return render(requête, "dijk/vérif_nouveau_chemin.html", {"chemin":c, "longueurs":(longueur, longueur_direct)})
+#     c = Chemin.of_étapes([d]+étapes+[a], pourcent_détour,  AR, g, bavard=2)
+#     longueur, longueur_direct = dessine_chemin(c, g, où_enregistrer="dijk/templates/dijk/nouveau_chemin.html", bavard=2)
+#     requête.session["chemin_à_valider"] = ([d]+étapes+[a], pourcent_détour, AR) # session est un dictionnaire pour stocker du bazar propre à un utilisateur.
+#     return render(requête, "dijk/vérif_nouveau_chemin.html", {"chemin":c, "longueurs":(longueur, longueur_direct)})
 
         
 def confirme_nv_chemin(requête):
     nb_lectures=10
-    (étapes, p_détour, AR) = requête.session["chemin_à_valider"]
-    print(étapes, p_détour, AR, "\n")
-    c = Chemin.of_étapes(étapes, p_détour, AR, g)
+    #(étapes, p_détour, AR) = requête.session["chemin_à_valider"]
+    d=requête.POST["départ"]
+    a=requête.POST["arrivée"]
+    noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
+    pourcentage_détour = int(requête.POST["pourcentage_détour"])
+    AR = bool_of_checkbox(requête.POST, "AR")
+    print("données reçues : ", noms_étapes, pourcentage_détour, AR, "\n")
+    
+    c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, bavard=2)
     c.sauv()
     n_lectures(nb_lectures, g, [c], bavard=1)
     tousLesChemins = chemins_of_csv(g, bavard=1)
     #n_lectures(nb_lectures, g, tousLesChemins, bavard=1) # Trop long... À mettre ailleurs ? Dans un cron ?
     g.sauv_cache()
     g.sauv_cycla()
-    return render(requête, "dijk/merci.html", {"chemins":tousLesChemins})
+    return render(requête, "dijk/merci.html", {"chemins":tousLesChemins, "chemin":c})
 
 
 

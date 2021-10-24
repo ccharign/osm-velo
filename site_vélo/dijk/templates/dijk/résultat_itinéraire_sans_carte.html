@@ -7,16 +7,68 @@
   {% if étapes %}
   en passant par {{étapes}}.
   {% endif %}
-<aside>
+</p>
+
+
+<!-- Statistiques -->
+<p>
   Longueur des trajets calculés :
   <ul>
     {% for x in longueurs_et_couleurs %}
     <li> <span style = "color: {{x.1}};">{{x.0}} m </span></li>
     {% endfor %}
   </ul>
-</aside>
-<section>
+</p>
 
+<p>
+  <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire dans un onglet séparé </a>
+</p>
+
+
+
+<!-- Formulaire pour relancer le calcul -->
+<p>
+    <form action = "{% url 'itinéraire' %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" id="départ" name="départ" value="{{départ}}">
+
+      <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
+
+      <input type="hidden" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}"><br><br>
+
+      <label for="étapes"> Ajouter ou modifier les étapes ? </label><br>
+      <input type="text" id="étapes" name="étapes" value="{{post_préc.étapes}}" size=100 ><br><br>
+
+      <input type="submit" value="Recalculer l’itinéraire">
+    </form>
+</p>
+
+
+{% if étapes %}
+<!-- Formulaire pour enregistrer la contribution -->
+<p>
+  Si l’itinéraire affiché vous paraît judicieux, autrement dit si pour aller de {{départ}} à {{arrivée}} il vous semble judicieux de passer par {{étapes}}, remplissez le formulaire ci-dessous pour l’enregistrer dans la base de donnée et ainsi améliorer l’appli pour les prochains utilisateurs !
+</p>
+<p>
+    <form action = "{% url 'confirme nv chemin' %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" id="départ" name="départ" value="{{départ}}">
+      <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
+      <input type="hidden" id="étapes" name="étapes" value="{{post_préc.étapes}}">
+
+      <label for="pourcentage_détour"> Pourcentage de détour : </label>
+      <input type="number" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}"><br>
+      <label for="AR"> Valable aussi pour le retour ? </label>
+      <input type="checkbox" id="AR" name="AR"><br>
+
+      <input type="submit" value="Enregistrer la contribution">
+    </form>
+</p>
+
+{% endif %}
+
+<!-- La carte -->
+<section>
   <div class="carte">
   {% block carte %}
   {% endblock carte %}

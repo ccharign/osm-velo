@@ -101,11 +101,11 @@ class Chemin():
     @classmethod
     def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, bavard=0):
         """
-        Plutôt pour rentrer à la main un chemin.
         Entrées : noms_étapes (str list).
                   pourcentage_détour (int)
                   AR (bool)
                   g (Graphe)
+        Sortie : instance de Chemin
         """
         étapes = [Étape(é, g) for é in noms_étapes]
         if bavard>0:
