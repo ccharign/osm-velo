@@ -49,7 +49,8 @@ class graphe(Graphe_minimaliste):
              - interdites : arêtes interdites.
         """
         #assert s in self.digraphe.nodes, f"le sommet {s} reçu par la méthode voisins n’est pas dans le graphe"
-        cycla_corrigée = lambda voisin: (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
+        # Formule pour prendre en compte p_détour : cycla**(p_détour*1.5)
+        cycla_corrigée = lambda voisin: ( self.cyclabilité.get((s, voisin), 1.)**( p_détour*1.5))
         if s in interdites:
             return ( ( voisin, données["length"]/cycla_corrigée(voisin) )
                      for (voisin, données) in self.digraphe[s].items() if voisin not in interdites[s]

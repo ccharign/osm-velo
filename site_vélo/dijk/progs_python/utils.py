@@ -221,6 +221,8 @@ def affiche_rue(nom_ville, rue, g, bavard=0):
     sommets = g.nœuds[ville.nom][normalise_rue(rue, ville)]
     affiche_sommets(sommets, g)
 
+def moyenne(t):
+    return sum(t)/len(t)
 
 def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     """
@@ -242,13 +244,18 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
 
         
 
-    nœuds_par_cycla = [ set([]) for i in range(n_coul)]
+    nœuds_par_cycla = [ set() for i in range(n_coul)]
     
 
     for s in g.digraphe.nodes:
         for t in g.voisins_nus(s):
+            vals=[]
             if (s,t) in g.cyclabilité:
-                i=num_paquet(g.cyclabilité[(s,t)])
+                vals.append(g.cyclabilité[(s,t)])
+            if (t,s) in g.cyclabilité:
+                vals.append(g.cyclabilité[(t,s)])
+            if len(vals)>0:
+                i=num_paquet(moyenne(vals))
                 nœuds_par_cycla[i].add(s)
                 nœuds_par_cycla[i].add(t)
 
