@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% block head_début %}  {{head}}  {% endblock %}
 	    
 {% block contenu %}
 
@@ -10,12 +11,15 @@
 </p>
 
 
+
+
+
 <!-- Statistiques -->
 <p>
   Longueur des trajets calculés :
   <ul>
-    {% for x in stats %}
-    <li> <span style = "color: {{x.3}};"> {{x.0}} : longueur : {{x.1}} m, longueur ressentie : {{x.2}} m </span></li>
+    {% for x in longueurs_et_couleurs %}
+    <li> <span style = "color: {{x.1}};">{{x.0}} m </span></li>
     {% endfor %}
   </ul>
 </p>
@@ -44,8 +48,10 @@
 </p>
 
 
-{% if étapes %}
+
+
 <!-- Formulaire pour enregistrer la contribution -->
+{% if étapes %}
 <p>
   Si l’itinéraire affiché vous paraît judicieux, autrement dit si pour aller de {{départ}} à {{arrivée}} il vous semble judicieux de passer par {{étapes}}, remplissez le formulaire ci-dessous pour l’enregistrer dans la base de donnée et ainsi améliorer l’appli pour les prochains utilisateurs !
 </p>
@@ -64,15 +70,24 @@
       <input type="submit" value="Enregistrer la contribution">
     </form>
 </p>
-
 {% endif %}
+
+
+
 
 <!-- La carte -->
 <section>
+
   <div class="carte">
-  {% block carte %}
-  {% endblock carte %}
+    {{body}}
+
+    {{script}}
   </div>
 </section>
 
 {% endblock contenu %}
+
+
+{% block script %}
+{{script}}
+{% endblock %}

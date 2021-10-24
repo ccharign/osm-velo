@@ -39,7 +39,11 @@ def récup_head_body_script(chemin):
 
         script = suite.split("<script>")[1].split("</script>")[0]
     return head, body, script
-    
+
+
+def visualisation_nv_chemin(requête):
+    return render(requête, "dijk/iti_folium.html", {})
+
     
 def vue_itinéraire(requête):
     """ Doit récupérer le résultat du formulaire via un post."""
@@ -57,33 +61,37 @@ def vue_itinéraire(requête):
     print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes}.")
 
     # Calcul des itinéraires
-    longueurs, couleurs = itinéraire(d, a, ps_détour, g, noms_étapes=noms_étapes, bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html" )
+    stats = itinéraire(d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0, noms_étapes=noms_étapes, bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html" )
 
     # Création du template
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
     with open("dijk/templates/dijk/résultat_itinéraire.html", "w") as sortie:
         sortie.write(f"""
         {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
-        {{% block head_suite %}}  {head}  {{% endblock %}}
-        {{% block carte %}} {body}\n <script> {script} </script> {{% endblock %}}
+        {{% block head_début %}}  {head}  {{% endblock %}}
+        {{% block carte %}} {body} {{% endblock %}}
+        {{% block script %}} <script> {script} </script> {{% endblock %}}
         """)
 
     # Chargement du template
     return render(requête, "dijk/résultat_itinéraire.html",
-                  {"longueurs_et_couleurs": zip(longueurs, couleurs), "départ":d, "arrivée":a, "étapes":texte_étapes, "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen }
+                  {"stats": stats,
+                   "départ":d, "arrivée":a, "étapes":texte_étapes, "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
+                   }
                   )
+
 
 
 
 ### Ajout d’un nouvel itinéraire ###
 
 def contribution(requête):
-    """ Page du formulaire pour ajouter un chemin."""
+    """ Page du formulaire pour ajouter un chemin.
+    À remplacer par une page « Comment aider » ?
+    """
     return render(requête, "dijk/contribution.html", {})
 
 
-def visualisation_nv_chemin(requête):
-    return render(requête, "dijk/iti_folium.html", {})
 
 
 # def vérif_nv_chemin(requête, debug=0):

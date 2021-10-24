@@ -47,7 +47,7 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, ps_détour, g, noms_étapes=[], où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
+def itinéraire(départ, arrivée, ps_détour, g, rajouter_iti_direct=True, noms_étapes=[], où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
@@ -56,8 +56,9 @@ def itinéraire(départ, arrivée, ps_détour, g, noms_étapes=[], où_enregistr
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
              Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
-    Sorie : liste des longueurs des itinéraires calculés, liste des couleurs utilisées
+    Sortie : liste de (légend, longeur, longueur ressentie, couleur) pour les itinéraires obtenus
     """
+    
     d = chemins.Étape(départ, g)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
@@ -70,17 +71,24 @@ def itinéraire(départ, arrivée, ps_détour, g, noms_étapes=[], où_enregistr
 
     np = len(ps_détour)
     à_dessiner = []
-    longueurs = []
-    couleurs = []
-    for i, p in enumerate( ps_détour):
+    res = []
+    for i, p in enumerate(ps_détour):
         c = chemins.Chemin([d]+étapes+[a], p, False)
-        iti, _ = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
+        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti, coul))
-        longueurs.append(g.longueur_itinéraire(iti))
-        couleurs.append(coul)
+        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
+
+    if rajouter_iti_direct:
+        c = chemins.Chemin([d,a], 0, False)
+        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
+        coul = "#000000"
+        à_dessiner.append( (iti, coul))
+        res.append(("Itinéraire direct", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
+
+        
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
-    return longueurs, couleurs
+    return res
     
 
 

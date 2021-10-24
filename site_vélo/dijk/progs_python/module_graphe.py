@@ -55,7 +55,7 @@ class graphe(Graphe_minimaliste):
     def longueur_itinéraire(self, iti):
         """
         Entrée : un itinéraire (liste de sommets)
-        Sortie : sa « vraie » longueur.
+        Sortie : partie entière de sa « vraie » longueur.
         """
         return int(sum(self.longueur_arête(s,t) for s,t in deuxConséc(iti)))
         
