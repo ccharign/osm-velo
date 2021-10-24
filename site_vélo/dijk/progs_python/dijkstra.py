@@ -78,23 +78,24 @@ def chemin_étapes(g, c):
 #######################################################################
 
 
-def arêtesDoubles(g, s, p_détour):
+def arêtesDoubles(g, s, p_détour, interdites):
     """ Itérateur sur les chemins de longueur 2 issus de s"""
-    for v1, d1 in g.voisins(s, p_détour):
-        for v2, d2 in g.voisins(v1, p_détour):
+    for v1, d1 in g.voisins(s, p_détour, interdites=interdites):
+        for v2, d2 in g.voisins(v1, p_détour, interdites=interdites):
             if v2!=s:
                 yield ((v1,d1), (v2,d2))
 
 
 
-def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étape):
+def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étape, interdites, bavard=0):
     """
-    Entrées : g, graphe avec méthode voisins qui prend un sommet et un p_détour et qui renvoie une liste de (voisin, longueur de l’arête)
-              départ et arrivée, ensembles de sommets
-              p_détour ∈ [0,1]
-              dist : dictionnaire donnant la distance initiale à prendre pour chaque élément de départ (utile quand départ sera une étape intermédiaire)
-              pred : dictionnaire des prédécesseurs déjà calculés.
-              première_étape (bool) : indique si on en est à la première étape du trajet final.
+    Entrées : - g, graphe avec méthode voisins qui prend un sommet et un p_détour et qui renvoie une liste de (voisin, longueur de l’arête)
+              - départ et arrivée, ensembles de sommets
+              - p_détour ∈ [0,1]
+              - dist : dictionnaire donnant la distance initiale à prendre pour chaque élément de départ (utile quand départ sera une étape intermédiaire)
+              - pred : dictionnaire des prédécesseurs déjà calculés.
+              - première_étape (bool) : indique si on en est à la première étape du trajet final.
+              - interdites : arêtes interdites. dico s->voisins interdits depuis s.
 
     Effet : pred et dist sont remplis de manière à fournir tous les plus courts chemins d’un sommet de départ vers un sommet d’arrivée, en prenant compte des bonus/malus liés aux valeurs initiales de dist.
     Sauf si première_étape, on impose de passer par au moins une arête de départ.
@@ -102,6 +103,8 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
     Attention : pred pourra contenir des couples par moments !
     """
 
+    if bavard>0:
+        print(f"Arêtes interdites dans vers_une_étape : {interdites}")
     àVisiter = []
     for (s, d) in dist.items():
         heappush(àVisiter, (d, s))
@@ -110,14 +113,14 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
     sommetsFinalsTraités = set({})
 
     def boucle_par_arêtes_doubles(s):
-        for ((v1,d1), (v2, d2)) in arêtesDoubles(g, s, p_détour):
+        for ((v1,d1), (v2, d2)) in arêtesDoubles(g, s, p_détour, interdites):
              if v1 in départ and (v2 not in dist or dist[s]+d1+d2 < dist[v2]):  # Passer par v1,v2 vaut le coup
                  dist[v2] = dist[s]+d1+d2
                  pred[v2] = (v1,s)
                  heappush(àVisiter, (dist[v2]+heuristique(g, v2, arrivée), v2))
 
     def boucle_simple(s):
-        for t, l in g.voisins(s, p_détour):
+        for t, l in g.voisins(s, p_détour, interdites=interdites):
                 if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
                     dist[t] = dist[s]+l
                     heappush(àVisiter, (dist[t]+heuristique(g, t, arrivée) , t))
@@ -141,10 +144,10 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
 
                     
 def reconstruction(chemin, pred, départ):
-    """ Entrées : chemin, la fin du chemin retourné. chemin[0] est le point d’arrivée final, chemin[-1] est un sommet dans l’arrivée de cette étape.
-                  départ, sommets de départ de l’étape (structure permettant un «in»)
-                  arrivée, sommets d’arrivée de l’étape. Doit être itérable
-                  pred, le dictionnaire sommet -> sommet ou couple de sommets précédents, créé par Dijkstra.
+    """ Entrées : - chemin, la fin du chemin retourné. chemin[0] est le point d’arrivée final, chemin[-1] est un sommet dans l’arrivée de cette étape.
+                  - départ, sommets de départ de l’étape (structure permettant un «in»)
+                  - arrivée, sommets d’arrivée de l’étape. Doit être itérable
+                  - pred, le dictionnaire sommet -> sommet ou couple de sommets précédents, créé par Dijkstra.
         Effet : remplit chemin avec un plus court trajet de chemin[-1] vers un sommet de départ.
     """  
     s = chemin[-1]
@@ -160,8 +163,9 @@ def reconstruction(chemin, pred, départ):
 
 def chemin_étapes_ensembles(g, c, bavard=0):
     """
-    Entrées : départ et arrivée, deux sommets
-              c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds.)
+    Entrées : - départ et arrivée, deux sommets
+              - c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds.)
+              - interdites : arêtes interdites. dico s->sommets interdits depuis s.
     Sortie : plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins une arête de chaque étape intéremédiaire.
     """
     
@@ -176,7 +180,7 @@ def chemin_étapes_ensembles(g, c, bavard=0):
     for i in range(1, len(étapes)):
         if bavard>0:
             print(f"Recherche d’un chemin de {étapes[i-1]} à {étapes[i]}.")
-        vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred, i==1)
+        vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred, i==1, c.interdites, bavard=bavard)
         if bavard>0: print(f"Je suis arrivé à {étapes[i]}")
         preds_précs.append(copy.deepcopy(pred))  # pour la reconstruction finale
         # preds_précs[k] contient les données pour aller de étapes[k] vers étapes[k+1], k==i-1

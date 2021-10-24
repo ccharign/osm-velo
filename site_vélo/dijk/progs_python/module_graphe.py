@@ -40,16 +40,24 @@ class graphe(Graphe_minimaliste):
         self.nœuds = {}
 
         
-    def voisins(self, s, p_détour):
+    def voisins(self, s, p_détour, interdites={}):
         """
-        La méthode utilisée par dijkstra.
-        Renvoie les couples (voisin, longueur de l'arrête) issus du sommet s.
-        p_détour (float) : pourcentage de détour accepté.
+        La méthode utilisée par dijkstra. Renvoie les couples (voisin, longueur de l'arrête) issus du sommet s.
         La longueur de l'arrête (s,t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
+        Paramètres :
+             - p_détour (float) : pourcentage de détour accepté.
+             - interdites : arêtes interdites.
         """
         #assert s in self.digraphe.nodes, f"le sommet {s} reçu par la méthode voisins n’est pas dans le graphe"
         cycla_corrigée = lambda voisin: (p_détour * self.cyclabilité.get((s, voisin), 1.) + 1 - p_détour)
-        return ( ( voisin, données["length"]/cycla_corrigée(voisin) )  for (voisin, données) in self.digraphe[s].items() )
+        if s in interdites:
+            return ( ( voisin, données["length"]/cycla_corrigée(voisin) )
+                     for (voisin, données) in self.digraphe[s].items() if voisin not in interdites[s]
+                    )
+        else:
+            return ( ( voisin, données["length"]/cycla_corrigée(voisin) )
+                     for (voisin, données) in self.digraphe[s].items()
+                    )
 
 
     def longueur_itinéraire(self, iti):

@@ -58,10 +58,16 @@ def vue_itinéraire(requête):
         texte_étapes = requête.POST["étapes"]
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
     p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
-    print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes}.")
+    rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
+    print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
 
     # Calcul des itinéraires
-    stats = itinéraire(d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0, noms_étapes=noms_étapes, bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html" )
+    stats = itinéraire(
+        d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0,
+        noms_étapes=noms_étapes,
+        rues_interdites=rues_interdites,
+        bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html"
+    )
 
     # Création du template
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")

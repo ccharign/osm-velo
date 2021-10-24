@@ -37,23 +37,51 @@ class Étape():
         self.nœuds = set(n)
         for n in self.nœuds:
             assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
-
+        
+        
     def __str__(self):
         return str(self.adresse)
+
+
+def dico_arête_of_nœuds(g, nœuds):
+    """
+    Entrée : nœuds, un ensemble de sommets
+    Sortie : dictionnaire s->voisins de s qui sont dans nœuds
+    """
+    return {
+        s: set((t for t in g.voisins_nus(s) if t in nœuds))
+        for s in nœuds
+    }
+
+
+def arêtes_interdites(g, noms_rues, bavard=0):
+    """
+    Entrée : g, graphe
+             noms_rues, liste de noms de rues à éviter
+    Sortie : dico des arêtes correspondant
+    """
+    interdites={}
+    for r in noms_rues:
+        interdites.update(
+            dico_arête_of_nœuds(g, nœuds_of_étape(r, g, bavard=bavard)[0])
+        )
+    return interdites
 
 
 class Chemin():
     """ Attributs : - p_détour (float)
                     - étapes (Étape list), liste de nœuds
+                    - interdites : arêtes interdites. dico s->sommets interdits depuis s
                     - AR (bool), indique si le retour est valable aussi.
                     - texte (None ou str), texte d'où vient le chemin (pour déboguage)
     """
-    def __init__(self, étapes, p_détour, AR):
+    def __init__(self, étapes, p_détour, AR, interdites={}):
         assert p_détour>=0 and p_détour<=2, "Y aurait-il confusion entre la proportion et le pourcentage de détour?"
         self.étapes = étapes
         self.p_détour = p_détour
         self.AR = AR
         self.texte = None
+        self.interdites=interdites
     
     
     @classmethod
@@ -99,7 +127,7 @@ class Chemin():
             sortie.write(ligne)
     
     @classmethod
-    def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, bavard=0):
+    def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
         """
         Entrées : noms_étapes (str list).
                   pourcentage_détour (int)
@@ -110,7 +138,10 @@ class Chemin():
         étapes = [Étape(é, g) for é in noms_étapes]
         if bavard>0:
             print(f"List des étapes obtenues : {étapes}")
-        return cls(étapes, pourcentage_détour/100, AR)
+        
+        return cls(étapes, pourcentage_détour/100, AR,
+                   interdites=arêtes_interdites(g, noms_rues_interdites)
+                   )
     
     
     def départ(self):

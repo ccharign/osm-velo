@@ -17,7 +17,7 @@ import chemins  # classe chemin et lecture du csv
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
 import récup_données
-import module_graphe
+#import module_graphe
 import webbrowser
 from matplotlib import cm
 import folium
@@ -30,8 +30,8 @@ def flatten(c):
     return res
 
 
-def ouvre_html(chemin):
-    webbrowser.open(chemin)
+def ouvre_html(fichier):
+    webbrowser.open(fichier)
 
 
 def cheminsValides(chemins, g):
@@ -47,7 +47,9 @@ def cheminsValides(chemins, g):
     return res
 
 
-def itinéraire(départ, arrivée, ps_détour, g, rajouter_iti_direct=True, noms_étapes=[], où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
+def itinéraire(départ, arrivée, ps_détour, g,
+               rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
+               où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
@@ -58,7 +60,8 @@ def itinéraire(départ, arrivée, ps_détour, g, rajouter_iti_direct=True, noms
              Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
     Sortie : liste de (légend, longeur, longueur ressentie, couleur) pour les itinéraires obtenus
     """
-    
+
+    ## Calcul des étapes
     d = chemins.Étape(départ, g)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
@@ -67,14 +70,19 @@ def itinéraire(départ, arrivée, ps_détour, g, rajouter_iti_direct=True, noms
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
     étapes = [chemins.Étape(é, g) for é in noms_étapes]
+
+    ## Arêtes interdites
+    interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
+
     
 
     np = len(ps_détour)
     à_dessiner = []
     res = []
     for i, p in enumerate(ps_détour):
-        c = chemins.Chemin([d]+étapes+[a], p, False)
+        c = chemins.Chemin([d]+étapes+[a], p, False, interdites=interdites)
         iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
+        if bavard>1:print(iti)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti, coul))
         res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
