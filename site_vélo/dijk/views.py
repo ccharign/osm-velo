@@ -82,7 +82,8 @@ def vue_itinéraire(requête):
     # Chargement du template
     return render(requête, "dijk/résultat_itinéraire.html",
                   {"stats": stats,
-                   "départ":d, "arrivée":a, "étapes":texte_étapes, "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
+                   "départ":d, "arrivée":a, "étapes":texte_étapes,
+                   "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
                    }
                   )
 
