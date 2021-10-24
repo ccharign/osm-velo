@@ -1,11 +1,13 @@
 
 À FAIRE :
 
+Pb de collision si deux utilisateurs en même temps
+    -> donner un nom personalisé aux fichiers html produits
+    -> les nettoyer après coup
+
 Mettre dans le cache les noms osm de lieux récupérés via nominatim
 
 Afficher les étapes sur la carte
-
-Ne pas renvoyer la longueur des chemins dans Dijkstra
 
 
 Il existe des rues qui figurent dans rue_num_coord, donc qui étaient dans le .osm, mais qui ne sont pas dans nœuds_rue. Ce dernier est créé par nœuds_des_rues.py. Par exemple place reine marguerite, dont le nœud du graphe est 339262446.
@@ -21,9 +23,6 @@ Problème lorsqu’une rue ne contient qu’un sommet de g, donc aucune arête.
         -> mettre dans la base de Django
 	-> Classe Ville_django avec les mêmes méthodes que Ville. Càd code, nom_complet et nom_norm
 
-
-- A*
-  -> Y-a-t-il une difficulté due aux ensembles ?
 
 - Accélérer l'apprentissage. Sauvegarder les trajets calculé par Dijkstra ?
 
