@@ -7,7 +7,9 @@
 
 from importlib import reload  # recharger un module après modif
 import os
-import params
+if os.path.split(os.getcwd())[1]=="progs_python":
+    os.chdir("../..")
+import dijk.progs_python.params
 from init_graphe import charge_graphe  # le graphe de Pau par défaut
 import apprentissage
 import dijkstra
