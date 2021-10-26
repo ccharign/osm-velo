@@ -7,9 +7,11 @@
 
 from importlib import reload  # recharger un module après modif
 import os
+import params
 if os.path.split(os.getcwd())[1]=="progs_python":
     os.chdir("../..")
-import dijk.progs_python.params
+
+
 from init_graphe import charge_graphe  # le graphe de Pau par défaut
 import apprentissage
 import dijkstra
@@ -19,4 +21,5 @@ import chemins  # classe chemin et lecture du csv
 from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT
 import utils
 import petites_fonctions
-g = charge_graphe(bavard=3)
+g = charge_graphe(bavard=3
+)
