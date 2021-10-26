@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from dijk.progs_python.params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
+from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
 from récup_données import cherche_lieu, coords_lieu, coords_of_adresse
 import module_graphe
 import os
