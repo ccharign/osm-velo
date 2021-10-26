@@ -71,6 +71,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
         print(f"Arrivée trouvé : {a}")
     étapes = [chemins.Étape(é, g) for é in noms_étapes]
 
+
     ## Arêtes interdites
     interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
 
