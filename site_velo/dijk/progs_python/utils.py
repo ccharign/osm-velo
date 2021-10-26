@@ -2,7 +2,7 @@
 
 ### Fonctions diverses pour utiliser le logiciel
 
-from dijk.progs_python.params import TMP
+from params import TMP
 from importlib import reload  # recharger un module après modif
 import subprocess
 import networkx as nx  # graphe
