@@ -10,7 +10,7 @@ from recup_donnees import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
 from petites_fonctions import distance_euc, deuxConséc
 from collections import deque
-from lecture_adresse.recup_nœuds import tous_les_nœuds
+from dijk.progs_python.lecture_adresse.recup_nœuds import tous_les_nœuds
 from graphe_minimal import Graphe_minimaliste
 
 class PasTrouvé(Exception):
