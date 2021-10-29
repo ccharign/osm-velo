@@ -16,7 +16,7 @@ import chemins  # classe chemin et lecture du csv
 
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
-import récup_données
+import recup_donnees
 #import module_graphe
 import webbrowser
 from matplotlib import cm

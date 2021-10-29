@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
-from récup_données import cherche_lieu, coords_lieu, coords_of_adresse
+from recup_donnees import cherche_lieu, coords_lieu, coords_of_adresse
 import module_graphe
 import os
 from lecture_adresse.normalisation import VILLE_DÉFAUT

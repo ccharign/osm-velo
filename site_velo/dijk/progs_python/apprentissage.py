@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from module_graphe import graphe
-from récup_données import coords_lieu
+from recup_donnees import coords_lieu
 import dijkstra
 
 ETA = 0.1
