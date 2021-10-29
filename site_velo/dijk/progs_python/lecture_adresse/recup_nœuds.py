@@ -2,7 +2,7 @@
 import module_graphe
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville, Adresse
 import re
-from récup_données import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local
+from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local
 from petites_fonctions import distance_euc
 from params import LOG_PB
 

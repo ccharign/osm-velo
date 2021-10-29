@@ -49,7 +49,7 @@ def cheminsValides(chemins, g):
 
 def itinéraire(départ, arrivée, ps_détour, g,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
-               où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
+               où_enregistrer=os.path.join(TMP, "itinéraire.html".encode("utf-8")), bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
@@ -153,7 +153,7 @@ n_coul = len(list_colors)
 
 
 
-def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
+def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html".encode("utf-8")), ouvrir=False, bavard=0):
     """ 
     Entrées :
        - c (instance de Chemin)
@@ -207,7 +207,7 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
     ouvre_html(nom)
 
 
-def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
+def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets".encode("utf-8")), ouvrir = True):
     """ Entrée : s, liste de sommets """
     dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
 
@@ -272,7 +272,7 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
             else:
                 carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
         
-    nom = os.path.join(où_enregistrer, "cycla.html")
+    nom = os.path.join(où_enregistrer, "cycla.html".encode("utf-8"))
     carte.save(nom)
     if ouvrir : ouvre_html(nom)
 

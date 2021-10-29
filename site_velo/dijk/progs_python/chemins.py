@@ -206,7 +206,7 @@ def chemins_of_csv(g, adresse_csv=CHEMIN_CHEMINS, bavard=0):
     return res
 
 
-def formulaire_vers_csv(ad_entrée=os.path.join(DONNÉES,"chemins_form.csv"), ad_sortie = CHEMIN_CHEMINS ):
+def formulaire_vers_csv(ad_entrée=os.path.join(DONNÉES,"chemins_form.csv".encode("utf-8")), ad_sortie = CHEMIN_CHEMINS ):
     """ 
     Entrées : adresse d’un csv issu du framaform
               autre adresse
