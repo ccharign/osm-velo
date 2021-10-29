@@ -131,7 +131,7 @@ def créationArbre():
     """
     res = {}
     print(f"Chargement de l’arbre des rues depuis {CHEMIN_NŒUDS_RUES}.")
-    with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
+    with open(CHEMIN_NŒUDS_RUES, "r", encoding="utf-8") as entrée:
         for ligne in entrée:
             ville, rue, _ = ligne.strip().split(";")
             ville_n = str(normalise_ville(ville))
