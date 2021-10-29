@@ -12,10 +12,10 @@ sys.path.append("dijk/")
 
 RACINE_PROJET="dijk/"
 
-DONNÉES = os.path.join(RACINE_PROJET,"données/Pau").encode("utf-8")
+DONNÉES = os.path.join(RACINE_PROJET,"données/Pau")
 TMP = os.path.join(RACINE_PROJET, "tmp/")
-os.makedirs(TMP, exist_ok=True)
-os.makedirs(DONNÉES, exist_ok=True)
+os.makedirs(TMP.encode("utf-8"), exist_ok=True)
+os.makedirs(DONNÉES.encode("utf-8"), exist_ok=True)
 
 CHEMIN_XML = os.path.join(DONNÉES, "voies_et_nœuds.osm")  #Adresse du fichier .osm élagué utilisé pour chercher les nœuds d'une rue.
 #CHEMIN_XML_COMPLET = os.path.join(TMP,"pau_agglo.osm") # le .osm complet. Mis dans TMP pour ne pas être transféré sur github. # Ne devrait plus servir : seul le script initialisation.py crée et manipule le fichier
