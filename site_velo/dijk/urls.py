@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     #path("itinéraireDirect/<str:départ>/<str:arrivée>/<int:pourcentage_détour>", views.vue_itinéraire_direct),
-    path("itineraire", views.vue_itinéraire, name="itinéraire"),
+    path("resultat", views.vue_itinéraire, name="résultat"),
     
     path("contribution", views.contribution, name="contribution"), 
     #path("vérif_nv_chemin", views.vérif_nv_chemin, name="vérif nouveau chemin"), # page intermédiaire pour vérifier le chemin entré.
