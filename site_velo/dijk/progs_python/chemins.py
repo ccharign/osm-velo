@@ -8,7 +8,7 @@ from lecture_adresse.normalisation import VILLE_DÉFAUT
 import re
 import dijkstra
 from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville
-from lecture_adresse.recup_nœuds import nœuds_of_étape
+from lecture_adresse.recup_noeuds import nœuds_of_étape
 #Pour test
 #import init_graphe
 #g = init_graphe.charge_graphe(bavard=1)
