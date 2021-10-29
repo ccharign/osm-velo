@@ -152,7 +152,7 @@ def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
 def charge_rue_num_coords():
     """ Renvoie le dictionnaire ville -> rue -> parité -> liste des (numéros, coords)"""
-    entrée = open(CHEMIN_RUE_NUM_COORDS)
+    entrée = open(CHEMIN_RUE_NUM_COORDS, encoding="utf-8")
     res = {}
     for ligne in entrée:
         villerue, tmp = ligne.strip().split(":")
@@ -182,7 +182,7 @@ def sauv_rue_nom_coords(d=D_RUE_NUM_COORDS):
     ville; rue : liste_pairs;liste_impairs
     Où liste_pairs et liste_impairs sont des (num, lat, lon) séparés par des |
     """
-    sortie = open(CHEMIN_JSON_NUM_COORDS,"w")
+    sortie = open(CHEMIN_JSON_NUM_COORDS,"w", encoding="utf-8")
     for ville in d.keys():
         villen = normalise_ville(ville)
         for rue in d[ville].keys():

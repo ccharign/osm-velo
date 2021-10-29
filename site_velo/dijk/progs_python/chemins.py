@@ -127,13 +127,13 @@ class Chemin():
             
         ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }|{self.noms_rues_interdites}\n"
         
-        with open(adresse) as entrée:
+        with open(adresse, encoding="utf-8") as entrée:
             for ligne_e in entrée:
                 if ligne_e==ligne:
                     print(f"Ligne déjà présente : {ligne}")
                     return None
                 
-        with open(adresse, "a") as sortie:
+        with open(adresse, "a", encoding="utf-8") as sortie:
             sortie.write(ligne)
         if bavard>0:
             print("Chemin {self} enregistré dans {adress}.")
@@ -193,7 +193,7 @@ def chemins_of_csv(g, adresse_csv=CHEMIN_CHEMINS, bavard=0):
     """
     Renvoie la liste des chemins contenus dans le csv.
     """
-    entrée = open(adresse_csv)
+    entrée = open(adresse_csv, encoding="utf-8")
     #res=[g.chemin_of_string(ligne) for ligne in entrée ]
     res = []
     for ligne in entrée:
@@ -219,8 +219,8 @@ def formulaire_vers_csv(ad_entrée=os.path.join(DONNÉES,"chemins_form.csv"), ad
             return False
         else:
             raise ValueError(f"J’attendais 'oui' ou 'non' mai j’ai eu {t}.")
-    entrée = open(ad_entrée)
-    sortie = open(ad_sortie,"w")
+    entrée = open(ad_entrée, encoding="utf-8")
+    sortie = open(ad_sortie,"w", encoding="utf-8")
     for ligne in entrée:
         données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
         assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."

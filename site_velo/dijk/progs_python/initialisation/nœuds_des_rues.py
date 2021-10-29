@@ -101,7 +101,7 @@ def sortie_csv(g, bavard=0):
     """
     res = extrait_nœuds_des_rues(g, bavard=bavard)
     print(f"Enregistrement des nœuds des rues dans {CHEMIN_NŒUDS_RUES}")
-    with open(CHEMIN_NŒUDS_RUES, "w") as sortie:
+    with open(CHEMIN_NŒUDS_RUES, "w", encoding="utf-8") as sortie:
         for ville, d in res.items():
             for rue, nœuds in d.items():
                 ligne = f"{ville};{rue};{','.join(map(str,nœuds))}\n"
@@ -113,7 +113,7 @@ def charge_csv(g):
     Charge le dictionnaire depuis le csv et le met dans l’attribut nœuds du graphe g.
     Les clefs (ville et rue) sont traitées via les fonctions de normalisation de lecture_adresse.normalisation.
     """
-    with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
+    with open(CHEMIN_NŒUDS_RUES, "r", encoding="utf-8") as entrée:
         for ligne in entrée:
             ville, rue, nœuds_à_découper = ligne.strip().split(";")
             ville = normalise_ville(ville)

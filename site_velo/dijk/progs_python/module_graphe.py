@@ -163,7 +163,7 @@ class graphe(Graphe_minimaliste):
        
     def sauv_cache(self):
         """ L’adresse du fichier csv est dans CHEMIN_CACHE."""
-        sortie = open(CHEMIN_CACHE, "w")
+        sortie = open(CHEMIN_CACHE, "w", encoding="utf-8")
         
         for c, v in self.nœud_of_rue.items():
             à_écrire = ",".join(map(str, v))
@@ -172,7 +172,7 @@ class graphe(Graphe_minimaliste):
 
     def charge_cache(self):
         print("Chargement du cache nœud_of_rue.")
-        entrée = open(CHEMIN_CACHE)
+        entrée = open(CHEMIN_CACHE, encoding="utf-8")
         for ligne in entrée:
             c, v = ligne.strip().split(":")
             l = list(map(int, v.split(",")))
@@ -181,14 +181,14 @@ class graphe(Graphe_minimaliste):
 
     def vide_cache(self):
         print("J’efface le cache des adresses")
-        entrée = open(CHEMIN_CACHE, "w")
+        entrée = open(CHEMIN_CACHE, "w", encoding="utf-8")
         entrée.close()
         self.nœud_of_rue={}
        
     def sauv_cycla(self):
         """ chemin : adresse et nom du fichier, sans l'extension"""
         print("Sauvegarde de la cyclabilité")
-        sortie = open(CHEMIN_CYCLA, "w")
+        sortie = open(CHEMIN_CYCLA, "w", encoding="utf-8")
         for (s, t), v in self.cyclabilité.items():
             sortie.write(f"{s};{t};{v}\n")
         sortie.close()
@@ -196,7 +196,7 @@ class graphe(Graphe_minimaliste):
     def charge_cycla(self):
         """ Charge la  cycla depuis le csv, et enregistre le max en attribut du graphe."""
         print("Chargement de la cyclabilité")
-        entrée = open(CHEMIN_CYCLA)
+        entrée = open(CHEMIN_CYCLA, encoding="utf-8")
         maxi=0
         for ligne in entrée:
             s, t, v = ligne.strip().split(";")

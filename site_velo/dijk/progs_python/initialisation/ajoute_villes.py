@@ -89,7 +89,7 @@ def crée_csv():
     
     """
     print(f"Enregistrement dans le fichier {CHEMIN_NŒUDS_VILLES}.")
-    sortie = open(CHEMIN_NŒUDS_VILLES, "w")
+    sortie = open(CHEMIN_NŒUDS_VILLES, "w", encoding="utf-8")
     début=True
     nœuds={}
     #try:
@@ -114,7 +114,7 @@ def crée_csv():
 def charge_csv():
     """ Renvoie le dico ville -> nœuds d’icelle"""
     res = {}
-    with open(CHEMIN_NŒUDS_VILLES) as entrée:
+    with open(CHEMIN_NŒUDS_VILLES, encoding="utf-8") as entrée:
         for ligne in entrée:
             ville, suite = ligne.strip().split(";")
             nœuds = tuple(map(int, suite.split(",")))
@@ -143,7 +143,7 @@ def ajoute_villes(g, bavard=0):
     Ajoute un champ "ville" à chaque arête de g, qui contient une liste de villes.
     """
     compte=0
-    with open(CHEMIN_NŒUDS_VILLES) as entrée:
+    with open(CHEMIN_NŒUDS_VILLES, encoding="utf-8") as entrée:
         for ligne in entrée:
 
             ville, suite = ligne.strip().split(";")

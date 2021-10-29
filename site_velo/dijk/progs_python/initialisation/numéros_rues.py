@@ -97,7 +97,7 @@ def extrait_rue_num_coords(chemin="données_inutiles/pau.osm", bavard=0):
     print(f"{nb} adresses collectées")
         
     print(f"Écriture du fichier {CHEMIN_RUE_NUM_COORDS}")
-    sortie = open(CHEMIN_RUE_NUM_COORDS, "w")
+    sortie = open(CHEMIN_RUE_NUM_COORDS, "w", encoding="utf-8")
     for villerue, l in res.items():
         if len(l) > 1:  # Une seule adresse dans la rue ça ne permet pas d’interpoler.
             l_pair = [x for x in l if x[0]%2 == 0]
