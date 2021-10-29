@@ -5,7 +5,7 @@ from dijk.progs_python import params
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 from dijk.progs_python.init_graphe import charge_graphe
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
-from dijk.progs_python.lecture_adresse.recup_nœuds import PasTrouvé
+from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
 from dijk.progs_python.apprentissage import n_lectures
 g=charge_graphe()
