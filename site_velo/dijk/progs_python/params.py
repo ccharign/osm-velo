@@ -3,10 +3,9 @@
 from datetime import datetime
 import os
 import sys
-sys.setdefaultencoding('UTF8')
 sys.path.append("dijk/progs_python")
 sys.path.append("dijk/")
-
+sys.se
 
 
 ### Adresses des fichiers de données ###
