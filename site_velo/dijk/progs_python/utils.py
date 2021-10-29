@@ -202,7 +202,7 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
     graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
     carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
-    nom = os.path.join(où_enregistrer, "dessine_chemins.html")
+    nom = os.path.join(où_enregistrer, "dessine_chemins.html".encode("utf-8"))
     carte.save(nom)
     ouvre_html(nom)
 
@@ -272,7 +272,7 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
             else:
                 carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
         
-    nom = os.path.join(où_enregistrer, "cycla.html".encode("utf-8"))
+    nom = os.path.join(où_enregistrer.encode("utf-8"), "cycla.html".encode("utf-8"))
     carte.save(nom)
     if ouvrir : ouvre_html(nom)
 
