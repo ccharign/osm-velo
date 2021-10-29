@@ -21,5 +21,4 @@ import chemins  # classe chemin et lecture du csv
 from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT
 import utils
 import petites_fonctions
-g = charge_graphe(bavard=3
-)
+g = charge_graphe(bavard=3)

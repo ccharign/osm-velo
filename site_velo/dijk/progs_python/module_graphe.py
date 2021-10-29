@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import networkx as nx
-from osmnx import plot_graph, nearest_nodes
+from osmnx import nearest_nodes #plot_graph,
 import os
 
 from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA
@@ -85,8 +85,8 @@ class graphe(Graphe_minimaliste):
         """ Entrée : c, objet de la classe Chemin"""
         return dijkstra.chemin_étapes_ensembles(self, c, bavard=bavard)
 
-    def affiche(self):
-        plot_graph(self.multidigraphe, node_size=10)
+    #def affiche(self):
+    #    plot_graph(self.multidigraphe, node_size=10)
 
          
     def nœud_le_plus_proche(self, coords, recherche = "", d_max = D_MAX_POUR_NŒUD_LE_PLUS_PROCHE ):

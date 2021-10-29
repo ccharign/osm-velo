@@ -8,7 +8,7 @@ Ces petites fonctions ne doivent pas dépendre d’autres modules, à part param
 """
 
 
-import math
+from math import pi
 from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
 import geopy
 import time
@@ -31,8 +31,8 @@ def distance_euc(c1, c2):
     Formule simplifiée pour petites distances."""
     long1, lat1 = c1
     long2, lat2 = c2
-    dx = R_TERRE * (long2-long1) * math.pi / 180
-    dy = R_TERRE * (lat2-lat1) * math.pi / 180
+    dx = R_TERRE * (long2-long1) * pi / 180
+    dy = R_TERRE * (lat2-lat1) * pi / 180
     return (dx**2+dy**2)**.5
 
 

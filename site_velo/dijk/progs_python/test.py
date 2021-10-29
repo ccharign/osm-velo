@@ -8,7 +8,8 @@
 from importlib import reload  # recharger un module après modif
 import networkx as nx  # graphe
 import os
-os.chdir("site_velo/") # Depuis emacs je suis dans le dossier osm-vélo, celui qui contient le .git
+if os.path.split(os.getcwd())[1]=="osm vélo":
+    os.chdir("site_velo/") # Depuis emacs je suis dans le dossier osm-vélo, celui qui contient le .git
 import dijk.progs_python.params
 from init_graphe import charge_graphe  # le graphe de Pau par défaut
 import apprentissage
