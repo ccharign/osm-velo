@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from dijk.progs_python import param
+from dijk.progs_python import params
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 from dijk.progs_python.init_graphe import charge_graphe
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
