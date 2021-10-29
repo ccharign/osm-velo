@@ -46,7 +46,7 @@ D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres
 ### logs ###
 os.makedirs(os.path.join(RACINE_PROJET, "log".encode("utf-8")), exist_ok=True)
 def LOG_PB(msg):
-    f = open(os.path.join(RACINE_PROJET,"log/pb.log"), "a")
+    f = open(os.path.join(RACINE_PROJET,"log/pb.log".encode("utf-8")), "a")
     f.write(f"{datetime.now()}   {msg}\n")
     f.close()
     print(msg)
