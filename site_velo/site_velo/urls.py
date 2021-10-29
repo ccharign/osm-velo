@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path("dijk/", include("dijk.urls")), # une adresse qui commence par dijk/ sera traitée par le urls.py de dijk
+    path("itinéraires/", include("dijk.urls")), # une adresse qui commence par dijk/ sera traitée par le urls.py de dijk
     path('admin/', admin.site.urls),
 ]
