@@ -12,8 +12,8 @@ sys.path.append("dijk/")
 
 RACINE_PROJET="dijk/".encode("utf-8")
 
-DONNÉES = os.path.join(RACINE_PROJET,"données/Pau").encode("utf-8")
-TMP = os.path.join(RACINE_PROJET, "tmp/").encode("utf-8")
+DONNÉES = os.path.join(RACINE_PROJET,"données/Pau".encode("utf-8"))
+TMP = os.path.join(RACINE_PROJET, "tmp/".encode("utf-8"))
 os.makedirs(TMP, exist_ok=True)
 os.makedirs(DONNÉES, exist_ok=True)
 
