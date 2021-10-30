@@ -24,7 +24,7 @@ def normalise_adresse(c):
 
 ### Villes ###
 
-print("Création du dico et de l’arbre lex de toutes villes.")
+print("Création du dico et de l’arbre lex de toutes villes.".encode("utf-8"))
 TOUTES_LES_VILLES={
     "Gelos": 64110,
     "Lée": 64320,
