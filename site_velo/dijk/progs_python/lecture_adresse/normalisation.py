@@ -130,7 +130,7 @@ def créationArbre():
     rema : dans le csv, les noms des rues et des villes sont supposées avoir l’orthographe d’osm.
     """
     res = {}
-    print(f"Chargement de l’arbre des rues depuis {CHEMIN_NŒUDS_RUES}.")
+    print(f"Chargement de l’arbre des rues depuis {CHEMIN_NŒUDS_RUES}.".encode("utf-8"))
     with open(CHEMIN_NŒUDS_RUES, "r", encoding="utf-8") as entrée:
         for ligne in entrée:
             ville, rue, _ = ligne.strip().split(";")
@@ -155,15 +155,15 @@ def normalise_rue(rue, ville, tol=2, bavard=0):
     res, d =  ARBRE_DES_RUES[ville.nom_complet].mots_les_plus_proches(étape1, d_max=tol)
     if len(res)==1:
         if bavard>0:
-            print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}")
+            print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}".encode("utf-8"))
         return list(res)[0]
     elif len(res)>1:
         # Devrait être très rare
-        print(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).")
+        print(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).".encode("utf-8"))
         return étape1
     else:
         # L’adresse fournie n’était sûrement pas un nom de rue.
-        print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je renvoie {étape1}.")
+        print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je renvoie {étape1}.".encode("utf-8"))
         return étape1
     
 
