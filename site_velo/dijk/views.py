@@ -8,6 +8,7 @@ from dijk.progs_python.chemins import Chemin, chemins_of_csv
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
 from dijk.progs_python.apprentissage import n_lectures
+from datetime import datetime
 g=charge_graphe()
 
 # Create your views here.
@@ -77,8 +78,9 @@ def vue_itinéraire(requête):
         return vueLieuPasTrouvé(requête, e)
     
     # Création du template
+    instant = str(datetime.now())
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
-    with open("dijk/templates/dijk/résultat_itinéraire.html", "w") as sortie:
+    with open(f"dijk/templates/dijk/résultat_itinéraire{instant}.html", "w") as sortie:
         sortie.write(f"""
         {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
         {{% block head_début %}}  {head}  {{% endblock %}}
@@ -87,7 +89,7 @@ def vue_itinéraire(requête):
         """)
 
     # Chargement du template
-    return render(requête, "dijk/résultat_itinéraire.html",
+    return render(requête, f"dijk/résultat_itinéraire{instant}.html",
                   {"stats": stats,
                    "départ":d, "arrivée":a, "étapes":texte_étapes,
                    "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
