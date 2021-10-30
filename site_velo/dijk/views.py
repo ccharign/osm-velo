@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
+
 from dijk.progs_python import params
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 from dijk.progs_python.init_graphe import charge_graphe
@@ -8,7 +9,12 @@ from dijk.progs_python.chemins import Chemin, chemins_of_csv
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
 from dijk.progs_python.apprentissage import n_lectures
+
 from datetime import datetime
+from glob import glob
+import os
+
+
 g=charge_graphe()
 
 # Create your views here.
@@ -79,6 +85,9 @@ def vue_itinéraire(requête):
     
     # Création du template
     instant = str(datetime.now())
+    vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire20**")
+    for f in vieux_fichier:
+        os.remove(f)
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
     with open(f"dijk/templates/dijk/résultat_itinéraire{instant}.html", "w") as sortie:
         sortie.write(f"""

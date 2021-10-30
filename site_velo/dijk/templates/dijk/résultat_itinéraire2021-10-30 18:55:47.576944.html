@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<head>    
+
+        {% extends "dijk/résultat_itinéraire_sans_carte.html" %}
+        {% block head_début %}      
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     
         <script>
@@ -32,13 +33,13 @@
                 }
             </style>
         
-</head>
-<body>    
+  {% endblock %}
+        {% block carte %}     
     
             <div class="folium-map" id="map_2b28e36f85244507a6e3ebb0f25e608a" ></div>
         
-</body>
-<script>    
+ {% endblock %}
+        {% block script %} <script>     
     
             var map_2b28e36f85244507a6e3ebb0f25e608a = L.map(
                 "map_2b28e36f85244507a6e3ebb0f25e608a",
@@ -8482,4 +8483,5 @@
                 {}
             );
         
-</script>
+ </script> {% endblock %}
+        
