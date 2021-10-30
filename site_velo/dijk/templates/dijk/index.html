@@ -1,10 +1,15 @@
     {% extends "base.html" %}
-<p>
-  Bienvenue dans le calculateur participatif d’itinéraires cyclables.
-</p>
+
 
 
 {% block contenu %}
+
+<p>
+  Bienvenue dans le calculateur participatif d’itinéraires cyclables de l’agglomération de Pau. La ville par défaut est Pau. Pour indiquer un emplacement dans une autre ville, préciser celle-ci entre parenthèses. Par exemple : « rue du souvenir (Lons) » ou « médiathèque (Billère) ».
+</p>
+
+
+
 <form action = "{% url 'résultat' %}" method="post">
   {% csrf_token %}
   <ul>
@@ -22,7 +27,7 @@
     <li>
       
       <label for="pourcentage_détour"> <b>Pourcentage détour</b>  : </label><br>
-    <input type="text" id="pourcentage_détour" name="pourcentage_détour" value = "0;20;40"><br>
+    <input type="text" id="pourcentage_détour" name="pourcentage_détour" value = "0;15;30"><br>
     Il s’agit du pourcentage duquel vous acceptez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé (référence : Rue Faisans) à un itinéraire entièrement en piste cyclable (référence : la piste cyclable de Fébus).<br>
 
     On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.
