@@ -8,4 +8,6 @@ tests
 tmp/**
 !tmp/
 log
-sit_vélo/dijk/tmp/**
+site_velo/dijk/tmp/**
+site_velo/dijk/templates/dijk/iti_folium.html
+site_velo/dijk/templates/dijk/résultat_itinéraire_complet*
