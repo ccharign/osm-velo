@@ -101,6 +101,8 @@ def sortie_csv(g, bavard=0):
     """
     res = extrait_nœuds_des_rues(g, bavard=bavard)
     print(f"Enregistrement des nœuds des rues dans {CHEMIN_NŒUDS_RUES}")
+    if bavard>0:
+        print(f"{sum( sum(len(v) for _,v in d.items() ) for _,d in res.items())} nœuds trouvés.")
     with open(CHEMIN_NŒUDS_RUES, "w", encoding="utf-8") as sortie:
         for ville, d in res.items():
             for rue, nœuds in d.items():

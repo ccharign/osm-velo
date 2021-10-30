@@ -7,6 +7,8 @@
 
 from importlib import reload  # recharger un module après modif
 import os
+if os.path.split(os.getcwd())[1]=="osm vélo":
+    os.chdir("site_velo/dijk/progs_python")
 import params
 if os.path.split(os.getcwd())[1]=="progs_python":
     os.chdir("../..")
@@ -21,4 +23,5 @@ import chemins  # classe chemin et lecture du csv
 from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT
 import utils
 import petites_fonctions
+import recup_donnees
 g = charge_graphe(bavard=3)

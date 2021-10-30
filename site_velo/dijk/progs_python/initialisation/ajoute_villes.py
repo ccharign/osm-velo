@@ -86,7 +86,10 @@ def test_overpass(id, bavard=0):
 
 def crée_csv():
     """
-    
+    Utilise la fonction liste_villes pour récupérer la liste des villes.
+    Ensuite, utilise osmnx pour récupérer les nœuds de chaque ville.
+
+    Crée le csv « ville;liste des nœuds »
     """
     print(f"Enregistrement dans le fichier {CHEMIN_NŒUDS_VILLES}.")
     sortie = open(CHEMIN_NŒUDS_VILLES, "w", encoding="utf-8")
@@ -149,7 +152,7 @@ def ajoute_villes(g, bavard=0):
             ville, suite = ligne.strip().split(";")
             nœuds = set(map(int, suite.split(",")))
             for n in nœuds:
-                if n in g.digraphe.nodes:
+                if n in g:
                     # Remplissage du graphe
                     for v in g.voisins_nus(n):
                         if v in nœuds:

@@ -11,8 +11,8 @@ from initialisation.ajoute_villes import ajoute_villes
 import initialisation.noeuds_des_rues as nr
 
 import time
-#import osmnx.io
-from networkx import read_graphml
+import osmnx.io
+#from networkx import read_graphml  # Défaut : ne convertit pas les types des données (longeur, id_osm, coords...), tout reste en str
 import subprocess
 import os
 #ox.config(use_cache=True, log_console=True)
@@ -37,16 +37,16 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
     
     s,o,n,e = bbox 
     nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
-    if bavard>0:print(bbox, nom_fichier)
+    if bavard>0:print(f"Nom du fichier du graphe : {nom_fichier}")
     if os.path.exists(nom_fichier):
-        #g = osmnx.io.load_graphml(nom_fichier)
-        g = read_graphml(nom_fichier)
+        g = osmnx.io.load_graphml(nom_fichier)
+        #g = read_graphml(nom_fichier, node_type=int)
         if bavard>0: print("Graphe en mémoire !")
     else:
         print(f"\nGraphe pas en mémoire à {nom_fichier}, je le charge via osmnx.\\")
 
         à_exécuter = [
-            os.path.join(RACINE_PROJET, "progs_python/initialisation/crée_graphe.py".encode("utf-8")),
+            os.path.join(RACINE_PROJET, "progs_python/initialisation/crée_graphe.py"),
             nom_fichier,
             str(bbox)
         ]
@@ -54,10 +54,11 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
         sortie = subprocess.run(à_exécuter)
         if bavard>1:print(sortie.stdout)
         print(sortie.stderr)
-        #g = osmnx.io.load_graphml(nom_fichier)
-        g = read_graphml(nom_fichier)
+        g = osmnx.io.load_graphml(nom_fichier)
+        #g = read_graphml(nom_fichier, node_type=int)
         
     gr = graphe(g)
+    
     gr.charge_cache()  # nœud_of_rue
     
     print("Chargement de la cyclabilité")

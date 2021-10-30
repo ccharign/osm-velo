@@ -7,6 +7,8 @@ Pb de collision si deux utilisateurs en même temps
 
 Mettre dans le cache les noms osm de lieux récupérés via nominatim
 
+Si un sommet change lors d’une màj de g, que se passe-t-il dans le cache ? -> recréer (à partir da la liste des chemins) ou supprimer le cache lors d’une màj ?
+
 Afficher les étapes sur la carte
 
 

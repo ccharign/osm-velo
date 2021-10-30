@@ -12,7 +12,23 @@ from math import pi
 from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
 import geopy
 import time
+import shutil
+import os
+import datetime
 
+
+def sauv_fichier(chemin):
+    """
+    Crée une copie du fichier dans le sous-répertoire « sauv » du répertoire contenant le fichier. Le sous-répertoire « sauv » doit exister au préalable.
+    """
+    dossier, nom = os.path.split(chemin)
+    dossier_sauv = os.path.join(dossier,"sauv")
+    os.makedirs(dossier_sauv, exist_ok=True)
+    nom_sauv = nom+str(datetime.datetime.now())
+    shutil.copyfile(
+        chemin,
+        os.path.join(dossier_sauv, nom_sauv)
+    )
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"
 localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")

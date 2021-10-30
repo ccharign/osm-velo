@@ -8,7 +8,7 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN
 import dijkstra
 from recup_donnees import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
-from petites_fonctions import distance_euc, deuxConséc
+from petites_fonctions import distance_euc, deuxConséc, sauv_fichier
 from collections import deque
 #from dijk.progs_python.lecture_adresse.recup_nœuds import tous_les_nœuds
 from graphe_minimal import Graphe_minimaliste
@@ -163,6 +163,7 @@ class graphe(Graphe_minimaliste):
        
     def sauv_cache(self):
         """ L’adresse du fichier csv est dans CHEMIN_CACHE."""
+        sauv_fichier(CHEMIN_CACHE)
         sortie = open(CHEMIN_CACHE, "w", encoding="utf-8")
         
         for c, v in self.nœud_of_rue.items():

@@ -28,7 +28,7 @@
 
 <!-- Formulaire pour relancer le calcul -->
 <p>
-    <form action = "{% url 'itinéraire' %}" method="post">
+    <form action = "{% url 'résultat' %}" method="post">
       {% csrf_token %}
       <input type="hidden" id="départ" name="départ" value="{{départ}}">
 

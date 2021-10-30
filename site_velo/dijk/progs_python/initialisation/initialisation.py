@@ -2,12 +2,10 @@
 # -*- coding:utf-8 -*-
 
 import os
-import shutil
 import subprocess
-from datetime import datetime
 
 if os.getcwd()=="/home/moi/git/osm vélo":
-    os.chdir("site_vélo/")
+    os.chdir("site_velo/")
 else :
     print(f"Dossier actuel: {os.getcwd()}")
     
@@ -17,9 +15,11 @@ from dijk.progs_python.params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_V
 from initialisation.crée_graphe import crée_graphe_bbox
 from initialisation.élaguage import élague_xml
 from initialisation.numéros_rues import extrait_rue_num_coords
-from initialisation.nœuds_des_rues import sortie_csv as csv_nœud_des_rues
+from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes
 from graphe_minimal import Graphe_minimaliste
+from petites_fonctions import sauv_fichier
+#from networkx import read_graphml
 
 
 """
@@ -45,18 +45,7 @@ Il ne crée aucun objet Python, seulement des fichiers : peut être utilisé ind
 # Quid du fichier osm élaguée ? Peut-on le tirer directement du graphe networkx ? Peut-on s’en passer entièrement ?
 # liste des villes : utiliser overpass cette fois ?
 
-def sauv_fichier(chemin):
-    """
-    Crée une copie du fichier dans le sous-répertoire « sauv » du répertoire contenant le fichier. Le sous-répertoire « sauv » doit exister au préalable.
-    """
-    dossier, nom = os.path.split(chemin)
-    dossier_sauv = os.path.join(dossier,"sauv")
-    os.makedirs(dossier_sauv, exist_ok=True)
-    nom_sauv = nom+str(datetime.now())
-    shutil.copyfile(
-        chemin,
-        os.path.join(dossier_sauv, nom_sauv)
-    )
+
 
 
 def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
@@ -73,26 +62,31 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
              - nœuds_rues.csv (CHEMIN_NŒUDS_RUES) qui donne les nœuds de chaque rue
     """
 
-    (o, s, e, n) = bbox
-    nom_fichier=f'{DONNÉES}/{o}{s}{e}{n}.graphml'
-    try:
+    s,o,n,e = bbox
+    nom_fichier=f'{DONNÉES}/{s}{o}{n}{e}.graphml'
+    if os.path.exists(nom_fichier):
+        #gr = read_graphml(nom_fichier, node_type=int)
         gr = osmnx.io.load_graphml(nom_fichier)
         if bavard: print("Graphe en mémoire !")
-    except FileNotFoundError:
+    else:
         print("Création du graphe via osmnx.")
-        gr = crée_graphe_bbox(nom_fichier, ouest=o, est=e, nord=n, sud=s)
+        gr = crée_graphe_bbox(nom_fichier, bbox, bavard=bavard)
     g=Graphe_minimaliste(gr)
     
     #print("Création de la liste des nœuds de chaque ville.")
     #sauv_fichier(CHEMIN_NŒUDS_VILLES)
     #csv_nœuds_des_villes()
     
+    print("\n\nRecherche de la liste des nœuds de chaque ville.")
+    if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...")
+    sauv_fichier(CHEMIN_NŒUDS_VILLES)
+    #csv_nœuds_des_villes()
     print("Ajout des villes dans le graphe")
-    ajoute_villes(g)
+    ajoute_villes(g, bavard=bavard)
     
-    print("Création de la liste des nœuds de chaque rue.")
+    print("\n\nCréation de la liste des nœuds de chaque rue.")
     sauv_fichier(CHEMIN_NŒUDS_RUES)
-    csv_nœud_des_rues(g)
+    csv_nœud_des_rues(g, bavard=bavard)
 
     return g
 

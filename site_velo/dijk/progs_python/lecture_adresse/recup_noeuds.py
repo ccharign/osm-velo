@@ -38,7 +38,10 @@ def nœuds_of_étape(c, g, bavard=0):
     # Fonction de mise en cache
     def renvoie(res):
         assert res != []
-        assert all(isinstance(s, int) and s in g.digraphe.nodes for s in res)
+        for s in res:
+            assert isinstance(s,int)
+            if s not in g.digraphe.nodes :
+                raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res}.")
         g.nœud_of_rue[c] = res
         print(f"Mis en cache : {res} pour {c}")
         return res, ad

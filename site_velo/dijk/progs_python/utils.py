@@ -49,7 +49,7 @@ def cheminsValides(chemins, g):
 
 def itinéraire(départ, arrivée, ps_détour, g,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
-               où_enregistrer=os.path.join(TMP, "itinéraire.html".encode("utf-8")), bavard=0, ouvrir=False):
+               où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
@@ -153,7 +153,7 @@ n_coul = len(list_colors)
 
 
 
-def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html".encode("utf-8")), ouvrir=False, bavard=0):
+def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
     """ 
     Entrées :
        - c (instance de Chemin)
@@ -202,12 +202,12 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
     graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
     carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
-    nom = os.path.join(où_enregistrer, "dessine_chemins.html".encode("utf-8"))
+    nom = os.path.join(où_enregistrer, "dessine_chemins.html")
     carte.save(nom)
     ouvre_html(nom)
 
 
-def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets".encode("utf-8")), ouvrir = True):
+def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
     """ Entrée : s, liste de sommets """
     dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
 
@@ -272,7 +272,7 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
             else:
                 carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
         
-    nom = os.path.join(où_enregistrer.encode("utf-8"), "cycla.html".encode("utf-8"))
+    nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)
     if ouvrir : ouvre_html(nom)
 

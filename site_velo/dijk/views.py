@@ -73,7 +73,7 @@ def vue_itinéraire(requête):
             rues_interdites=rues_interdites,
             bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
-    except Exception as e:
+    except (PasTrouvé, LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
     
     # Création du template
