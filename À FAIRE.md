@@ -1,10 +1,6 @@
 
 À FAIRE :
 
-Pb de collision si deux utilisateurs en même temps
-    -> donner un nom personalisé aux fichiers html produits
-    -> les nettoyer après coup
-
 Mettre dans le cache les noms osm de lieux récupérés via nominatim
 
 Si un sommet change lors d’une màj de g, que se passe-t-il dans le cache ? -> recréer (à partir da la liste des chemins) ou supprimer le cache lors d’une màj ?
@@ -15,6 +11,9 @@ Afficher les étapes sur la carte
 Il existe des rues qui figurent dans rue_num_coord, donc qui étaient dans le .osm, mais qui ne sont pas dans nœuds_rue. Ce dernier est créé par nœuds_des_rues.py. Par exemple place reine marguerite, dont le nœud du graphe est 339262446.
 Problème lorsqu’une rue ne contient qu’un sommet de g, donc aucune arête.
 -> Il faut mettre le nom de la rue et de la ville dans le nœud plutôt que l’arête, et reprendre extrait_nœuds_des_rues
+
+Y-a-t-il des risques de conflit si deux utilisateurs en même temps ?
+
 
 À FAIRE (un jour)
 

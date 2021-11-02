@@ -33,8 +33,20 @@ def bool_of_checkbox(dico, clef):
             return False
     except KeyError:
         return False
- 
 
+def énumération_texte(l):
+    """
+    Entrée : liste de str
+    Sortie : une str contenant les éléments de l séparés par des virgules, sauf dernier qui est séparé par le mot « et »
+    """
+    if len(l)==0:
+        return ""
+    elif len(l)==1:
+        return l[0]
+    else:
+        return ", ".join(l[:-1]) + " et " + l[-1]
+
+    
 ### Recherche d’itinéraire simple ###
 
 def récup_head_body_script(chemin):
@@ -65,10 +77,7 @@ def vue_itinéraire(requête):
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
-    if len(noms_étapes)>1:
-        texte_étapes = ",".join(noms_étapes[:-1])+" et "+noms_étapes[-1]
-    else:
-        texte_étapes = requête.POST["étapes"]
+    texte_étapes = énumération_texte(noms_étapes)
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
     p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
     rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
@@ -102,7 +111,9 @@ def vue_itinéraire(requête):
     # Chargement du template
     return render(requête, f"dijk/résultat_itinéraire{suffixe}.html",
                   {"stats": stats,
-                   "départ":d, "arrivée":a, "étapes":texte_étapes,
+                   "départ":d, "arrivée":a,
+                   "étapes": texte_étapes,
+                   "rues_interdites": énumération_texte(rues_interdites),
                    "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
                    }
                   )

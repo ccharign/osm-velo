@@ -10,19 +10,30 @@
 </p>
 
 
+<p>
+  <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire dans un onglet séparé </a>
+</p>
+
+<!-- La carte -->
+<section>
+  <div class="carte">
+  {% block carte %}
+  {% endblock carte %}
+  </div>
+</section>
+
+</br>
+
 <!-- Statistiques -->
 <p>
   Longueur des trajets calculés :
   <ul>
     {% for x in stats %}
-    <li> <span style = "color: {{x.3}};"> {{x.0}} : longueur : {{x.1}} m, longueur ressentie : {{x.2}} m </span></li>
+    <li> <span style = "color: {{x.3}};"> {{x.0}} : longueur : {{x.1}} m, ressentie : {{x.2}} m </span></li>
     {% endfor %}
   </ul>
 </p>
 
-<p>
-  <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire dans un onglet séparé </a>
-</p>
 
 
 
@@ -48,17 +59,18 @@
 
 
 {% if étapes or post_préc.rues_interdites %}
+</br>
 <!-- Formulaire pour enregistrer la contribution -->
 <p>
   Si l’itinéraire affiché vous paraît judicieux, autrement dit si pour aller de « {{départ}} » à « {{arrivée}} » il vous semble judicieux de
   {% if étapes %}
-  passer par {{étapes}}
+  passer par « {{étapes}} »
   {% endif %}
   {% if étapes and post_préc.rues_interdites %}
   et/ou
   {% endif %}
   {% if post_préc.rues_interdites %}
-  d’éviter {{post_préc.rues_interdites}}
+  d’éviter « {{rues_interdites}} »
   {% endif%}, remplissez le formulaire ci-dessous pour l’enregistrer dans la base de donnée et ainsi améliorer l’appli pour les prochains utilisateurs !
 </p>
 <p>
@@ -81,12 +93,5 @@
 
 {% endif %}
 
-<!-- La carte -->
-<section>
-  <div class="carte">
-  {% block carte %}
-  {% endblock carte %}
-  </div>
-</section>
 
 {% endblock contenu %}
