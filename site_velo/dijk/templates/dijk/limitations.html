@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block contenu %}
+<p>
+  Les problèmes ci-dessous sont déjà connus, je m’y atèle dès que j’aurai un moment...
+  <ul>
+    <li> Très peu de numéros de rue sont présents dans openstreetmap (sur la ville de Pau au moins). Lorsqu’aucun numéro de rue n’est disponible, l’algo cherche le point de la rue le plus proche.</li>
+    <li> Lorsqu’entre deux carrefours existent deux tronçons de rues, qui ne croisent aucune autre rue (pour les mathématiciens : deux sommets sont reliés par plusieurs arêtes), au moment de l’affichage ces deux tronçons seront affichés simultanément, ce qui dessine des boucle. Mais pour le calcul, seul le tronçon de rue le plus intéressant a été pris en compte.</li>
+    <li>Certaines petites rues ne figurent pas dans la base de données. Or le programme lorsqu’il ne reconnaît pas un nom de rue regarde s’il en connaît une à une ou deux fautes de frappes près. Ainsi dans le cas où une rue ne serait pas dans la base, mais où il en existe une à moins de deux fautes de frappes, la première sera remplacée par la seconde. Ainsi une recherche sur « rue d’Artagnan » donnera « rue d’Armagnac ». </li>
+  </ul>
+
+
+  
+</p>
+{% endblock %}

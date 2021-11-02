@@ -29,7 +29,7 @@ def chemin(g, départ, arrivée, p_détour):
     assert p_détour < 10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
     dist = {départ: 0.}  #dist[s] contient l'estimation actuelle de d(départ, i) si s est gris, et la vraie valeur si s est noir.
     pred = {départ: -1}
-    àVisiter =[(0, départ)]  # tas des sommets à visiter. Doublons autorisés.
+    àVisiter =[(0., départ)]  # tas des sommets à visiter. Doublons autorisés.
 
     fini = False
     while len(àVisiter) > 0 and not fini:

@@ -24,6 +24,9 @@ g=charge_graphe()
 def index(requête):
     return render(requête, "dijk/index.html", {"ville":VILLE_DÉFAUT})
 
+def limitations(requête):
+    return render(requête, "dijk/limitations.html", {})
+
 def bool_of_checkbox(dico, clef):
     """Transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
     try:
