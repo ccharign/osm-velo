@@ -1,7 +1,7 @@
 
 # -*- coding:utf-8 -*-
 import re
-from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB
+from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 
 
@@ -25,20 +25,7 @@ def normalise_adresse(c):
 ### Villes ###
 
 print("Création du dico et de l’arbre lex de toutes villes.")
-TOUTES_LES_VILLES={
-    "Gelos": 64110,
-    "Lée": 64320,
-    "Pau": 64000,
-    "Lescar": 64230,
-    "Billère": 64140,
-    "Jurançon":64110,
-    "Ousse": 64320,
-    "Idron": 64320,
-    "Lons": 64140 ,
-    "Bizanos": 64320,
-    "Artigueloutan": 64420,
-    "Mazères-Lezons": 64110
-}
+
 ARBRE_VILLES=ArbreLex()
 for nom in TOUTES_LES_VILLES.keys():
     ARBRE_VILLES.insère(nom)

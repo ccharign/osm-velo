@@ -2,7 +2,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+
 from dijk.progs_python import params
+from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 from dijk.progs_python.init_graphe import charge_graphe
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
@@ -20,7 +22,7 @@ g=charge_graphe()
 # Create your views here.
 
 def index(requête):
-    return render(requête, "dijk/index.html", {})
+    return render(requête, "dijk/index.html", {"ville":VILLE_DÉFAUT})
 
 def bool_of_checkbox(dico, clef):
     """Transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
@@ -84,12 +86,12 @@ def vue_itinéraire(requête):
         return vueLieuPasTrouvé(requête, e)
     
     # Création du template
-    instant = str(datetime.now())
+    suffixe = d+texte_étapes+a+"".join(rues_interdites)
     vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire20**")
     for f in vieux_fichier:
         os.remove(f)
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
-    with open(f"dijk/templates/dijk/résultat_itinéraire{instant}.html", "w") as sortie:
+    with open(f"dijk/templates/dijk/résultat_itinéraire{suffixe}.html", "w") as sortie:
         sortie.write(f"""
         {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
         {{% block head_début %}}  {head}  {{% endblock %}}
@@ -98,7 +100,7 @@ def vue_itinéraire(requête):
         """)
 
     # Chargement du template
-    return render(requête, f"dijk/résultat_itinéraire{instant}.html",
+    return render(requête, f"dijk/résultat_itinéraire{suffixe}.html",
                   {"stats": stats,
                    "départ":d, "arrivée":a, "étapes":texte_étapes,
                    "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen

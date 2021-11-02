@@ -91,7 +91,7 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
     return g
 
 
-def rajoute_donnée(bbox, garder_le_osm_complet=True):
+def rajoute_donnée(bbox=BBOX_DÉFAUT, garder_le_osm_complet=True):
     """
     Entrée : une bbox suffisamment petite pour être acceptée par overpass.
     Effet : récupère le .osm correspondant à la bounding box indiquée, et l’utilise pour compléter les données suivantes :
@@ -101,7 +101,7 @@ def rajoute_donnée(bbox, garder_le_osm_complet=True):
        - garder_le_osm_complet : mettre à False pour forcer le retéléchargement  d’un fichier déjà présent.
     """
 
-
+    print("J’essaie de télécharger le fichier .osm complet de la zone {bbox}, pour en extraire les coordonnées des numéros de rue disponibles. Sans cette étape, l’appli fonctionnera quand même, mais les numéros de rue seront ignorés.")
     chemin_osm_complet = os.path.join(TMP, str(bbox)+"_complet.osm")
     if garder_le_osm_complet and os.path.exists(chemin_osm_complet):
         print(f"Le fichier {chemin_osm_complet} est déjà présent, je le garde. Mettre le paramètre « garder_le_osm_complet » à False pour forcer le retéléchargement des données.")
@@ -116,3 +116,8 @@ def rajoute_donnée(bbox, garder_le_osm_complet=True):
     print("Recherche des coordonnées des numéros de rues disponibles. Au passage, servira pour la liste des villes.")
     sauv_fichier(CHEMIN_RUE_NUM_COORDS)
     extrait_rue_num_coords(chemin=chemin_osm_complet, bavard=1)
+
+
+if __name__ == "__main__":
+    initialisation_sans_overpass()
+    rajoute_donnée()

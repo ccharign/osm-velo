@@ -5,21 +5,21 @@
 from params import TMP
 from importlib import reload  # recharger un module après modif
 import subprocess
-import networkx as nx  # graphe
-import osmnx as ox
-ox.config(use_cache=True, log_console=True)
-from module_graphe import graphe  #ma classe de graphe
+#import networkx as nx  # graphe
+from osmnx import plot_graph_folium
+#ox.config(use_cache=True, log_console=True)
+#from module_graphe import graphe  #ma classe de graphe
 #import récup_données as rd
-import apprentissage
+#import apprentissage
 import dijkstra
 import chemins  # classe chemin et lecture du csv
 
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
-import recup_donnees
+#import recup_donnees
 #import module_graphe
 import webbrowser
-from matplotlib import cm
+#from matplotlib import cm
 import folium
 
 def flatten(c):
@@ -126,10 +126,10 @@ def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
 
     l, coul = listes_sommets[0]
     sous_graphe = g.multidigraphe.subgraph(l)
-    carte = ox.plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
+    carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
     for l, coul in listes_sommets[1:]:
         sous_graphe = g.multidigraphe.subgraph(l)
-        carte = ox.plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
+        carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
     
     carte.save(où_enregistrer)
     print(g.coords_of_nœud(l[0]))
@@ -190,7 +190,7 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
         except dijkstra.PasDeChemin:
             print(f"Pas de chemin pour {c}")
     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
-    carte = ox.plot_graph_folium(graphe_c_directs, popup_attribute="name", color="red")
+    carte = plot_graph_folium(graphe_c_directs, popup_attribute="name", color="red")
 
     chemins_complets = []
     for c in chemins:
@@ -200,7 +200,7 @@ def dessine_chemins(chemins, g, où_enregistrer=TMP):
             print(e)
             print(f"Pas de chemin avec étapes pour {c}")
     graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
-    carte = ox.plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
+    carte = plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
     nom = os.path.join(où_enregistrer, "dessine_chemins.html")
     carte.save(nom)
@@ -267,10 +267,10 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
             print(len(nœuds))
             à_rajouter = g.multidigraphe.subgraph(list(nœuds))
             if début:
-                carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i])
+                carte = plot_graph_folium(à_rajouter, color=color_dict[i])
                 début=False
             else:
-                carte = ox.plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
+                carte = plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
         
     nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)

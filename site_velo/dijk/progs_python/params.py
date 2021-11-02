@@ -6,6 +6,27 @@ import sys
 sys.path.append("dijk/progs_python")
 sys.path.append("dijk/")
 
+### Choix de la zone géographique
+
+BBOX_DÉFAUT = (43.2671, -0.45, 43.3403, -0.2541) # la bbox de la zone prise en charge # Convention overpass : sud, ouest, nord, est
+STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
+PAYS_DÉFAUT = "France"
+TOUTES_LES_VILLES={
+    "Gelos": 64110,
+    "Lée": 64320,
+    "Pau": 64000,
+    "Lescar": 64230,
+    "Billère": 64140,
+    "Jurançon":64110,
+    "Ousse": 64320,
+    "Idron": 64320,
+    "Lons": 64140 ,
+    "Bizanos": 64320,
+    "Artigueloutan": 64420,
+    "Mazères-Lezons": 64110
+}
+
+
 
 ### Adresses des fichiers de données ###
 
@@ -34,10 +55,7 @@ for f in (CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, CHEMI
 
 ### Réglages divers ###
 
-BBOX_DÉFAUT = (43.2671, -0.45, 43.3403, -0.2541) # la bbox de la zone prise en charge # Convention overpass : sud, ouest, nord, est
-STR_VILLE_DÉFAUT = "64000 Pau"  #Lorsque la ville n'est pas précisée par l'utilisateur
-PAYS_DÉFAUT = "France"
-#NAVIGATEUR = "firefox"  # Commande à lancer pour afficher les cartes html # Plus utilisé : utilisation de la commande Python idoine à la place à savoir webbrowser
+
 
 D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres
 
