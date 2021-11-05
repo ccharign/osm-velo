@@ -99,11 +99,11 @@ def vue_itinéraire(requête):
     
     # Création du template
     suffixe = d+texte_étapes+a+"".join(rues_interdites)
-    vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire20**")
+    vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire_complet**")
     for f in vieux_fichier:
         os.remove(f)
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
-    with open(f"dijk/templates/dijk/résultat_itinéraire{suffixe}.html", "w") as sortie:
+    with open(f"dijk/templates/dijk/résultat_itinéraire_complet{suffixe}.html", "w") as sortie:
         sortie.write(f"""
         {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
         {{% block head_début %}}  {head}  {{% endblock %}}
@@ -112,7 +112,7 @@ def vue_itinéraire(requête):
         """)
 
     # Chargement du template
-    return render(requête, f"dijk/résultat_itinéraire{suffixe}.html",
+    return render(requête, f"dijk/résultat_itinéraire_complet{suffixe}.html",
                   {"stats": stats,
                    "départ":d, "arrivée":a,
                    "étapes": texte_étapes,
