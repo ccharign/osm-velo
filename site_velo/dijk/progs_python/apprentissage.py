@@ -2,6 +2,7 @@
 from module_graphe import graphe
 from recup_donnees import coords_lieu
 import dijkstra
+from params import LOG_PB
 
 ETA = 0.1
 
@@ -59,23 +60,25 @@ def lecture_plusieurs_chemins(g, chemins, bavard=0):
 
 
 def n_lectures(n, g, chemins, bavard=0):
-    print(f"Début de l'apprentissage. C'est parti pour {n} lectures.")
-    for i in range(n):
-        n_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard-1)
-        print(f" ----- Étape {i}, {n_modif} arêtes modifiées -----")
-        if n_modif == 0:
-            print("Plus de modifications, j’arrête l’apprentissage.")
-            break
+    return lecture_jusqu_à_perfection(g, chemins, n_max=n, bavard=bavard)
 
 
-def lecture_jusqu_à_perfection(g, chemins, bavard=0):
-    """ Modifie la cyclabilité jusqu'à ce que le chemin trouvé soit le bon pour tous ceux passés dans la liste chemins.
-    Parfaitement susceptible de planter : à n'utiliser qu'à des fins de test.
+def lecture_jusqu_à_perfection(g, chemins, n_max=50, bavard=0):
+    """ 
+    Modifie la cyclabilité jusqu'à ce que le chemin trouvé soit le bon pour tous ceux passés dans la liste chemins.
+    n_max : nb max d’itérations
     """
     n_étapes = 0
-    while lecture_plusieurs_chemins(g, chemins, bavard=bavard) > 0:  # La fonction lecture_plusieurs_chemins renvoie le nb d'arêtes modifiées.
+    n_modif=1
+    print("Début de l’apprentissage")
+    while n_modif>0 and n_étapes<n_max:  # La fonction lecture_plusieurs_chemins renvoie le nb d'arêtes modifiées.
         n_étapes += 1
+        n_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard) > 0
+        if bavard >0:
+            print(f" ----- Étape {n_étapes}, {n_modif} arêtes modifiées -----")
     print(f"Entraînement fini en {n_étapes} étapes.")
+    if n_étapes==n_max:
+        LOG_PB(f"Nombre max d’itérations ({n_max}) atteint lors de l’apprentissage pour les chemins {chemins}.")
 
 
 

@@ -10,7 +10,7 @@ from dijk.progs_python.init_graphe import charge_graphe
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
-from dijk.progs_python.apprentissage import n_lectures
+from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection
 
 from datetime import datetime
 from glob import glob
@@ -148,6 +148,7 @@ def confirme_nv_chemin(requête):
     c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
     c.sauv(bavard=1)
     n_lectures(nb_lectures, g, [c], bavard=1)
+    
     #tousLesChemins = chemins_of_csv(g, bavard=1)
     #n_lectures(nb_lectures, g, tousLesChemins, bavard=1) # Trop long... À mettre ailleurs ? Dans un cron ?
     g.sauv_cache()
