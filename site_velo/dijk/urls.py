@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from . import views
 
@@ -14,4 +15,4 @@ urlpatterns = [
     path("cycla", views.carte_cycla, name="carte cycla"),
     
     path('', views.index, name='index'), # Création d'une url pointant vers la vue « index », ou se trouve le formulaire d’itinéraire simple.
-]
+] + staticfiles_urlpatterns()

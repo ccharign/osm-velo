@@ -15,7 +15,7 @@ from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfect
 from datetime import datetime
 from glob import glob
 import os
-
+import re
 
 g=charge_graphe()
 
@@ -49,8 +49,17 @@ def énumération_texte(l):
     else:
         return ", ".join(l[:-1]) + " et " + l[-1]
 
+def sans_style(texte):
+    """
+    Entrée : du code html (str)
+    Sortie : le code sans les lignes entourées de balises <style>...</style>
+    """
     
-### Recherche d’itinéraire simple ###
+    x=re.findall("(.*?)<style>.*?</style>(.*)", texte) # ? : non greedy
+    if x:
+        return x[0][0] + sans_style(x[0][1])
+    else:
+        return texte
 
 def récup_head_body_script(chemin):
     """ Entrée : adresse d’un fichier html
@@ -66,7 +75,12 @@ def récup_head_body_script(chemin):
         body = body.split("<body>")[1]
 
         script = suite.split("<script>")[1].split("</script>")[0]
-    return head, body, script
+    return (head), body, script
+
+
+
+
+### Recherche d’itinéraire simple ###
 
 
 def visualisation_nv_chemin(requête):

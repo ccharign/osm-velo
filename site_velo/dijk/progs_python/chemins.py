@@ -179,7 +179,7 @@ class Chemin():
         if self.texte is not None:
             return self.texte
         else:
-            return "étapes : " + ";".join(map(str, self.étapes)) + "rues interdites : " + self.noms_rues_interdites
+            return "Étapes : " + ";".join(map(str, self.étapes)) + "\nRues interdites : " + self.noms_rues_interdites
 
     def texte_court(self, n_étapes=4):
         if len(self.étapes) <= n_étapes:

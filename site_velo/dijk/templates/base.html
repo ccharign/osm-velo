@@ -3,16 +3,30 @@
   <head>
     <meta charset="utf-8">
     <title>{% block titre %}Recherche d’itinéraire{% endblock %}</title>
+    <!-- <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/> -->
     {% block head_début %} {% endblock %}
     <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/>
+
     
+    <style>
+      .carte {
+	  width 95%;height: 70%;margin: 0;padding: 0; border:2px solid black;
+      }
+      .stats{
+	 
+      }
+      nav{
+	  text-align:center;border:2px solid lightblue
+      }
+    </style>
   </head>
 
   <body>
 
 
 <header>
-  <nav> <a href="{% url 'index'%}"> entrée </a>
+  <nav>
+    <a href="{% url 'index'%}"> entrée </a>
     | <a href="{% url 'carte cycla'%}"> la carte de la cyclabilité </a>
     | <a href="{% url 'limitations'%}"> problèmes connus </a>
     <!-- <a href="{% url 'contribution' %}">contribution</a> -->
@@ -20,11 +34,8 @@
 </header>
 </br>
 
-<section>
 
   {% block contenu %} {% endblock %}
-
-</section>
 
   </body>
 
