@@ -11,11 +11,12 @@ from dijk.progs_python.chemins import Chemin, chemins_of_csv
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
 from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection
+from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 
 from datetime import datetime
 from glob import glob
 import os
-import re
+
 
 g=charge_graphe()
 
@@ -26,57 +27,6 @@ def index(requête):
 
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
-
-def bool_of_checkbox(dico, clef):
-    """Transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
-    try:
-        if dico[clef]=="on":
-            return True
-        else:
-            return False
-    except KeyError:
-        return False
-
-def énumération_texte(l):
-    """
-    Entrée : liste de str
-    Sortie : une str contenant les éléments de l séparés par des virgules, sauf dernier qui est séparé par le mot « et »
-    """
-    if len(l)==0:
-        return ""
-    elif len(l)==1:
-        return l[0]
-    else:
-        return ", ".join(l[:-1]) + " et " + l[-1]
-
-def sans_style(texte):
-    """
-    Entrée : du code html (str)
-    Sortie : le code sans les lignes entourées de balises <style>...</style>
-    """
-    
-    x=re.findall("(.*?)<style>.*?</style>(.*)", texte) # ? : non greedy
-    if x:
-        return x[0][0] + sans_style(x[0][1])
-    else:
-        return texte
-
-def récup_head_body_script(chemin):
-    """ Entrée : adresse d’un fichier html
-        Sortie : la partie body de celui-ci
-    """
-    with open(chemin) as entrée:
-        tout=entrée.read()
-        
-        head, suite = tout.split("</head>")
-        head = head.split("<head>")[1]
-        
-        body, suite = suite.split("</body>")
-        body = body.split("<body>")[1]
-
-        script = suite.split("<script>")[1].split("</script>")[0]
-    return (head), body, script
-
 
 
 
@@ -106,7 +56,7 @@ def vue_itinéraire(requête):
             d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
             rues_interdites=rues_interdites,
-            bavard=4, où_enregistrer="dijk/templates/dijk/iti_folium.html"
+            bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
     except (PasTrouvé, LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)

@@ -2,7 +2,7 @@
 import module_graphe
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville, Adresse
 import re
-from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local
+from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local, cherche_adresse_complète
 from petites_fonctions import distance_euc
 from params import LOG_PB
 
@@ -169,9 +169,12 @@ def filtre_nœuds(nœuds, g):
 def un_seul_nœud(g, adresse, bavard=0):
     """ Renvoie un singleton si on dispose d’assez de données pour localiser le numéro. Sinon renvoie tous les nœuds de la rue."""
     try:
-        if bavard > 0: print(f"Je lance coords_of_adresse pour {adresse}.")
-        coords = coords_of_adresse(adresse)
-        return [nœud_sur_rue_le_plus_proche(g, coords, adresse)]
+        #if bavard > 0: print(f"Je lance coords_of_adresse pour {adresse}.")
+        #coords = coords_of_adresse(adresse)
+        #return [nœud_sur_rue_le_plus_proche(g, coords, adresse)]
+        if bavard>0:print(f"Récupération des coordonnées de {adresse} via adresse.data.gouv.fr")
+        coords = cherche_adresse_complète(adresse, bavard=bavard)
+        return [nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=bavard-1)]
     except Exception as e:
         LOG_PB(f"Échec dans coords_of_adresse : {e}. Je vais renvoyer tous les nœuds pour {adresse}). J’efface le numéro de l’adresse.")
         adresse.num=None
@@ -235,6 +238,8 @@ def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
     Renvoie le nœud sur la rue nom_rue le plus proche de coords."""
 
     nœuds = tous_les_nœuds(g, adresse, bavard=bavard-1)
+    if bavard>0:print(f"Nœuds récupérés pour la rue de {adresse} : {nœuds}")
     tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]
+    if bavard>0:print(f"distances aux nœuds de la rue : {tab}")
     _, res = min(tab)
     return res

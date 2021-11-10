@@ -47,6 +47,7 @@ def distance_euc(c1, c2):
     Formule simplifiée pour petites distances."""
     long1, lat1 = c1
     long2, lat2 = c2
+    assert lat1>40 and lat2>40, f"Je voulais des coordonnées au format (lon, lat) et j’ai reçu {c1} et {c2}"
     dx = R_TERRE * (long2-long1) * pi / 180
     dy = R_TERRE * (lat2-lat1) * pi / 180
     return (dx**2+dy**2)**.5

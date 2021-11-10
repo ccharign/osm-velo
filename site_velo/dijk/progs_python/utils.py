@@ -62,11 +62,11 @@ def itinéraire(départ, arrivée, ps_détour, g,
     """
 
     ## Calcul des étapes
-    d = chemins.Étape(départ, g)
+    d = chemins.Étape(départ, g, bavard=bavard-1)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
         #print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
-    a = chemins.Étape(arrivée, g)
+    a = chemins.Étape(arrivée, g, bavard=bavard-1)
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
     étapes = [chemins.Étape(é, g) for é in noms_étapes]

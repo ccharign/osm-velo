@@ -17,12 +17,12 @@ import dijkstra
 import chemins  # classe chemin et lecture du csv
 #import initialisation.nœuds_des_rues as nr
 #import lecture_adresse.arbresLex as lex
-from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT
+from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT, Adresse
 import utils
 import petites_fonctions
+import recup_donnees
 g = charge_graphe(bavard=2)
 #nr.sortie_csv(g)
-
 
 
 arêtes_barbanègre= chemins.arêtes_interdites(g, ["boulevard barbanègre"])

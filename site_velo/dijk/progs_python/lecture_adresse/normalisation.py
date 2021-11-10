@@ -172,9 +172,9 @@ class Adresse():
     
     def __init__(self, texte, bavard=0):
         """ 
-        Entrée : texte d’une adresse. Format : (num)? rue (code_postale? ville)
+        Entrée : texte d’une adresse. Format : (num)? rue (code_postal? ville)
         """
-        e = re.compile("(^[0-9]*)([^()]+)(\((.*)\))?")
+        e = re.compile("(^[0-9]*) *([^()]+)(\((.*)\))?")
         essai = re.findall(e, texte)
         if bavard > 1: print(f"Résultat de la regexp : {essai}")
         if len(essai) == 1:
@@ -203,16 +203,16 @@ class Adresse():
         
     def __str__(self):
         """
-        Utilisé en particulier pour l’enregistrement dans chemins.csv et pour l’affichage pour vérification à l’utilisateur.
+        Utilisé en particulier pour l’enregistrement dans chemins.csv, pour l’affichage pour vérification à l’utilisateur, et pour la recherche de coordonnése
         """
         if self.num is not None:
             déb=f"{self.num} "
         else:
             déb=""
         if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm} ({self.ville.avec_code()})"
+            return f"{déb}{self.rue_osm}, ({self.ville.avec_code()})"
         else:
-            return f"{déb}{self.rue} ({self.ville.avec_code()})"
+            return f"{déb}{self.rue}, ({self.ville.avec_code()})"
 
         
     def pour_nominatim(self):

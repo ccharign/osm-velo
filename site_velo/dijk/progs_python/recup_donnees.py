@@ -11,7 +11,9 @@ import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
 from lecture_adresse.normalisation import normalise_rue, normalise_ville
-
+import requests
+import json
+import urllib.parse
 
 geopy.geocoders.options.default_user_agent = "pau à vélo"
 localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
@@ -29,6 +31,18 @@ class LieuPasTrouvé(Exception):
 # Pour contourner le pb des tronçons manquant dans Nominatim :
 # 1) récupérer le nom osm de la rue
 # 2) recherche dans le graphe
+# -- à éliminer pour éviter le charegment du .osm, ou alors charger uniquement au besoin
+
+def cherche_adresse_complète(adresse, bavard=0):
+    """
+    Entrée : une adresse avec numéro de rue.
+    Sortie : coordonnées (lon, lat) gps de cette adresse obtenue avec api-adresse.data.gouv.fr
+    """
+    # https://perso.esiee.fr/~courivad/python_bases/15-geo.html
+    api_url = "https://api-adresse.data.gouv.fr/search/?q="
+    r = requests.get(api_url + urllib.parse.quote(str(adresse)))
+    r=r.content.decode('unicode_escape')
+    return json.loads(r)["features"][0]["geometry"]["coordinates"]
 
 
 def cherche_lieu(adresse, bavard=0):

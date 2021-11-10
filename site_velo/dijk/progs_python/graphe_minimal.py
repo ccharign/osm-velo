@@ -38,10 +38,10 @@ class Graphe_minimaliste():
 
 
     def coords_of_nœud(self, n):
-        """ Renvoie le couple (lat, lon)
-        Au fait, attention : dans osm l’ordre est inversé : x=lon, y=lat.
+        """ Renvoie le couple (lon, lat)
+         dans osmnx : x=lon, y=lat.
         """
-        return self.digraphe.nodes[n]["y"], self.digraphe.nodes[n]["x"]
+        return self.digraphe.nodes[n]["x"], self.digraphe.nodes[n]["y"]
 
     
     def d_euc(self, n1, n2):
