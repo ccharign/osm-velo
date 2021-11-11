@@ -1,41 +1,29 @@
-{% block title %} Entraîner l’IA {% endblock %}
+{% extends "base.html" %}
+
+{% block titre %} Contribuer {% endblock %}
     
-    {% block contenu %}
-    <p>Cette page permet de rentrer un itinéraire que vous validez en tant que cyliste. Il sera inclus dans la base de données et servira à entraîner l'IA. </p>
+{% block contenu %}
 
-    <p>
-      Quelques points techniques:
-      <ul>
-	<li> Entre deux étapes indiquées, l’algo prend le meilleur chemin en l’état actuel de ses connaissances. Il est donc inutile d’indiquer la moindre rue empruntée : seulement les étapes marquantes.</li>
-	<li> Si vous indiquez une adresse précise (soit un bâtiment, soit en précisant un numéro de rue) l’algo fera passer le chemin exactement par ce point. Toutefois openstreet map contient très peu de numéros de rue ; si vous indiquez un numéro dans une rue pour lequel on ne dispose pas de deux numéros de la bonne parité, il sera ignoré.</li>
+Quelques suggestions pour aider à améliorer ce site :
+<ul>
+  <li> L’utiliser ! </li>
+  
+  <li> Enregistrer les itinéraires que vous pratiquez et recommandez. Voir <a href="{% url 'mode d’emploi'%}"> le mode d’emploi du site </a> </li>
+  
+  <li> Signaler les bugs.</li>
+  
+  <li>  Proposer des améliorations : que ça soit de nouvelles fonctionalités, ou de simples question de mise en page ou de plan du site, tous les détails comptent !</li>
+  
+  <li> Ou juste m’envoyer un message pour me dire que ça a marché (ou pas)</li>
+  
+  <li> cyril [point] charignon [chez] net-c.com </li>
 
-	<li>Si une rue est indiquée comme étape sans préciser de numéro, l’algo fera en sorte d’emprunter au moins un tronçon de cette rue. Dans des cas extrêmes, il pourrait faire un aller-retour sur cette rue. De manière générale, il ne faut pas indiquer une rue que l’on ne fait que traverser.</li>
-      </ul>
-    </p>
+  
+  <li>Je suis un mathématicien, et pas un développeurs web, et je pense que ça se voit ! Si vous avez des compétences en html, css et cie et que vous pouvez améliorer l’aspect et l’ergonomie du site, je vous bénirai sur quatre générations.</li>
 
-    <p>
-      Quand vous aurez validé votre entrée, le site vous laissera la possibilité de vérifier si votre trajet a bien été compris par l’algo avant de le valider pour de bon.
-    </p>
+  
+  <li> Pour les amateurs de clonages et de pull request, le code source <a href="https://github.com/ccharign/osm-velo">est là </a>.
+</ul>
 
-    
-    <form action = "{% url 'vérif nouveau chemin' %}" method="post">
-      {% csrf_token %}
-      <label for="départ">Départ : </label><br>
-      <input type="text" id="départ" name="départ"><br><br>
 
-      <label for="arrivée"> Arrivée </label><br>
-      <input type="text" id="arrivée" name="arrivée"><br><br>
-
-      <label for="étapes"> Étapes, séparées par des point-virgules </label><br>
-      <input type="text" id="étapes" name="étapes" size=100><br><br>
-
-      <label for="pourcentage_détour"> Pourcentage détour </label><br>
-      <input type="text" id="pourcentage_détour" name="pourcentage_détour"> <br><br>
-
-      <label for="AR"> Valable aussi pour le retour ? </label>       <input type="checkbox" id="AR" name="AR"><br><br>
-      
-      <input type="submit" value="C’est parti!">
-    </form>
-
-    
 {% endblock %}

@@ -31,6 +31,8 @@ def limitations(requête):
 def mode_demploi(requête):
     return render(requête, "dijk/mode_demploi.html", {"ville_défaut":VILLE_DÉFAUT})
 
+def contribution(requête):
+    return render(requête, "dijk/contribution.html", {})
 
 
 ### Recherche d’itinéraire simple ###
