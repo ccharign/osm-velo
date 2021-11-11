@@ -8,9 +8,6 @@
   Bienvenue dans le calculateur participatif d’itinéraires cyclables de l’agglomération de {{ville}}. La ville par défaut est {{ville}}. Pour indiquer un emplacement dans une autre ville, préciser celle-ci entre parenthèses. Par exemple : « rue du souvenir (Lons) » ou « médiathèque (Billère) ».
 </p>
 
-<p>
-La première recherche est un peu longue : c’est le temps que le serveur mette le graphe en mémoire...
-</p>
 
 <form action = "{% url 'résultat' %}" method="post">
   {% csrf_token %}
