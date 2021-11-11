@@ -1,14 +1,15 @@
 
 À FAIRE :
 
-Paramétrer les fichiers statiques côté serveur
+Écrire l’aide
+
+Stats sur le temps de chargemnent
+
+Afficher les étapes sur la carte
 
 Mettre dans le cache les noms osm de lieux récupérés via nominatim
 
 Si un sommet change lors d’une màj de g, que se passe-t-il dans le cache ? -> recréer (à partir da la liste des chemins) ou supprimer le cache lors d’une màj ?
-
-Afficher les étapes sur la carte
-
 
 Il existe des rues qui figurent dans rue_num_coord, donc qui étaient dans le .osm, mais qui ne sont pas dans nœuds_rue. Ce dernier est créé par nœuds_des_rues.py. Par exemple place reine marguerite, dont le nœud du graphe est 339262446.
 Problème lorsqu’une rue ne contient qu’un sommet de g, donc aucune arête.
@@ -27,8 +28,11 @@ Y-a-t-il des risques de conflit si deux utilisateurs en même temps ?
 	-> Classe Ville_django avec les mêmes méthodes que Ville. Càd code, nom_complet et nom_norm
 
 
-- Accélérer l'apprentissage. Sauvegarder les trajets calculé par Dijkstra ?
+- Accélérer l'apprentissage.
+  	    Éliminer au fur et à mesur les zones où plus de changement
+  	    Sauvegarder les trajets calculé par Dijkstra ?
+
 
 - Gestion des transitions entre deux rues.
-
+  	  - rajouter un coeff de trasition entre deux arêtes
 

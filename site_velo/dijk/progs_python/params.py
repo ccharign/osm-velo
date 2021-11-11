@@ -60,11 +60,25 @@ for f in (CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, CHEMI
 D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres
 
 
+
 ### logs ###
+
+
 os.makedirs(os.path.join(RACINE_PROJET, "log"), exist_ok=True)
-def LOG_PB(msg):
-    f = open(os.path.join(RACINE_PROJET,"log/pb.log"), "a", encoding="utf-8")
-    f.write(f"{datetime.now()}   {msg}\n")
+DÉCALAGE_MAX=10
+def LOG(msg, type_de_log, bavard=0):
+    f = open(os.path.join(RACINE_PROJET,f"log/{type_de_log}.log"), "a", encoding="utf-8")
+    décalage=2*(max(DÉCALAGE_MAX-bavard,0))*" "
+    f.write(f"{décalage}{datetime.now()}  {msg}\n")
     f.close()
-    print(msg)
+    print(f"{décalage} {msg}\n")
+
+LOG_PB=lambda m: LOG(m, "pb")
+    
+# def LOG_PB(msg):
+#     f = open(os.path.join(RACINE_PROJET,"log/pb.log"), "a", encoding="utf-8")
+#     f.write(f"{datetime.now()}   {msg}\n")
+#     f.close()
+#     print(msg)
+    
 LOG_PB("Nouveau chargement de params.py\n\n")

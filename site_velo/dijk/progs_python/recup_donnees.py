@@ -186,17 +186,19 @@ def charge_rue_num_coords():
                     res[ville_n][rue][k].append((int(num), (float(lat), float(lon))))
     return res
 
-print("Chargement du dictionnaire ville -> rue -> parité -> liste des (numéros, coords).")
-D_RUE_NUM_COORDS = charge_rue_num_coords()
+#print("Chargement du dictionnaire ville -> rue -> parité -> liste des (numéros, coords).")
+#D_RUE_NUM_COORDS = charge_rue_num_coords()
 
 
-def sauv_rue_nom_coords(d=D_RUE_NUM_COORDS):
+def sauv_rue_nom_coords(d=None):
     """ Sauvegarde le dico ville -> rue -> parité -> liste des (numéros, coords) dans le fichier CHEMIN_JSON_NUM_COORDS.
     Format :
     Une ligne pour chaque couple (ville,rue).
     ville; rue : liste_pairs;liste_impairs
     Où liste_pairs et liste_impairs sont des (num, lat, lon) séparés par des |
     """
+    if d is None:
+        d=charge_rue_num_coords()
     sortie = open(CHEMIN_JSON_NUM_COORDS,"w", encoding="utf-8")
     for ville in d.keys():
         villen = normalise_ville(ville)
@@ -222,6 +224,8 @@ class CoordsPasTrouvées(Exception):
 def coords_of_adresse(adresse, bavard=0):
     """ Cherche les coordonnées de l’adresse fournie en interpolant parmi les adresses connues."""
 
+    LOG_PB(f"J’ai eu besoin de recup_donnees.coords_of_adresse")
+    D_RUE_NUM_COORDS = charge_rue_num_coords()
     num=adresse.num
     ville=adresse.ville
     rue=adresse.rue_norm
