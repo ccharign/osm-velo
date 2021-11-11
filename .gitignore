@@ -13,3 +13,4 @@ site_velo/dijk/templates/dijk/iti_folium.html
 site_velo/dijk/templates/dijk/cycla.html
 site_velo/dijk/templates/dijk/résultat_itinéraire_complet*
 site_velo/site_velo/settings.py
+**/iti_folium.html
