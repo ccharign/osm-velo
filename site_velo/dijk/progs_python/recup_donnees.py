@@ -111,17 +111,17 @@ def coords_lieu(nom_rue, ville= VILLE_DÉFAUT, pays="France", bavard=0):
 ###################################################
 
 
-try:
-    print(f"Chargement du xml {CHEMIN_XML}")
-    root = xml.parse(CHEMIN_XML).getroot()
-    print("fini\n")
-except Exception as e:
-    print(f"Le chargement du fichier osm élagué a échoué, {e}.")
 
 
 def nœuds_sur_tronçon_local(id_rue):
     """ Cherche les nœuds d'une rue dans le fichier local. Renvoie la liste des nœuds trouvés (int list).
     """
+    try:
+        print(f"Chargement du xml {CHEMIN_XML}")
+        root = xml.parse(CHEMIN_XML).getroot()
+        print("fini\n")
+    except Exception as e:
+        print(f"Le chargement du fichier osm élagué a échoué, {e}.")
 
     for c in root:
         if c.tag == "way" and c.attrib["id"] == str(id_rue):
@@ -130,6 +130,7 @@ def nœuds_sur_tronçon_local(id_rue):
 
 
 def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
+    LOG_PB(f"J’ai eu besoin de recup_donnees.nœuds_sur_rue_local pour {nom_rue}, {ville}.")
     rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
     if bavard: print(rue)
     res = []
