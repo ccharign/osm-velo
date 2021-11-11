@@ -8,6 +8,7 @@
     <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/>
 
     
+    <!-- N’ayant pas pris le temps de voir comment sont gérés les fichiers statiques par Django, je mets le css ici -->
     <style>
       .carte {
 	  width 95%;height: 70%;margin: 0;padding: 0; border:2px solid black;
@@ -18,7 +19,36 @@
       nav{
 	  text-align:center;border:2px solid lightblue
       }
+
+      nav ul{
+	  padding:0;
+	  margin:auto;
+	  list-style-type:none;
+	  text-align:center;
+      }
+      nav li {
+	  margin-left:5px;
+	  float:left; /*pour IE*/
+      }
+      nav ul li ul{
+	  display:none
+      }
+      nav ul li:hover ul { /*Au survol d’un élément du menu par la souris*/
+	  display:block;
+      }
+      nav li:hover ul li {
+	  float:none; /*Annuler le float left du menu principal pour remettre un vertical*/
+      }
+      nav li ul{
+	  position : absolute;
+	  background-color:white;
+	  box-shadow:1px 2px 3px #CCC
+      }
+      nav li a:hover { /*Changer la couleur quand la souris passe*/
+	  color:#FFD700;
+      }
     </style>
+    
   </head>
 
   <body>
@@ -26,13 +56,24 @@
 
 <header>
   <nav>
-    <a href="{% url 'index'%}"> entrée </a>
-    | <a href="{% url 'carte cycla'%}"> la carte de la cyclabilité </a>
-    | <a href="{% url 'limitations'%}"> problèmes connus </a>
-    <!-- <a href="{% url 'contribution' %}">contribution</a> -->
+    <ul>
+      <li><a href="{% url 'index'%}"> entrée </a> </li>
+      
+      <li> Comment ça marche
+	<ul>
+	  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </li>
+	  <li><a href="{% url 'limitations'%}"> problèmes connus </a> </li>
+	  <li> Sous le capot </li>
+	</ul>
+      </li>
+      
+      <li> <a href="{% url 'carte cycla'%}"> la carte de la cyclabilité </a>
+    </ul>
+    
   </nav>
 </header>
 </br>
+<br>
 
 
   {% block contenu %} {% endblock %}
