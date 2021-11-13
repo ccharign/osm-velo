@@ -150,5 +150,41 @@ class ArbreLex():
                 return res
 
 
-        
+    def sauv(self, chemin):
+        """
+        Enregistre l’arbre dans le fichier spécifié.
+        Chaque ligne contient le booléen term puis les lettre étiquettant les fils d’un certain nœuds.
+        Les nœuds sont enregistrés selon un parcours en profondeur préfixe.
+        """
+        with open(chemin,"w") as sortie:
+            def aux(a):
+                fils = list(a.fils.items()) # Cette étape pour m’assurer que les fils seront traité dans le même ordre dans les deux opérations à suivre. Sans doute inutile...
+                if len(fils)==0 and not a.term:
+                    raise ValueError(f"Feuille non terminale dans mon arbre lexicographique.")
+                ligne = str(int(a.term)) + "".join(lettre for lettre,_ in fils)
+                sortie.write(ligne+"\n")
+                for _, f in fils:
+                    aux(f)
+            aux(self)
+
+
+    @classmethod
+    def of_fichier(cls, chemin):
+        """
+        Renvoie l’arbre enregistré dans le fichier indiqué.
+        """
+        with open(chemin) as entrée:
+            def aux():
+                res = cls()
+                ligne=entrée.readline().strip()
+                if len(ligne)==1:#C’est une feuille
+                    res.term=True
+                    return res
+                else:
+                    for lettre in ligne[1:]:
+                        res.fils[lettre]=aux()
+                    return res
+            return aux()
+                
+                
 #test = ArbreLex.of_iterable(["bal", "blaa", "blu"])
