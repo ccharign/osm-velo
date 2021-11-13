@@ -71,7 +71,7 @@ def vue_itinéraire(requête):
 
     # Calcul des itinéraires
     try:
-        stats = itinéraire(
+        stats, chemin = itinéraire(
             d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
             rues_interdites=rues_interdites,
@@ -100,6 +100,7 @@ def vue_itinéraire(requête):
                    "départ":d, "arrivée":a,
                    "étapes": texte_étapes,
                    "rues_interdites": énumération_texte(rues_interdites),
+                   "chemin":str(chemin),
                    "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
                    }
                   )

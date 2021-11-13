@@ -131,6 +131,7 @@ def créationArbre():
 
     for ville_n, arbre in res.items():
         arbre.sauv(os.path.join(DONNÉES, ville_n))
+    return res
 
 #créationArbre()
 
@@ -228,9 +229,9 @@ class Adresse():
         else:
             déb=""
         if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm}, ({self.ville.avec_code()})"
+            return f"{déb}{self.rue_osm} ({self.ville.avec_code()})"
         else:
-            return f"{déb}{self.rue}, ({self.ville.avec_code()})"
+            return f"{déb}{self.rue} ({self.ville.avec_code()})"
 
         
     def pour_nominatim(self):

@@ -14,8 +14,25 @@ class ArbreLex():
         """ Renvoie un arbre vide"""
         self.fils = {}
         self.term = False
-            
 
+    def tous_les_mots(self):
+        """
+        Renvoie la liste des mots de l’arbre
+        """
+        if self.term:
+            res=[""]
+        else:
+            res=[]
+        if len(self.fils)==0:
+            return res
+        else:
+            for x, a in self.fils.items():
+                #print(x)
+                res.extend(
+                    list(map(lambda m:x+m, a.tous_les_mots()))
+                )
+            return res
+        
     def insère(self, mot):
         """
         Entrée : mot (str)
@@ -176,7 +193,7 @@ class ArbreLex():
         with open(chemin) as entrée:
             def aux():
                 res = cls()
-                ligne=entrée.readline().strip()
+                ligne=entrée.readline().strip("\n")
                 if len(ligne)==1:#C’est une feuille
                     res.term=True
                     return res

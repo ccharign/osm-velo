@@ -17,7 +17,7 @@ import dijkstra
 import chemins  # classe chemin et lecture du csv
 #import initialisation.nœuds_des_rues as nr
 #import lecture_adresse.arbresLex as lex
-from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT, Adresse
+from lecture_adresse.normalisation import normalise_rue, VILLE_DÉFAUT, Adresse, ARBRE_DES_RUES
 import utils
 import petites_fonctions
 import recup_donnees

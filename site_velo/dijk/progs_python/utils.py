@@ -89,15 +89,15 @@ def itinéraire(départ, arrivée, ps_détour, g,
         res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
 
     if rajouter_iti_direct:
-        c = chemins.Chemin([d,a], 0, False)
-        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
+        cd = chemins.Chemin([d,a], 0, False)
+        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, cd, bavard=bavard-1)
         coul = "#000000"
         à_dessiner.append( (iti, coul))
         res.append(("Itinéraire direct", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
 
         
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
-    return res
+    return res, c
     
 
 
