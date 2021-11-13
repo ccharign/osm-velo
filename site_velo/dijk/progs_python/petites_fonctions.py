@@ -3,13 +3,13 @@
 
 
 """
-Ces petites fonctions ne doivent pas dépendre d’autres modules, à part params.py, pour ne pas créer de pbde dépendance.
+Ces petites fonctions ne doivent pas dépendre d’autres modules, à part params.py, pour ne pas créer de pb de dépendance.
 
 """
 
 
 from math import pi
-from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE
+from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, LOG
 import geopy
 import time
 import shutil
@@ -76,3 +76,11 @@ def ajouteDico(d, clef, val):
             d[clef].append(val)
     else:
             d[clef]=[val]
+
+def chrono(tic, tâche):
+    """
+    Entrée : tic, float
+             tâche, str
+    Effet : log (time.perf_counter()-tic) pour la tâche précisée
+    """
+    LOG(f"{time.perf_counter()-tic}s pour {tâche}", "perfs")

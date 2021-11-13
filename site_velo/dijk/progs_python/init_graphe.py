@@ -4,14 +4,23 @@
 
 
 #import networkx as nx
-from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
-from module_graphe import graphe  # ma classe de graphe
-
-from initialisation.ajoute_villes import ajoute_villes
-import initialisation.noeuds_des_rues as nr
-
 import time
+from petites_fonctions import chrono
+from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
+tic=time.perf_counter()
+from module_graphe import graphe  # ma classe de graphe
+chrono(tic, "module_graphe")
+tic=time.perf_counter()
+from initialisation.ajoute_villes import ajoute_villes
+chrono(tic, "ajoute_villes")
+tic=time.perf_counter()
+import initialisation.noeuds_des_rues as nr
+chrono(tic, "noeuds_des_rues")
+
+
+tic=time.perf_counter()
 import osmnx.io
+chrono(tic, "Chargement de osmnx.io")
 #from networkx import read_graphml  # Défaut : ne convertit pas les types des données (longeur, id_osm, coords...), tout reste en str
 import subprocess
 import os

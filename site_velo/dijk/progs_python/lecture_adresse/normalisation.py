@@ -1,9 +1,10 @@
 
 # -*- coding:utf-8 -*-
 import re
-from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES
+from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
-
+import time
+from petites_fonctions import chrono
 
 
 def partie_commune(c):
@@ -24,12 +25,14 @@ def normalise_adresse(c):
 
 ### Villes ###
 
+tic=time.perf_counter()
 print("Création du dico et de l’arbre lex de toutes villes.")
-
 ARBRE_VILLES=ArbreLex()
 for nom in TOUTES_LES_VILLES.keys():
     ARBRE_VILLES.insère(nom)
+chrono(tic, "Arbre lex des villes")
 
+    
 class VillePasTrouvée(Exception):
     pass
     
@@ -127,8 +130,9 @@ def créationArbre():
     return res
 
 
-
+tic=time.perf_counter()
 ARBRE_DES_RUES = créationArbre()
+chrono(tic, "Arbre lex des rues")
 
 def normalise_rue(rue, ville, tol=2, bavard=0):
     """
