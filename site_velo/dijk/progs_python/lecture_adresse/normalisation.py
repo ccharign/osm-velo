@@ -1,10 +1,11 @@
 
 # -*- coding:utf-8 -*-
 import re
-from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG
+from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 import time
 from petites_fonctions import chrono
+import os
 
 
 def partie_commune(c):
@@ -116,7 +117,7 @@ def prétraitement_rue(rue):
 
 def créationArbre():
     """ 
-    Lit le csv CHEMIN_NŒUDS_RUES, en extrait les noms de toutes les rues et met le tout dans un dictionnaire ville -> arbre des rues.
+    Lit le csv CHEMIN_NŒUDS_RUES, en extrait les noms de toutes les rues. Enregistre pour chaque ville l’arbre lexicographique de ses rues dans un fihier portant le nom de la ville, normalisé via str(normalise_ville(...)).
     rema : dans le csv, les noms des rues et des villes sont supposées avoir l’orthographe d’osm.
     """
     res = {}
@@ -127,11 +128,24 @@ def créationArbre():
             ville_n = str(normalise_ville(ville))
             if ville_n not in res: res[ville_n] = ArbreLex()
             res[ville_n].insère(prétraitement_rue(rue))
+
+    for ville_n, arbre in res.items():
+        arbre.sauv(os.path.join(DONNÉES, ville_n))
+
+#créationArbre()
+
+def charge_arbres_rues():
+    """
+    Renvoie le dictionnaire ville (normalisée) -> arbre de ses rues
+    """
+    res={}
+    for ville in TOUTES_LES_VILLES.keys():
+        ville_n = str(normalise_ville(ville))
+        res[ville_n] = ArbreLex.of_fichier(os.path.join(DONNÉES, ville_n))
     return res
 
-
 tic=time.perf_counter()
-ARBRE_DES_RUES = créationArbre()
+ARBRE_DES_RUES = charge_arbres_rues()
 chrono(tic, "Arbre lex des rues")
 
 def normalise_rue(rue, ville, tol=2, bavard=0):

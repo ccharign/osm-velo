@@ -17,6 +17,7 @@ from initialisation.élaguage import élague_xml
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes
+from normalisation import créationArbre
 from graphe_minimal import Graphe_minimaliste
 from petites_fonctions import sauv_fichier
 #from networkx import read_graphml
@@ -88,6 +89,9 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
     sauv_fichier(CHEMIN_NŒUDS_RUES)
     csv_nœud_des_rues(g, bavard=bavard)
 
+    print("\nArbres lexicographiques des rues")
+    créationArbre()
+    
     return g
 
 

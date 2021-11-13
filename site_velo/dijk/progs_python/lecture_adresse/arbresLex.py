@@ -183,6 +183,7 @@ class ArbreLex():
                 else:
                     for lettre in ligne[1:]:
                         res.fils[lettre]=aux()
+                    res.term=bool(int(ligne[0]))
                     return res
             return aux()
                 
