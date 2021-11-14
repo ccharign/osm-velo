@@ -118,7 +118,7 @@ def vue_itinéraire(requête):
 
         
 def confirme_nv_chemin(requête):
-    nb_lectures=10
+    nb_lectures=50
     #(étapes, p_détour, AR) = requête.session["chemin_à_valider"]
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
