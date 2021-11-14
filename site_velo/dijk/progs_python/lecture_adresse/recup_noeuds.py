@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-import module_graphe
+#import module_graphe
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville, Adresse
 import re
 from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local, cherche_adresse_complète

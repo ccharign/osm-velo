@@ -4,23 +4,18 @@
 
 
 #import networkx as nx
-import time
+from time import perf_counter
 from petites_fonctions import chrono
 from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
-tic=time.perf_counter()
 from module_graphe import graphe  # ma classe de graphe
-chrono(tic, "module_graphe")
-tic=time.perf_counter()
 from initialisation.ajoute_villes import ajoute_villes
-chrono(tic, "ajoute_villes")
-tic=time.perf_counter()
 import initialisation.noeuds_des_rues as nr
-chrono(tic, "noeuds_des_rues")
 
 
-tic=time.perf_counter()
-import osmnx.io
-chrono(tic, "Chargement de osmnx.io")
+
+tic=perf_counter()
+from osmnx.io import load_graphml
+chrono(tic, "Chargement de osmnx.io.load_graphml (depuis init_graphe)")
 #from networkx import read_graphml  # Défaut : ne convertit pas les types des données (longeur, id_osm, coords...), tout reste en str
 import subprocess
 import os
@@ -48,9 +43,12 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
     nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
     if bavard>0:print(f"Nom du fichier du graphe : {nom_fichier}")
     if os.path.exists(nom_fichier):
-        g = osmnx.io.load_graphml(nom_fichier)
+        tic=perf_counter()
+        g = load_graphml(nom_fichier)
         #g = read_graphml(nom_fichier, node_type=int)
-        if bavard>0: print("Graphe en mémoire !")
+        if bavard>0:
+            print("Graphe en mémoire !")
+            chrono(tic, f"osmnx.io.load_graphml({nom_fichier})")
     else:
         print(f"\nGraphe pas en mémoire à {nom_fichier}, je le charge via osmnx.\\")
 
@@ -63,7 +61,7 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
         sortie = subprocess.run(à_exécuter)
         if bavard>1:print(sortie.stdout)
         print(sortie.stderr)
-        g = osmnx.io.load_graphml(nom_fichier)
+        g = load_graphml(nom_fichier)
         #g = read_graphml(nom_fichier, node_type=int)
         
     gr = graphe(g)
@@ -71,13 +69,19 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
     gr.charge_cache()  # nœud_of_rue
     
     print("Chargement de la cyclabilité")
+    tic=perf_counter()
     gr.charge_cycla()
+    chrono(tic, "ajout de la cycla au graphe")
 
-    print("Ajout du nom des villes")
-    ajoute_villes(gr, bavard=bavard-1)
-
+    # print("Ajout du nom des villes")
+    # tic=perf_counter()
+    # ajoute_villes(gr, bavard=bavard-1)
+    # chrono(tic, "ajout du nom des villes au graphe")
+    
     print("Ajout de la liste des nœuds de chaque rue")
+    tic=perf_counter()
     nr.charge_csv(gr)
+    chrono(tic, "ajout de la liste des nœuds de chaque rue au graphe.")
     
     print("Chargement du graphe fini.\n")
     return gr

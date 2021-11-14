@@ -1,7 +1,14 @@
 # -*- coding:utf-8 -*-
+from petites_fonctions import chrono
+from time import perf_counter
 
+tic=perf_counter()
 import networkx as nx
+#from networkx import Digraph
+chrono(tic, "networkx", bavard=2)
+tic=perf_counter()
 from osmnx import nearest_nodes #plot_graph,
+chrono(tic, "osmn.nearest_nodes", bavard=2)
 import os
 
 from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA

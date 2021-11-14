@@ -1,0 +1,44 @@
+{% extends base.html %}
+{% block title %} Sous le capot {% endblock %}
+
+<h1>Comment ça marche ?</h1>
+
+<h2>Les données</h2>
+
+
+<ul>
+  <li> Les graphes sont extraits des données <a href="https://www.openstreetmap.org/">d’openstreetmap</a> via le module python <a href="https://github.com/gboeing/osmnx">osmnx</a>. Mille mercis à son créateur Geoff Boeing.
+  </li>
+
+  
+  <li> Les adresses sont récupérées sur <a href="https://adresse.data.gouv.fr/base-adresse-nationale">la base nationale d’adresses</a> lorsqu’elles contiennent un numéro de rue, directement dans le graphe lorsqu’elle contiennent un nom de rue sans numéro, et sur le moteur de recherche Nominatim d’openstreetmap dans les cas restants (bâtiment public, bar, …)</li>
+</ul>
+
+<h2>Les maths</h2>
+
+<ul>
+  <li> L’algo employé pour calculer un itinéraire est celui de <a href="https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra">Dijkstra</a>, ou plutôt sa variante <a href="https://fr.wikipedia.org/wiki/Algorithme_A*">A*</a>. L’utilisation de la cyclabilité fait que je ne peux pas utiliser directement la distance euclidienne comme heuristique, il faut la diviser par la cyclabilité maximale, du coup l’algo doit perdre un peu en efficacité...<br>
+
+    Par rapport à l’algorithme classique il faut prendre en compte le fait que le départ et l’arrivée peuvent être des ensembles de sommets; ce n’est pas bien compliqué.
+
+    Implémenter le concept de rue interdites est également presque immédiat.
+
+    En revanche, gérer les étapes demande un rien plus de réflexion : il s’agit d’imposer au chemin de passer par au moins une arête de chaque étapes indiquée. Quoique beaucoup plus facile à programmer, imposer de passer par juste un sommet de l’étape ne correspond pas à ce à quoi s’attend l’utilisateur : quand on dit qu’on emprunte la rue truc, c’est qu’on l’utilise sur une distance non nulle, et pas qu’on la traverse juste.
+    <br>
+
+    Le code est dans le fichier <a href="https://github.com/ccharign/osm-velo/blob/main/site_velo/dijk/progs_python/dijkstra.py">dijksta.py</a>.
+  </li>
+
+  
+  <li> Il y a un peu d’algorithmique aussi pour la gestion des fautes de frappe : les rues de chaque ville sont enregistrées dans un arbre lexicographique, ce qui permet de rechercher facilement la rue la plus proche au sens de la <a href="https://fr.wikipedia.org/wiki/Distance_de_Levenshtein">distance de Levenshtein</a> (nombre de fautes de frappe) de ce qui a été tapé par l’utilisateur.
+
+    Le code est <a href="https://github.com/ccharign/osm-velo/blob/main/site_velo/dijk/progs_python/lecture_adresse/arbresLex.py">là</a>.
+</ul>
+
+
+<h2>L’IA</h2>
+
+<p>La couche d’apprentissage surpervisée est tout à fait basique. On peut dire qu’il s’agit d’un réseau de neurones à une seule couche. L’avantage est qu’elle nécessite relativement peu de données pour fournir des résultats utilisables.<br>
+
+  En pratique, à chaque arête du graphe est associé un flottant qui représente sa cyclabilité, et qui est pris en compte par Dijkstra. Lorsqu’un nouvel itinéraire est rentré, il est comparé à l’ancien, celui qui aurait été renvoyé jusqu’ici. On augmente alors la cyclabilité toutes les arêcet qui figurent sur le nouvel itinéraire mais pas sur l’ancien, et on diminue la cyclabilité de toutes les arêtes qui figurent dans l’ancien itinéraire mais pas dans le nouveau (ces arêtes ont été évitées par le contributeur).</p>
+

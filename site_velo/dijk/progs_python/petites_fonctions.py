@@ -77,10 +77,10 @@ def ajouteDico(d, clef, val):
     else:
             d[clef]=[val]
 
-def chrono(tic, tâche):
+def chrono(tic, tâche, bavard=1):
     """
     Entrée : tic, float
              tâche, str
     Effet : log (time.perf_counter()-tic) pour la tâche précisée
     """
-    LOG(f"{time.perf_counter()-tic}s pour {tâche}", "perfs")
+    LOG(f"{time.perf_counter()-tic}s pour {tâche}", "perfs", bavard=bavard)

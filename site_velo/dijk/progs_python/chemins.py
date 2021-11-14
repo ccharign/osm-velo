@@ -208,28 +208,28 @@ def chemins_of_csv(g, adresse_csv=CHEMIN_CHEMINS, bavard=0):
     return res
 
 
-def formulaire_vers_csv(ad_entrée=os.path.join(DONNÉES,"chemins_form.csv"), ad_sortie = CHEMIN_CHEMINS ):
-    """ 
-    Entrées : adresse d’un csv issu du framaform
-              autre adresse
-    Effet : copie une version nettoyée du csv initial dans l’adresse de sortie. Format utilisé : AR|pourcentage_détour|étapes séparées par des ;
-    """
-    def bool_of_text(t):
-        if t=="oui":
-            return True
-        elif t=="non":
-            return False
-        else:
-            raise ValueError(f"J’attendais 'oui' ou 'non' mai j’ai eu {t}.")
-    entrée = open(ad_entrée, encoding="utf-8")
-    sortie = open(ad_sortie,"w", encoding="utf-8")
-    for ligne in entrée:
-        données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
-        assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
-        données[0]=str(bool_of_text(données[0]))
-        ligne = "|".join(données)
-        print("\n", ligne)
-        sortie.write(ligne+"\n")
+# def formulaire_vers_csv(ad_entrée=os.path.join(DONNÉES,"chemins_form.csv"), ad_sortie = CHEMIN_CHEMINS ):
+#     """ 
+#     Entrées : adresse d’un csv issu du framaform
+#               autre adresse
+#     Effet : copie une version nettoyée du csv initial dans l’adresse de sortie. Format utilisé : AR|pourcentage_détour|étapes séparées par des ;
+#     """
+#     def bool_of_text(t):
+#         if t=="oui":
+#             return True
+#         elif t=="non":
+#             return False
+#         else:
+#             raise ValueError(f"J’attendais 'oui' ou 'non' mai j’ai eu {t}.")
+#     entrée = open(ad_entrée, encoding="utf-8")
+#     sortie = open(ad_sortie,"w", encoding="utf-8")
+#     for ligne in entrée:
+#         données = list(map(sans_guillemets, ligne.strip().split("|")[9:]))
+#         assert len(données) == 3, f"Pas le bon nombre de colonnes dans la ligne {ligne}."
+#         données[0]=str(bool_of_text(données[0]))
+#         ligne = "|".join(données)
+#         print("\n", ligne)
+#         sortie.write(ligne+"\n")
 
 
 def lecture_étape(c):
