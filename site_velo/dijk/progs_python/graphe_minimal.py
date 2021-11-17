@@ -22,11 +22,10 @@ class Graphe_minimaliste():
     def __contains__(self, n):
         """ Indique si le nœud n est dans g"""
         return n in self.digraphe.nodes
-
     
     def voisins_nus(self, s):
         """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
-        return (t for t in self.digraphe[s].keys())
+        return self.digraphe[s].keys()
 
     
     def est_arête(self, s, t):
@@ -92,3 +91,12 @@ class Graphe_minimaliste():
                     if t not in déjàVu:
                         àVisiter.appendleft((t, d+1))
                         déjàVu.add(t)
+
+    def vers_csv(self, chemin):
+        """
+        Crée un csv avec la liste des arêtes et leurs longueurs.
+        """
+        with open(chemin,"w") as sortie:
+            for s in self.digraphe.nodes:
+                for t, données in self.digraphe[s].items():
+                    sortie.write(f"{s},{t},{données['length']}\n")

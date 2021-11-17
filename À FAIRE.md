@@ -1,9 +1,7 @@
 
 À FAIRE :
 
-Écrire l’aide
-
-Stats sur le temps de chargemnent
+Il semble que la gestion des fautes de frappes sur les noms de rue ne marche pas
 
 Afficher les étapes sur la carte
 
