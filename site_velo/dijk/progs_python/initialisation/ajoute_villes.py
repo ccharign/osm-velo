@@ -84,7 +84,7 @@ def test_overpass(id, bavard=0):
 
 
 
-def crée_csv():
+def crée_csv(g):
     """
     Utilise la fonction liste_villes pour récupérer la liste des villes.
     Ensuite, utilise osmnx pour récupérer les nœuds de chaque ville.
@@ -104,7 +104,7 @@ def crée_csv():
                 début=False
                 time.sleep(10)
             print(f"\n\nRecherche des nœuds de {ville}")
-            nœuds[str(ville)]=nœuds_ville(ville)
+            nœuds[str(ville)] = [n for n in nœuds_ville(ville) if n in g.digraphe.nodes ]
         else:
             print(f"J’avais déjà {len(nœuds[str(ville)])} nœuds pour {ville}.")
         sortie.write( str(ville) + ";" + ",".join(map(str, nœuds[str(ville)] )) + "\n")
@@ -143,7 +143,7 @@ def vérif_unicité_ville():
 
 def ajoute_villes(g, bavard=0):
     """ 
-    Ajoute un champ "ville" à chaque arête de g, qui contient une liste de villes.
+    Ajoute un champ "ville" à chaque sommet de g, qui contient une liste de villes.
     """
     compte=0
     with open(CHEMIN_NŒUDS_VILLES, encoding="utf-8") as entrée:
@@ -154,10 +154,7 @@ def ajoute_villes(g, bavard=0):
             for n in nœuds:
                 if n in g:
                     # Remplissage du graphe
-                    for v in g.voisins_nus(n):
-                        if v in nœuds:
-                            ajouteDico( g.digraphe[n][v], "ville", ville )
-                            ajouteDico( g.digraphe[v][n], "ville", ville )
-                            compte+=1
+                    ajouteDico( g.digraphe[n], "ville", ville )
+                    compte+=1
     if bavard>0:
         print(f"{compte} noms de ville ajoutés")
