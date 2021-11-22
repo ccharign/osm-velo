@@ -13,11 +13,11 @@ import osmnx.io
 
 from dijk.progs_python.params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, DONNÉES, BBOX_DÉFAUT
 from initialisation.crée_graphe import crée_graphe_bbox
-from initialisation.élaguage import élague_xml
+#from initialisation.élaguage import élague_xml
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues
-from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes
-from normalisation import créationArbre
+from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
+from lecture_adresse.normalisation import créationArbre
 from graphe_minimal import Graphe_minimaliste
 from petites_fonctions import sauv_fichier
 #from networkx import read_graphml
@@ -52,11 +52,12 @@ Il ne crée aucun objet Python, seulement des fichiers : peut être utilisé ind
 
 
 
-def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, force_téléchargement=False, bavard=1):
+def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=False, force_téléchargement=False, bavard=1):
     """
     Entrée :
         bbox : (o, s, e, n) bounding box de la zone de laquelle récupérer les données.
         force_téléchargement : si True force la fonction à télécharger de nouveau le graphe depuis osm.
+        aussi_nœuds_des_villes (bool) : pour recharger également les nœuds de chaque ville. Passe par un téléchargement du graphe de chaque ville via osmnx : un peu long.
     Effet :
        Initialise les données qui ne nécessitent pas un gros téléchargement depuis openstreetmap mais qui passent uniquement par osmnx.
        rema : Il faudrait voir comment s’y prend osmnx !
@@ -78,18 +79,20 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, force_téléchargement=False
         gr = crée_graphe_bbox(nom_fichier, bbox, bavard=bavard)
     g=Graphe_minimaliste(gr)
     
-
-    # Ville de chaque nœud
-    print("\n\nRecherche de la liste des nœuds de chaque ville.")
-    #if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...") # Maintenant c’est fait
-    sauv_fichier(CHEMIN_NŒUDS_VILLES)
-    csv_nœuds_des_villes(g)
-    print("Ajout des villes de chaque nœud.")
+    if aussi_nœuds_des_villes:
+        # Ville de chaque nœud
+        print("\n\nRecherche de la liste des nœuds de chaque ville.")
+        #if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...") # Maintenant c’est fait
+        sauv_fichier(CHEMIN_NŒUDS_VILLES)
+        csv_nœuds_des_villes(g)
+    print(f"Création du csv villes_of_nœud")
+    crée_csv_villes_of_nœuds(g,bavard=bavard)
+    print("Ajout des villes de chaque nœud dans le graphe.")
     ajoute_villes(g, bavard=bavard)
     
     print("\n\nCréation de la liste des nœuds de chaque rue.")
     sauv_fichier(CHEMIN_NŒUDS_RUES)
-    csv_nœud_des_rues(g, bavard=bavard)
+    csv_nœud_des_rues(g, bavard=bavard-1)
 
     print("\nArbres lexicographiques des rues")
     créationArbre()

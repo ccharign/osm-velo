@@ -6,7 +6,7 @@
 
 import overpy
 #from récup_données import localisateur
-from params import CHEMIN_NŒUDS_VILLES, CHEMIN_RUE_NUM_COORDS
+from params import CHEMIN_NŒUDS_VILLES, CHEMIN_RUE_NUM_COORDS, CHEMIN_VILLES_OF_NŒUDS
 from petites_fonctions import ajouteDico
 #from dijk.models import Ville, Sommet
 from lecture_adresse.normalisation import normalise_ville, TOUTES_LES_VILLES
@@ -138,6 +138,26 @@ def vérif_unicité_ville():
     return True
 
 
+def crée_csv_villes_of_nœuds(g, bavard=0):
+    """
+    Charge le csv CHEMIN_NŒUDS_VILLES qui donne les nœuds de chaque ville, et crée un csv CHEMIN_VILLES_OF_NŒUDS qui donne les villes de chaque nœud.
+    """
+    compte=0
+    d={} # dico nœud -> liste des villes
+    with open(CHEMIN_NŒUDS_VILLES, encoding="utf-8") as entrée:
+        for ligne in entrée:
+            ville, suite = ligne.strip().split(";")
+            nœuds = map(int, suite.split(","))
+            for n in nœuds:
+                if n in g:# devrait devenir inutile dès que le csv CHEMIN_NŒUDS_VILLES aura été proprement fait
+                    ajouteDico( d, n, ville )
+                    compte+=1
+    if bavard>0:
+        print(f"{compte} noms de ville ajoutés")
+
+    with open(CHEMIN_VILLES_OF_NŒUDS, "w") as sortie:
+        for n, villes in d.items():
+            sortie.write(f"{n};{','.join(villes)}\n")
 
 
 
@@ -145,14 +165,10 @@ def ajoute_villes(g, bavard=0):
     """ 
     Remplit le dictionnaire g.villes_of_nœud
     """
-    compte=0
-    with open(CHEMIN_NŒUDS_VILLES, encoding="utf-8") as entrée:
+    with open(CHEMIN_VILLES_OF_NŒUDS) as entrée:
         for ligne in entrée:
-            ville, suite = ligne.strip().split(";")
-            nœuds = map(int, suite.split(","))
-            for n in nœuds:
-                if n in g:# devrait devenir inutile dès que le csv CHEMIN_NŒUDS_VILLES aura été proprement fait
-                    ajouteDico( g.villes_of_nœud , n, ville )
-                    compte+=1
-    if bavard>0:
-        print(f"{compte} noms de ville ajoutés")
+            n_t, villes_t = ligne.strip().split(";")
+            n=int(n_t)
+            villes = villes_t.split(",")
+            g.villes_of_nœud[n]=villes
+    

@@ -45,6 +45,7 @@ CHEMIN_NŒUDS_RUES = os.path.join(DONNÉES,"nœuds_rues.csv")
 CHEMIN_CACHE = os.path.join(DONNÉES,"cache_adresses.csv")
 CHEMIN_CYCLA = os.path.join(DONNÉES,"Cyclabilité.csv")
 CHEMIN_CHEMINS = os.path.join(DONNÉES,"chemins.csv")
+CHEMIN_VILLES_OF_NŒUDS = os.path.join(DONNÉES, "villes_of_nœud.csv")
 
 # Création des csv vides s’il n’existent pas déjà:
 for f in (CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, CHEMIN_CACHE, CHEMIN_CHEMINS):
