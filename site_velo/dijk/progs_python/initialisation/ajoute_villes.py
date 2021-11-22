@@ -143,18 +143,16 @@ def vérif_unicité_ville():
 
 def ajoute_villes(g, bavard=0):
     """ 
-    Ajoute un champ "ville" à chaque sommet de g, qui contient une liste de villes.
+    Remplit le dictionnaire g.villes_of_nœud
     """
     compte=0
     with open(CHEMIN_NŒUDS_VILLES, encoding="utf-8") as entrée:
         for ligne in entrée:
-
             ville, suite = ligne.strip().split(";")
-            nœuds = set(map(int, suite.split(",")))
+            nœuds = map(int, suite.split(","))
             for n in nœuds:
-                if n in g:
-                    # Remplissage du graphe
-                    ajouteDico( g.digraphe[n], "ville", ville )
+                if n in g:# devrait devenir inutile dès que le csv CHEMIN_NŒUDS_VILLES aura été proprement fait
+                    ajouteDico( g.villes_of_nœud , n, ville )
                     compte+=1
     if bavard>0:
         print(f"{compte} noms de ville ajoutés")

@@ -37,8 +37,11 @@ Script pour tout initialiser, càd:
 Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
    -> À voir, peut être le cache ?
    -> Ou carrément recréer le cache...
+   De toute façon le cache est assez peu utilisé me semble-t-il maintenant.
+
 Il ne crée aucun objet Python, seulement des fichiers : peut être utilisé indépendemment du reste.
    -> le paramétrer pour usage en script
+
 """
 
 
@@ -49,13 +52,14 @@ Il ne crée aucun objet Python, seulement des fichiers : peut être utilisé ind
 
 
 
-def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
+def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, force_téléchargement=False, bavard=1):
     """
-    Entrée : bbox : (o, s, e, n) bounding box de la zone de laquelle récupérer les données.
-    
+    Entrée :
+        bbox : (o, s, e, n) bounding box de la zone de laquelle récupérer les données.
+        force_téléchargement : si True force la fonction à télécharger de nouveau le graphe depuis osm.
     Effet :
        Initialise les données qui ne nécessitent pas un gros téléchargement depuis openstreetmap mais qui passent uniquement par osmnx.
-       rema : Il faudra voir comment s’y prend osmnx !
+       rema : Il faudrait voir comment s’y prend osmnx !
 
        Précisément, cette procédure crée :
              - le graphe au format graphml
@@ -65,7 +69,7 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
 
     s,o,n,e = bbox
     nom_fichier=f'{DONNÉES}/{s}{o}{n}{e}.graphml'
-    if os.path.exists(nom_fichier):
+    if not force_téléchargement and os.path.exists(nom_fichier):
         #gr = read_graphml(nom_fichier, node_type=int)
         gr = osmnx.io.load_graphml(nom_fichier)
         if bavard: print("Graphe en mémoire !")
@@ -81,7 +85,7 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
     print("\n\nRecherche de la liste des nœuds de chaque ville.")
     if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...")
     sauv_fichier(CHEMIN_NŒUDS_VILLES)
-    #csv_nœuds_des_villes()
+    csv_nœuds_des_villes(g)
     print("Ajout des villes dans le graphe")
     ajoute_villes(g, bavard=bavard)
     
@@ -97,9 +101,11 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, bavard=1):
 
 def rajoute_donnée(bbox=BBOX_DÉFAUT, garder_le_osm_complet=True):
     """
+    NB : maintenant que rue_num_coords n’est plus utilisé, cette fonction devient inutile.
+
     Entrée : une bbox suffisamment petite pour être acceptée par overpass.
     Effet : récupère le .osm correspondant à la bounding box indiquée, et l’utilise pour compléter les données suivantes :
-        - rue_nom_coords (CHEMIN_RUE_NUM_COORDS)
+        - rue_num_coords (CHEMIN_RUE_NUM_COORDS)
 
     Paramètres:
        - garder_le_osm_complet : mettre à False pour forcer le retéléchargement  d’un fichier déjà présent.

@@ -41,10 +41,14 @@ class graphe(Graphe_minimaliste):
         """ Entrée : g, MultiDiGraph de networkx"""
         self.multidigraphe = g
         print("Calcul de la version sans multiarêtes")
+        tic= perf_counter()
         self.digraphe = nx.DiGraph(g)  # ox.get_digraph(g)
+        chrono(tic, "conversion en digraph simple.")
         self.cyclabilité = {}
         self.nœud_of_rue = {}
         self.nœuds = {}
+        self.villes_of_nœud={}
+
 
         
     def voisins(self, s, p_détour, interdites={}):

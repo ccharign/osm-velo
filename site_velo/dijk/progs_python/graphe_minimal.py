@@ -9,7 +9,12 @@ class Graphe_minimaliste():
     """
     Classe de graphe avec uniquement le graphe networkx tiré d’osm.
     Pour être utilisé lors de la phase d’initialisation quamd aucune donnée n’a encore été obtenue.
-    Munie tout de même des méthodes rue_dune_arête et ville_dune_arête. Le première fonctionne grâce au champ « name » présentdans les arêtes dans le grphe renvoyé par osm. Le seconde recherche un champ « ville » qui peut avoir été rempli par ajoute_villes dans initialisation.ajoute_villes.
+    Munie tout de même des méthodes rue_dune_arête et ville_dune_sommet. Le première fonctionne grâce au champ « name » présent dans les arêtes dans le grphe renvoyé par osm. La seconde grâce au dico ville_of_nœud, rempli par ajoute_villes.
+
+    Attributs:
+        multidigraphe
+        digraphe
+        villes_of_nœud : dictionnaire nœud -> liste des villes
     """
     
     def __init__(self, g):
@@ -17,6 +22,7 @@ class Graphe_minimaliste():
         self.multidigraphe = g
         print("Calcul de la version sans multiarêtes")
         self.digraphe = nx.DiGraph(g)  # ox.get_digraph(g)
+        self.villes_of_nœud={}
 
 
     def __contains__(self, n):
@@ -66,6 +72,17 @@ class Graphe_minimaliste():
         """
         try:
             return self.digraphe[s][t]["ville"] 
+        except KeyError:
+            if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
+            return []
+
+    def villes_dun_sommet(self, s):
+        """
+        Entrée : s (int), sommet du graphe.
+        Sortie : liste des villes de ce sommet.
+        """
+        try:
+            return self.villes_of_nœud[s]
         except KeyError:
             if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
             return []
