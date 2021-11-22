@@ -24,6 +24,10 @@ import recup_donnees
 g = charge_graphe(bavard=2)
 #nr.sortie_csv(g)
 from initialisation.ajoute_villes import ajoute_villes
+ajoute_villes(g)
+from initialisation.noeuds_des_rues import sortie_csv
+
+
 
 arêtes_barbanègre= chemins.arêtes_interdites(g, ["boulevard barbanègre"])
 c = chemins.Chemin([chemins.Étape("rue des véroniques", g), chemins.Étape("place royale", g) ], .4, False, interdites=arêtes_barbanègre)
