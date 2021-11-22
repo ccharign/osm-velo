@@ -78,15 +78,13 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, force_téléchargement=False
         gr = crée_graphe_bbox(nom_fichier, bbox, bavard=bavard)
     g=Graphe_minimaliste(gr)
     
-    #print("Création de la liste des nœuds de chaque ville.")
-    #sauv_fichier(CHEMIN_NŒUDS_VILLES)
-    #csv_nœuds_des_villes()
-    
+
+    # Ville de chaque nœud
     print("\n\nRecherche de la liste des nœuds de chaque ville.")
-    if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...")
+    #if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...") # Maintenant c’est fait
     sauv_fichier(CHEMIN_NŒUDS_VILLES)
     csv_nœuds_des_villes(g)
-    print("Ajout des villes dans le graphe")
+    print("Ajout des villes de chaque nœud.")
     ajoute_villes(g, bavard=bavard)
     
     print("\n\nCréation de la liste des nœuds de chaque rue.")

@@ -66,17 +66,19 @@ class Graphe_minimaliste():
         except KeyError:
             if bavard>0:
                 print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
+            return ()
 
-    def ville_dune_arête(self, s, t, bavard=0):
-        """ Liste des villes contenant l’arête (s,t).
-        """
-        try:
-            return self.digraphe[s][t]["ville"] 
-        except KeyError:
-            if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
-            return []
+    ### Remplacé par villes_dun_sommet
+    # def ville_dune_arête(self, s, t, bavard=0):
+    #     """ Liste des villes contenant l’arête (s,t).
+    #     """
+    #     try:
+    #         return self.digraphe[s][t]["ville"] 
+    #     except KeyError:
+    #         if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
+    #         return []
 
-    def villes_dun_sommet(self, s):
+    def villes_dun_sommet(self, s, bavard=0):
         """
         Entrée : s (int), sommet du graphe.
         Sortie : liste des villes de ce sommet.
@@ -84,7 +86,7 @@ class Graphe_minimaliste():
         try:
             return self.villes_of_nœud[s]
         except KeyError:
-            if bavard>0: print(f"Pas de ville en mémoire pour l’arête {s,t}.  Voici ses données\n {self.digraphe[s][t]}")
+            if bavard>0: print(f"Pas de ville en mémoire pour le sommet {s}.  Voici ses données\n {self.digraphe[s]}.")
             return []
 
     def nb_arêtes_avec_ville(self):

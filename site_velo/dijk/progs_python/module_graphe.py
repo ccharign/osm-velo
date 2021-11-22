@@ -33,8 +33,10 @@ class graphe(Graphe_minimaliste):
     Attributs : - multidigraphe : un multidigraph de networkx
                 - digraphe : le digraph correspondant
                 - cyclabilité un dictionnaire (int * int) -> float, qui associe à une arrête (couple des id osm des nœuds) sa cyclabilité. Valeur par défaut : 1. Les distances seront divisées par  (p_détour × cycla + 1 - p_détour).
+                - cycla_max (float) : cyclabilité maximale. Créé par charge_cycla.
                 - nœud_of_rue : dictionnaire de type str -> int qui associe à un nom de rue l'identifiant correspondant dans le graphe. Calculé au moyen de la méthode un_nœud_sur_rue. Sert de cache. La clé utilisée est "nom_rue,ville,pays".
                 - nœuds : dictionnaire ville -> rue -> nœuds. Calculé par un parcours de tous le graphe dans initialisation/nœuds_des_rue.py
+
     """
    
     def __init__(self, g):
@@ -61,7 +63,8 @@ class graphe(Graphe_minimaliste):
         """
         #assert s in self.digraphe.nodes, f"le sommet {s} reçu par la méthode voisins n’est pas dans le graphe"
         # Formule pour prendre en compte p_détour : cycla**(p_détour*1.5)
-        cycla_corrigée = lambda voisin: ( self.cyclabilité.get((s, voisin), 1.)**( p_détour*1.5))
+        def cycla_corrigée(voisin):
+            return self.cyclabilité.get((s, voisin), 1.)**( p_détour*1.5)
         if s in interdites:
             return ( ( voisin, données["length"]/cycla_corrigée(voisin) )
                      for (voisin, données) in self.digraphe[s].items() if voisin not in interdites[s]
