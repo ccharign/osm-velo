@@ -17,6 +17,7 @@ tic=perf_counter()
 from osmnx.io import load_graphml
 chrono(tic, "Chargement de osmnx.io.load_graphml (depuis init_graphe)")
 #from networkx import read_graphml  # Défaut : ne convertit pas les types des données (longeur, id_osm, coords...), tout reste en str
+# https://networkx.org/documentation/stable/reference/readwrite/generated/networkx.readwrite.graphml.read_graphml.html#networkx.readwrite.graphml.read_graphml
 import subprocess
 import os
 #ox.config(use_cache=True, log_console=True)

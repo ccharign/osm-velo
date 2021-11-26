@@ -116,12 +116,17 @@ def charge_csv(g):
     Les clefs (ville et rue) sont traitées via les fonctions de normalisation de lecture_adresse.normalisation.
     """
     with open(CHEMIN_NŒUDS_RUES, "r", encoding="utf-8") as entrée:
+        dico_ville_norm = {}
         for ligne in entrée:
             ville, rue, nœuds_à_découper = ligne.strip().split(";")
-            ville = normalise_ville(ville)
-            ville_n=ville.nom_norm
+            if ville in dico_ville_norm:
+                ville_n = dico_ville_norm[ville]
+            else:
+                ville = normalise_ville(ville)
+                ville_n=ville.nom_norm
+                dico_ville_norm[ville]=ville_n
             rue = prétraitement_rue(rue) # Il ne devrait pas y avoir de faute de frappe dans le csv : je saute la recherche dans l’arbre lex.
-            nœuds = list(map(int, nœuds_à_découper.split(",")))
+            nœuds = set(map(int, nœuds_à_découper.split(",")))
             if ville_n not in g.nœuds : g.nœuds[ville_n]={}
             g.nœuds[ville_n][rue] = nœuds
     print("Chargement de la liste des nœuds de chaque rue finie.")
