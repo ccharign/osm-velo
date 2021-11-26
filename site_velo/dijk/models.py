@@ -15,8 +15,11 @@ class Rue(models.Model):
     nom_complet = models.CharField(max_length=200)
     nom_norm = models.CharField(max_length=200)
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
+    nœuds_à_découper = models.CharField(max_length=2000) #chaîne de caractère contenant les nœuds à splitter
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
+    def nœuds(self):
+        return map(int, self.nœuds_à_découper.split(","))
     
 
 class Sommet(models.Model):
