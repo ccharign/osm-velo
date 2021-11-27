@@ -2,6 +2,7 @@
 
 import networkx as nx
 from petites_fonctions import distance_euc
+#from time import perf_counter
 
 
 
@@ -21,7 +22,9 @@ class Graphe_minimaliste():
         """ Entrée : g, MultiDiGraph de networkx"""
         self.multidigraphe = g
         print("Calcul de la version sans multiarêtes")
+        #tic= perf_counter()
         self.digraphe = nx.DiGraph(g)  # ox.get_digraph(g)
+        #chrono(tic, "conversion en digraph simple.")
         self.villes_of_nœud={}
 
 

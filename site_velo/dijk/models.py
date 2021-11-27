@@ -10,12 +10,12 @@ class Ville(models.Model):
     def __str__(self):
         return self.nom_complet
 
-
+#https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
 class Rue(models.Model):
     nom_complet = models.CharField(max_length=200)
     nom_norm = models.CharField(max_length=200)
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
-    nœuds_à_découper = models.CharField(max_length=2000) #chaîne de caractère contenant les nœuds à splitter
+    nœuds_à_découper = models.CharField(max_length=2000) #chaîne de caractères contenant les nœuds à splitter
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
     def nœuds(self):
@@ -56,7 +56,7 @@ class Arête(models.Model):
     arrivée = models.ForeignKey(Sommet, related_name="sommet_arrivée", on_delete=models.CASCADE)
     longueur = models.FloatField()
     cycla = models.FloatField(default=1.0)
-    rue = models.ForeignKey(Rue, on_delete=models.CASCADE) # Si plusieurs rues : séparées par un point-virgule.
+    rue = models.ManyToManyField(Rue)
     def __str__(self):
         return f"({self.départ}, {self.arrivée})"
 

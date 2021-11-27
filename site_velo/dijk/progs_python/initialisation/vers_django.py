@@ -18,15 +18,18 @@ def nv(nom_ville):
 
 code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
 
+#Utiliser bulk_create
+#https://pmbaumgartner.github.io/blog/the-fastest-way-to-load-data-django-postgresql/
 
 def villes_vers_django():
     """
     Effet : réinitialise la table dijk_ville
     """
     Ville.objects.all().delete()
+    villes_à_créer=[]
     for nom, code in TOUTES_LES_VILLES.items():
-        v = Ville(nom_complet=nom, nom_norm=nv(nom), code=code)
-        v.save()
+        villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(nom), code=code))
+    Ville.objects.bulk_create(villes_à_créer)
 
         
 def charge_villes_rues_nœuds(g, bavard=0):
@@ -39,7 +42,7 @@ def charge_villes_rues_nœuds(g, bavard=0):
     Rue.objects.all().delete()
     Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
     
-    
+    rues_à_créer=[]
     with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
         compte=0
         nb_lignes_lues=0
@@ -55,25 +58,10 @@ def charge_villes_rues_nœuds(g, bavard=0):
             ville_d = Ville.objects.get(nom_norm=ville_n) # l’objet Django. # get renvoie un seul objet, et filter plusieurs (à confirmer...)
             
             rue_n = normalise_rue(rue, ville)
-            rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds=nœuds_à_découper)
-            rue_d.save()
+            rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+            rues_à_créer.append(rue_d)
             
-            # nœuds = map(int, nœuds_à_découper.split(","))
-            # for n in nœuds:
-            #     compte+=1
-            #     try:
-            #         n_d = Sommet.objects.get(id_osm=n)
-            #     except Exception as e :
-            #         if bavard >0: print(e)
-            #         lat, lon = g.coords_of_nœud(n)
-            #         n_d = Sommet(id_osm=n, lon=lon, lat=lat)
-            #         n_d.save()
-            #     asso = Ville_of_Sommet(sommet=n_d, ville=ville_d)
-            #     asso.save()
-            #     asso2 = Nœud_of_Rue(ville=ville_d, rue=rue_d, nœud=n_d)
-            #     asso2.save()
-            #     if bavard>0 and compte%100==0: print(f"{compte} sommets traités.")
-            
+        Rue.objects.bulk_create(rues_à_créer)
             
     print("Chargement des rues vers django fini.")
 
