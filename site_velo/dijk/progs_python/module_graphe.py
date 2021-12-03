@@ -88,12 +88,16 @@ class Graphe():
         """
         return self.g.met_en_cache(texte,nœuds)
 
-    def nœuds_of_rue(self, ville_n, rue_n):
+    def nœuds_of_rue(self, ville_n, rue_n, bavard=0):
         """
         Entrées : ville_n, rue_n (str) : noms normalisés d’une ville et d’une rue de celle-ci.
         Sortie : la liste des nœuds en mémoire pour la rue indiquée.
         """
-        return self.g.nœuds_of_rue(ville_n, rue_n)
+        try:
+            return self.g.nœuds_of_rue(ville_n, rue_n)
+        except Exception as e:
+            if bavard:print(f"Pas trouvé dans g.nœuds_of_rue les nœuds de {rue_n} ({ville_n})", e)
+            return None
     
     def longueur_arête(self, s, t):
         return self.g.longueur_arête(s,t)

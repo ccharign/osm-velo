@@ -4,7 +4,7 @@ import networkx as nx
 from petites_fonctions import distance_euc
 #from time import perf_counter
 from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA
-
+from osmnx import nearest_nodes
 
 
 class Graphe_nw():
