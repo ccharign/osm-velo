@@ -230,7 +230,7 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     Crée la carte de la cyclabilité.
     """
    
-    mini, maxi = min(g.cyclabilité.values()), max(g.cyclabilité.values())
+    mini, maxi = min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
     
     def num_paquet(val):
@@ -248,13 +248,13 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     nœuds_par_cycla = [ set() for i in range(n_coul)]
     
 
-    for s in g.digraphe.nodes:
+    for s in g.g.digraphe.nodes:
         for t in g.voisins_nus(s):
             vals=[]
-            if (s,t) in g.cyclabilité:
-                vals.append(g.cyclabilité[(s,t)])
-            if (t,s) in g.cyclabilité:
-                vals.append(g.cyclabilité[(t,s)])
+            if (s,t) in g.g.cyclabilité:
+                vals.append(g.g.cyclabilité[(s,t)])
+            if (t,s) in g.g.cyclabilité:
+                vals.append(g.g.cyclabilité[(t,s)])
             if len(vals)>0:
                 i=num_paquet(moyenne(vals))
                 nœuds_par_cycla[i].add(s)
@@ -265,7 +265,7 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     for i, nœuds in enumerate(nœuds_par_cycla):
         if len(nœuds) > 0:
             print(len(nœuds))
-            à_rajouter = g.multidigraphe.subgraph(list(nœuds))
+            à_rajouter = g.g.multidigraphe.subgraph(list(nœuds))
             if début:
                 carte = plot_graph_folium(à_rajouter, color=color_dict[i])
                 début=False
