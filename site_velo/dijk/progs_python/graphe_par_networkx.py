@@ -56,7 +56,19 @@ class Graphe_nw():
         """
         return self.digraphe.nodes[n]["x"], self.digraphe.nodes[n]["y"]
 
-    
+
+    def simplifie(self):
+        """
+        Supprime tous les attributs des arêtes, hormis 'length', 'name' et 'geometry'
+        """
+        à_garder=["length", "name", "geometry"]
+        for s in self.multidigraphe.nodes:
+            for t in self.multidigraphe[s]:
+                for i in self.multidigraphe[s][t]:
+                    à_supprimer = [att for att in self.multidigraphe[s][t][i] if att not in à_garder ]
+                    for att in à_supprimer:
+                        self.multidigraphe[s][t][i].pop(att)
+        
 
     
     def rue_dune_arête(self, s, t, bavard=0):

@@ -7,15 +7,18 @@
 from time import perf_counter
 from petites_fonctions import chrono
 from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
+#tic=perf_counter()
 from graphe_par_networkx import Graphe_nw
+#chrono(tic, "graphe_par_networkx")
+#tic=perf_counter()
 from module_graphe import Graphe, Graphe_mélange  # ma classe de graphe
-from initialisation.ajoute_villes import ajoute_villes
-import initialisation.noeuds_des_rues as nr
-
+#chrono(tic, "module_graphe")
+#from initialisation.ajoute_villes import ajoute_villes
+#import initialisation.noeuds_des_rues as nr
 
 
 tic=perf_counter()
-from osmnx.io import load_graphml
+from osmnx.io import load_graphml, save_graphml
 chrono(tic, "Chargement de osmnx.io.load_graphml (depuis init_graphe)")
 #from networkx import read_graphml  # Défaut : ne convertit pas les types des données (longeur, id_osm, coords...), tout reste en str
 # https://networkx.org/documentation/stable/reference/readwrite/generated/networkx.readwrite.graphml.read_graphml.html#networkx.readwrite.graphml.read_graphml
@@ -67,6 +70,9 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
         #g = read_graphml(nom_fichier, node_type=int)
         
     gr = Graphe(Graphe_mélange(g))
+
+    #gr.g.simplifie()
+    #save_graphml(g, nom_fichier)
     
     gr.g.charge_cache()  # nœud_of_rue
     
