@@ -4,7 +4,7 @@
 
  Ce projet permet d'utiliser les données d'openstreetmap pour calculer des itinéraires cyclables.
 
- Son intérêt est d'implémenter une partie apprentissage supervisé : après récupération d'une banque d'itinéraires entrés par des cyclistes, un note de cyclabilité est attribuée à chaque tronçon, et les itinéraires sont calculés en en tenant compte.
+ Son intérêt est d'implémenter une partie apprentissage supervisé : après récupération d'une banque d'itinéraires entrés par des cyclistes, une note de cyclabilité est attribuée à chaque tronçon, et les itinéraires sont calculés en en tenant compte.
 
  Les sens interdits sont gérés uniquement au niveau de l'IA : en pratique si un tronçon n'est jamais emprunté dans un certain sens, il sera rarement proposé dans ce sens.
 
