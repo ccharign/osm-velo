@@ -18,7 +18,7 @@ from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
 from lecture_adresse.normalisation import créationArbre
-from graphe_minimal import Graphe_minimaliste
+from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier
 #from networkx import read_graphml
 
@@ -77,7 +77,7 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=Fals
     else:
         print("Création du graphe via osmnx.")
         gr = crée_graphe_bbox(nom_fichier, bbox, bavard=bavard)
-    g=Graphe_minimaliste(gr)
+    g=Graphe_nx(gr)
     
     if aussi_nœuds_des_villes:
         # Ville de chaque nœud

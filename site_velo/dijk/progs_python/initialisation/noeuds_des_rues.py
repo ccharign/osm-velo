@@ -127,7 +127,7 @@ def charge_csv(g):
                 dico_ville_norm[ville]=ville_n
             rue = prétraitement_rue(rue) # Il ne devrait pas y avoir de faute de frappe dans le csv : je saute la recherche dans l’arbre lex.
             nœuds = set(map(int, nœuds_à_découper.split(",")))
-            if ville_n not in g.nœuds : g.nœuds[ville_n]={}
-            g.nœuds[ville_n][rue] = nœuds
+            if ville_n not in g.g.nœuds : g.g.nœuds[ville_n]={}
+            g.g.nœuds[ville_n][rue] = nœuds
     print("Chargement de la liste des nœuds de chaque rue finie.")
             

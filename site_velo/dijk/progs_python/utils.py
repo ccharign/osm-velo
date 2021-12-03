@@ -125,10 +125,10 @@ def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
     """
 
     l, coul = listes_sommets[0]
-    sous_graphe = g.multidigraphe.subgraph(l)
+    sous_graphe = g.g.multidigraphe.subgraph(l)
     carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
     for l, coul in listes_sommets[1:]:
-        sous_graphe = g.multidigraphe.subgraph(l)
+        sous_graphe = g.g.multidigraphe.subgraph(l)
         carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
     
     carte.save(où_enregistrer)

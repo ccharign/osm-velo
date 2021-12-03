@@ -19,7 +19,7 @@ class Rue(models.Model):
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
     def nœuds(self):
-        return map(int, self.nœuds_à_découper.split(","))
+        return tuple(map(int, self.nœuds_à_découper.split(",")))
     
 
 class Sommet(models.Model):

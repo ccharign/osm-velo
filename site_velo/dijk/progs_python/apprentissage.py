@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from module_graphe import graphe
+#from module_graphe import Graphe
 from recup_donnees import coords_lieu
 import dijkstra
 from params import LOG_PB

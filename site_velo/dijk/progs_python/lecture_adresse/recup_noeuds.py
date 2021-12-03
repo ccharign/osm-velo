@@ -29,9 +29,10 @@ def nœuds_of_étape(c, g, bavard=0):
     ad = Adresse(c, bavard=bavard-1)
     
     # Recherche dans le cache
-    if c in g.nœud_of_rue:  
+    essai = g.nœuds_of_cache(c)
+    if essai is not None:  
         if bavard > 1 : print(f"Adresse dans le cache : {c}")
-        return g.nœud_of_rue[c], ad
+        return essai, ad
     else:
         if bavard > 0 :print(f"Pas dans le cache : {c}")
 
@@ -40,9 +41,9 @@ def nœuds_of_étape(c, g, bavard=0):
         assert res != []
         for s in res:
             assert isinstance(s,int)
-            if s not in g.digraphe.nodes :
+            if s not in g :
                 raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res}.")
-        g.nœud_of_rue[c] = res
+        g.met_en_cache(c, res)
         print(f"Mis en cache : {res} pour {c}")
         return res, ad
 
@@ -71,7 +72,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
 
     Méthode actuelle :
-       - essai 1 :  dans g.nœuds[ville.nom_norm][rue]
+       - essai 1 :  via la méthode g.nœuds_of_rue (en local)
        - recherche Nominatim pour trouver le nom de la rue dans osm
        - essai 2 : dans g.nœuds avec ce nouveau nom
        - essai 3 : récupérer les nodes osm des way trouvées, et garder ceux qui sont dans g
@@ -80,10 +81,11 @@ def tous_les_nœuds(g, adresse, bavard=0):
     """
 
     ## Essai 1
-    try:
-        return g.nœuds[adresse.ville.nom_norm][adresse.rue_norm]
-    except KeyError as e :
-        print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}  ({e}).")
+    essai1 = g.nœuds_of_rue(adresse.ville.nom_norm, adresse.rue_norm)
+    if essai1 is not None:
+        return essai1
+    else :
+        print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
 
 
         ## recherche Nominatim
@@ -106,9 +108,10 @@ def tous_les_nœuds(g, adresse, bavard=0):
             adresse.rue_osm = nom
 
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
-            nom_n = normalise_rue(nom, adresse.ville) 
-            if nom_n in g.nœuds[adresse.ville.nom_norm] :
-                return g.nœuds[adresse.ville.nom_norm][nom_n]
+            nom_n = normalise_rue(nom, adresse.ville)
+            essai2 = g.nœuds_of_rue(adresse.ville.nom_norm, nom_n)
+            if essai2 is not None :
+                return essai2
             else:
                 if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
 
@@ -118,6 +121,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
                     id_rue = tronçon["osm_id"]
                     nœuds.extend(nœuds_sur_tronçon_local(id_rue)) # Pourrait être géré par overpass
                 LOG_PB(f"Dans mon fichier osm local, j’ai trouvé les nœuds suivants : {nœuds}")
+                print(" J’utilise une méthode inefficace : nœuds_de_g = [n for n in nœuds if n in g] dans recup_noeuds.py.")
                 nœuds_de_g = [n for n in nœuds if n in g]
                 LOG_PB(f"Parmi ces nœuds, voici ceux qui sont dans g : {nœuds_de_g}.")
                 if len(nœuds_de_g) > 0:

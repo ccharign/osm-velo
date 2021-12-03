@@ -7,7 +7,8 @@
 from time import perf_counter
 from petites_fonctions import chrono
 from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
-from module_graphe import graphe  # ma classe de graphe
+from graphe_par_networkx import Graphe_nw
+from module_graphe import Graphe, Graphe_mélange  # ma classe de graphe
 from initialisation.ajoute_villes import ajoute_villes
 import initialisation.noeuds_des_rues as nr
 
@@ -37,7 +38,7 @@ import os
 
 def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
     """
-    Renvoie le graphe (instance de graphe) correspondant à la bbox indiquée.
+    Renvoie le graphe (instance de Graphe) correspondant à la bbox indiquée.
     """
     
     s,o,n,e = bbox 
@@ -65,24 +66,27 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
         g = load_graphml(nom_fichier)
         #g = read_graphml(nom_fichier, node_type=int)
         
-    gr = graphe(g)
+    gr = Graphe(Graphe_mélange(g))
     
-    gr.charge_cache()  # nœud_of_rue
+    gr.g.charge_cache()  # nœud_of_rue
     
     print("Chargement de la cyclabilité")
     tic=perf_counter()
-    gr.charge_cycla()
+    cycla_max=gr.g.charge_cycla()
+    gr.cycla_max=cycla_max
     chrono(tic, "ajout de la cycla au graphe")
+    
 
     # print("Ajout du nom des villes")
     # tic=perf_counter()
     # ajoute_villes(gr, bavard=bavard-1)
     # chrono(tic, "ajout du nom des villes au graphe")
-    
-    print("Ajout de la liste des nœuds de chaque rue")
-    tic=perf_counter()
-    nr.charge_csv(gr)
-    chrono(tic, "ajout de la liste des nœuds de chaque rue au graphe.")
+
+    # Plus besoin vu que les rues sont dans la base Django
+    # print("Ajout de la liste des nœuds de chaque rue")
+    # tic=perf_counter()
+    # nr.charge_csv(gr)
+    # chrono(tic, "ajout de la liste des nœuds de chaque rue au graphe.")
     
     print("Chargement du graphe fini.\n")
     return gr
