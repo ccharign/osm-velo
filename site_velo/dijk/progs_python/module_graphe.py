@@ -128,6 +128,7 @@ class Graphe():
         """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
         return self.g.voisins_nus(n)
 
+    
 
     ### Méthodes vraiment créées dans cette classe. ###
     

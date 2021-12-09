@@ -237,7 +237,7 @@ class Graphe_nw():
         self.cache_lieu[texte]=nœuds
        
     def sauv_cycla(self):
-        """ chemin : adresse et nom du fichier, sans l'extension"""
+        """ enregistre l’état actuel de la cyclabilité"""
         print("Sauvegarde de la cyclabilité")
         sortie = open(CHEMIN_CYCLA, "w", encoding="utf-8")
         for (s, t), v in self.cyclabilité.items():
