@@ -1,14 +1,20 @@
 # -*- coding:utf-8 -*-
-
+from time import perf_counter
+from petites_fonctions import chrono
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
+tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_lieu, coords_of_adresse
-import module_graphe
+chrono(tic, "recup_donnees")
+#import module_graphe
 import os
-from lecture_adresse.normalisation import VILLE_DÉFAUT
+tic=perf_counter()
+from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville
+chrono(tic, "lecture_adresse.normalisation")
 import re
 import dijkstra
-from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville
+tic=perf_counter()
 from lecture_adresse.recup_noeuds import nœuds_of_étape
+chrono(tic, "lecture_adresse.recup_noeuds")
 #Pour test
 #import init_graphe
 #g = init_graphe.charge_graphe(bavard=1)

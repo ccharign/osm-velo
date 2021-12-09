@@ -195,7 +195,7 @@ class Graphe():
         sauv_fichier(CHEMIN_CACHE)
         sortie = open(CHEMIN_CACHE, "w", encoding="utf-8")
         
-        for c, v in self.nœud_of_rue.items():
+        for c, v in self.g.cache_lieu.items():
             à_écrire = ",".join(map(str, v))
             sortie.write(f"{c}:{à_écrire}\n")
         sortie.close()
