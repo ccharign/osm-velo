@@ -2,7 +2,7 @@
  =============================================================
 
 
- Ce projet permet d'utiliser les données d'openstreetmap pour calculer des itinéraires cyclables.
+ Ce projet permet d'utiliser les données d'openstreetmap pour calculer des itinéraires cyclables. Il se présente sous la forme d’une appli Django.
 
  Son intérêt est d'implémenter une partie apprentissage supervisé : après récupération d'une banque d'itinéraires entrés par des cyclistes, une note de cyclabilité est attribuée à chaque tronçon, et les itinéraires sont calculés en en tenant compte.
 
