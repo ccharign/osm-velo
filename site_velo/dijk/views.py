@@ -83,6 +83,8 @@ def vue_itinéraire(requête):
         )
     except (PasTrouvé, LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
+    except Exception as e:
+        return vueLieuPasTrouvé(requête, e)
     
     # Création du template
     suffixe = d+texte_étapes+a+"".join(rues_interdites)
@@ -150,4 +152,4 @@ def carte_cycla(requête):
 ### Erreurs ###
 
 def vueLieuPasTrouvé(requête, e):
-    return render(requête, "dijk/LieuPasTrouvé.html", {"msg":str(e)})
+    return render(requête, "dijk/LieuPasTrouvé.html", {"msg": f"{e.type}, {e}"})

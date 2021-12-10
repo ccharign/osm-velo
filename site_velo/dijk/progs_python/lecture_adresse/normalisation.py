@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 import re
 from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
+from dijk.models import Rue
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 import time
 from petites_fonctions import chrono
@@ -26,12 +27,12 @@ def normalise_adresse(c):
 
 ### Villes ###
 
-tic=time.perf_counter()
-print("Création du dico et de l’arbre lex de toutes villes.")
+#tic=time.perf_counter()
+#print("Création du dico et de l’arbre lex de toutes villes.")
 ARBRE_VILLES=ArbreLex()
 for nom in TOUTES_LES_VILLES.keys():
     ARBRE_VILLES.insère(nom)
-chrono(tic, "Arbre lex des villes")
+#chrono(tic, "Arbre lex des villes")
 
     
 class VillePasTrouvée(Exception):
@@ -100,6 +101,7 @@ def normalise_ville(ville):
         return Ville(ville)
 
 
+    
 ### Rue ###
     
 
@@ -155,6 +157,8 @@ def normalise_rue(rue, ville, tol=2, bavard=0):
       - ville (instance de Ville)
       - rue (str)
 
+    Sortie: ( nom normalisé de la rue, nom complet de la rue).
+    
     Fonction finale de normalisation d’un nom de rue. Applique partie_commune puis prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue), auquel cas c’est ce nom qui sera renvoyé.
     """
     étape1 = prétraitement_rue(rue)
@@ -162,15 +166,23 @@ def normalise_rue(rue, ville, tol=2, bavard=0):
     if len(res)==1:
         if bavard>0:
             print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}")
-        return list(res)[0]
+        rue_n = list(res)[0]
+        if rue_n!=étape1:
+            #il y avait une faute de frappe
+            #Retrouvons le nom complet initial
+            r=Rue.objects.get(nom_norm=rue_n)
+            return rue_n, r.nom_complet
+        else:
+            return rue_n, rue
+            
     elif len(res)>1:
         # Devrait être très rare
         print(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).")
-        return étape1
+        return étape1, rue
     else:
         # L’adresse fournie n’était sûrement pas un nom de rue.
         print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je renvoie {étape1}.")
-        return étape1
+        return étape1, rue
     
 
 
@@ -193,6 +205,8 @@ class Adresse():
         """ 
         Entrée : texte d’une adresse. Format : (num)? rue (code_postal? ville)
         """
+        
+        # Lecture de la regexp
         e = re.compile("(^[0-9]*) *([^()]+)(\((.*)\))?")
         essai = re.findall(e, texte)
         if bavard > 1: print(f"Résultat de la regexp : {essai}")
@@ -205,10 +219,14 @@ class Adresse():
             num, rue, _, ville = essai[0]
             rue=rue.strip()
 
+        # Normalisation de la ville et de la rue
         if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville}")
         ville_n = normalise_ville(ville)
-        rue_n = normalise_rue(rue, ville_n)
-        if bavard>0: print(f"arpès normalisation : num={num}, rue_n={rue_n}, ville_n={ville_n}")
+        rue_n, rue = normalise_rue(rue, ville_n)
+        
+        if bavard>0: print(f"après normalisation : num={num}, rue_n={rue_n}, ville_n={ville_n}")
+
+        # Initialisation des attributs
         if num=="":
             self.num=None
         else:
