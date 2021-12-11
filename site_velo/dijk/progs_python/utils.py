@@ -6,7 +6,7 @@ from params import TMP
 from importlib import reload  # recharger un module après modif
 import subprocess
 #import networkx as nx  # graphe
-from osmnx import plot_graph_folium
+from osmnx import plot_graph_folium, plot_route_folium
 #ox.config(use_cache=True, log_console=True)
 #from module_graphe import graphe  #ma classe de graphe
 #import récup_données as rd
@@ -18,20 +18,20 @@ from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalis
 import os
 #import recup_donnees
 #import module_graphe
-import webbrowser
+#import webbrowser
 #from matplotlib import cm
 import folium
 
-def flatten(c):
-    """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
-    res = []
-    for x in c:
-        res.extend(x)
-    return res
+# def flatten(c):
+#     """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
+#     res = []
+#     for x in c:
+#         res.extend(x)
+#     return res
 
 
-def ouvre_html(fichier):
-    webbrowser.open(fichier)
+# def ouvre_html(fichier):
+#     webbrowser.open(fichier)
 
 
 def cheminsValides(chemins, g):
@@ -76,7 +76,6 @@ def itinéraire(départ, arrivée, ps_détour, g,
     interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
 
     
-
     np = len(ps_détour)
     à_dessiner = []
     res = []
@@ -114,20 +113,21 @@ def itinéraire(départ, arrivée, ps_détour, g,
 # Gestion de plusieurs p_détour ?
 # arg facultatif autres_p_détour
 
-def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
+def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     """
     Entrées :
-      - listes_sommets : liste de couples (liste de sommets, couleur)
+      - listes_chemins : liste de couples (liste de sommets, couleur)
       - g (instance de Graphe)
       - où_enregistrer : adresse du fichier html à créer
     Effet:
       Crée le fichier html de la carte superposant tous les itinéraires fournis.
     """
 
-    l, coul = listes_sommets[0]
+    l, coul = listes_chemins[0]
     sous_graphe = g.g.multidigraphe.subgraph(l)
     carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
-    for l, coul in listes_sommets[1:]:
+    #carte = plot_route_folium(g.g.multidigraphe, l, popup_attribute="name", color=coul) # Ne marche pas...
+    for l, coul in listes_chemins[1:]:
         sous_graphe = g.g.multidigraphe.subgraph(l)
         carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
     
@@ -178,33 +178,33 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
     return longueur, longueur_direct
 
     
-def dessine_chemins(chemins, g, où_enregistrer=TMP):
-    """ 
-    Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
-    Peu pertinent dès qu’il y a trop de chemins.
-    """
-    chemins_directs = []
-    for c in chemins:
-        try:
-            chemins_directs.append(c.chemin_direct_sans_cycla(g))
-        except dijkstra.PasDeChemin:
-            print(f"Pas de chemin pour {c}")
-    graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
-    carte = plot_graph_folium(graphe_c_directs, popup_attribute="name", color="red")
+# def dessine_chemins(chemins, g, où_enregistrer=TMP):
+#     """ 
+#     Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
+#     Peu pertinent dès qu’il y a trop de chemins.
+#     """
+#     chemins_directs = []
+#     for c in chemins:
+#         try:
+#             chemins_directs.append(c.chemin_direct_sans_cycla(g))
+#         except dijkstra.PasDeChemin:
+#             print(f"Pas de chemin pour {c}")
+#     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
+#     carte = plot_graph_folium(graphe_c_directs, popup_attribute="name", color="red")
 
-    chemins_complets = []
-    for c in chemins:
-        try:
-            chemins_complets.append(dijkstra.chemin_étapes_ensembles(g, c))
-        except dijkstra.PasDeChemin as e:
-            print(e)
-            print(f"Pas de chemin avec étapes pour {c}")
-    graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
-    carte = plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
+#     chemins_complets = []
+#     for c in chemins:
+#         try:
+#             chemins_complets.append(dijkstra.chemin_étapes_ensembles(g, c))
+#         except dijkstra.PasDeChemin as e:
+#             print(e)
+#             print(f"Pas de chemin avec étapes pour {c}")
+#     graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
+#     carte = plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
     
-    nom = os.path.join(où_enregistrer, "dessine_chemins.html")
-    carte.save(nom)
-    ouvre_html(nom)
+#     nom = os.path.join(où_enregistrer, "dessine_chemins.html")
+#     carte.save(nom)
+#     ouvre_html(nom)
 
 
 def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
