@@ -34,7 +34,7 @@ tic=time.perf_counter()
 g=charge_graphe()
 LOG(f"{time.perf_counter()-tic}s pour le chargement du graphe", "perfs")
 
-chrono(tic0, "Chargement total")
+chrono(tic0, "Chargement total\n\n")
 
 # Create your views here.
 

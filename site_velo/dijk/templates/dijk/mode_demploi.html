@@ -6,6 +6,27 @@
 
 <h1>Mode d’emploi du site</h1>
 
+<h2>Qu’est-ce que c’est ?</h2>
+
+<p>
+Ce site permet de calculer des itinéraires à vélo dans l’ogglomération de {{ville_défaut}}. Sa spécificité est d’être basée sur une intelligence artificielle : en apprenant des trajets rentrés par les utilisateurs, il donne des résultats de plus en plus pertinents.
+</p>
+
+<p>
+  Avantage : les trajets sont calculés en tenant compte de l’expérience des autres utilisateurs, donc de vrais cyclistes. Une rue sera décrétée adaptée aux vélos si et seulement si elle a été choisie par d’autres cyclistes, et non selon des critères plus facile à obtenir mais moins fiables tels que la présence « officielle » d’une bande cyclable, la limite de vittesse « théoriquement » respectée par les automobilistes, etc.
+
+  Ainsi les itinéraires calculés seront-ils choisis pour être, dans la mesure du possible, sécurisé et agréables, selon les critères de la communauté des utilisateurs.
+</p>
+
+<p>
+  Inconvénients :
+  <ul>
+    <li>Dans les zones où l’IA n’a pas encore été suffisamment entraînée, l’algo affichera juste le plus court chemin</li>
+    <li>Toujours dans ces zones, l’algo peut renvoyer un passage en sens interdit. Et dans une zone entraînée, l’algo renverra un sens interdit si la plupart des utilisateurs le prennent... 
+  </ul>
+</p>
+
+<p>La carte de la cyclabilité permet de se rendre compte de l’état de L’IA. Les rues à favoriser apparaissent en vert, et celles à éviter en rouge.</p>
 
 <h2>Recherche simple d’itinéraire</h2>
 <p>Remplir le champ « départ », le champ « arrivée », taper sur « entrée ». Bon vous aviez déjà deviné.</p>
@@ -13,7 +34,7 @@
 <p>
   Par défaut, les étapes sont recherchées dans {{ville_défaut}}. Pour indiquer une autre ville, la mettre entre parenthèses. Par exemple : « 12 rue de l’église (Lons) », « europub (billère) », ou encore « boulangerie (Bizanos) ». (Pour ce dernier exemple, l’algo renverra la première boulangerie de Bizanos qu’il aura trouvé.)<br>
 
-  Pour les noms de rue, l’algo est tolérant à deux fautes de frappe (« plac Clamenceau » au lieu de « place Clémenceau ») et ne fait pas attention aux majuscules.
+  Pour les noms de rue et de ville, l’algo est tolérant à deux fautes de frappe (« plac Clamenceau » au lieu de « place Clémenceau ») et ne fait pas attention aux majuscules.
 
   Les autres noms de lieu sont traités par le moteur de recherche d’openstreetmap, qu’on peut tester <a href="https://www.openstreetmap.org/"> ici </a>.
 </p>
@@ -22,9 +43,9 @@
 
 <p>Enfin, le paramètre « pourcentage détour » définit votre profil de cycliste. Plus vous réglez ce paramètre haut, et plus l’appli vous proposera des trajets longs mais agréable et sécurisés.</br>
 
-  Précisément, le paramètre « pourcentage détour » est le pourcentage duquel vous êtes prêt à rallonger votre parcours pour remplacer un trajet entièrement sur des rues de centre-ville limitées à 50km/h non aménagées, par un trajet entièrement sur des vraies pistes cyclables. Par « piste cyclable » on entend « voie réservée aux vélos et physiquement séparée de la chaussée des voiture » (ce qui à Pau n’existe grosso-modo que le long du Fébus).</br>
+  Précisément, le paramètre « pourcentage détour » est le pourcentage duquel vous êtes prêt à rallonger votre parcours pour remplacer un trajet entièrement sur des rues de centre-ville limitées à 50km/h non aménagées, par un trajet entièrement sur des vraies pistes cyclables. Par « piste cyclable » on entend « voie réservée aux vélos (pas aux piétons en particulier) et physiquement séparée de la chaussée des voiture » (ce qui à Pau n’existe grosso-modo que le long du Fébus).</br>
 
-  Vous pouvez indiquer plusieurs pourcentages de détour, séparés par des point-virgules, auquel cas l’appli affichera tous les trajets correspondant.
+  Vous pouvez indiquer plusieurs pourcentages de détour, séparés par des point-virgules, auquel cas l’appli affichera tous les trajets correspondants.
   </p>
 
 
@@ -42,14 +63,12 @@
 
 
 <p>
-  L’algo est basé sur une intelligence artifielle. Cela signifie que c’est en analysant les trajets qui lui ont été présentés comme adaptés aux vélos qu’il déduit quels tronçons de rues sont à favoriser et lesquels sont à éviter.<br>
-
-  Si vous faites une recherche dans une zone où il ne dispose d’aucune donnée, il renverra simplement le plus court chemin.
+  L’algo est basé sur une intelligence artifielle. Cela signifie que c’est en analysant les trajets qui lui ont été présentés comme adaptés aux vélos qu’il déduit quels tronçons de rues sont à favoriser et lesquels sont à éviter.
 </p>
 
 <p>C’est pourquoi il est important, pour l’efficacité de l’appli que les utilisateurs comme vous indiquent les itinéraires qu’ils recommandent !
   <br>
-  Pour ce, effectuer une recherche sur un trajet que vous connaissez bien (domicile-travail par exemple). Si l’itinéraire proposé vous semble moins adapté que le votre, renseignez les champs « étapes » et « rues interdites » jusqu’à obtenir l’itinéraire souhaité. Si le même itinéraire est valable dans les deux sens, cochez la case idoine. Enfin, remplissez la case « pourcentage détour » pour préciser le profil de cyclistes auxquels s’adresse votre trajet. Puis cliquez sur « enregistrez votre contribution » : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
+  Pour ce, effectuer une recherche sur un trajet que vous connaissez bien (domicile-travail par exemple). Si l’itinéraire proposé vous semble moins adapté que le votre, renseignez les champs « étapes » et « rues interdites » jusqu’à obtenir l’itinéraire souhaité. Si le même itinéraire est valable dans les deux sens (pas de sens interdit notamment), cochez la case idoine. Enfin, remplissez la case « pourcentage détour » pour préciser le profil de cyclistes auxquels s’adresse votre trajet. Puis cliquez sur « enregistrez votre contribution » : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
 </p>
 
 
@@ -59,7 +78,7 @@
 
   Subtilité : la notion de cyclabilité employée par l’algo est « locale », ainsi un tronçon de rue apparaît en vert lorsqu’il est plus agréable, ou juste moins désagréable, que ses voisins : cela ne signifie pas qu’il est agréable dans l’absolu. En particulier deux rues d’une même couleur dans deux quartiers différents peuvent être très différentes.<br>
 
-  De part la conception même de l’algo il y a autant de rouge que de vert. Si on voulait comparer Pau à une ville un peu axée sur les mobilités douces, elle serait à peu près entièrement rouge.
+  De part la conception même de l’algo il y a à peu près autant de rouge que de vert. Mais si on comparait Pau à une ville un peu axée sur les mobilités douces, la carte serait à peu près entièrement rouge.
   </p>
 
 
