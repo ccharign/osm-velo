@@ -76,7 +76,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
        - essai 1 :  via la méthode g.nœuds_of_rue (en local)
        - recherche Nominatim pour trouver le nom de la rue dans osm
        - essai 2 : dans g.nœuds avec ce nouveau nom
-       - essai 3 : récupérer les nodes osm des way trouvées, et garder ceux qui sont dans g
+       - (supprimé car lent) essai 3 : récupérer les nodes osm des way trouvées dans le .osm local, et garder ceux qui sont dans g
        - essai 4 : récupérer les nodes de la recherche Nominatim, et garder ceux qui sont dans g
        - essai 5 : coordonnés du premier objet renvoyé par la recherche, et nœud de g le plus proche d’icelui.
     """
@@ -117,16 +117,16 @@ def tous_les_nœuds(g, adresse, bavard=0):
                 if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
 
                 ## Essai 3, prendre les nœuds dans le fichier .osm
-                nœuds=[]
-                for tronçon in way_osm:
-                    id_rue = tronçon["osm_id"]
-                    nœuds.extend(nœuds_sur_tronçon_local(id_rue)) # Pourrait être géré par overpass
-                LOG_PB(f"Dans mon fichier osm local, j’ai trouvé les nœuds suivants : {nœuds}")
-                print(" J’utilise une méthode inefficace : nœuds_de_g = [n for n in nœuds if n in g] dans recup_noeuds.py.")
-                nœuds_de_g = [n for n in nœuds if n in g]
-                LOG_PB(f"Parmi ces nœuds, voici ceux qui sont dans g : {nœuds_de_g}.")
-                if len(nœuds_de_g) > 0:
-                    return nœuds_de_g
+                # nœuds=[]
+                # for tronçon in way_osm:
+                #     id_rue = tronçon["osm_id"]
+                #     nœuds.extend(nœuds_sur_tronçon_local(id_rue)) # Pourrait être géré par overpass
+                # LOG_PB(f"Dans mon fichier osm local, j’ai trouvé les nœuds suivants : {nœuds}")
+                # print(" J’utilise une méthode inefficace : nœuds_de_g = [n for n in nœuds if n in g] dans recup_noeuds.py.")
+                # nœuds_de_g = [n for n in nœuds if n in g]
+                # LOG_PB(f"Parmi ces nœuds, voici ceux qui sont dans g : {nœuds_de_g}.")
+                # if len(nœuds_de_g) > 0:
+                #     return nœuds_de_g
                 #else:
                    
                 
