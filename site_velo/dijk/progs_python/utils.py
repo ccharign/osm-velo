@@ -33,7 +33,7 @@ import os
 #import webbrowser
 #from matplotlib import cm
 
-tic.perf_counter()
+tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
 
