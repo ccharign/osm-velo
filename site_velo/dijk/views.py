@@ -152,4 +152,4 @@ def carte_cycla(requête):
 ### Erreurs ###
 
 def vueLieuPasTrouvé(requête, e):
-    return render(requête, "dijk/LieuPasTrouvé.html", {"msg": f"{e.type}, {e}"})
+    return render(requête, "dijk/LieuPasTrouvé.html", {"msg": f"{e.__name__}, {e}"})

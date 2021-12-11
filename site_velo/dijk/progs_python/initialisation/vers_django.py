@@ -32,15 +32,15 @@ def villes_vers_django():
     Ville.objects.bulk_create(villes_à_créer)
 
         
-def charge_villes_rues_nœuds(g, bavard=0):
+def charge_villes_rues_nœuds(bavard=0):
     """ 
     Transfert le contenu du csv CHEMIN_NŒUDS_RUES dans la base.
-    Réinitialise les tables dijk_rue, dijk_sommet, dijk_ville_of_sommet, dijk_nœud_of_rue
+    Réinitialise la table Rue (dijk_rue)
     """
 
     # Vidage des tables
     Rue.objects.all().delete()
-    Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
+    #Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
     
     rues_à_créer=[]
     with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
