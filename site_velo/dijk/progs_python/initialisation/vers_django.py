@@ -9,7 +9,7 @@
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
 from dijk.models import Ville, Rue, Sommet, Arête, Nœud_of_Rue, Cache_Adresse, Ville_of_Sommet
-from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES
+from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue
 from dijk.progs_python.init_graphe import charge_graphe
 
 
@@ -57,7 +57,7 @@ def charge_villes_rues_nœuds(bavard=0):
             ville_n = ville.nom_norm
             ville_d = Ville.objects.get(nom_norm=ville_n) # l’objet Django. # get renvoie un seul objet, et filter plusieurs (à confirmer...)
             
-            rue_n = normalise_rue(rue, ville)
+            rue_n = prétraitement_rue(rue)
             rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
             rues_à_créer.append(rue_d)
             
