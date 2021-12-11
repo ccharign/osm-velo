@@ -112,7 +112,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
+def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     """
     Entrées :
       - listes_chemins : liste de couples (liste de sommets, couleur)
