@@ -56,7 +56,28 @@ class Graphe_nw():
     def nb_arêtes(self):
         return sum(len(self.digraphe[s]) for s in self.digraphe.nodes)
 
+    
+    def geom_arête(self,s,t):
+        """
+        Entrée : deux sommets s et t tels que (s, t) est une arête
+        Sortie : (liste des coordonnées décrivant la géométrie de l’arête la plus courte de s à t, nom de l’arête).
+        Obtenues dans l’attribut geometry de l’arête.
+        """
+        
+        arête = min((a for _,a in self.multidigraphe[s][t].items()), key=lambda a: a["length"] )
+        if "name" in arête:
+            nom=arête["name"]
+        else:
+            nom=None
+        return arête["geometry"].coords, nom
+    
 
+    def nom_arête(self,s,t):
+        try:
+            return self.digraphe[s][t]["name"]
+        except Exception as e:
+            return None
+    
     def coords_of_nœud(self, n):
         """ Renvoie le couple (lon, lat)
          dans osmnx : x=lon, y=lat.

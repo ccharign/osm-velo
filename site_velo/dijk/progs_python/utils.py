@@ -13,7 +13,7 @@ import subprocess
 #from osmnx import plot_graph_folium
 
 tic=perf_counter()
-from mon_folium import plot_graph_folium
+from mon_folium import  folium_of_chemin, ajoute_marqueur, folium_of_arêtes
 chrono(tic, "mon_folium", bavard=2)
 
 #ox.config(use_cache=True, log_console=True)
@@ -136,16 +136,20 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     """
 
     l, coul = listes_chemins[0]
-    sous_graphe = g.g.multidigraphe.subgraph(l)
-    carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
+    #sous_graphe = g.g.multidigraphe.subgraph(l)
+    #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
+    carte = folium_of_chemin(g, l, fit=True, color=coul)
     #carte = plot_route_folium(g.g.multidigraphe, l, popup_attribute="name", color=coul) # Ne marche pas...
     for l, coul in listes_chemins[1:]:
-        sous_graphe = g.g.multidigraphe.subgraph(l)
-        carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
+        #sous_graphe = g.g.multidigraphe.subgraph(l)
+        #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
+        carte = folium_of_chemin(g, l, carte=carte, color=coul)
+    
+    
+    ajoute_marqueur(g.coords_of_nœud(l[0]), carte)
+    ajoute_marqueur(g.coords_of_nœud(l[-1]), carte)
     
     carte.save(où_enregistrer)
-    print(g.coords_of_nœud(l[0]))
-    folium.CircleMarker(location=g.coords_of_nœud(l[0])).add_to(carte)
     if ouvrir : ouvre_html(où_enregistrer)
 
 
@@ -219,9 +223,10 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
 #     ouvre_html(nom)
 
 
-def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
-    """ Entrée : s, liste de sommets """
-    dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
+# Ne marche plus si s n’est pas un chemin dans le graphe
+# def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
+#     """ Entrée : s, liste de sommets """
+#     dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
 
 
 def affiche_rue(nom_ville, rue, g, bavard=0):
@@ -257,8 +262,8 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
 
         
 
-    nœuds_par_cycla = [ set() for i in range(n_coul)]
-    
+    #nœuds_par_cycla = [ set() for i in range(n_coul)]
+    arêtes=[]
 
     for s in g.g.digraphe.nodes:
         for t in g.voisins_nus(s):
@@ -268,22 +273,25 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
             if (t,s) in g.g.cyclabilité:
                 vals.append(g.g.cyclabilité[(t,s)])
             if len(vals)>0:
-                i=num_paquet(moyenne(vals))
-                nœuds_par_cycla[i].add(s)
-                nœuds_par_cycla[i].add(t)
+                val = moyenne(vals)
+                i=num_paquet(val)
+                #nœuds_par_cycla[i].add(s)
+                #nœuds_par_cycla[i].add(t)
+                arêtes.append((s, t, {"color":color_dict[i], "popup":val}))
 
 
-    début=True
-    for i, nœuds in enumerate(nœuds_par_cycla):
-        if len(nœuds) > 0:
-            print(len(nœuds))
-            à_rajouter = g.g.multidigraphe.subgraph(list(nœuds))
-            if début:
-                carte = plot_graph_folium(à_rajouter, color=color_dict[i])
-                début=False
-            else:
-                carte = plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
-        
+    # début=True
+    # for i, nœuds in enumerate(nœuds_par_cycla):
+    #     if len(nœuds) > 0:
+    #         print(len(nœuds))
+    #         à_rajouter = g.g.multidigraphe.subgraph(list(nœuds))
+    #         if début:
+    #             carte = plot_graph_folium(à_rajouter, color=color_dict[i])
+    #             début=False
+    #         else:
+    #             carte = plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
+
+    carte = folium_of_arêtes(g, arêtes)
     nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)
     if ouvrir : ouvre_html(nom)

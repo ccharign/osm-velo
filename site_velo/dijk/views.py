@@ -86,8 +86,8 @@ def vue_itinéraire(requête):
         )
     except (PasTrouvé, LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
-    except Exception as e:
-        return vueLieuPasTrouvé(requête, e)
+    #except Exception as e:
+    #    return vueLieuPasTrouvé(requête, e)
     
     # Création du template
     suffixe = d+texte_étapes+a+"".join(rues_interdites)

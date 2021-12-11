@@ -32,6 +32,7 @@ class TropLoin(Exception):
     """ Pour le cas où le nœud de g trouvé serait trop loin de l’emplacement initialement recherché."""
     pass
 
+
 class Graphe_mélange(Graphe_django, Graphe_nw):
     """
     Ceci devrait être temporaire...
@@ -44,6 +45,7 @@ class Graphe_mélange(Graphe_django, Graphe_nw):
         Graphe_nw.__init__(self, g)
         Graphe_django.__init__(self)
 
+        
 class Graphe():
     """
     Attributs : - g, instance de Graphe_nw ou de Graphe_django.
@@ -128,7 +130,12 @@ class Graphe():
         """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
         return self.g.voisins_nus(n)
 
-    
+    def geom_arête(self,s,t):
+        """
+        Entrée : deux sommets s et t tels que (s,t) est une arête
+        Sortie : liste des coordonnées décrivant la géométrie de l’arête.
+        """
+        return self.g.geom_arête(s,t)
 
     ### Méthodes vraiment créées dans cette classe. ###
     
@@ -139,7 +146,8 @@ class Graphe():
         """
         return int(sum(self.longueur_arête(s,t) for s,t in deuxConséc(iti)))
 
-    
+    def nom_arête(self,s,t):
+        return self.g.nom_arête(s,t)
     
     def chemin(self, d, a, p_détour):
         return dijkstra.chemin(self, d, a, p_détour)
