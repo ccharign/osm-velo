@@ -2,7 +2,7 @@
 #import module_graphe
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville, Adresse
 import re
-from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local, cherche_adresse_complète
+from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local, cherche_adresse_complète, rue_of_coords
 from petites_fonctions import distance_euc
 from params import LOG_PB
 
@@ -149,8 +149,12 @@ def tous_les_nœuds(g, adresse, bavard=0):
         if len(lieu)>0:
             truc = lieu[0].raw
             adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0]
-            if bavard>0: print(f"Je vais chercher le nœud de g le plus proche de {truc}.")
-            return [g.nœud_le_plus_proche( (float(truc["lon"]), float(truc["lat"])), recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
+            print(f"Je vais chercher le nœud de g le plus proche de {truc}.")
+            coords = (float(truc["lon"]), float(truc["lat"]))
+            rue, ville, code = rue_of_coords(coords)
+            if bavard>0:print(f"J’ai obtenu l’adresse suivante : {rue} ({code} {ville}).")
+            return [nœud_sur_rue_le_plus_proche(g, coords, Adresse(f"{rue} ({ville})"))]
+            #return [g.nœud_le_plus_proche( coords, recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
 
     
         raise PasTrouvé(f"Pas réussi à trouver de nœud pour {nom_rue} ({ville}).")

@@ -7,9 +7,9 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN
 from petites_fonctions import chrono
 from time import perf_counter
 
-tic=perf_counter()
-from osmnx import nearest_nodes
-chrono(tic, "osmnx (pour nearest_nodes)", bavard=1)
+# tic=perf_counter()
+# from osmnx import nearest_nodes
+# chrono(tic, "osmnx (pour nearest_nodes)", bavard=1)
 
 class Graphe_nw():
     """
@@ -165,18 +165,19 @@ class Graphe_nw():
     def longueur_arête(self, s, t):
         return self.digraphe[s][t]["length"]
 
-    def nœud_le_plus_proche(self, coords, recherche = "", d_max = D_MAX_POUR_NŒUD_LE_PLUS_PROCHE ):
-        """
-        recherche est la recherche initiale qui a eu besoin de cet appel. Uniquement pour compléter l’erreur qui sera levée si le nœud le plus proche est à distance > d_max.
-        Les coords doivent être dans l’ordre (lon, lat).
-        """
+    # Supprimé car nécessite de charger osmnx
+    # def nœud_le_plus_proche(self, coords, recherche = "", d_max = D_MAX_POUR_NŒUD_LE_PLUS_PROCHE ):
+    #     """
+    #     recherche est la recherche initiale qui a eu besoin de cet appel. Uniquement pour compléter l’erreur qui sera levée si le nœud le plus proche est à distance > d_max.
+    #     Les coords doivent être dans l’ordre (lon, lat).
+    #     """
         
-        n, d = nearest_nodes(self.multidigraphe, *coords, return_dist = True)
-        if d > d_max:
-            print(f" Distance entre {self.coords_of_nœud(n)} et {coords} supérieure à {d_max}.")
-            raise TropLoin(recherche)
-        else:
-            return n
+    #     n, d = nearest_nodes(self.multidigraphe, *coords, return_dist = True)
+    #     if d > d_max:
+    #         print(f" Distance entre {self.coords_of_nœud(n)} et {coords} supérieure à {d_max}.")
+    #         raise TropLoin(recherche)
+    #     else:
+    #         return n
 
     def incr_cyclabilité(self, a, dc):
         """ Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
