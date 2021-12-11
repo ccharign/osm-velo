@@ -22,9 +22,12 @@ tic=time.perf_counter()
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
 from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection
-from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
-chrono(tic, "recup_noeuds, recup_donnees, utils, bib_vues", bavard=3)
+chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
+
+tic=time.perf_counter()
+from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
+chrono(tic, "utils", bavard=3)
 
 from datetime import datetime
 from glob import glob

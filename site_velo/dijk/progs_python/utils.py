@@ -24,7 +24,7 @@ import dijkstra
 
 tic=perf_counter()
 import chemins  # classe chemin et lecture du csv
-chrono(ti, "chemins", bavard=2)
+chrono(tic, "chemins", bavard=2)
 
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
