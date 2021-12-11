@@ -7,12 +7,12 @@
 from time import perf_counter
 from petites_fonctions import chrono
 from params import RACINE_PROJET, DONNÉES, BBOX_DÉFAUT
-#tic=perf_counter()
+tic=perf_counter()
 from graphe_par_networkx import Graphe_nw
-#chrono(tic, "graphe_par_networkx")
-#tic=perf_counter()
+chrono(tic, "graphe_par_networkx")
+tic=perf_counter()
 from module_graphe import Graphe, Graphe_mélange  # ma classe de graphe
-#chrono(tic, "module_graphe")
+chrono(tic, "module_graphe")
 #from initialisation.ajoute_villes import ajoute_villes
 #import initialisation.noeuds_des_rues as nr
 

@@ -68,6 +68,8 @@ D_MAX_POUR_NŒUD_LE_PLUS_PROCHE = 500 #en mètres
 os.makedirs(os.path.join(RACINE_PROJET, "log"), exist_ok=True)
 DÉCALAGE_MAX=10
 def LOG(msg, type_de_log, bavard=1):
+    """
+    """
     if bavard>0:
         f = open(os.path.join(RACINE_PROJET,f"log/{type_de_log}.log"), "a", encoding="utf-8")
         décalage=2*(max(DÉCALAGE_MAX-bavard,0))*" "

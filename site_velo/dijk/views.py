@@ -8,15 +8,15 @@ tic0=time.perf_counter()
 from dijk.progs_python.params import LOG
 from petites_fonctions import chrono
 from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT
-chrono(tic0, "params, petites_fonctions, normalisation")
+chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
 tic=time.perf_counter()
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
-chrono(tic, "chemins")
+chrono(tic, "chemins", bavard=3)
 
 tic=time.perf_counter()
 from dijk.progs_python.init_graphe import charge_graphe
-chrono(tic, "charge_graphe")
+chrono(tic, "charge_graphe", bavard=3)
 
 tic=time.perf_counter()
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
@@ -24,7 +24,7 @@ from dijk.progs_python.recup_donnees import LieuPasTrouvé
 from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
-chrono(tic, "recup_noeuds, recup_donnees, utils, bib_vues")
+chrono(tic, "recup_noeuds, recup_donnees, utils, bib_vues", bavard=3)
 
 from datetime import datetime
 from glob import glob
@@ -32,9 +32,9 @@ import os
 
 tic=time.perf_counter()
 g=charge_graphe()
-LOG(f"{time.perf_counter()-tic}s pour le chargement du graphe", "perfs")
+LOG(f"{time.perf_counter()-tic}s pour le chargement du graphe", "perfs", bavard=3)
 
-chrono(tic0, "Chargement total\n\n")
+chrono(tic0, "Chargement total\n\n", bavard=3)
 
 # Create your views here.
 
