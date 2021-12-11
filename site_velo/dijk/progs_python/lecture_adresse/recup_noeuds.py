@@ -49,7 +49,8 @@ def nœuds_of_étape(c, g, bavard=0):
 
     
     if ad.num is None:
-    ## Pas de numéro de rue -> liste de tous les nœuds de la rue
+        ## Pas de numéro de rue -> soit c’est une rue entière, soit c’est un batiment spécial
+        ## liste de tous les nœuds de la rue
         if bavard > 0 : print("Pas de numéro de rue, je vais renvoyer une liste de nœuds")
         if ad.rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
@@ -180,7 +181,7 @@ def un_seul_nœud(g, adresse, bavard=0):
         coords = cherche_adresse_complète(adresse, bavard=bavard)
         return [nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=bavard-1)]
     except Exception as e:
-        LOG_PB(f"Échec dans coords_of_adresse : {e}. Je vais renvoyer tous les nœuds pour {adresse}). J’efface le numéro de l’adresse.")
+        LOG_PB(f"Échec dans cherche_adresse_complète : {e}. Je vais renvoyer tous les nœuds pour {adresse}). J’efface le numéro de l’adresse.")
         adresse.num=None
         return tous_les_nœuds(g, adresse, bavard=bavard)
         

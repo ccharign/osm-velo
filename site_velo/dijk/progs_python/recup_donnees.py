@@ -28,10 +28,6 @@ class LieuPasTrouvé(Exception):
     pass
 
 
-# Pour contourner le pb des tronçons manquant dans Nominatim :
-# 1) récupérer le nom osm de la rue
-# 2) recherche dans le graphe
-# -- à éliminer pour éviter le charegment du .osm, ou alors charger uniquement au besoin
 
 def cherche_adresse_complète(adresse, bavard=0):
     """
@@ -41,13 +37,25 @@ def cherche_adresse_complète(adresse, bavard=0):
     # https://perso.esiee.fr/~courivad/python_bases/15-geo.html
     api_url = "https://api-adresse.data.gouv.fr/search/?q="
     r = requests.get(api_url + urllib.parse.quote(str(adresse)))
-    r=r.content.decode('unicode_escape')
+    r = r.content.decode('unicode_escape')
     return json.loads(r)["features"][0]["geometry"]["coordinates"]
 
+#https://adresse.data.gouv.fr/api-doc/adresse
+def rue_of_coords(c):
+    """
+    Entrée : (lon, lat)
+    Sortie : (nom, ville, code de postal) de la rue renvoyé par adresse.data.gouv
+    """
+    lon, lat = c
+    api_url = f"https://api-adresse.data.gouv.fr/reverse/?lon={lon}&lat={lat}&type=street"
+    r = requests.get(api_url).content.decode('unicode_escape')
+    d = json.loads(r)["features"][0]["properties"]
+    return d["name"], d["city"], int(d["postcode"])
+    
 
 def cherche_lieu(adresse, bavard=0):
     """
-    adresse (instance de Adresse)
+    Entrée : adresse (instance de Adresse)
 
     Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
     """
