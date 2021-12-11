@@ -77,10 +77,14 @@ def ajouteDico(d, clef, val):
     else:
             d[clef]=[val]
 
-def chrono(tic, tâche, bavard=1):
+def chrono(tic, tâche, bavard=1, force=False):
     """
     Entrée : tic, float
              tâche, str
+             froce, bool
     Effet : log (time.perf_counter()-tic) pour la tâche précisée
+    Si force est faux, ne log que pour un temps>.1s
     """
-    LOG(f"{time.perf_counter()-tic}s pour {tâche}", "perfs", bavard=bavard)
+    temps = time.perf_counter()-tic
+    if temps>.1 or force:
+        LOG(f"{time.perf_counter()-tic}s pour {tâche}", "perfs", bavard=bavard)
