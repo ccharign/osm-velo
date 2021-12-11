@@ -1,11 +1,14 @@
 # -*- coding:utf-8 -*-
+from petites_fonctions import chrono
+from time import perf_counter
 
+tic=perf_counter()
 import networkx as nx
+chrono(tic, "networkx", bavard=2)
+
 from petites_fonctions import distance_euc
 #from time import perf_counter
 from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA
-from petites_fonctions import chrono
-from time import perf_counter
 
 # tic=perf_counter()
 # from osmnx import nearest_nodes

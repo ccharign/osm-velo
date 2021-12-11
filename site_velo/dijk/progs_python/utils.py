@@ -2,19 +2,29 @@
 
 ### Fonctions diverses pour utiliser le logiciel
 
+from time import perf_counter
+from petites_fonctions import chrono
+
 from params import TMP
-from importlib import reload  # recharger un module après modif
+#from importlib import reload  # recharger un module après modif
 import subprocess
 #import networkx as nx  # graphe
 
 #from osmnx import plot_graph_folium
+
+tic=perf_counter()
 from mon_folium import plot_graph_folium
+chrono(tic, "mon_folium", bavard=2)
+
 #ox.config(use_cache=True, log_console=True)
 #from module_graphe import graphe  #ma classe de graphe
 #import récup_données as rd
 #import apprentissage
 import dijkstra
+
+tic=perf_counter()
 import chemins  # classe chemin et lecture du csv
+chrono(ti, "chemins", bavard=2)
 
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
@@ -22,7 +32,10 @@ import os
 #import module_graphe
 #import webbrowser
 #from matplotlib import cm
+
+tic.perf_counter()
 import folium
+chrono(tic, "folium", bavard=2)
 
 # def flatten(c):
 #     """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
