@@ -1,12 +1,13 @@
 
 À FAIRE :
 
+réécrire folium...
 
 Afficher les étapes sur la carte
 
-Si un sommet change lors d’une màj de g, que se passe-t-il dans le cache ? -> recréer (à partir da la liste des chemins) ou supprimer le cache lors d’une màj ?
+Gélocalisation : y-a-t-il une fonction idoine dans folium ?
 
-Il existe des rues qui figurent dans rue_num_coord, donc qui étaient dans le .osm, mais qui ne sont pas dans nœuds_rue. Ce dernier est créé par nœuds_des_rues.py. Par exemple place reine marguerite, dont le nœud du graphe est 339262446.
+Si un sommet change lors d’une màj de g, que se passe-t-il dans le cache ? -> recréer (à partir de la liste des chemins) ou supprimer le cache lors d’une màj ?
 
 Mettre une case pour donner un bonus/malus à une rue dans la recherche ?
 
