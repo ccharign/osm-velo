@@ -6,7 +6,9 @@ from params import TMP
 from importlib import reload  # recharger un module après modif
 import subprocess
 #import networkx as nx  # graphe
-from osmnx import plot_graph_folium, plot_route_folium
+
+#from osmnx import plot_graph_folium
+from mon_folium import plot_graph_folium
 #ox.config(use_cache=True, log_console=True)
 #from module_graphe import graphe  #ma classe de graphe
 #import récup_données as rd
@@ -110,10 +112,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-# Gestion de plusieurs p_détour ?
-# arg facultatif autres_p_détour
-
-def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
+def dessine(listes_sommets, g, où_enregistrer, ouvrir=False, bavard=0):
     """
     Entrées :
       - listes_chemins : liste de couples (liste de sommets, couleur)
@@ -276,4 +275,4 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     carte.save(nom)
     if ouvrir : ouvre_html(nom)
 
-
+    
