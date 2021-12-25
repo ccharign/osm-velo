@@ -98,7 +98,7 @@ class Graphe():
         try:
             return self.g.nœuds_of_rue(ville_n, rue_n)
         except Exception as e:
-            if bavard:print(f"Pas trouvé dans g.nœuds_of_rue les nœuds de {rue_n} ({ville_n})", e)
+            LOG(f"Pas trouvé dans g.nœuds_of_rue les nœuds de {rue_n} ({ville_n})  {e}", bavard=bavard)
             return None
     
     def longueur_arête(self, s, t):

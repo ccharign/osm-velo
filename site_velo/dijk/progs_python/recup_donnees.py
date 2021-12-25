@@ -7,6 +7,7 @@ import geopy
 #, overpy
 from params import LOG_PB, CHEMIN_XML, CHEMIN_RUE_NUM_COORDS
 from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT, Adresse
+from petites_fonctions import LOG
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
@@ -41,7 +42,7 @@ def cherche_adresse_complète(adresse, bavard=0):
     return json.loads(r)["features"][0]["geometry"]["coordinates"]
 
 #https://adresse.data.gouv.fr/api-doc/adresse
-def rue_of_coords(c):
+def rue_of_coords(c, bavard=0):
     """
     Entrée : (lon, lat)
     Sortie : (nom, ville, code de postal) de la rue renvoyé par adresse.data.gouv
@@ -50,7 +51,9 @@ def rue_of_coords(c):
     api_url = f"https://api-adresse.data.gouv.fr/reverse/?lon={lon}&lat={lat}&type=street"
     r = requests.get(api_url).content.decode('unicode_escape')
     d = json.loads(r)["features"][0]["properties"]
-    return d["name"], d["city"], int(d["postcode"])
+    res = d["name"], d["city"], int(d["postcode"])
+    LOG(f"(rue_of_coords) Pour les coordonnées {c} j'ai obtenu {res}.", bavard=bavard)
+    return res
     
 
 def cherche_lieu(adresse, bavard=0):
@@ -172,6 +175,7 @@ def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
 
 ########## Interpolation des adresses ##########
+## Plus utilisé maintenant pour la France puisqu'il y a data.gouv
 
 def charge_rue_num_coords():
     """ Renvoie le dictionnaire ville -> rue -> parité -> liste des (numéros, coords)"""
