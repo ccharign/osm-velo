@@ -84,7 +84,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
     ## Essai 1
     essai1 = g.nœuds_of_rue(adresse, bavard=bavard-1)
-    if essai1 is not None:
+    if essai1 is not None and len(essai1)>0:
         return essai1
     else :
         LOG(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.", bavard=bavard)
