@@ -83,7 +83,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
     LOG(f"\n\n(tous_les_nœuds) Lancement de tous_les_nœuds(g, {adresse})", bavard=bavard)
 
     ## Essai 1
-    essai1 = g.nœuds_of_rue(adresse.ville.nom_norm, adresse.rue_norm)
+    essai1 = g.nœuds_of_rue(adresse, bavard=bavard-1)
     if essai1 is not None:
         return essai1
     else :
@@ -108,11 +108,12 @@ def tous_les_nœuds(g, adresse, bavard=0):
             nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
             LOG(f"nom trouvé : {nom}", bavard=bavard)
             adresse.rue_osm = nom
+            nom_n, _ = normalise_rue(nom, adresse.ville, bavard=bavard-1)
+            adresse.rue_norm = nom_n
 
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
-            nom_n, _ = normalise_rue(nom, adresse.ville, bavard=bavard-1)
-            LOG(f"essai2 : g.nœuds_of_rue({adresse.ville.nom_norm}, {nom_n})", bavard=bavard-1)
-            essai2 = g.nœuds_of_rue(adresse.ville.nom_norm, nom_n)
+            LOG(f"essai2 : g.nœuds_of_rue({adresse})", bavard=bavard-1)
+            essai2 = g.nœuds_of_rue(adresse, bavard=bavard-1)
             if essai2 is not None :
                 return essai2
             else:
@@ -141,7 +142,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
         ## Essai 4, avec les nodes trouvés
         if nœuds_osm != []:
-            LOG(f"essai 4 : La recherche nominatim a donné les nœuds {nœuds_osm}", bavard=bavard)
+            LOG(f"essai 4 : La recherche Nominatim a donné les nœuds {nœuds_osm}", bavard=bavard)
             nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g]
             if len(nœuds_de_g) > 0:
                 return nœuds_de_g
@@ -155,7 +156,9 @@ def tous_les_nœuds(g, adresse, bavard=0):
             LOG(f"Essai 5 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
-            return [nœud_sur_rue_le_plus_proche(g, coords, Adresse(f"{rue} ({ville})", bavard=bavard))]
+            res=nœud_sur_rue_le_plus_proche(g, coords, Adresse(f"{rue} ({ville})", bavard=bavard))
+            if res is not None:
+                return [res]
             #return [g.nœud_le_plus_proche( coords, recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
 
     
@@ -247,10 +250,11 @@ def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
              adresse (instance de Adresse)
              coords ( (float, float) )
     Renvoie le nœud sur la rue nom_rue le plus proche de coords.
-    Les nœuds de la rue seront récupérée via g.nœuds_of_rue : il faut donc que ça soit une rue qui existe dans la base.
+    Les nœuds de la rue seront récupérée via g.nœuds_of_rue.
     """
-    nœuds = g.nœuds_of_rue(adresse.ville.nom_norm, adresse.rue_norm)
+    nœuds = g.nœuds_of_rue(adresse, bavard=bavard)
     #nœuds = tous_les_nœuds(g, adresse, bavard=bavard-1) ## Ceci peut planter si la rue n'est pas en mémoire...
+    
     if nœuds is not None:
         LOG(f"Nœuds récupérés pour la rue de {adresse} : {nœuds}", bavard=bavard)
         tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]

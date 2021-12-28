@@ -12,7 +12,7 @@ from time import perf_counter
 # import os
 
 
-from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA
+from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA, LOG
 import dijkstra
 from recup_donnees import coords_lieu, cherche_lieu, nœuds_sur_tronçon_local
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue
@@ -88,17 +88,17 @@ class Graphe():
         """
         Associe dans le cache nœuds à la valeur texte.
         """
-        return self.g.met_en_cache(texte,nœuds)
+        return self.g.met_en_cache(texte, nœuds)
 
-    def nœuds_of_rue(self, ville_n, rue_n, bavard=0):
+    def nœuds_of_rue(self, adresse, bavard=0):
         """
-        Entrées : ville_n, rue_n (str) : noms normalisés d’une ville et d’une rue de celle-ci.
+        Entrées : adresse (normalisation.Adresse)
         Sortie : la liste des nœuds en mémoire pour la rue indiquée.
         """
         try:
-            return self.g.nœuds_of_rue(ville_n, rue_n)
+            return self.g.nœuds_of_rue(adresse, bavard=bavard)
         except Exception as e:
-            LOG(f"Pas trouvé dans g.nœuds_of_rue les nœuds de {rue_n} ({ville_n})  {e}", bavard=bavard)
+            LOG(f"Pas trouvé dans g.nœuds_of_rue les nœuds de {adresse}  {e}", bavard=bavard)
             return None
     
     def longueur_arête(self, s, t):

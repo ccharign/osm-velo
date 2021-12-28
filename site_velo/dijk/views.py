@@ -7,7 +7,7 @@ tic0=time.perf_counter()
 
 from dijk.progs_python.params import LOG
 from petites_fonctions import chrono
-from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT
+from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT, Adresse
 chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
 tic=time.perf_counter()
