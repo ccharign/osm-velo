@@ -15,7 +15,7 @@ class Rue(models.Model):
     nom_complet = models.CharField(max_length=200)
     nom_norm = models.CharField(max_length=200)
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
-    nœuds_à_découper = models.CharField(max_length=2000) #chaîne de caractères contenant les nœuds à splitter
+    nœuds_à_découper = models.TextField() #chaîne de caractères contenant les nœuds à splitter
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
     def nœuds(self):
@@ -35,20 +35,20 @@ class Sommet(models.Model):
         arêtes = Arête.objects.get(départ=self.id)
         return [(a.arrivée.id_osm, a.longueur) for a in arêtes]
 
-    
-class Ville_of_Sommet(models.Model):
-    """ Table d’association sommet -> ville (il peut y avoir plusieurs villes par sommet)"""
-    sommet = models.ForeignKey(Sommet, on_delete=models.CASCADE )
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
-    
+# Passage à un many_to_many de Django
 
-class Nœud_of_Rue(models.Model):
-    """ table d'association ville -> rue -> nœud """
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
-    rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
-    nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
-    def __str__(self):
-        return f"{self.ville}, {self.rue}, {self.nœud}"
+# class Ville_of_Sommet(models.Model):
+#     """ Table d’association sommet -> ville (il peut y avoir plusieurs villes par sommet)"""
+#     sommet = models.ForeignKey(Sommet, on_delete=models.CASCADE )
+#     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
+    
+# class Nœud_of_Rue(models.Model):
+#     """ table d'association ville -> rue -> nœud """
+#     ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+#     rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
+#     nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
+#     def __str__(self):
+#         return f"{self.ville}, {self.rue}, {self.nœud}"
 
     
 class Arête(models.Model):

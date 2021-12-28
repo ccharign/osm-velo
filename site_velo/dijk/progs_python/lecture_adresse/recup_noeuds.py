@@ -114,10 +114,10 @@ def tous_les_nœuds(g, adresse, bavard=0):
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
             LOG(f"essai2 : g.nœuds_of_rue({adresse})", bavard=bavard-1)
             essai2 = g.nœuds_of_rue(adresse, bavard=bavard-1)
-            if essai2 is not None :
+            if essai2 is not None and len(essai2)>0:
                 return essai2
             else:
-                LOG(f"(nœuds_sur_rue) Rue (nom osm) pas en mémoire : {nom_n}.", bavard=bavard)
+                LOG(f"(nœuds_sur_rue) Échec de g.nœuds_sur_rue({adresse}).", bavard=bavard)
 
                 ## Essai 3, prendre les nœuds dans le fichier .osm
                 # nœuds=[]

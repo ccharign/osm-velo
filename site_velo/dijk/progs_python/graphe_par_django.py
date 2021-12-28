@@ -30,7 +30,8 @@ class Graphe_django():
             # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
             res = [ n for n in rd.nœuds_of_rue(adresse) if n in self]
             LOG(f"nœuds trouvés : {res}", bavard=bavard)
-            self.ajoute_rue(adresse, res, bavard=bavard)
+            if len(res)>0:
+                self.ajoute_rue(adresse, res, bavard=bavard)
             return res
 
         
