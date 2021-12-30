@@ -2,6 +2,7 @@
 from time import perf_counter
 from petites_fonctions import chrono
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
+from dijk.models import Sommet
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_lieu, coords_of_adresse
 chrono(tic, "recup_donnees")
@@ -35,14 +36,14 @@ class Étape():
     Attributs : 
         texte (str), adresse de l'étape. 
         adresse (instance de Adresse)
-        nœuds (int set) : ensemble de nœuds
+        nœuds (Sommet set) : ensemble de nœuds
     """
     def __init__(self, texte, g, bavard=0):
         self.texte = texte
         n, self.adresse = nœuds_of_étape(texte, g, bavard=bavard-1)
         self.nœuds = set(n)
-        for n in self.nœuds:
-            assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
+        #for n in self.nœuds:
+        #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
         
         
     def __str__(self):
@@ -51,8 +52,8 @@ class Étape():
 
 def dico_arête_of_nœuds(g, nœuds):
     """
-    Entrée : nœuds, un ensemble de sommets
-    Sortie : dictionnaire s->voisins de s qui sont dans nœuds
+    Entrée : nœuds (Sommet iterable), un ensemble de sommets
+    Sortie : dictionnaire s -> voisins de s qui sont dans nœuds
     """
     return {
         s: set((t for t in g.voisins_nus(s) if t in nœuds))
@@ -62,14 +63,16 @@ def dico_arête_of_nœuds(g, nœuds):
 
 def arêtes_interdites(g, noms_rues, bavard=0):
     """
-    Entrée : g, graphe
-             noms_rues, liste de noms de rues à éviter
+    Entrée : g (graphe)
+             noms_rues (str iterable), liste de noms de rues à éviter
     Sortie : dico des arêtes correspondant
     """
     interdites={}
     for r in noms_rues:
         interdites.update(
-            dico_arête_of_nœuds(g, nœuds_of_étape(r, g, bavard=bavard)[0])
+            dico_arête_of_nœuds(g,
+                                nœuds_of_étape(r, g, bavard=bavard)[0]
+            )
         )
     return interdites
 

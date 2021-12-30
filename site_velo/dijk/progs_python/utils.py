@@ -28,25 +28,11 @@ chrono(tic, "chemins", bavard=2)
 
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
 import os
-#import recup_donnees
-#import module_graphe
-#import webbrowser
-#from matplotlib import cm
+
 
 tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
-
-# def flatten(c):
-#     """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
-#     res = []
-#     for x in c:
-#         res.extend(x)
-#     return res
-
-
-# def ouvre_html(fichier):
-#     webbrowser.open(fichier)
 
 
 def cheminsValides(chemins, g):
@@ -73,10 +59,11 @@ def itinéraire(départ, arrivée, ps_détour, g,
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
              Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
-    Sortie : liste de (légend, longeur, longueur ressentie, couleur) pour les itinéraires obtenus
+    Sortie : liste de (légende, longueur, longueur ressentie, couleur) pour les itinéraires obtenus.
     """
 
     ## Calcul des étapes
+    tic=perf_counter()
     d = chemins.Étape(départ, g, bavard=bavard-1)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
@@ -89,7 +76,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
 
     ## Arêtes interdites
     interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
-
+    tic=chrono(tic, "Calcul des étapes et arêtes interdites.")
     
     np = len(ps_détour)
     à_dessiner = []
@@ -97,20 +84,23 @@ def itinéraire(départ, arrivée, ps_détour, g,
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin([d]+étapes+[a], p, False, interdites=interdites)
         iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
+        tic=chrono(tic, f"dijkstra {c}")
         if bavard>1:print(iti)
         coul = color_dict[ (i*n_coul)//np ]
-        à_dessiner.append( (iti, coul))
-        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
+        à_dessiner.append( (iti, coul, p))
+        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti, p), int(l_ressentie), coul ))
 
     if rajouter_iti_direct:
         cd = chemins.Chemin([d,a], 0, False)
         iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, cd, bavard=bavard-1)
         coul = "#000000"
-        à_dessiner.append( (iti, coul))
-        res.append(("Itinéraire direct", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
+        à_dessiner.append( (iti, coul, 0))
+        res.append(("Itinéraire direct", g.longueur_itinéraire(iti, p), int(l_ressentie), coul ))
+        tic=chrono(tic, "Calcul de l'itinéaraire direct.")
 
         
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    chrono(tic, "Dessin")
     return res, c
     
 
@@ -135,19 +125,19 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
       Crée le fichier html de la carte superposant tous les itinéraires fournis.
     """
 
-    l, coul = listes_chemins[0]
+    l, coul, p = listes_chemins[0]
     #sous_graphe = g.g.multidigraphe.subgraph(l)
     #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
-    carte = folium_of_chemin(g, l, fit=True, color=coul)
+    carte = folium_of_chemin(g, l, p, fit=True, color=coul)
     #carte = plot_route_folium(g.g.multidigraphe, l, popup_attribute="name", color=coul) # Ne marche pas...
-    for l, coul in listes_chemins[1:]:
+    for l, coul, p in listes_chemins[1:]:
         #sous_graphe = g.g.multidigraphe.subgraph(l)
         #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
-        carte = folium_of_chemin(g, l, carte=carte, color=coul)
+        carte = folium_of_chemin(g, l, p, carte=carte, color=coul)
     
     
-    ajoute_marqueur(g.coords_of_nœud(l[0]), carte)
-    ajoute_marqueur(g.coords_of_nœud(l[-1]), carte)
+    ajoute_marqueur(g.coords_of_id_osm(l[0]), carte)
+    ajoute_marqueur(g.coords_of_id_osm(l[-1]), carte)
     
     carte.save(où_enregistrer)
     if ouvrir : ouvre_html(où_enregistrer)
@@ -184,13 +174,13 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
 
     # Calcul des chemins
     c_complet, _ = dijkstra.chemin_étapes_ensembles(g, c)
-    longueur = g.longueur_itinéraire(c_complet)
+    longueur = g.longueur_itinéraire(c_complet, c.p_détour)
     
     départ, arrivée = c_complet[0], c_complet[-1]
     c_direct, _ = dijkstra.chemin(g, départ, arrivée, 0)
-    longueur_direct = g.longueur_itinéraire(c_direct)
+    longueur_direct = g.longueur_itinéraire(c_direct, 0)
 
-    dessine([(c_complet, "blue"), (c_direct,"red")], g, où_enregistrer, ouvrir=ouvrir)
+    dessine([(c_complet, "blue", c.p_détour), (c_direct,"red", 0)], g, où_enregistrer, ouvrir=ouvrir)
     return longueur, longueur_direct
 
     

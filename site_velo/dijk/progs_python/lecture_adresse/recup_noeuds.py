@@ -1,3 +1,4 @@
+
 # -*- coding:utf-8 -*-
 #import module_graphe
 from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville, Adresse
@@ -5,7 +6,7 @@ import re
 from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local, cherche_adresse_complète, rue_of_coords
 from petites_fonctions import distance_euc
 from params import LOG_PB, LOG
-
+from dijk.models import Sommet
 
 ### Module pour associer une liste de nœuds à une adresse. ###
 
@@ -18,7 +19,7 @@ class PasTrouvé(Exception):
 def nœuds_of_étape(c:str, g, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
-        Sortie : (liste de nœuds de g associé à cette adresse, l’adresse de type Adresse)
+        Sortie : (liste de nœuds (instance de Sommet) de g associé à cette adresse, l’adresse de type Adresse)
            Si un numéro est indiqué, la liste de nœuds est le singleton du nœud de la rue le plus proche.
            Sinon c’est la liste de tous les nœuds connus de la rue.
     """
@@ -29,22 +30,27 @@ def nœuds_of_étape(c:str, g, bavard=0):
     ad = Adresse(c, bavard=bavard-1)
     
     # Recherche dans le cache
-    essai = g.nœuds_of_cache(c)
-    if essai is not None:  
-        if bavard > 1 : print(f"Adresse dans le cache : {c}")
-        return essai, ad
-    else:
-        if bavard > 0 :print(f"Pas dans le cache : {c}")
+    # essai = g.nœuds_of_cache(c)
+    # if essai is not None:  
+    #     if bavard > 1 : print(f"Adresse dans le cache : {c}")
+    #     return essai, ad
+    # else:
+    #     if bavard > 0 :print(f"Pas dans le cache : {c}")
 
-    # Fonction de mise en cache
-    def renvoie(res):
+    def renvoie(res, mettre_en_cache=False):
+        """
+        Entrée : res (int list)
+        Sortie : res, adresse
+        Effet : si mettre_en_cache, rajoute res dans le cache.
+        """
         assert res != []
-        for s in res:
-            assert isinstance(s,int)
-            if s not in g :
-                raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res}.")
-        g.met_en_cache(c, res)
-        print(f"Mis en cache : {res} pour {c}")
+        #res_d = [Sommet.objects.get(id_osm=s) for s in res]
+        # for s in res_d:
+        #     if s not in g :
+        #        raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res_d}.")
+        if mettre_en_cache:
+            g.met_en_cache(c, res)
+            print(f"Mis en cache : {res} pour {c}")
         return res, ad
 
     
@@ -257,7 +263,7 @@ def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
     
     if nœuds is not None:
         LOG(f"Nœuds récupérés pour la rue de {adresse} : {nœuds}", bavard=bavard)
-        tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]
+        tab = [ (distance_euc(g.coords_of_id_osm(n),coords), n) for n in nœuds ]
         LOG(f"distances aux nœuds de la rue : {tab}", bavard=bavard)
         _, res = min(tab)
         return res

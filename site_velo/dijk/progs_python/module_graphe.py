@@ -21,7 +21,7 @@ from collections import deque
 #from dijk.progs_python.lecture_adresse.recup_nœuds import tous_les_nœuds
 #from graphe_minimal import Graphe_minimaliste
 
-from graphe_par_networkx import Graphe_nw # À terme, cet import doit disparaître
+#from graphe_par_networkx import Graphe_nw # À terme, cet import doit disparaître
 from graphe_par_django import Graphe_django
 
 
@@ -33,7 +33,7 @@ class TropLoin(Exception):
     pass
 
 
-class Graphe_mélange(Graphe_django, Graphe_nw):
+class Graphe_mélange(Graphe_django): #, Graphe_nw):
     """
     Ceci devrait être temporaire...
     Prend les méthode en priorité dans la classe Graphe_django, et se rabat sur la classe Graphe_nw si elles ne sont pas implémentées.
@@ -42,7 +42,7 @@ class Graphe_mélange(Graphe_django, Graphe_nw):
         """
         Entrée : g, graphe de networkx
         """
-        Graphe_nw.__init__(self, g)
+        #Graphe_nw.__init__(self, g)
         Graphe_django.__init__(self)
 
         
@@ -57,7 +57,8 @@ class Graphe():
     def __init__(self, gr):
         """ Entrée : gr, instance de Graphe_nw ou de Graphe_django."""
         self.g=gr
-        #self.cycla_max = self.g.cycla_max
+        self.cycla_max = self.g.cycla_max()
+        self.cycla_min = self.g.cycla_min()
 
 
     ### "Fausses méthodes", elles ne font qu’appeler la méthode correspondante de self.g
@@ -68,8 +69,11 @@ class Graphe():
         return self.g.voisins(s , p_détour, interdites=interdites)
         
     def coords_of_nœud(self,n):
-        return self.g.coords_of_nœud(n)
+        return self.g.coords_of_id_osm(n)
 
+    def coords_of_id_osm(self,n):
+        return self.g.coords_of_id_osm(n)
+    
     def d_euc(self, n1, n2):
         """ distance euclidienne entre n1 et n2."""
         return distance_euc(self.coords_of_nœud(n1), self.coords_of_nœud(n2))
@@ -130,22 +134,26 @@ class Graphe():
         """ Itérateur sur les voisins de s, sans la longueur de l’arête."""
         return self.g.voisins_nus(n)
 
-    def geom_arête(self,s,t):
+    def geom_arête(self,s,t,p):
         """
         Entrée : deux sommets s et t tels que (s,t) est une arête
-        Sortie : liste des coordonnées décrivant la géométrie de l’arête.
+                 p, proportion détour
+        Sortie : liste des coordonnées décrivant la géométrie de l’arête, nom de l'arête
         """
-        return self.g.geom_arête(s,t)
+        return self.g.geom_arête(s,t,p)
 
     ### Méthodes vraiment créées dans cette classe. ###
     
-    def longueur_itinéraire(self, iti):
-        """
-        Entrée : un itinéraire (liste de sommets)
-        Sortie : partie entière de sa « vraie » longueur.
-        """
-        return int(sum(self.longueur_arête(s,t) for s,t in deuxConséc(iti)))
+    # def longueur_itinéraire(self, iti):
+    #     """
+    #     Entrée : un itinéraire (liste de sommets)
+    #     Sortie : partie entière de sa « vraie » longueur.
+    #     """
+    #     return int(sum(self.longueur_arête(s,t) for s,t in deuxConséc(iti)))
 
+    def longueur_itinéraire(self, iti, p):
+        return self.g.longueur_itinéraire(iti, p)
+    
     def nom_arête(self,s,t):
         return self.g.nom_arête(s,t)
     

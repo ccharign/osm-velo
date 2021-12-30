@@ -291,14 +291,14 @@ from petites_fonctions import deuxConséc
 #     return pl
 
 
-def polyline_of_arête(g, s, t, popup=None, **kwargs):
+def polyline_of_arête(g, s, t, p, popup=None, **kwargs):
     """
     Entrées:
         g (graphe)
         s, t deux sommets formant une arête
         popup : texte à afficher. Si None, on prendra le nom de l’arête si disponible.
     """
-    locations, nom = g.geom_arête(s,t)
+    locations, nom = g.geom_arête(s,t,p)
     if popup is None:
         popup=nom
     loc_à_lenvers = [(lat, lon) for lon, lat in locations]
@@ -306,7 +306,7 @@ def polyline_of_arête(g, s, t, popup=None, **kwargs):
     return pl
 
 
-def folium_of_chemin(g, iti, carte=None, tiles="cartodbpositron", zoom=1, fit=False, **kwargs):
+def folium_of_chemin(g, iti, p, carte=None, tiles="cartodbpositron", zoom=1, fit=False, **kwargs):
     """
     Entrées : 
         g (graphe)
@@ -318,7 +318,7 @@ def folium_of_chemin(g, iti, carte=None, tiles="cartodbpositron", zoom=1, fit=Fa
     Sortie : carte de folium.Map
     """
 
-    cd, cf = g.coords_of_nœud(iti[0]), g.coords_of_nœud(iti[-1])
+    cd, cf = g.coords_of_id_osm(iti[0]), g.coords_of_id_osm(iti[-1])
     cm = (cd[0]+cf[0])/2., (cd[1]+cf[1])/2.
     
     if carte is None:
@@ -326,7 +326,7 @@ def folium_of_chemin(g, iti, carte=None, tiles="cartodbpositron", zoom=1, fit=Fa
     
 
     for s,t in deuxConséc(iti):
-        pl=polyline_of_arête(g, s, t, **kwargs)
+        pl=polyline_of_arête(g, s, t, p, **kwargs)
         pl.add_to(carte)
 
     if fit:
@@ -357,7 +357,7 @@ def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
 
     lons, lats = [], []
     for s, t, kwargs in arêtes:
-        c1, c2 = g.coords_of_nœud(s), g.coords_of_nœud(t)
+        c1, c2 = s.coords, t.ccords
         lons.extend((c1[0], c2[0]))
         lats.extend((c1[1], c2[1]))
         pl=polyline_of_arête(g, s, t, **kwargs)

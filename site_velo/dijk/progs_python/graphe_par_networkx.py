@@ -168,9 +168,9 @@ class Graphe_nw():
     def voisins(self, s, p_détour, interdites={}):
         """
         La méthode utilisée par dijkstra. Renvoie les couples (voisin, longueur de l'arrête) issus du sommet s.
-        La longueur de l'arrête (s,t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
+        La longueur de l'arrête (s, t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
         Paramètres :
-             - p_détour (float) : pourcentage de détour accepté.
+             - p_détour (float) : proportion de détour accepté.
              - interdites : arêtes interdites.
         """
         #assert s in self.digraphe.nodes, f"le sommet {s} reçu par la méthode voisins n’est pas dans le graphe"
