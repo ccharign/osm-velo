@@ -1,19 +1,20 @@
 # -*- coding:utf-8 -*-
 
-from dijk.models import Rue, Ville, Arête, Sommet
+from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse
 import recup_donnees as rd
 from params import LOG
 from petites_fonctions import deuxConséc, chrono, distance_euc
 from time import perf_counter
 from django.db.models import Max, Min
+import dijkstra
 
 
 class Graphe_django():
     """
     Cette classe sert d'interface avec la base Django.
     Attribut: 
-        dico_voisins (dico int -> (int, float, float) list) associe à un id_osm la liste de ses (voisins, distance, cycla)
-        dico_coords (dico int->(float,float)) associe (lon,lat) à chaque id_osm
+        dico_voisins (dico int -> (int, Arête) list) associe à un id_osm la liste de ses (voisins, arête)
+        dico_Sommet (dico int->Sommet) associe le sommet à chaque id_osm
     """
     
     def __init__(self):
@@ -21,23 +22,24 @@ class Graphe_django():
         # Arêtes
         tic=perf_counter()
         self.dico_voisins={}
-        for a in Arête.objects.all().select_related("départ", "arrivée"):
+        arêtes = Arête.objects.all().select_related("départ", "arrivée")
+        for a in arêtes:
             s = a.départ.id_osm
             t = a.arrivée.id_osm
             if s not in self.dico_voisins: self.dico_voisins[s]=[]
-            self.dico_voisins[s].append((t, a.longueur, a.cyclabilité()))
+            self.dico_voisins[s].append((t, a))
         tic=chrono(tic, "Chargement de dico_voisins depuis la base de données.")
 
         #Sommets
-        self.dico_coords={}
+        self.dico_Sommet={}
         for s in Sommet.objects.all():
-            self.dico_coords[s.id_osm] = s.coords()
-        tic=chrono(tic, "Chargement des coords des sommets (pour A*)")
+            self.dico_Sommet[s.id_osm] = s
+        tic=chrono(tic, "Chargement des sommets")
 
         #cycla min et max
-        self.cycla_min = Arête.objects.all().aggregate(Min("cycla"))["cycla__min"]
-        self.cycla_max = Arête.objects.all().aggregate(Max("cycla"))["cycla__max"]
-        chrono(tic, "calcul cycla min et max")
+        self.cycla_min = arêtes.aggregate(Min("cycla"))["cycla__min"]
+        self.cycla_max = arêtes.aggregate(Max("cycla"))["cycla__max"]
+        #chrono(tic, "calcul cycla min et max", force=True)
 
         
     def __contains__(self, s):
@@ -53,32 +55,27 @@ class Graphe_django():
 
     def coords_of_id_osm(self, s):
         #return Sommet.objects.get(id_osm=s).coords()
-        return self.dico_coords[s]
+        return self.dico_Sommet[s].coords()
 
     def d_euc(self, s, t):
         cs, ct = self.coords_of_id_osm(s), self.coords_of_id_osm(t)
         return distance_euc(cs, ct)
 
     
-    def longueur_corrigée(self, l, cy, p_détour):
-        """
-        La formule pour prendre en compte la cyclabilité.
-        Actuellement : l / cy**(p_détour*1.5)
-        """
-        return l / cy**(p_détour*1.5)
+
 
     
     def meilleure_arête(self, s, t, p_détour):
         """
-        Échoue si deux arêtes ont mêmes départ, arrivée, et longueur...
+        Renvoie l'arête (instance d'Arête) entre s et t de longueur corrigée minimale.
         """
         #arêtes = Arête.objects.filter(départ__id_osm=s, arrivée__id_osm=t)
-        données = [(l, cy) for (v, l, cy) in self.dico_voisins[s] if v==t]
-        _, l, cy = min( (self.longueur_corrigée(l, cy, p_détour), l, cy) for (l,cy) in données )
-        return Arête.objects.get(départ__id_osm=s, arrivée__id_osm=t, longueur=l)
+        données = ((a.longueur_corrigée(p_détour), a) for (v, a) in self.dico_voisins[s] if v==t)
+        _, a = min(données)
+        return a
 
     def longueur_meilleure_arête(self, s, t, p_détour):
-        longueurs = (l for (v,l) in self.voisins(s, p_détour) if v==t)
+        longueurs = (a.longueur_corrigée(p_détour) for (v, a) in self.dico_voisins[s] if v==t)
         return min(longueurs)
         
     def geom_arête(self, s, t, p_détour):
@@ -89,17 +86,34 @@ class Graphe_django():
         return a.géométrie(), a.nom
 
     
-    def longueur_itinéraire(self, iti, p_détour):
+    def liste_Arête_of_iti(self, iti, p_détour):
+        return [self.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
+
+    def itinéraire(self, chemin, bavard=0):
         """
-        Entrée : iti (Sommet list)
-                 p_détour (float)
-        Renvoie la vraie longueur de l'itinéraire. p_détour sert à choisir l'arête en cas de multiarête.
+        Entrée : chemin (Chemin)
+        Sortie : iti_d, l_ressentie (liste d'Arêtes, float)
         """
-        res = 0.
-        #iti_d = [Sommet.objects.get(id_osm=s) for s in iti]
-        for s,t in deuxConséc(iti):
-            res += self.longueur_meilleure_arête(s,t,p_détour)
-        return res
+        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(self, chemin, bavard=bavard)
+        return self.liste_Arête_of_iti(iti, chemin.p_détour), l_ressentie
+    
+    # def longueur_itinéraire(self, iti, p_détour):
+    #     """
+    #     Entrée : iti (Sommet list)
+    #              p_détour (float)
+    #     Renvoie la vraie longueur de l'itinéraire. p_détour sert à choisir l'arête en cas de multiarête.
+    #     """
+    #     res = 0.
+    #     #iti_d = [Sommet.objects.get(id_osm=s) for s in iti]
+    #     for s,t in deuxConséc(iti):
+    #         res += self.longueur_meilleure_arête(s,t,p_détour)
+    #     return res
+    def longueur_itinéraire(self, iti_d):
+        """
+        Entrée : iti_d (Arête list)
+        Sortie : la vraie longueur de l'itinéraire.
+        """
+        return sum(a.longueur for a in iti_d)
 
 
     def tous_les_nœuds(self):
@@ -119,14 +133,14 @@ class Graphe_django():
         La méthode utilisée par dijkstra. Renvoie les couples (voisin, longueur de l'arrête) issus du sommet s.
         La longueur de l'arrête (s, t) renvoyée est sa longueur physique divisée par sa cyclabilité**(p_détour*1.5).
         """
-        tout = [ (t, self.longueur_corrigée(l, cy, p_détour) ) for (t,l,cy) in self.dico_voisins[s]]
+        tout = [ (t, a.longueur_corrigée(p_détour) ) for (t, a) in self.dico_voisins[s]]
         if s in interdites:
             return [(t,l) for (t,l) in tout if t not in interdites[s]]
         else:
             return tout
 
     def voisins_nus(self, s):
-        return [t for (t,_,_) in self.dico_voisins[s]]
+        return [t for (t,_) in self.dico_voisins[s]]
 
         
     def nœuds_of_rue(self, adresse, bavard=0):
@@ -134,7 +148,8 @@ class Graphe_django():
         Entrées : adresse (Adresse)
         Sortie : la liste des nœuds pour la rue indiquée.
                  Essai 1 : recherche dans la base (utilise adresse.rue_norm)
-                 Essai 2 : via Nominatim et overpass, par recup_donnees.nœuds_of_rue
+                 Essai 2 : via Nominatim et overpass, par recup_donnees.nœuds_of_rue. Ceci récupère les nœuds des ways renvoyés par Nominatim.
+                    En cas d'essai 2 concluant, le résultat est rajouté dans la table des Rues.
         """
         
         try:
@@ -168,3 +183,16 @@ class Graphe_django():
             nœuds_à_découper = ",".join(map(str, nœuds))
             rue_d = Rue(nom_complet=adresse.rue, nom_norm=adresse.rue_norm, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
             rue_d.save()
+
+            
+    def met_en_cache(self, adresse, res):
+        ligne = Cache_Adresse(adresse=str(adresse), nœuds_à_découper = ",".join(map(str,res)))
+        ligne.save()
+        LOG(f"Mis en cache : {res} pour {adresse}", bavard=1)
+
+    def dans_le_cache(self, adresse):
+        res = Cache_Adresse.objects.filter(adresse=str(adresse))
+        if len(res)==1:
+            return res[0].nœuds()
+        elif len(res)>1:
+            LOG_PB(f"Plusieurs valeurs en cache pour {adresse}")

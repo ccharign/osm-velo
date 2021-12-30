@@ -3,6 +3,9 @@ from django.db import models
 # Create your models here.
 
 
+def découpe_chaîne_de_nœuds(c):
+    return tuple(map(int, c.split(",")))
+
 class Ville(models.Model):
     nom_complet = models.CharField(max_length=100)
     nom_norm = models.CharField(max_length=100)
@@ -22,7 +25,7 @@ class Rue(models.Model):
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
     def nœuds(self):
-        return tuple(map(int, self.nœuds_à_découper.split(",")))
+        return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
 
 class Sommet(models.Model):
@@ -110,23 +113,26 @@ class Arête(models.Model):
         else:
             return self.cycla_défaut
     
-    # def longueur_corrigée(self, p_détour):
-    #     """
-    #     Entrée : p_détour (float), proportion de détour.
-    #     Sortie : Longueur corrigée par la cyclabilité.
-    #     """
-    #     cy = self.cyclabilité()
-    #     return self.longueur / cy**( p_détour*1.5)
+    def longueur_corrigée(self, p_détour):
+        """
+        Entrée : p_détour (float), proportion de détour.
+        Sortie : Longueur corrigée par la cyclabilité.
+        """
+        cy = self.cyclabilité()
+        return self.longueur / cy**( p_détour*1.5)
     
     
 
 
     
 class Cache_Adresse(models.Model):
-    """ Table d'association ville -> adresse -> sommet
-    Un seul sommet par ligne"""
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    """ 
+    Table d'association ville -> adresse -> chaîne de nœuds
+    Note : tout ce qui correspond à des ways dans Nominatim sera enregistré dans la table Rue, via g.nœuds_of_rue.
+    """
     adresse = models.CharField(max_length=200)
-    nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
+    nœuds_à_découper = models.TextField()
     def __str__(self):
         return f"{self.ville}, {self.adresse}, {self.nœud}"
+    def nœuds(self):
+        return découpe_chaîne_de_nœuds(self.nœuds_à_découper)

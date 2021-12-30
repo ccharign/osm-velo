@@ -88,6 +88,8 @@ def tous_les_nœuds(g, adresse, bavard=0):
     """
     LOG(f"\n\n(tous_les_nœuds) Lancement de tous_les_nœuds(g, {adresse})", bavard=bavard)
 
+
+    
     ## Essai 1
     essai1 = g.nœuds_of_rue(adresse, bavard=bavard-1)
     if essai1 is not None and len(essai1)>0:
@@ -155,7 +157,13 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
             
         ## Essai 5 : en se basant sur les coords enregistrées dans osm pour le premier élément renvoyé par Nominatim
-        ## Ce devrait être la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, commerce...)
+        ## Ce devrait être la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, bar, commerce...)
+        ## Mettre en cache dans ce cas.
+        
+        # Essai 5.0 : dans le cache
+        essai_cache = g.dans_le_cache(adresse)
+        if essai_cache is not None : return essai_cache
+
         if len(lieu)>0:
             truc = lieu[0].raw
             adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0]
@@ -164,6 +172,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
             res=nœud_sur_rue_le_plus_proche(g, coords, Adresse(f"{rue} ({ville})", bavard=bavard))
             if res is not None:
+                g.met_en_cache(adresse, [res])
                 return [res]
             #return [g.nœud_le_plus_proche( coords, recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
 

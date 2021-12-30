@@ -3,7 +3,7 @@
 ### Fonctions diverses pour utiliser le logiciel
 
 from time import perf_counter
-from petites_fonctions import chrono
+from petites_fonctions import chrono, deuxConséc
 
 from params import TMP
 #from importlib import reload  # recharger un module après modif
@@ -35,17 +35,29 @@ import folium
 chrono(tic, "folium", bavard=2)
 
 
-def cheminsValides(chemins, g):
-    """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
-    res = []
-    for c in chemins:
-        try:
-            dijkstra.chemin_étapes_ensembles(g, c)
-            res.append(c)
-        except dijkstra.PasDeChemin as e:
-            print(e)
-            print(f"Pas de chemin avec étapes pour {c}")
+# def cheminsValides(chemins, g):
+#     """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
+#     res = []
+#     for c in chemins:
+#         try:
+#             dijkstra.chemin_étapes_ensembles(g, c)
+#             res.append(c)
+#         except dijkstra.PasDeChemin as e:
+#             print(e)
+#             print(f"Pas de chemin avec étapes pour {c}")
+#     return res
+
+
+def liste_Arête_of_iti(g, iti, p_détour):
+    """
+    Entrée : iti (int list), liste d'id osm
+    Sortie : liste d'Arêtes
+    """
+    tic=perf_counter()
+    res = [g.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
+    chrono(tic, "conversion de l'itinéraire en liste d'Arêtes.")
     return res
+
 
 
 def itinéraire(départ, arrivée, ps_détour, g,
@@ -63,7 +75,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
     """
 
     ## Calcul des étapes
-    tic=perf_counter()
+    tic0=perf_counter()
     d = chemins.Étape(départ, g, bavard=bavard-1)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
@@ -76,31 +88,31 @@ def itinéraire(départ, arrivée, ps_détour, g,
 
     ## Arêtes interdites
     interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
-    tic=chrono(tic, "Calcul des étapes et arêtes interdites.")
+    tic=chrono(tic0, "Calcul des étapes et arêtes interdites.")
     
     np = len(ps_détour)
     à_dessiner = []
     res = []
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin([d]+étapes+[a], p, False, interdites=interdites)
-        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
-        tic=chrono(tic, f"dijkstra {c}")
-        if bavard>1:print(iti)
+        iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
-        à_dessiner.append( (iti, coul, p))
-        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti, p), int(l_ressentie), coul ))
+        à_dessiner.append( (iti_d, coul, p))
+        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti_d), int(l_ressentie), coul ))
+        tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if rajouter_iti_direct:
         cd = chemins.Chemin([d,a], 0, False)
-        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, cd, bavard=bavard-1)
+        iti_d, l_ressentie = g.itinéraire(cd, bavard=bavard-1)
         coul = "#000000"
-        à_dessiner.append( (iti, coul, 0))
-        res.append(("Itinéraire direct", g.longueur_itinéraire(iti, p), int(l_ressentie), coul ))
-        tic=chrono(tic, "Calcul de l'itinéaraire direct.")
+        à_dessiner.append( (iti_d, coul, 0))
+        res.append(("Itinéraire direct", g.longueur_itinéraire(iti_d), int(l_ressentie), coul ))
+        tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
-        
+    tic=perf_counter()
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
     chrono(tic, "Dessin")
+    chrono(tic0, f"Total pour l'itinéraire {c}")
     return res, c
     
 
@@ -118,7 +130,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
 def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     """
     Entrées :
-      - listes_chemins : liste de couples (liste de sommets, couleur)
+      - listes_chemins : liste de couples (liste d'Arêtes, couleur)
       - g (instance de Graphe)
       - où_enregistrer : adresse du fichier html à créer
     Effet:
@@ -136,8 +148,8 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
         carte = folium_of_chemin(g, l, p, carte=carte, color=coul)
     
     
-    ajoute_marqueur(g.coords_of_id_osm(l[0]), carte)
-    ajoute_marqueur(g.coords_of_id_osm(l[-1]), carte)
+    ajoute_marqueur(l[0].départ.coords(), carte)
+    ajoute_marqueur(l[-1].arrivée.coords(), carte)
     
     carte.save(où_enregistrer)
     if ouvrir : ouvre_html(où_enregistrer)
