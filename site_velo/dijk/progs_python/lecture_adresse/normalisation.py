@@ -135,6 +135,17 @@ def créationArbre():
         arbre.sauv(os.path.join(DONNÉES, ville_n))
     return res
 
+def arbre_rue_dune_ville(ville_d, rues):
+    """
+    Entrée : ville_d (Ville)
+             rues (iterable)
+    Effet: crée le fichier contenant l'arbre des rue de la ville. Le fichier porte le nom ville_d.nom_norm
+    """
+    res = ArbreLex()
+    for rue in rues:
+        res.insère(rue)
+    res.sauv(os.path.join(DONNÉES, ville_d.nom_norm))
+
 #créationArbre()
 
 def charge_arbres_rues():

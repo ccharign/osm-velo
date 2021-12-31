@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 
-# Ce module regroupe les fonctions de recherche de données géographiques qui n'utilisent pas osmnx, pour utilisation à chaque utilisation.
-# Les fonctions d’analyse de données plus lentes depuis le .osm qui ont vocation à n’être utilisées qu’une fois (ou lors des mise à jour des données osm) sont dans le dossier initialisation.
+# Ce module regroupe les petiter fonctions de recherche de données géographiques qui utilisent Nominatim, overpass, ou data.gouv.
 
 import geopy
 import overpy
@@ -29,6 +28,7 @@ class LieuPasTrouvé(Exception):
     pass
 
 
+### Avec data.gouv ###
 
 def cherche_adresse_complète(adresse, bavard=0):
     """
@@ -55,7 +55,10 @@ def rue_of_coords(c, bavard=0):
     res = d["name"], d["city"], int(d["postcode"])
     LOG(f"(rue_of_coords) Pour les coordonnées {c} j'ai obtenu {res}.", bavard=bavard)
     return res
-    
+
+
+
+### Avec Nominatim ###
 
 def cherche_lieu(adresse, bavard=0):
     """
@@ -85,6 +88,8 @@ def cherche_lieu(adresse, bavard=0):
         else:
             raise LieuPasTrouvé(f"{adresse}")
 
+
+### Avec overpass ###
 
 def nœuds_of_rue(adresse, bavard=0):
     """
@@ -117,6 +122,19 @@ def nœuds_of_idrue(id_rue, bavard=0):
     w = res_req.ways[0]
     return w._node_ids
 
+
+def villes_of_bbox(bbox):
+    requête="""[out:json][timeout:25];
+// gather results
+(
+  node["place"~"city|town|village|hamlet"]({{bbox}});
+  way["place"="village"]({{bbox}});
+  relation["place"="village"]({{bbox}});
+);
+// print results
+out body;
+>;
+out skel qt;"""
 
 
 def infos_nœud(id_nœud):

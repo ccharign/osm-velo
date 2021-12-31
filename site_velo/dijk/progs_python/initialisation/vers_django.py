@@ -10,63 +10,32 @@
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
 from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse
-from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue
+from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue, ABRE_VILLES
 from dijk.progs_python.init_graphe import charge_graphe
 
 
-def nv(nom_ville):
-    return normalise_ville(nom_ville).nom_norm
 
-code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
 
-#Utiliser bulk_create
-#https://pmbaumgartner.github.io/blog/the-fastest-way-to-load-data-django-postgresql/
 
-def villes_vers_django():
+def nv_ville(nom, code, tol=3):
     """
-    Effet : réinitialise la table dijk_ville
+    Effet : si pas déjà présente, rajoute la ville dans la base django et dans l'arbre lex ARBRE_VILLES.
+    Sortie : l'objet Ville créé.
     """
-    Ville.objects.all().delete()
-    villes_à_créer=[]
-    for nom, code in TOUTES_LES_VILLES.items():
-        villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(nom), code=code))
-    Ville.objects.bulk_create(villes_à_créer)
+    noms_proches=ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)[0]
+    if len(noms_proches)>0:
+        print(f"Ville(s) trouvée(s) dans l'arbre : {noms_proches}")
+        nom_corrigé=noms_proches[0]
+        v_d=Ville.objects.get(nom_complet=nom_corrigé)
+        return v_d
+    else:
+        nom_n=partie_commune(nom_corrigé)
+        v_d = Ville(nom_complet=nom, code=code, nom_n=nom_n)
+        v_d.save()
+        ARBRE_VILLES.insère(nom)
+        return v_d
 
         
-def charge_rues(bavard=0):
-    """ 
-    Transfert le contenu du csv CHEMIN_NŒUDS_RUES dans la base.
-    Réinitialise la table Rue (dijk_rue)
-    """
-
-    # Vidage des tables
-    Rue.objects.all().delete()
-    #Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
-    
-    rues_à_créer=[]
-    with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
-        compte=0
-        nb_lignes_lues=0
-        for ligne in entrée:
-            nb_lignes_lues+=1
-            if nb_lignes_lues%100==0:
-                print(f"ligne {nb_lignes_lues}")
-            if bavard>1:print(ligne)
-            ville_t, rue, nœuds_à_découper = ligne.strip().split(";")
-
-            ville=normalise_ville(ville_t)
-            ville_n = ville.nom_norm
-            ville_d = Ville.objects.get(nom_norm=ville_n) # l’objet Django. # get renvoie un seul objet, et filter plusieurs (à confirmer...)
-            
-            rue_n = prétraitement_rue(rue)
-            rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
-            rues_à_créer.append(rue_d)
-            
-        Rue.objects.bulk_create(rues_à_créer)
-            
-    print("Chargement des rues vers django fini.")
-
-    
         
 def transfert_graphe(g, bavard=0, juste_arêtes=False):
     """
@@ -144,3 +113,78 @@ def transfert_graphe(g, bavard=0, juste_arêtes=False):
     Arête.objects.bulk_create(à_créer)
     Arête.objects.bulk_update(à_màj, ["geom"])
                  
+
+
+
+def charge_dico_rues_nœuds(ville_d, dico):
+    """
+    Entrée :
+        - ville_d (instance de ville)
+        - dico : un dico nom_de_rue -> liste de nœuds
+    Effet :
+        remplit la table dijk_rue
+    """
+    rues_à_créeer=[]
+    for rue, nœuds in dico.items():
+        rue_n = prétraitement_rue(rue)
+        rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+        rues_à_créer.append(rue_d)
+    Rue.objecs.bulk_create(rues_à_créeer)
+        
+
+### vieux trucs ###
+
+
+
+def nv(nom_ville):
+    return normalise_ville(nom_ville).nom_norm
+
+code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
+
+#Utiliser bulk_create
+#https://pmbaumgartner.github.io/blog/the-fastest-way-to-load-data-django-postgresql/
+
+def villes_vers_django():
+    """
+    Effet : réinitialise la table dijk_ville
+    """
+    Ville.objects.all().delete()
+    villes_à_créer=[]
+    for nom, code in TOUTES_LES_VILLES.items():
+        villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(nom), code=code))
+    Ville.objects.bulk_create(villes_à_créer)
+
+        
+def charge_rues(bavard=0):
+    """ 
+    Transfert le contenu du csv CHEMIN_NŒUDS_RUES dans la base.
+    Réinitialise la table Rue (dijk_rue)
+    """
+
+    # Vidage des tables
+    Rue.objects.all().delete()
+    #Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
+    
+    rues_à_créer=[]
+    with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
+        compte=0
+        nb_lignes_lues=0
+        for ligne in entrée:
+            nb_lignes_lues+=1
+            if nb_lignes_lues%100==0:
+                print(f"ligne {nb_lignes_lues}")
+            if bavard>1:print(ligne)
+            ville_t, rue, nœuds_à_découper = ligne.strip().split(";")
+
+            ville=normalise_ville(ville_t)
+            ville_n = ville.nom_norm
+            ville_d = Ville.objects.get(nom_norm=ville_n) # l’objet Django. # get renvoie un seul objet, et filter plusieurs (à confirmer...)
+            
+            rue_n = prétraitement_rue(rue)
+            rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+            rues_à_créer.append(rue_d)
+            
+        Rue.objects.bulk_create(rues_à_créer)
+            
+    print("Chargement des rues vers django fini.")
+

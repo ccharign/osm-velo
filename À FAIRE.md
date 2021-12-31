@@ -1,9 +1,6 @@
 
 À FAIRE :
 
-Cache dès qu'une recherche d'adresse a nécessité une requête Nominatim/overpass. (À partir de étape 2 ou 3 ?)
-À terme faire un abre lex des cles du cache ?
-
 
 initialisation de la cycla:
        - piste cyclables
@@ -20,6 +17,10 @@ màj / recalcul de la cycla
     - formulaire avec sélection d'un chemin et affichage de l'iti correspondant.
     - avertissement si sens interdit ?
 
+Mettre les nœuds aux feuilles des arbres lex de rue ?
+
+Création des arbres lex depuis la bdd
+
 script de mise à jour/agrandissement du graphe :
        - rajouter un modèle Zone. Associer chaque Sommet à une (ou plusieurs?) zone.
        - interface ? Faire une page cachée exprès. Avec mot de passe ? Mettre le import initialisation dans la vue.
@@ -31,10 +32,6 @@ script de mise à jour/agrandissement du graphe :
 
 
 Charger la zone au moyen d'un get.   
-
-
-gestion des multiarêtes ?
- A priori pb possible uniquement à l'affichage et dans le cas de deux arêtes de mêmes départ, arrivée et longueur.
 
 
 
@@ -57,13 +54,13 @@ Vaut-il mieux mettre les nœuds d'une rue en texte dans la base, ou avec une rel
 
 À FAIRE (un jour)
 
-
 Géolocalisation : y-a-t-il une fonction idoine dans folium ?
 
 Afficher les étapes sur la carte
 
 export du gpx
 
+À terme faire un abre lex des cles du cache ?
 Si un sommet change lors d’une màj de g, que se passe-t-il dans le cache ? -> recréer (à partir de la liste des chemins) ou supprimer le cache lors d’une màj ?
 
 Mettre une case pour donner un bonus/malus à une rue dans la recherche ?

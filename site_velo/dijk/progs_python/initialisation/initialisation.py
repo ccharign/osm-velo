@@ -9,47 +9,61 @@ if os.getcwd()=="/home/moi/git/osm vélo":
 else :
     print(f"Dossier actuel: {os.getcwd()}")
     
-import osmnx.io
+import osmnx
 
 from dijk.progs_python.params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, DONNÉES, BBOX_DÉFAUT
 from initialisation.crée_graphe import crée_graphe_bbox
 #from initialisation.élaguage import élague_xml
 from initialisation.numéros_rues import extrait_rue_num_coords
-from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues
+from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues, extrait_nœuds_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
-from lecture_adresse.normalisation import créationArbre
+from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville
 from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier
 #from networkx import read_graphml
+from dijk.models import Ville
+import vers_django as vd
 
 
 """
-Script pour tout initialiser, càd:
-    -- le graphe au format graphml
-    -- les différents fichiers du graphe, à savoir dans l’ordre:
-             - la carte .osm complète (CHEMIN_XML_COMPLET)
-             - la carte élaguée (CHEMIN_XML)
-             - rue_num_coords.csv (CHEMIN_RUE_NUM_COORDS) qui permet de retrouver les coords gps d’un numéro de rue
-             - nœuds_rues.csv (CHEMIN_NŒUDS_RUES) qui donne les nœuds de chaque rue 
-             - nœuds_ville.csv (CHEMIN_NŒUDS_VILLES) qui donne les nœuds de chaque ville 
-
+Script pour réinitialiser ou ajouter une nouvelle zone.
 
 Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
    -> À voir, peut être le cache ?
    -> Ou carrément recréer le cache...
    De toute façon le cache est assez peu utilisé me semble-t-il maintenant.
-
-Il ne crée aucun objet Python, seulement des fichiers : peut être utilisé indépendemment du reste.
-   -> le paramétrer pour usage en script
-
 """
 
 
-## À FAIRE :
-# Quid du fichier osm élaguée ? Peut-on le tirer directement du graphe networkx ? Peut-on s’en passer entièrement ?
-# liste des villes : utiliser overpass cette fois ?
+def charge_ville(nom, code, zone="Pau", pays="France", bavard=2):
 
+    ## Création de la ville dans Django et dans l'arbre lex
+    ville_d = vd.nv_ville(nom, code)
 
+    ## Récup des graphe via osmnx
+    print("Récupération du graphe avec une marge")
+    gr_avec_marge = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True", buffer_dist=500)
+    print("Récupération du graphe exact")
+    gr_strict = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True")
+
+    g = Graphe_nx(gr_avec_marge)
+    
+    ## Noms des villes
+    print("Ajout du nom de ville.")
+    for n in gr_strict.nodes:
+        #if n not in g.villes_of_nœud: g.villes_of_nœud=[]
+        g.villes_of_nœud[n] = [nom]
+
+    ## nœuds des rues
+    print("Calcul des nœuds de chaque rue")
+    dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds
+    vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
+    print("Création de l'arbre lexicographique")
+    arbre_rue_dune_ville(ville_d, dico_rues.keys())
+
+    ## Transfert du graphe
+    vd.transfert_graphe(g, bavard=bavard-1, juste_arêtes=False)
+    
 
 
 def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=False, force_téléchargement=False, bavard=1):
@@ -68,6 +82,7 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=Fals
              - nœuds_rues.csv (CHEMIN_NŒUDS_RUES) qui donne les nœuds de chaque rue
     """
 
+    ## Création du graphe networkx
     s,o,n,e = bbox
     nom_fichier=f'{DONNÉES}/{s}{o}{n}{e}.graphml'
     if not force_téléchargement and os.path.exists(nom_fichier):
@@ -78,22 +93,26 @@ def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=Fals
         print("Création du graphe via osmnx.")
         gr = crée_graphe_bbox(nom_fichier, bbox, bavard=bavard)
     g=Graphe_nx(gr)
-    
+
+
+    ## ville de chaque nœud. Va être nécessaire pour récupérer les nœuds des rues.
     if aussi_nœuds_des_villes:
         # Ville de chaque nœud
         print("\n\nRecherche de la liste des nœuds de chaque ville.")
-        #if bavard>0:print("  Note : on pourrait ne garder que les nœuds de g...") # Maintenant c’est fait
         sauv_fichier(CHEMIN_NŒUDS_VILLES)
         csv_nœuds_des_villes(g)
     print(f"Création du csv villes_of_nœud")
     crée_csv_villes_of_nœuds(g,bavard=bavard)
     print("Ajout des villes de chaque nœud dans le graphe.")
     ajoute_villes(g, bavard=bavard)
-    
+
+
+    ## Nœuds de chaque rue
     print("\n\nCréation de la liste des nœuds de chaque rue.")
     sauv_fichier(CHEMIN_NŒUDS_RUES)
     csv_nœud_des_rues(g, bavard=bavard-1)
 
+    ## Arbres lex des rues
     print("\nArbres lexicographiques des rues")
     créationArbre()
     
