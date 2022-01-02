@@ -94,11 +94,15 @@ class Chemin():
         self.interdites=interdites
         self.noms_rues_interdites=texte_interdites
     
-    
+
+    @classmethod
+    def of_django(cls, c_d, g, bavard=0):
+        return cls.of_données(c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
+        
     @classmethod
     def of_ligne(cls, ligne, g, tol=.25, bavard=0):
         """ Entrée : ligne (str), une ligne du csv de chemins. Format AR|pourcentage_détour|étapes|rues interdites.
-                     g (Graphe). Utilisé pour déterminer le nœud associé à chaque étape.
+                     g (Graphe). Utilisé pour déterminer les nœuds associés à chaque étape.
         tol indique la proportion tolérée d’étapes qui n’ont pas pu être trouvées.
         """
 
@@ -106,7 +110,19 @@ class Chemin():
         AR_t, pourcentage_détour_t, étapes_t,rues_interdites_t = ligne.strip().split("|")
         p_détour = int(pourcentage_détour_t)/100.
         AR = bool(AR_t)
+        return cls.of_données(AR, p_détour, étapes_t, rues_interdites_t, bavard=bavard)
 
+        
+    @classmethod
+    def of_données(cls, AR, p_détour, étapes_t, rues_interdites_t, bavard=0):
+        """
+        Entrée :
+            - AR (bool)
+            - p_détour (float)
+            - étapes_t (str) : étapes séparées par ;
+            - rues_interdites_t (str) : rues interdites, séparées par ;
+        """
+        
         #rues interdites
         noms_rues = rues_interdites_t.split(";")
         interdites = arêtes_interdites(g, noms_rues, bavard=bavard)

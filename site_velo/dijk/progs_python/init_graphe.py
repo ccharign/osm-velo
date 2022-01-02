@@ -47,6 +47,8 @@ import ast
 #################### Récupération du graphe  ####################
 
 
+
+
 def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
     """
     Renvoie le graphe (instance de Graphe) correspondant à la bbox indiquée.

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse
+from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse, Zone
 import recup_donnees as rd
 from params import LOG
 from petites_fonctions import deuxConséc, chrono, distance_euc
@@ -17,12 +17,14 @@ class Graphe_django():
         dico_Sommet (dico int->Sommet) associe le sommet à chaque id_osm
     """
     
-    def __init__(self):
+    def __init__(self, zone="Pau"):
 
+        zone_d = Zone.objects.get(nom=zone)
+        
         # Arêtes
         tic=perf_counter()
         self.dico_voisins={}
-        arêtes = Arête.objects.all().select_related("départ", "arrivée")
+        arêtes = Arête.objects.filter(zone=zone_d).select_related("départ", "arrivée")
         for a in arêtes:
             s = a.départ.id_osm
             t = a.arrivée.id_osm
@@ -32,13 +34,12 @@ class Graphe_django():
 
         #Sommets
         self.dico_Sommet={}
-        for s in Sommet.objects.all():
+        for s in Sommet.objects.filter(zone=zone_d):
             self.dico_Sommet[s.id_osm] = s
         tic=chrono(tic, "Chargement des sommets")
 
         #cycla min et max
-        self.cycla_min = arêtes.aggregate(Min("cycla"))["cycla__min"]
-        self.cycla_max = arêtes.aggregate(Max("cycla"))["cycla__max"]
+        self.calcule_cycla_min_max()
         #chrono(tic, "calcul cycla min et max", force=True)
 
         
@@ -85,7 +86,22 @@ class Graphe_django():
         a = self.meilleure_arête(s, t, p_détour)
         return a.géométrie(), a.nom
 
-    
+    def incr_cyclabilité(self, a, p_détour, dc):
+        """ 
+        Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
+        Met à jour self.cycla_max si besoin
+        Formule appliquée : *= (1+dc)
+        """
+        s,t = a
+        a_d = self.meilleure_arête(s, t, p_détour)
+        a_d.incr_cyclabilité(dc)
+        a_d.save()
+        #self.cycla_max = max(self.cycla_max, a_d.cycla)
+
+    def calcule_cycla_min_max(self):
+        self.cycla_min = arêtes.aggregate(Min("cycla"))["cycla__min"]
+        self.cycla_max = arêtes.aggregate(Max("cycla"))["cycla__max"]
+        
     def liste_Arête_of_iti(self, iti, p_détour):
         return [self.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
 

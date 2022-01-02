@@ -117,7 +117,8 @@ class Graphe():
 
 
     def incr_cyclabilité(self, a, dc):
-        """ Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
+        """ 
+        Augmente la cyclabilité de l'arête a (couple de nœuds), ou l'initialise si elle n'était pas encore définie.
         Met à jour self.cycla_max si besoin
         Formule appliquée : *= (1+dc)
         """

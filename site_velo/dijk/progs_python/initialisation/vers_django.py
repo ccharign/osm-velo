@@ -9,10 +9,10 @@
 
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
-from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse
+from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue, ABRE_VILLES
 from dijk.progs_python.init_graphe import charge_graphe
-
+from params import CHEMIN_CHEMINS
 
 
 
@@ -35,11 +35,24 @@ def nv_ville(nom, code, tol=3):
         ARBRE_VILLES.insère(nom)
         return v_d
 
+def cycla_défaut(a):
+    """
+    Entrée : a, arête d'un graphe nx.
+    Sortie (float) : cycla_défaut
+    """
+    pas=1.1
+    res=1.0
+    bonus = [("higway", "path"), ("higway", "cycleway"), ("maxspeed", 30), ("maxspeed", 20)]
+    for clef, val in bonus:
+        if a.get(clef,None)==val:res*=pas
+
+    return res
+    
         
-        
-def transfert_graphe(g, bavard=0, juste_arêtes=False):
+def transfert_graphe(g, zone_d, bavard=0, juste_arêtes=False):
     """
     Entrée : g (graphe_par_networkx)
+             zone_d (instance de Zone)
     Effet : transfert le graphe dans la base Django
     Stratégie pour les arêtes : 
            si entre deux sommets il y a le même nombre d'arêtes avec les mêmes noms, on màj la géométrie (sans doute inutile 99 fois sur 100)
@@ -58,6 +71,7 @@ def transfert_graphe(g, bavard=0, juste_arêtes=False):
             essai = Sommet.objects.filter(id_osm=s).first()
             if essai is None:
                 s_d = Sommet(id_osm=s, lon=lon, lat=lat)
+                
                 à_créer.append(s_d)
             else:
                 s_d = essai
@@ -65,6 +79,7 @@ def transfert_graphe(g, bavard=0, juste_arêtes=False):
                 s_d.lon=lon
                 s_d.lat=lat
                 à_màj.append(s_d)
+            s_d.zone.add(zone_d)
         Sommet.objects.bulk_create(à_créer)
         Sommet.objects.bulk_update(à_màj, ["lon", "lat"])
             
@@ -97,18 +112,21 @@ def transfert_graphe(g, bavard=0, juste_arêtes=False):
                 for _, a in arêtes.items():
                     a_d = vieilles_arêtes.objects.get(nom=a["name"])
                     a_d.géométrie = géom_vers_texte(a["geometry"].coords)
+                    a_d.zone.add(zone_d)
+                    a_d.cycla_défaut= cycla_défaut(a)
                     à_màj.append(a_d)
             else:
                 # On efface et on recommence
                 if len(vieilles_arêtes)>0:
                     LOG(f"Arêtes supprimées : {vieilles_arêtes}.", bavard=2)
                     vieilles_arêtes.delete()
-                cycla_dans_g = g.cyclabilité.get((s,t), 1.0)  # Utile juste pour la transition depuis mon vieux graphe qui ne prenait pas en compte les multi-arêtes.
+                cycla_dans_g = g.cyclabilité.get((s,t), None)  # Utile juste pour la transition depuis mon vieux graphe qui ne prenait pas en compte les multi-arêtes.
                 # En temps normal ce sera 1.0
                 for _, a in arêtes.items():
                     nom=a.get("name", None)
                     geom=géom_vers_texte(a["geometry"].coords)
-                    a_d = Arête(départ=départ, arrivée=arrivée, longueur=a["length"], cycla=cycla_dans_g, geom =geom)
+                    a_d = Arête(départ=départ, arrivée=arrivée, longueur=a["length"], cycla=cycla_dans_g, cycla_défaut=cycla_défaut(a), geom =geom)
+                    a_d.zone.add(zone_d)
                     à_créer.append(a_d)
     Arête.objects.bulk_create(à_créer)
     Arête.objects.bulk_update(à_màj, ["geom"])
@@ -188,3 +206,22 @@ def charge_rues(bavard=0):
             
     print("Chargement des rues vers django fini.")
 
+
+
+def charge_csv_chemins(g, réinit=False):
+    """
+    Effet : charge le csv de CHEMIN_CHEMINS dans la base
+    Si réinit, vide au préalbale la table.
+    """
+    with open(CHEMIN_CHEMINS) as entrée:
+        à_créer=[]
+        for ligne in entrée:
+            AR_t, pourcentage_détour_t, étapes_t,rues_interdites_t = ligne.strip().split("|")
+            p_détour = int(pourcentage_détour_t)/100.
+            AR = bool(AR_t)
+            à_créer.append(Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t))
+
+    if réinit:
+        Chemins_d.objects.all().delete()
+    Chemin_d.objects.bulk_create(à_créer)
+            

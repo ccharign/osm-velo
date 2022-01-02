@@ -5,6 +5,7 @@
 initialisation de la cycla:
        - piste cyclables
        - zone 30
+       - sens interdit : les attraper en désorientant le graphe
 
 modif du graphe:
       - ronds points

@@ -135,6 +135,7 @@ def créationArbre():
         arbre.sauv(os.path.join(DONNÉES, ville_n))
     return res
 
+
 def arbre_rue_dune_ville(ville_d, rues):
     """
     Entrée : ville_d (Ville)

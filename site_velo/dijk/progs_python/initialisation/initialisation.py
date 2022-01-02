@@ -34,15 +34,45 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
    De toute façon le cache est assez peu utilisé me semble-t-il maintenant.
 """
 
+def charge_multidigraph():
+    """
+    Renvoie le multidigraph de la zone défaut. Plutôt pour tests.
+    """
+    s,o,n,e = BBOX_DÉFAUT
+    nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
+    g = load_graphml(nom_fichier)
+    return g
 
-def charge_ville(nom, code, zone="Pau", pays="France", bavard=2):
+
+def désoriente(g):
+    """
+    Entrée : g, multidigraph nx
+    Effet : rajoute les arêtes inverses quand elles manquent, mais avec un attribut supplementaire «sens_interdit» qui vaut True.
+    """
+    for s in g.nodes:
+        for t in g[s].keys():
+            for a in g[s][t].values():
+                if arête_inverse_non_présente(s,t,a):
+                    a_envers = Arête(départ=Sommet.objects.get(id_osm=s),
+                                     arrivée=Sommet.objects.get(id_osm=t),
+                                     longueur=a["length"],
+                                     cycla_défaut
+                    )
+
+
+def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavard=2):
 
     ## Création de la ville dans Django et dans l'arbre lex
     ville_d = vd.nv_ville(nom, code)
+    ## Création ou récupération de la zone
+    if ville_défaut is not None:
+        zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom=ville_défaut))
+    else:
+        zone_d = Zone.objects.get(nom=zone)
 
     ## Récup des graphe via osmnx
     print("Récupération du graphe avec une marge")
-    gr_avec_marge = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True", buffer_dist=500)
+    gr_avec_marge = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True", buffer_dist=500).get_undirected()
     print("Récupération du graphe exact")
     gr_strict = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True")
 
@@ -62,7 +92,7 @@ def charge_ville(nom, code, zone="Pau", pays="France", bavard=2):
     arbre_rue_dune_ville(ville_d, dico_rues.keys())
 
     ## Transfert du graphe
-    vd.transfert_graphe(g, bavard=bavard-1, juste_arêtes=False)
+    vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False)
     
 
 

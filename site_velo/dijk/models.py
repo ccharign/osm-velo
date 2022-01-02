@@ -6,6 +6,9 @@ from django.db import models
 def découpe_chaîne_de_nœuds(c):
     return tuple(map(int, c.split(",")))
 
+
+
+    
 class Ville(models.Model):
     nom_complet = models.CharField(max_length=100)
     nom_norm = models.CharField(max_length=100)
@@ -13,35 +16,28 @@ class Ville(models.Model):
     def __str__(self):
         return self.nom_complet
 
-#https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
-class Rue(models.Model):
+class Zone(models.Model):
     """
-    Une entrée pour chaque couple (rue, ville) : certaines rues peuvent apparaître en double.
+    Une zone délimite une zone dont le graphe sera mis en mémoire au chargement.
     """
-    nom_complet = models.CharField(max_length=200)
-    nom_norm = models.CharField(max_length=200)
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
-    nœuds_à_découper = models.TextField() #chaîne de caractères contenant les nœuds à splitter
-    def __str__(self):
-        return f"{self.nom_complet} ({self.ville})"
-    def nœuds(self):
-        return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
-
+    nom = models.CharField(max_length=100, unique=True)
+    ville_défaut = models.ForeignKey(Ville, on_delete=models.CASCADE)
 
 class Sommet(models.Model):
     
     id_osm = models.IntegerField(unique=True)
     lon = models.FloatField()
     lat = models.FloatField()
+    zone = models.ManyToManyField(Zone)
     
     def __str__(self):
         return str(self.id_osm)
 
     # Sert dans les tas de Dijkstra au cas où deux sommets aient exactement la même distance au départ
     def __lt__(self, autre):
-        return True
-    def __gt__(self, autre):
-        return False
+        return self.id_osm < autre
+    # def __gt__(self, autre):
+    #     return False
 
     def __hash__(self):
         return self.id_osm
@@ -57,21 +53,19 @@ class Sommet(models.Model):
     def coords(self):
         return self.lon, self.lat
     
-
-# Passage à un many_to_many de Django
-
-# class Ville_of_Sommet(models.Model):
-#     """ Table d’association sommet -> ville (il peut y avoir plusieurs villes par sommet)"""
-#     sommet = models.ForeignKey(Sommet, on_delete=models.CASCADE )
-#     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
-    
-# class Nœud_of_Rue(models.Model):
-#     """ table d'association ville -> rue -> nœud """
-#     ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
-#     rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
-#     nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
-#     def __str__(self):
-#         return f"{self.ville}, {self.rue}, {self.nœud}"
+#https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
+class Rue(models.Model):
+    """
+    Une entrée pour chaque couple (rue, ville) : certaines rues peuvent apparaître en double.
+    """
+    nom_complet = models.CharField(max_length=200)
+    nom_norm = models.CharField(max_length=200)
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
+    nœuds_à_découper = models.TextField() #chaîne de caractères contenant les nœuds à splitter
+    def __str__(self):
+        return f"{self.nom_complet} ({self.ville})"
+    def nœuds(self):
+        return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
     
 class Arête(models.Model):
@@ -93,6 +87,7 @@ class Arête(models.Model):
     rue = models.ManyToManyField(Rue)
     geom = models.TextField()
     nom = models.CharField(max_length=200, blank=True, null=True, default=None)
+    zone = models.ManyToManyField(Zone)
 
     def __str__(self):
         return f"({self.départ}, {self.arrivée})"
@@ -112,6 +107,12 @@ class Arête(models.Model):
             return self.cycla
         else:
             return self.cycla_défaut
+
+    def incr_cyclabilité(self, dc):
+        if self.cycla is not None:
+            self.cycla *= dc
+        else:
+            self.cycla = dc
     
     def longueur_corrigée(self, p_détour):
         """
@@ -121,6 +122,8 @@ class Arête(models.Model):
         cy = self.cyclabilité()
         return self.longueur / cy**( p_détour*1.5)
     
+    
+
     
 
 
@@ -136,3 +139,17 @@ class Cache_Adresse(models.Model):
         return f"{self.ville}, {self.adresse}, {self.nœud}"
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
+
+
+class Chemin_d(models.Model):
+    ar=models.BooleanField(default=False)
+    p_détour=models.FloatField()
+    étapes_texte=models.TextField()
+    interdites_texte=models.TextField(default=None, blank=True, null=True)
+    # def étapes(self):
+    #     return map(Étape, self.étapes_texte.split(";"))
+    # def interdites(self):
+    #     return map(Étape, self.interdites_texte.split(";"))
+    def __str__(self):
+        é = self.étapes
+        return é[0] + "-->" + é[-1]

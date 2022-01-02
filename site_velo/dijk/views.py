@@ -21,7 +21,7 @@ chrono(tic, "charge_graphe", bavard=3)
 tic=time.perf_counter()
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
-from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection
+from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
@@ -32,9 +32,11 @@ chrono(tic, "utils", bavard=3)
 from datetime import datetime
 from glob import glob
 import os
+from dijk.models import Chemin_d
+
 
 tic=time.perf_counter()
-g=charge_graphe()
+#g=charge_graphe()
 LOG(f"{time.perf_counter()-tic}s pour le chargement du graphe", "perfs", bavard=3)
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
@@ -151,6 +153,18 @@ def carte_cycla(requête):
     dessine_cycla(g, où_enregistrer="dijk/templates/dijk")
     return render(requête, "dijk/cycla.html")
 
+
+### Admin ###
+
+def lisTousChemins(requête):
+    """
+    Lis une fois chaque chemin de la base
+    """
+    chemins=[]
+    for c_d in Chemin_d.objects.all():
+        chemins.append(Chemin.of_django(c_d))
+    n_modif, prop_modif = lecture_plusieurs_chemins(g, chemins, bavard=1)
+    print(n_modif, prop_modif)
 
 ### Erreurs ###
 

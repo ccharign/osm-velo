@@ -25,7 +25,10 @@ def heuristique(g, s, arrivée):
 
 
 def chemin(g, départ, arrivée, p_détour):
-    """  Nécessite une classe graphe avec méthode « voisins » qui prend un sommet s et le pourcentage de détour p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)"""
+    """  Nécessite une classe graphe avec méthode « voisins » qui prend un sommet s et le pourcentage de détour p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)
+
+    Sortie : (itinéraire, sa longueur)
+    """
     assert p_détour < 10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
     dist = {départ: 0.}  #dist[s] contient l'estimation actuelle de d(départ, i) si s est gris, et la vraie valeur si s est noir.
     pred = {départ: -1}
