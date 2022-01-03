@@ -4,9 +4,10 @@
 # Les fonctions d’analyse de données plus lentes depuis le .osm qui ont vocation à n’être utilisées qu’une fois (ou lors des mise à jour des données osm) sont dans le dossier initialisation.
 
 import geopy
-#, overpy
+import overpy
 from params import LOG_PB, CHEMIN_XML, CHEMIN_RUE_NUM_COORDS
 from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT, Adresse
+from petites_fonctions import LOG
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
@@ -21,7 +22,7 @@ localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
 
 
     
-#api = overpy.Overpass()
+
 
 
 class LieuPasTrouvé(Exception):
@@ -40,8 +41,9 @@ def cherche_adresse_complète(adresse, bavard=0):
     r = r.content.decode('unicode_escape')
     return json.loads(r)["features"][0]["geometry"]["coordinates"]
 
+
 #https://adresse.data.gouv.fr/api-doc/adresse
-def rue_of_coords(c):
+def rue_of_coords(c, bavard=0):
     """
     Entrée : (lon, lat)
     Sortie : (nom, ville, code de postal) de la rue renvoyé par adresse.data.gouv
@@ -50,7 +52,9 @@ def rue_of_coords(c):
     api_url = f"https://api-adresse.data.gouv.fr/reverse/?lon={lon}&lat={lat}&type=street"
     r = requests.get(api_url).content.decode('unicode_escape')
     d = json.loads(r)["features"][0]["properties"]
-    return d["name"], d["city"], int(d["postcode"])
+    res = d["name"], d["city"], int(d["postcode"])
+    LOG(f"(rue_of_coords) Pour les coordonnées {c} j'ai obtenu {res}.", bavard=bavard)
+    return res
     
 
 def cherche_lieu(adresse, bavard=0):
@@ -58,10 +62,12 @@ def cherche_lieu(adresse, bavard=0):
     Entrée : adresse (instance de Adresse)
 
     Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
+
+    Utilise en premier essai adresse.rue, et en second essai adresse.pour_nominatim().
     """
     nom_rue = adresse.rue
-    ville=adresse.ville
-    pays=adresse.pays
+    ville = adresse.ville
+    pays = adresse.pays
     #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
     if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}')
     lieu = localisateur.geocode( {"street":nom_rue, "city":ville.avec_code(), "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
@@ -80,8 +86,36 @@ def cherche_lieu(adresse, bavard=0):
             raise LieuPasTrouvé(f"{adresse}")
 
 
+def nœuds_of_rue(adresse, bavard=0):
+    """
+    Sortie : liste des nœuds osm correspondant aux ways correspondant à l'adresse.
+    Attention : si l'adresse ne précise pas la ville, risque de résultats aberrants...
+    """
+    api = overpy.Overpass()
+    lieu = cherche_lieu(adresse, bavard=bavard)
+    res = []
+    
+    for truc in lieu:
+        if truc.raw["osm_type"]=="way":
+            id_way = truc.raw["osm_id"]
+            res.extend(nœuds_of_idrue(id_way))
+    return res
 
 
+def nœuds_of_idrue(id_rue, bavard=0):
+    """
+    Entrée : id_rue (int), id osm d'un way
+    Sortie : liste des nœuds d'icelle
+    """
+    api = overpy.Overpass()
+    requête=f"""(
+            way(id:{id_rue});
+            );
+            out body;"""
+    if bavard>0:print(requête)
+    res_req = api.query(requête)
+    w = res_req.ways[0]
+    return w._node_ids
 
 
 
@@ -118,7 +152,7 @@ def coords_lieu(nom_rue, ville= VILLE_DÉFAUT, pays="France", bavard=0):
 #####          Recherche en local             #####
 ###################################################
 
-
+# Plus utilisé car lent...
 
 
 def nœuds_sur_tronçon_local(id_rue):
@@ -172,6 +206,7 @@ def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
 
 
 ########## Interpolation des adresses ##########
+## Plus utilisé maintenant pour la France puisqu'il y a data.gouv
 
 def charge_rue_num_coords():
     """ Renvoie le dictionnaire ville -> rue -> parité -> liste des (numéros, coords)"""

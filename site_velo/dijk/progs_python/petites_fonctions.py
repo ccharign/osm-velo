@@ -62,7 +62,7 @@ def distance_si_pas_trop(c1, c2):
         return d
 
 def deuxConséc(t):
-    """ renvoie un itérateur sur les couples d'éléments consécutifs de t."""
+    """ Renvoie un itérateur sur les couples d'éléments consécutifs de t."""
     n = len(t)
     for i in range(n-1):
         yield t[i], t[i+1]
@@ -87,4 +87,4 @@ def chrono(tic, tâche, bavard=1, force=False):
     """
     temps = time.perf_counter()-tic
     if temps>.1 or force:
-        LOG(f"{time.perf_counter()-tic}s pour {tâche}", "perfs", bavard=bavard)
+        LOG(f"{round(time.perf_counter()-tic, 2)}s pour {tâche}", "perfs", bavard=bavard)

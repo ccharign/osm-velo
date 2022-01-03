@@ -4,7 +4,7 @@ from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, norm
 import re
 from recup_donnees import coords_lieu, coords_of_adresse, cherche_lieu, nœuds_sur_tronçon_local, cherche_adresse_complète, rue_of_coords
 from petites_fonctions import distance_euc
-from params import LOG_PB
+from params import LOG_PB, LOG
 
 
 ### Module pour associer une liste de nœuds à une adresse. ###
@@ -15,7 +15,7 @@ class PasTrouvé(Exception):
 
 
 
-def nœuds_of_étape(c, g, bavard=0):
+def nœuds_of_étape(c:str, g, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
         Sortie : (liste de nœuds de g associé à cette adresse, l’adresse de type Adresse)
@@ -50,7 +50,7 @@ def nœuds_of_étape(c, g, bavard=0):
     
     if ad.num is None:
         ## Pas de numéro de rue -> soit c’est une rue entière, soit c’est un batiment spécial
-        ## liste de tous les nœuds de la rue
+        ## -> liste de tous les nœuds de la rue
         if bavard > 0 : print("Pas de numéro de rue, je vais renvoyer une liste de nœuds")
         if ad.rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
@@ -80,20 +80,21 @@ def tous_les_nœuds(g, adresse, bavard=0):
        - essai 4 : récupérer les nodes de la recherche Nominatim, et garder ceux qui sont dans g
        - essai 5 : coordonnés du premier objet renvoyé par la recherche, et nœud de g le plus proche d’icelui.
     """
+    LOG(f"\n\n(tous_les_nœuds) Lancement de tous_les_nœuds(g, {adresse})", bavard=bavard)
 
     ## Essai 1
-    essai1 = g.nœuds_of_rue(adresse.ville.nom_norm, adresse.rue_norm)
-    if essai1 is not None:
+    essai1 = g.nœuds_of_rue(adresse, bavard=bavard-1)
+    if essai1 is not None and len(essai1)>0:
         return essai1
     else :
-        print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
+        LOG(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.", bavard=bavard)
 
 
-        ## recherche Nominatim
+        ## Recherche Nominatim
         lieu = cherche_lieu(adresse, bavard=bavard-1)
-        if bavard > 0 : print(f"La recherche Nominatim a donné {lieu}.")
+        LOG(f"La recherche Nominatim a donné {lieu}.", bavard=bavard)
         
-        nœuds_osm = [] #Ne servira que si on ne trouve pas de way dans lieu
+        nœuds_osm = [] # Ne servira que si on ne trouve pas de way dans lieu
         way_osm = []
         for tronçon in lieu:
             if tronçon.raw["osm_type"] == "way":
@@ -105,16 +106,18 @@ def tous_les_nœuds(g, adresse, bavard=0):
         if len(way_osm)>0:
             tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
             nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
-            print(f"nom trouvé : {nom}")
+            LOG(f"nom trouvé : {nom}", bavard=bavard)
             adresse.rue_osm = nom
+            nom_n, _ = normalise_rue(nom, adresse.ville, bavard=bavard-1)
+            adresse.rue_norm = nom_n
 
             ## Essai 2, avec le nom de la rue qu’on vient de récupérer
-            nom_n = normalise_rue(nom, adresse.ville)
-            essai2 = g.nœuds_of_rue(adresse.ville.nom_norm, nom_n)
-            if essai2 is not None :
+            LOG(f"essai2 : g.nœuds_of_rue({adresse})", bavard=bavard-1)
+            essai2 = g.nœuds_of_rue(adresse, bavard=bavard-1)
+            if essai2 is not None and len(essai2)>0:
                 return essai2
             else:
-                if bavard >0: print(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.")
+                LOG(f"(nœuds_sur_rue) Échec de g.nœuds_sur_rue({adresse}).", bavard=bavard)
 
                 ## Essai 3, prendre les nœuds dans le fichier .osm
                 # nœuds=[]
@@ -139,25 +142,27 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
         ## Essai 4, avec les nodes trouvés
         if nœuds_osm != []:
+            LOG(f"essai 4 : La recherche Nominatim a donné les nœuds {nœuds_osm}", bavard=bavard)
             nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g]
             if len(nœuds_de_g) > 0:
                 return nœuds_de_g
 
             
         ## Essai 5 : en se basant sur les coords enregistrées dans osm pour le premier élément renvoyé par Nominatim
-        ## Ce devrait la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, commerce...)
+        ## Ce devrait être la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, commerce...)
         if len(lieu)>0:
             truc = lieu[0].raw
             adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0]
-            print(f"Je vais chercher le nœud de g le plus proche de {truc}.")
+            LOG(f"Essai 5 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
-            rue, ville, code = rue_of_coords(coords)
-            if bavard>0:print(f"J’ai obtenu l’adresse suivante : {rue} ({code} {ville}).")
-            return [nœud_sur_rue_le_plus_proche(g, coords, Adresse(f"{rue} ({ville})"))]
+            rue, ville, code = rue_of_coords(coords, bavard=bavard)
+            res=nœud_sur_rue_le_plus_proche(g, coords, Adresse(f"{rue} ({ville})", bavard=bavard))
+            if res is not None:
+                return [res]
             #return [g.nœud_le_plus_proche( coords, recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
 
     
-        raise PasTrouvé(f"Pas réussi à trouver de nœud pour {nom_rue} ({ville}).")
+        raise PasTrouvé(f"Pas réussi à trouver de nœud pour {adresse}.")
 
 
     
@@ -244,11 +249,15 @@ def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
     Entrée : g (graphe)
              adresse (instance de Adresse)
              coords ( (float, float) )
-    Renvoie le nœud sur la rue nom_rue le plus proche de coords."""
-
-    nœuds = tous_les_nœuds(g, adresse, bavard=bavard-1)
-    if bavard>0:print(f"Nœuds récupérés pour la rue de {adresse} : {nœuds}")
-    tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]
-    if bavard>0:print(f"distances aux nœuds de la rue : {tab}")
-    _, res = min(tab)
-    return res
+    Renvoie le nœud sur la rue nom_rue le plus proche de coords.
+    Les nœuds de la rue seront récupérée via g.nœuds_of_rue.
+    """
+    nœuds = g.nœuds_of_rue(adresse, bavard=bavard)
+    #nœuds = tous_les_nœuds(g, adresse, bavard=bavard-1) ## Ceci peut planter si la rue n'est pas en mémoire...
+    
+    if nœuds is not None:
+        LOG(f"Nœuds récupérés pour la rue de {adresse} : {nœuds}", bavard=bavard)
+        tab = [ (distance_euc(g.coords_of_nœud(n),coords), n) for n in nœuds ]
+        LOG(f"distances aux nœuds de la rue : {tab}", bavard=bavard)
+        _, res = min(tab)
+        return res
