@@ -10,9 +10,6 @@ from petites_fonctions import chrono
 from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT
 chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
-tic=time.perf_counter()
-from dijk.progs_python.chemins import Chemin, chemins_of_csv
-chrono(tic, "chemins", bavard=3)
 
 tic=time.perf_counter()
 from dijk.progs_python.init_graphe import charge_graphe
@@ -28,6 +25,11 @@ chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 tic=time.perf_counter()
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
+
+tic=time.perf_counter()
+from dijk.progs_python.chemins import Chemin, chemins_of_csv
+chrono(tic, "chemins", bavard=3)
+
 
 from datetime import datetime
 from glob import glob

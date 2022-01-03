@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from time import perf_counter
 from petites_fonctions import chrono
+from models import Chemin_d
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_lieu, coords_of_adresse
@@ -127,6 +128,17 @@ class Chemin():
         chemin.texte = étapes_t
         return chemin
 
+
+    def sauv_bdd(self):
+        """
+        Enregistre le chemin dans la base.
+        """
+        c = Chemin_d(p_détour=self.p_détour,
+                   étapes=";".join(map(str, self.étapes)),
+                   ar=self.AR,
+                   interdites=self.noms_rues_interdites,
+                   )
+        c.sauv()
     
     def sauv(self, adresse=CHEMIN_CHEMINS, bavard=0):
         """ Ajoute le chemin dans le csv, après avoir vérifié qu’il n’y est pas déjà."""

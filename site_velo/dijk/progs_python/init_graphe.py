@@ -61,7 +61,7 @@ def charge_graphe(bbox=BBOX_DÉFAUT, option={"network_type":"all"}, bavard=1):
         #g = read_graphml(nom_fichier, node_type=int)
         if bavard>0:
             print("Graphe en mémoire !")
-            chrono(tic, f"osmnx.io.load_graphml({nom_fichier})")
+            chrono(tic, f"load_graphml({nom_fichier})")
     else:
         print(f"\nGraphe pas en mémoire à {nom_fichier}, je le charge via osmnx.\\")
 

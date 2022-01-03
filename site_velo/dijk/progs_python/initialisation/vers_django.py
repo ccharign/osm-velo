@@ -7,11 +7,11 @@
 
 
 
-from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
+from dijk.progs_python.params import CHEMIN_NŒUDS_RUES, CHEMIN_CHEMINS
 from dijk.models import Ville, Rue, Sommet, Arête, Nœud_of_Rue, Cache_Adresse, Ville_of_Sommet
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue
 from dijk.progs_python.init_graphe import charge_graphe
-
+import chemin
 
 def nv(nom_ville):
     return normalise_ville(nom_ville).nom_norm
@@ -66,7 +66,13 @@ def charge_villes_rues_nœuds(bavard=0):
     print("Chargement des rues vers django fini.")
 
     
-        
+def chemins_vers_django():
+    with open(CHEMIN_CHEMINS) as entrée:
+        for ligne in entrée:
+            c=chemin.of_ligne(ligne)
+            c.sauv_bdd()
+
+
 def transfert(g):
     """
     Entrée : g (graphe)

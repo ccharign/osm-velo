@@ -64,7 +64,8 @@ def cheminsValides(chemins, g):
 
 def itinéraire(départ, arrivée, ps_détour, g,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
-               où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
+               où_enregistrer=os.path.join(TMP, "itinéraire.html"),
+               bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.

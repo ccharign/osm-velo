@@ -42,13 +42,13 @@ class Ville_of_Sommet(models.Model):
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
     
 
-class Nœud_of_Rue(models.Model):
-    """ table d'association ville -> rue -> nœud """
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
-    rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
-    nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
-    def __str__(self):
-        return f"{self.ville}, {self.rue}, {self.nœud}"
+# class Nœud_of_Rue(models.Model):
+#     """ table d'association ville -> rue -> nœud """
+#     ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+#     rue = models.ForeignKey(Rue, on_delete=models.CASCADE)
+#     nœud = models.ForeignKey(Sommet, on_delete=models.CASCADE)
+#     def __str__(self):
+#         return f"{self.ville}, {self.rue}, {self.nœud}"
 
     
 class Arête(models.Model):
@@ -61,7 +61,12 @@ class Arête(models.Model):
         return f"({self.départ}, {self.arrivée})"
 
     
-
+class Chemin_d(models.Model):
+    ar = models.BooleanField(default=False)
+    étapes = models.TextField(null=False)
+    p_détour = models.FloatField()
+    p_modif = models.FloatField()
+    interdites = models.TextField()
 
     
 class Cache_Adresse(models.Model):
