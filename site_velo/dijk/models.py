@@ -62,6 +62,12 @@ class Rue(models.Model):
     nom_norm = models.CharField(max_length=200)
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
     nœuds_à_découper = models.TextField() #chaîne de caractères contenant les nœuds à splitter
+
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(fields=["nom_norm", "ville"], name = "une seule rue pour chaque nom_norm pour chaque ville.")
+        ]
+    
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
     def nœuds(self):

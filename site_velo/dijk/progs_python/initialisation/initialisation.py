@@ -88,6 +88,27 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
     vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False)
     
 
+À_RAJOUTER_PAU={
+    "Gelos": 64110,
+    #"Lée": 64320,
+    #"Pau":64000
+    "Lescar": 64230,
+    "Billère": 64140,
+    "Jurançon":64110,
+    "Ousse": 64320,
+    "Idron": 64320,
+    "Lons": 64140 ,
+    "Bizanos": 64320,
+    "Artigueloutan": 64420,
+    "Mazères-Lezons": 64110
+}.items()
+
+def charge_zone(liste_villes, zone="Pau"):
+    for nom, code in liste_villes:
+        charge_ville(nom, code, zone=zone)
+
+
+
 
 def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=False, force_téléchargement=False, bavard=1):
     """
@@ -171,6 +192,3 @@ def rajoute_donnée(bbox=BBOX_DÉFAUT, garder_le_osm_complet=True):
     extrait_rue_num_coords(chemin=chemin_osm_complet, bavard=1)
 
 
-if __name__ == "__main__":
-    initialisation_sans_overpass()
-    rajoute_donnée()

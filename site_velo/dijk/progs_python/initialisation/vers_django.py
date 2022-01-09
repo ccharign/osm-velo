@@ -383,12 +383,14 @@ def charge_dico_rues_nœuds(ville_d, dico):
         - ville_d (instance de ville)
         - dico : un dico nom_de_rue -> liste de nœuds
     Effet :
-        remplit la table dijk_rue
+        remplit la table dijk_rue. Si une rue était déjà présente, elle sera supprimée.
     """
     rues_à_créer=[]
     for rue, nœuds in dico.items():
         rue_n = prétraitement_rue(rue)
         nœuds_texte = ",".join(map(str, nœuds))
+        vieilles_rues = Rue.objects.filter(nom_norm=rue_n, ville=ville_d)
+        vieilles_rues.delete()
         rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_texte)
         rues_à_créer.append(rue_d)
     Rue.objects.bulk_create(rues_à_créer)
