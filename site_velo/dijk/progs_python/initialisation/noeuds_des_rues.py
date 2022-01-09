@@ -12,7 +12,7 @@ def est_sur_rueville(g, s, rue, ville):
     Rappel : il peut y avoir plusieurs rues et villes associées à une arête. rue_dune_arête et ville_dune_arête renvoient un tuple (ou liste)"""
     villes = g.villes_dun_sommet(s)
     for t in g.voisins_nus(s):
-        rues = g.rue_dune_arête(s,t)
+        rues = g.rue_dune_arête(s, t)
         if rues is not None and rue in rues and ville in villes : return True
     return False
 
@@ -73,7 +73,7 @@ def extrait_nœuds_des_rues(g, bavard = 0):
         suivre_rue(t, ville, rue)
                 
     for s in g.digraphe.nodes:
-        villes = g.villes_dun_sommet(s, bavard=bavard)
+        villes = g.villes_dun_sommet(s, bavard=bavard-1)
         for ville in villes :
             if ville not in déjàVu:
                 print(f"Nouvelle ville rencontrée : {ville}")

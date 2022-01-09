@@ -10,19 +10,19 @@
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
 from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d
-from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue, ABRE_VILLES
+from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue, ARBRE_VILLES
 from dijk.progs_python.init_graphe import charge_graphe
-from params import CHEMIN_CHEMINS
-
-
-
+from params import CHEMIN_CHEMINS, LOG
+from petites_fonctions import union, mesure_temps
+from time import perf_counter, sleep
+from django.db import transaction
 
 def nv_ville(nom, code, tol=3):
     """
     Effet : si pas déjà présente, rajoute la ville dans la base django et dans l'arbre lex ARBRE_VILLES.
     Sortie : l'objet Ville créé.
     """
-    noms_proches=ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)[0]
+    noms_proches=tuple(ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)[0])
     if len(noms_proches)>0:
         print(f"Ville(s) trouvée(s) dans l'arbre : {noms_proches}")
         nom_corrigé=noms_proches[0]
@@ -35,43 +35,184 @@ def nv_ville(nom, code, tol=3):
         ARBRE_VILLES.insère(nom)
         return v_d
 
-def cycla_défaut(a):
+    
+def liste_attributs(g):
+    """
+    Entrée : g (multidigraph)
+    Sortie : dico (attribut -> liste des valeurs) des arêtes qui apparaissent dans g
+    Fonction utile pour régler les paramètres de cycla_défaut.
+    """
+
+    res = {}
+    for s in g.nodes:
+        for t in g[s].keys():
+            for a in g[s][t].values():
+                for att, val in a.items():
+                    if att not in ["name", "length", "geometry", "osmid"]:
+                        if att not in res:res[att]=set()
+                        res[att].add(str(val))
+    return res
+
+
+def désoriente(g, bavard=0):
+    """
+    Entrée : g (Graphe_nx)
+    Effet : rajoute les arêtes inverses si elles ne sont pas présentes, avec un attribut 'sens_interdit' en plus.
+    """
+    
+    def existe_inverse(s,t,a):
+        if s not in gx[t]:
+            return False
+        else:
+            inverses_de_a = tuple(a_i for a_i in gx[t][s].values() if a.get("name",None)==a_i.get("name", None))
+            if len(inverses_de_a)==1:
+                return True
+            elif len(inverses_de_a)==0:
+                return False
+            else:
+                inverses_de_a = tuple(a_i for a_i in inverses_de_a if sorted(géom_texte(s,t,a,g) )==sorted(géom_texte(t,s,a_i,g)))
+                if len(inverses_de_a)==1:
+                    return True
+                elif len(inverses_de_a) == 0:
+                    return False
+                else:
+                    raise RuntimeError(f"Arête en double : {s}, {t}, {a}")
+                
+    def ajoute_inverse(s,t,a):
+        if bavard>0:
+            print(f"ajout de l’arête inverse de {s}, {t}, {a}")
+        a_i = {att:val for att,val in a.items()}
+        a_i["sens_interdit"]=True
+        gx.add_edge(t,s,**a_i )
+        # 
+        # if s not in gx[t]:
+        #     gx[t][s] = {0:a_i}
+        # else:
+        #     ind = max(gx[t][s].keys())
+        #     gx[t][s] [ind+1] = a_i
+
+        
+    gx=g.multidigraphe
+    for s in gx.nodes:
+        for t in gx[s].keys():
+            if t!=s:  # Il semble qu’il y ait des doublons dans les boucles dans les graphes venant de osmnx
+                for a in gx[s][t].values():
+                    if not existe_inverse(s, t, a):
+                        ajoute_inverse(s,t,a)
+                    
+@transaction.atomic
+def sauv_données(à_sauver):
+    """
+    Sauvegarde les objets en une seule transaction.
+    Pour remplacer bulk_create si besoin du champ id nouvellement créé.
+    """
+    for o in à_sauver:
+        o.save()
+
+def géom_texte(s, t, a, g):
+    """
+    Entrée : a (dico), arête de nx.
+             s_d, t_d (Sommet, Sommet), sommets de départ et d’arrivée de a
+    Sortie : str adéquat pour le champ geom d'un objet Arête. 
+    """
+    if "geometry" in a:
+        geom = a["geometry"].coords
+    else:
+        geom = (g.coords_of_nœud(s), g.coords_of_nœud(t))
+    coords_texte = (f"{lon},{lat}" for lon, lat in geom)
+    return ";".join(coords_texte)
+
+
+
+def cycla_défaut(a, sens_interdit=False, pas=1.1):
     """
     Entrée : a, arête d'un graphe nx.
     Sortie (float) : cycla_défaut
+    Paramètres:
+        pas : pour chaque point de bonus, on multiplie la cycla par pas
+        sens_interdit : si Vrai, bonus de -2
+    Les critères pour attribuer des bonus en fonction des données osm sont définis à l’intérieur de cette fonction.
     """
-    pas=1.1
-    res=1.0
-    bonus = [("higway", "path"), ("higway", "cycleway"), ("maxspeed", 30), ("maxspeed", 20)]
-    for clef, val in bonus:
-        if a.get(clef,None)==val:res*=pas
+    # disponible dans le graphe venant de osmnx :
+    # maxspeed, highway, lanes, oneway, access, width
+    critères={
+        #att : {val: bonus}
+        "highway":{
+            "residential":1,
+            "cycleway":3,
+            "step":-2,
+            "pedestrian":1,
+            "tertiary":1,
+            "living_street":1,
+            "pedestrian":1,
+            "footway":1,
+        },
+        "maxspeed":{
+            "10":3,
+            "20":2,
+            "30":1,
+            "70":-2,
+            "90":-4,
+            "130":-float("inf")
+        },
+        "sens_interdit":{True:-3}
+    }
+    bonus = 0
+    for att in critères.keys():
+        if att in a:
+            val_s = a[att]
+            if isinstance(val_s, str) and val_s in critères[att]:
+                bonus+=critères[att][val_s]
+            elif isinstance(val_s, list):
+                for v in val_s:
+                    if v in critères[att]:
+                        bonus+= critères[att][v]
 
-    return res
+    return 1.1**bonus
     
         
-def transfert_graphe(g, zone_d, bavard=0, juste_arêtes=False):
+def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     """
-    Entrée : g (graphe_par_networkx)
+    Entrée : g (Graphe_nx)
              zone_d (instance de Zone)
-    Effet : transfert le graphe dans la base Django
-    Stratégie pour les arêtes : 
-           si entre deux sommets il y a le même nombre d'arêtes avec les mêmes noms, on màj la géométrie (sans doute inutile 99 fois sur 100)
-           sinon on efface les anciennes et on remplace par celles de g. Avec la cycla si présente.
+    Effet : transfert le graphe dans la base Django.
+    Paramètres:
+        rapide (int) : pour tout  (s,t) sommets voisins dans g,
+                            0 -> efface toutes les arêtes de s vers t et remplace par celles de g
+                            1 -> regarde si les arête entre s et t dans g correspondent à celles dans la base, et dans ce cas ne rien faire.
+                        « correspondent » signifie : même nombre et même noms.
+                            2 -> si il y a quelque chose dans la base pour (s,t), ne rien faire.
+        juste_arêtes (bool) : si vrai, ne recharge pas les sommets.
     """
 
+    gx = g.multidigraphe
+
+    ### Chargement des arêtes###
+
+    tous_les_sommets = Sommet.objects.all()
+    print(f"{len(tous_les_sommets)} sommets dans la base")
+
+    dico_voisins={}
+    toutes_les_arêtes = Arête.objects.all().select_related("départ", "arrivée")
+    for a in toutes_les_arêtes:
+        s = a.départ.id_osm
+        t = a.arrivée.id_osm
+        if s not in dico_voisins: dico_voisins[s]=[]
+        dico_voisins[s].append((t, a))
+
+        
     if not juste_arêtes:
-        #Chargement des sommets
+        LOG("Chargement des sommets")
         à_créer=[]
         à_màj=[]
         nb=0
         for s in g.digraphe.nodes:
-            if nb%100==0: print(f"{nb} sommets vus")
+            if nb%100==0: print(f"    {nb} sommets vus")
             nb+=1
             lon, lat = g.coords_of_nœud(s)
             essai = Sommet.objects.filter(id_osm=s).first()
             if essai is None:
                 s_d = Sommet(id_osm=s, lon=lon, lat=lat)
-                
                 à_créer.append(s_d)
             else:
                 s_d = essai
@@ -79,59 +220,161 @@ def transfert_graphe(g, zone_d, bavard=0, juste_arêtes=False):
                 s_d.lon=lon
                 s_d.lat=lat
                 à_màj.append(s_d)
-            s_d.zone.add(zone_d)
-        Sommet.objects.bulk_create(à_créer)
+        LOG("Ajout des nouveaux sommets dans la base")
+        #créés=Sommet.objects.bulk_create(à_créer) # Attention : il semble que les objets créés ne soient pas les même que les objets à créer !
+        sauv_données(à_créer)
+        #if len(créés) != len(à_créer):
+        #    raise RuntimeError(f"{len(créés)} sommets créés par bulk_create alors qu’il fallait en créer {len(à_créer)}")
+        LOG("Mise à jour des sommets modifiés")
         Sommet.objects.bulk_update(à_màj, ["lon", "lat"])
-            
+
+        LOG("Ajout de la zone à chaque sommet")
+        # Pas possible avant car il faut avoir sauvé l’objet pour rajouter une relation ManyToMany.
+        # Il faudrait un bulk_manyToMany ... -> utiliser la table d’association automatiquement créée par Django : through
+        #https://docs.djangoproject.com/en/4.0/ref/models/fields/#django.db.models.ManyToManyField
+        print("Sommets créés")
+        rel_àcréer=[]
+        for s_d in à_créer:
+            rel = Sommet.zone.through(sommet_id = s_d.id, zone_id = zone_d.id)
+            rel_àcréer.append(rel)
+        print("Sommets mis à jour")
+        for s_d in à_màj:
+            if zone_d not in s_d.zone.all() :
+                rel = Sommet.zone.through(sommet_id = s_d.id, zone_id = zone_d.id)
+                rel_àcréer.append(rel)
+        Sommet.zone.through.objects.bulk_create(rel_àcréer)
 
 
-    # Chargement des arêtes
-    def géom_vers_texte(geom):
-        """
-        Entrée : liste de couples (lon,lat)
-        Sortie : str adéquat pour le champ geom d'un objet Arête. 
-        """
-        coords_texte = (f"{lon},{lat}" for lon, lat in geom)
-        return ";".join(coords_texte)
+    ### Transfert des arêtes ###
+
+    # pour profiling
+    temps={"correspondance":0., "remplace_arêtes":0., "màj_arêtes":0., "récup_nom":0.}
+    nb_appels={"correspondance":0, "remplace_arêtes":0, "màj_arêtes":0, "récup_nom":0}
     
+    
+    @mesure_temps("récup_nom", temps, nb_appels)
+    def récup_noms(arêtes_d, nom):
+        """ Renvoie le tuple des a∈arêtes_d qui ont pour nom 'nom'"""
+        return [a_d for a_d in arêtes_d if nom==a_d.nom]
+    
+    @mesure_temps("correspondance", temps, nb_appels)
+    def correspondance(s_d, t_d, s, t, gx):
+        """
+        Entrées:
+            - s_d, t_d (Sommet)
+            - s, t (int)
+            - gx (multidigraph)
+        Sortie ( bool × (Arête list) × (dico list)) : le triplet ( les arêtes correspondent à celles dans la base, arêtes de la bases, arêtes de gx)
+        Dans le cas où il y a correspondance, les deux listes renvoyées contiennent les arêtes dans le même ordre.
+        Ne prend en compte que les arêtes de s_d vers t_d.
+        « Correspondent » signifie ici même nombre, et mêmes noms. En cas de plusieurs arêtes de même nom, le résultat sera Faux dans tous les cas.
+        """
+        vieilles_arêtes = [a_d for (v, a_d) in dico_voisins.get(s, []) if v==t]
+        if t not in gx[s]:
+            return False, vieilles_arêtes, []
+        else:
+            arêtes = gx[s][t].values()
+            noms = [ a.get("name", None) for a in arêtes ]
+            if len(noms)!= len(vieilles_arêtes):
+                return False, vieilles_arêtes, arêtes
+            else:
+                arêtes_ordre = []
+                for a in arêtes:
+                    essai_a_d = récup_noms(vieilles_arêtes, a.get("name", None) )
+                    if len(essai_a_d) != 1:
+                        #if vieilles_arêtes.filter(nom=a.get("name", None)).count()!=1:
+                        return False, vieilles_arêtes, arêtes
+                    else:
+                        arêtes_ordre.append(essai_a_d[0])
+                    
+                return True, arêtes_ordre, arêtes
+
     à_créer=[]
     à_màj=[]
+    
+    @mesure_temps("màj_arêtes", temps, nb_appels)
+    def màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x):
+        """
+        Entrées:
+            - arêtes_d (Arête list) : arêtes de la base
+            - arêtes_x (dico list) : arêtes de gx
+        Précondition : les deux listes représentent les mêmes arêtes, et dans le même ordre
+        Effet:
+            Met à jour les champs cycla_défaut, zone, géométrie des arêtes_d avec les données des arête_nx.
+            Rajoute les arêtes dans à_màj : il faudra encore un Arête.bulk_update(à_maj).
+        """
+        for a_d, a_x in zip(arêtes_d, arêtes_x):
+            #a_d.geom = géom_texte(s, t, a_x, g)
+            #a_d.zone.add(zone_d)
+            a_d.cycla_défaut= cycla_défaut(a_x)
+            à_màj.append(a_d)
+
+
+    @mesure_temps("remplace_arêtes", temps, nb_appels)
+    def remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx):
+        """
+        Supprime les arêtes de arêtes_d, et crée à la place celles venant de arêtes_nx.
+        Sortie (Arête list): les arêtes créées.
+        """
+        #arêtes_d.delete()
+        for a in arêtes_d: a.delete()
+        if t in gx[s]:
+            arêtes_nx = gx[s][t].values()
+        else:
+            arêtes_nx=[]
+        res=[]
+        for a_nx in arêtes_nx:
+            a_d = Arête(départ=s_d, arrivée=t_d,
+                        nom=a_nx.get("name", None),
+                        longueur=round(a_nx["length"], 3),  # On enregistre les longueurs avec 3 décimales.
+                        cycla_défaut=cycla_défaut(a_nx),
+                        geom =géom_texte(s, t, a_nx, g)
+            )
+            res.append(a_d)
+        à_créer.extend(res)
+        return res
+
+    LOG("Chargement des arêtes depuis le graphe osmnx")
     nb=0
-    for s in g.digraphe.nodes:
-        if nb%100==0:print(f"{nb} arêtes traitées")
+    
+    for s in gx.nodes:
+        s_d = tous_les_sommets.get(id_osm=s)
+        for t, arêtes in gx[s].items():
+            if t!=s : # Suppression des boucles
+                nb+=1
+                if nb%500==0:print(f"    {nb} arêtes traitées\n {temps}\n{nb_appels}\n")
+                t_d = tous_les_sommets.get(id_osm=t)
+                correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
+                if not (rapide==2 and len(arêtes_d)>0):
+                    if rapide==0 or not correspondent:
+                        arêtes_d=remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
+                    else:
+                        màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x)
+    
+    LOG("Ajout des nouvelles arêtes dans la base")
+    #créées=Arête.objects.bulk_create(à_créer)
+    sauv_données(à_créer)
+    #print(f"{len(créées)} arêtes créées")
+    #if len(créées)!=len(à_créer):
+    #    raise RuntimeError(f"Pas le bon nombre d’arêtes créées.")
+    LOG("Mise à jour des anciennes arêtes")
+    Arête.objects.bulk_update(à_màj, ["cycla_défaut"])
+
+    LOG("Ajout de la zone à chaque arête")
+    nb=0
+    rel_àcréer=[]
+    for i, a_d in enumerate(à_créer):
+        rel = Arête.zone.through(arête_id = a_d.id, zone_id = zone_d.id)
+        rel_àcréer.append(rel)
+    Arête.zone.through.objects.bulk_create(rel_àcréer)
+    rel_àcréer=[]
+    for a_d in à_màj:
+        if zone_d not in a_d.zone.all() :
+            rel = Arête.zone.through(arête_id = a_d.id, zone_id = zone_d.id)
+            rel_àcréer.append(rel)
         nb+=1
-        départ = Sommet.objects.get(id_osm=s)
-        for t, arêtes in g.multidigraphe[s].items():
-            arrivée = Sommet.objects.get(id_osm=t)
-
-            # Y-a-t-il correspondance exacte entre les anciennes et les nouvelles arêtes ?
-            vieilles_arêtes = Arête.objects.filter(départ=départ, arrivée=arrivée)
-            noms = [ a.get("name", None) for _, a in arêtes.items()]
-            if not any(n is None for n in noms) and len(vieilles_arêtes) == len(arêtes) and all( len(vieilles_arêtes.objects.filter(nom=n)==1 for n in noms )):
-                # mode màj. Juste la géom au cas où. 
-                for _, a in arêtes.items():
-                    a_d = vieilles_arêtes.objects.get(nom=a["name"])
-                    a_d.géométrie = géom_vers_texte(a["geometry"].coords)
-                    a_d.zone.add(zone_d)
-                    a_d.cycla_défaut= cycla_défaut(a)
-                    à_màj.append(a_d)
-            else:
-                # On efface et on recommence
-                if len(vieilles_arêtes)>0:
-                    LOG(f"Arêtes supprimées : {vieilles_arêtes}.", bavard=2)
-                    vieilles_arêtes.delete()
-                cycla_dans_g = g.cyclabilité.get((s,t), None)  # Utile juste pour la transition depuis mon vieux graphe qui ne prenait pas en compte les multi-arêtes.
-                # En temps normal ce sera 1.0
-                for _, a in arêtes.items():
-                    nom=a.get("name", None)
-                    geom=géom_vers_texte(a["geometry"].coords)
-                    a_d = Arête(départ=départ, arrivée=arrivée, longueur=a["length"], cycla=cycla_dans_g, cycla_défaut=cycla_défaut(a), geom =geom)
-                    a_d.zone.add(zone_d)
-                    à_créer.append(a_d)
-    Arête.objects.bulk_create(à_créer)
-    Arête.objects.bulk_update(à_màj, ["geom"])
-                 
-
+        if nb%1000==0:print(f"    {nb} arêtes traités")
+    Arête.zone.through.objects.bulk_create(rel_àcréer)
 
 
 def charge_dico_rues_nœuds(ville_d, dico):
@@ -142,12 +385,13 @@ def charge_dico_rues_nœuds(ville_d, dico):
     Effet :
         remplit la table dijk_rue
     """
-    rues_à_créeer=[]
+    rues_à_créer=[]
     for rue, nœuds in dico.items():
         rue_n = prétraitement_rue(rue)
-        rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+        nœuds_texte = ",".join(map(str, nœuds))
+        rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_texte)
         rues_à_créer.append(rue_d)
-    Rue.objecs.bulk_create(rues_à_créeer)
+    Rue.objects.bulk_create(rues_à_créer)
         
 
 ### vieux trucs ###

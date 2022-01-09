@@ -73,11 +73,13 @@ class Arête(models.Model):
     Attributs:
         départ (Sommet)
         arrivée (Sommet)
+        longueur (float)
         cycla (float) : cyclabilité calculée par l'IA. None par défaut.
         cycla_défaut (float) : cyclabilité obtenue par les données présentes dans osm. À terme dépendra de zone 30, piste cyclable, etc. Pour l'instant c'est 1.
-        longueur (float)
-        rue (Rue)
+        rue (Rue). Ce champ est-il utile ?
         geom (string). Couples lon,lat séparés par des ;
+        nom (str)
+        zone (Zone)
     """
     départ = models.ForeignKey(Sommet, related_name="sommet_départ", on_delete=models.CASCADE, db_index=True)
     arrivée = models.ForeignKey(Sommet, related_name="sommet_arrivée", on_delete=models.CASCADE)
@@ -88,13 +90,14 @@ class Arête(models.Model):
     geom = models.TextField()
     nom = models.CharField(max_length=200, blank=True, null=True, default=None)
     zone = models.ManyToManyField(Zone)
+    sensInterdit = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"({self.départ}, {self.arrivée})"
+        return f"{self.id} : ({self.départ}, {self.arrivée}, longueur : {self.longueur}, géom : {self.geom}, nom : {self.nom})"
 
     def géométrie(self):
         """
-        Renvoie une liste de (lon,lat) qui décrit la géométrie de l'arête.
+        Sortie ( float*float list ) : liste de (lon, lat) qui décrit la géométrie de l'arête.
         """
         res=[]
         for c in self.geom.split(";"):
@@ -121,6 +124,22 @@ class Arête(models.Model):
         """
         cy = self.cyclabilité()
         return self.longueur / cy**( p_détour*1.5)
+
+    def inverse(self):
+        """
+        Renvoie l’arête inverse. Elle a une cyclabilité_défaut de .8 * self.cycla_défaut
+        """
+        return Arête(
+            départ=self.arrivée,
+            arrivée=self.départ,
+            nom=self.nom,
+            longueur=self.longueur,
+            #zone=self.zone, # À faire après coup, en cas de bulk_create
+            cycla_défaut=.8*self.cycla_défaut,
+            #rue=self.rue,
+            geom=self.geom,
+            sensInterdit=True
+        )
     
     
 
@@ -146,6 +165,7 @@ class Chemin_d(models.Model):
     p_détour=models.FloatField()
     étapes_texte=models.TextField()
     interdites_texte=models.TextField(default=None, blank=True, null=True)
+    utilisateur = models.CharField(max_length=100, default=None, blank=True, null=True)
     # def étapes(self):
     #     return map(Étape, self.étapes_texte.split(";"))
     # def interdites(self):

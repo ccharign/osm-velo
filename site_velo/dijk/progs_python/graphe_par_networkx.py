@@ -14,7 +14,7 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN
 # from osmnx import nearest_nodes
 # chrono(tic, "osmnx (pour nearest_nodes)", bavard=1)
 
-class Graphe_nw():
+class Graphe_nx():
     """
     Classe de graphe basée sur le graphe networkx tiré d’osm.
     Pour être utilisé lors de la phase d’initialisation quamd aucune donnée n’a encore été obtenue.
@@ -82,7 +82,7 @@ class Graphe_nw():
         """ Renvoie le couple (lon, lat)
          dans osmnx : x=lon, y=lat.
         """
-        return self.digraphe.nodes[n]["x"], self.digraphe.nodes[n]["y"]
+        return self.multidigraphe.nodes[n]["x"], self.multidigraphe.nodes[n]["y"]
 
 
     def simplifie(self):

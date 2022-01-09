@@ -11,6 +11,7 @@ else :
     
 import osmnx
 
+from time import perf_counter
 from dijk.progs_python.params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, DONNÉES, BBOX_DÉFAUT
 from initialisation.crée_graphe import crée_graphe_bbox
 #from initialisation.élaguage import élague_xml
@@ -19,10 +20,10 @@ from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues, ext
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
 from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville
 from graphe_par_networkx import Graphe_nx
-from petites_fonctions import sauv_fichier
+from petites_fonctions import sauv_fichier, chrono
 #from networkx import read_graphml
-from dijk.models import Ville
-import vers_django as vd
+from dijk.models import Ville, Zone
+import initialisation.vers_django as vd
 
 
 """
@@ -40,24 +41,9 @@ def charge_multidigraph():
     """
     s,o,n,e = BBOX_DÉFAUT
     nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
-    g = load_graphml(nom_fichier)
+    g = osmnx.load_graphml(nom_fichier)
     return g
 
-
-def désoriente(g):
-    """
-    Entrée : g, multidigraph nx
-    Effet : rajoute les arêtes inverses quand elles manquent, mais avec un attribut supplementaire «sens_interdit» qui vaut True.
-    """
-    for s in g.nodes:
-        for t in g[s].keys():
-            for a in g[s][t].values():
-                if arête_inverse_non_présente(s,t,a):
-                    a_envers = Arête(départ=Sommet.objects.get(id_osm=s),
-                                     arrivée=Sommet.objects.get(id_osm=t),
-                                     longueur=a["length"],
-                                     cycla_défaut
-                    )
 
 
 def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavard=2):
@@ -66,15 +52,18 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
     ville_d = vd.nv_ville(nom, code)
     ## Création ou récupération de la zone
     if ville_défaut is not None:
-        zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom=ville_défaut))
+        zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_défaut))
     else:
         zone_d = Zone.objects.get(nom=zone)
 
     ## Récup des graphe via osmnx
-    print("Récupération du graphe avec une marge")
-    gr_avec_marge = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True", buffer_dist=500).get_undirected()
+    print(f"Récupération du graphe pour « {code} {nom}, {pays} » avec une marge")
+    gr_avec_marge = osmnx.graph_from_place(
+        {"city":f"{nom}", "postcode":code, "country":pays},
+        network_type="all", retain_all="True", buffer_dist=500
+    )
     print("Récupération du graphe exact")
-    gr_strict = osmnx.graph_from_place(f"{code} {nom}, {pays}", network_type="all", retain_all="True")
+    gr_strict = osmnx.graph_from_place({"city":f"{nom}", "postcode":code, "country":pays}, network_type="all", retain_all="True")
 
     g = Graphe_nx(gr_avec_marge)
     
@@ -86,11 +75,15 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
 
     ## nœuds des rues
     print("Calcul des nœuds de chaque rue")
-    dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds
+    dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
     print("Création de l'arbre lexicographique")
     arbre_rue_dune_ville(ville_d, dico_rues.keys())
 
+    ## désorientation
+    print("Désorientation du graphe")
+    vd.désoriente(g, bavard=bavard-1)
+    
     ## Transfert du graphe
     vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False)
     

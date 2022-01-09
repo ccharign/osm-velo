@@ -67,6 +67,15 @@ def deuxConséc(t):
     for i in range(n-1):
         yield t[i], t[i+1]
 
+def union(t1, t2):
+    """
+    Entrée : t1, t2 deux itérateur
+    Sortie : itérateur sur t1 ∪ t2
+    """
+    for x in t1:
+        yield x
+    for x in t2:
+        yield x
         
 def ajouteDico(d, clef, val):
     """d est un dico de listes.
@@ -91,3 +100,20 @@ def chrono(tic, tâche, bavard=1, force=False):
     if temps>.1 or force:
         LOG(f"{round(time.perf_counter()-tic, 2)}s pour {tâche}", "perfs", bavard=bavard)
     return tac
+
+
+# Une fabrique de décorateurs.
+def mesure_temps(nom, temps, nb_appels):
+    """
+    Entrées : temps et nb_appels deux dicos dont nom est une clef.
+    """
+    def décorateur(f):
+        def nv_f(*args, **kwargs):
+            tic=time.perf_counter()
+            res=f(*args, **kwargs)
+            temps[nom]+=time.perf_counter()
+            nb_appels[nom]+=1
+            return res
+        return nv_f
+    return décorateur
+        

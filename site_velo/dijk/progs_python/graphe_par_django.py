@@ -18,19 +18,26 @@ class Graphe_django():
     """
     
     def __init__(self, zone="Pau"):
+        self.dico_voisins={}
+        #cycla min et max
+        self.calcule_cycla_min_max()
+        #chrono(tic, "calcul cycla min et max", force=True)
 
+    def charge_zone(self, zone="Pau"):
+        """
+        Charge les données présentes dans la base concernant la zone indiquée.
+        """
         zone_d = Zone.objects.get(nom=zone)
         
         # Arêtes
         tic=perf_counter()
-        self.dico_voisins={}
         arêtes = Arête.objects.filter(zone=zone_d).select_related("départ", "arrivée")
         for a in arêtes:
             s = a.départ.id_osm
             t = a.arrivée.id_osm
             if s not in self.dico_voisins: self.dico_voisins[s]=[]
             self.dico_voisins[s].append((t, a))
-        tic=chrono(tic, "Chargement de dico_voisins depuis la base de données.")
+        tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone}.")
 
         #Sommets
         self.dico_Sommet={}
@@ -38,9 +45,6 @@ class Graphe_django():
             self.dico_Sommet[s.id_osm] = s
         tic=chrono(tic, "Chargement des sommets")
 
-        #cycla min et max
-        self.calcule_cycla_min_max()
-        #chrono(tic, "calcul cycla min et max", force=True)
 
         
     def __contains__(self, s):
@@ -99,8 +103,16 @@ class Graphe_django():
         #self.cycla_max = max(self.cycla_max, a_d.cycla)
 
     def calcule_cycla_min_max(self):
-        self.cycla_min = arêtes.aggregate(Min("cycla"))["cycla__min"]
-        self.cycla_max = arêtes.aggregate(Max("cycla"))["cycla__max"]
+        
+        self.cycla_min = Arête.objects.aggregate(Min("cycla"))["cycla__min"]
+        if self.cycla_min is None:
+            self.cycla_min=1.
+
+        self.cycla_max = Arête.objects.aggregate(Max("cycla"))["cycla__max"]
+        if self.cycla_max is None:
+            self.cycla_max=1.
+            
+        print(f"Cycla min et max : {self.cycla_min}, {self.cycla_max}")
         
     def liste_Arête_of_iti(self, iti, p_détour):
         return [self.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
@@ -141,6 +153,7 @@ class Graphe_django():
         
     def voisins(self, s, p_détour, interdites={}):
         """
+        La méthode utilisée par dijkstra.
         Entrées :
             - s (int)
             - p_détour (float), proportion de détour accepté.
