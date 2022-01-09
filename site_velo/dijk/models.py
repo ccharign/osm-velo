@@ -150,9 +150,6 @@ class Arête(models.Model):
     
 
     
-
-
-    
 class Cache_Adresse(models.Model):
     """ 
     Table d'association ville -> adresse -> chaîne de nœuds
@@ -176,6 +173,33 @@ class Chemin_d(models.Model):
     #     return map(Étape, self.étapes_texte.split(";"))
     # def interdites(self):
     #     return map(Étape, self.interdites_texte.split(";"))
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(fields=["ar", "p_détour", "étapes_texte", "interdites_texte"], name = "Pas de chemins en double.")
+        ]
+    
     def __str__(self):
         é = self.étapes
         return é[0] + "-->" + é[-1]
+
+    def sauv(self):
+        """
+        Sauvegarde le chemin si pas déjà présent.
+        Si déjà présent, et si un utilisateur est renseigné dans self, met à jour l’utisateur.
+        """
+        c_d, créé = Chemin_d.objects.get_or_create(
+            p_détour=self.p_détour, ar=self.ar, étapes_texte=self.étapes_texte, interdites_texte=self.interdites_texte
+        )
+        if self.utilisateur is not None:
+            c_d.utilisateur=self.utilisateur
+            c_d.save()
+        if créé:
+            self.save()
+            
+    
+    @classmethod
+    def of_ligne_csv(cls, ligne, utilisateur=None):
+        AR_t, pourcentage_détour_t, étapes_t,rues_interdites_t = ligne.strip().split("|")
+        p_détour = int(pourcentage_détour_t)/100.
+        AR = bool(AR_t)
+        return cls(p_détour=p_détour, ar=AR, étapes_texte=étapes_t, interdites_texte=rues_interdites_t,utilisateur=utilisateur)

@@ -2,7 +2,7 @@
 from time import perf_counter
 from petites_fonctions import chrono
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
-from dijk.models import Sommet
+from dijk.models import Sommet, Chemin_d
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_lieu, coords_of_adresse
 chrono(tic, "recup_donnees")
@@ -98,7 +98,19 @@ class Chemin():
     @classmethod
     def of_django(cls, c_d, g, bavard=0):
         return cls.of_données(c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
-        
+
+    def vers_django(self, utilisateur=None):
+        """
+        Transfert le chemin dans la base.
+        Sortie : l’instance de Chemin_d créée.
+        """
+        étapes_texte = ";".join(map(str, étapes))
+        c_d = Chemin_d(
+            p_détour = self.p_détour, ar=self.AR, étapes_texte=étapes_texte, interdites_texte=self.noms_rues_interdites, utilisateur=utilisateur
+        )
+        c_d.save()
+        return c_d
+    
     @classmethod
     def of_ligne(cls, ligne, g, tol=.25, bavard=0):
         """ Entrée : ligne (str), une ligne du csv de chemins. Format AR|pourcentage_détour|étapes|rues interdites.

@@ -453,21 +453,21 @@ def charge_rues(bavard=0):
     print("Chargement des rues vers django fini.")
 
 
-
-def charge_csv_chemins(g, réinit=False):
+@transaction.atomic
+def charge_csv_chemins(réinit=False):
     """
     Effet : charge le csv de CHEMIN_CHEMINS dans la base
-    Si réinit, vide au préalbale la table.
+    Si réinit, vide au prélable la table.
     """
+    if réinit:
+        Chemin_d.objects.all().delete()
     with open(CHEMIN_CHEMINS) as entrée:
         à_créer=[]
         for ligne in entrée:
+            print(ligne)
             AR_t, pourcentage_détour_t, étapes_t,rues_interdites_t = ligne.strip().split("|")
             p_détour = int(pourcentage_détour_t)/100.
-            AR = bool(AR_t)
-            à_créer.append(Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t))
-
-    if réinit:
-        Chemins_d.objects.all().delete()
-    Chemin_d.objects.bulk_create(à_créer)
-            
+            if AR_t=="True": AR=True
+            else: AR=False
+            c_d = Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t)
+            c_d.sauv()

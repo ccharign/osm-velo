@@ -19,7 +19,8 @@ True|30|rue ramond de carbonnieres;rue du marechal joffre;rue des cordeliers;rue
 True|20|rue serviez (64000 pau);rue jean jacques de monaix (64000 pau);avenue de buros (64000 pau)|
 True|20|rue des veroniques (64000 Pau);chemin des ecoliers (64000 Pau);allee françois truffaut (64000 Pau);avenue de la malsence (64000 Pau);avenue de lons  (64140 Billère);Rue du Lacaou (64140 Billère);Europub (64140 Billère)|
 False|20|palais des sports (64000 Pau);allee cordorcet (64000 Pau);avenue duffau (64000 Pau);place royale (64000 Pau)|
-True|20|rue des veroniques (64000 Pau);rue laffite  (64140 Billère);chemin lapassade  (64140 Lons);rue flandre dunkerque  (64230 Lescar);rue benjamin franklin  (64230 Lescar)|False|20|rue des veroniques (64000 Pau);place royale (64000 Pau)|boulevard barbanègre;rue Latapie
+True|20|rue des veroniques (64000 Pau);rue laffite  (64140 Billère);chemin lapassade  (64140 Lons);rue flandre dunkerque  (64230 Lescar);rue benjamin franklin  (64230 Lescar)|
+-False|20|rue des veroniques (64000 Pau);place royale (64000 Pau)|boulevard barbanègre;rue Latapie
 False|20|rue des veroniques (64000 Pau);place royale (64000 Pau)|boulevard barbanègre
 False|20|place royale (64000 Pau);rue louis barthou (64000 Pau);allee alfred de musset (64000 Pau);avenue trespoey (64000 Pau);avenue de montebello (64000 Pau);rue des veroniques (64000 Pau)|boulevard barbanègre;avenue du général Leclerc
 False|15|rue des cordeliers (64000 Pau);rue saint jacques (64000 Pau);halle des sports uppa (64000 Pau)|
