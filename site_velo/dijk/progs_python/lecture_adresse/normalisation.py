@@ -1,13 +1,13 @@
 
 # -*- coding:utf-8 -*-
 import re
-from params import STR_VILLE_DÉFAUT, PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
+from params import PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
 from dijk.models import Rue
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 import time
 from petites_fonctions import chrono
 import os
-
+from recup_donnees import cherche_lieu
 
 def partie_commune(c):
     """ Appliquée à tout : nom de ville, de rue, et adresse complète
@@ -29,14 +29,11 @@ def normalise_adresse(c):
 
 #tic=time.perf_counter()
 #print("Création du dico et de l’arbre lex de toutes villes.")
-ARBRE_VILLES=ArbreLex()
-for nom in TOUTES_LES_VILLES.keys():
-    ARBRE_VILLES.insère(nom)
+# ARBRE_VILLES=ArbreLex()
+# for nom in TOUTES_LES_VILLES.keys():
+#     ARBRE_VILLES.insère(nom)
 #chrono(tic, "Arbre lex des villes")
-
-    
-class VillePasTrouvée(Exception):
-    pass
+# ---> maintenant attribut de Graphe_django
     
 class Ville():
     """
@@ -46,7 +43,7 @@ class Ville():
       - nom_complet (str) : le nom pas encore normalisé
     """
     
-    def __init__(self, texte, tol=3):
+    def __init__(self, g, texte, tol=2):
         """
         Entrée : chaîne de car au format "(code_postal)? nom_ville". Par exemple  ’64000 Pau’ ou ’Bizanos’.
         """
@@ -57,16 +54,12 @@ class Ville():
         
 
         # Récupération du nom de la ville dans l’arbre
-        noms_proches=ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)[0]
-        if len(noms_proches)==0:
-            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {TOUTES_LES_VILLES}.")
-        elif len(noms_proches)>1:
-            raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
-        else:
-            nom_corrigé, = noms_proches
-            code_corrigé = TOUTES_LES_VILLES[nom_corrigé]
-            if code is not None and int(code)!= code_corrigé:
-                LOG_PB(f"Avertissement : j’ai corrigé le code postal de {code} à {code_corrigé} pour la ville {nom_corrigé}. Chaîne initiale {texte}")
+        v_d = g.ville_la_plus_proche(nom, tol=tol)
+        nom_corrigé = v_d.nom_complet
+        code_corrigé = v_d.code
+        if code is not None and int(code)!= code_corrigé:
+            LOG_PB(f"Avertissement : j’ai corrigé le code postal de {code} à {code_corrigé} pour la ville {nom_corrigé}. Chaîne initiale {texte}")
+            
         # Enregistrement des données
         self.nom_complet = nom_corrigé
         self.nom_norm= partie_commune(nom_corrigé)
@@ -85,20 +78,20 @@ class Ville():
 
 
     
-VILLE_DÉFAUT = Ville(STR_VILLE_DÉFAUT)
+#VILLE_DÉFAUT = Ville(STR_VILLE_DÉFAUT)
+# ---> dans g.ville_défaut
 
 
 
-
-def normalise_ville(ville):
+def normalise_ville(g, ville):
     """
     Actuellement transforme la chaîne de car en un objet de la classe Ville.
-    La chaîne vide "" est transformée en VILLE_DÉFAUT (défini dans params.py).
+    La chaîne vide "" est transformée en g.ville_défaut.
     """
     if ville == "":
-        return Ville(STR_VILLE_DÉFAUT)
+        return g.ville_défaut
     else:
-        return Ville(ville)
+        return Ville(g, ville)
 
 
     
@@ -139,7 +132,7 @@ def créationArbre():
 def arbre_rue_dune_ville(ville_d, rues):
     """
     Entrée : ville_d (Ville)
-             rues (iterable)
+             rues (str iterable)
     Effet: crée le fichier contenant l'arbre des rue de la ville. Le fichier porte le nom ville_d.nom_norm
     """
     res = ArbreLex()
@@ -149,32 +142,39 @@ def arbre_rue_dune_ville(ville_d, rues):
 
 #créationArbre()
 
-def charge_arbres_rues():
-    """
-    Renvoie le dictionnaire ville (normalisée) -> arbre de ses rues
-    """
-    res={}
-    for ville in TOUTES_LES_VILLES.keys():
-        ville_n = str(normalise_ville(ville))
-        res[ville_n] = ArbreLex.of_fichier(os.path.join(DONNÉES, ville_n))
-    return res
+# def charge_arbres_rues(g):
+#     """
+#     Renvoie le dictionnaire ville (normalisée) -> arbre de ses rues
+#     """
+#     res={}
+#     for ville in TOUTES_LES_VILLES.keys():
+#         ville_n = str(normalise_ville(g, ville))
+#         res[ville_n] = ArbreLex.of_fichier(os.path.join(DONNÉES, ville_n))
+#     return res
 
-tic=time.perf_counter()
-ARBRE_DES_RUES = charge_arbres_rues()
-chrono(tic, "Arbre lex des rues")
+# tic=time.perf_counter()
+# ARBRE_DES_RUES = charge_arbres_rues()
+# chrono(tic, "Arbre lex des rues")
 
-def normalise_rue(rue, ville, tol=2, bavard=0):
+# ---> dans g.arbres_des_rues
+
+
+def normalise_rue(g, rue, ville, persevérant=True, tol=2, bavard=0):
     """
     Entrées : 
       - ville (instance de Ville)
       - rue (str)
 
     Sortie: ( nom normalisé de la rue, nom complet de la rue).
+    Params:
+        persevérant : si True, lance une recherche Nominatim en cas d’échec de la recherche dans g.arbres_des_rues.
     
     Fonction finale de normalisation d’un nom de rue. Applique partie_commune puis prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue), auquel cas c’est ce nom qui sera renvoyé.
     """
+
     étape1 = prétraitement_rue(rue)
-    res, d =  ARBRE_DES_RUES[ville.nom_complet].mots_les_plus_proches(étape1, d_max=tol)
+    
+    res, d =  g.arbres_des_rues[ville.nom_norm].mots_les_plus_proches(étape1, d_max=tol)
     if len(res)==1:
         if bavard>0:
             print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}")
@@ -191,10 +191,24 @@ def normalise_rue(rue, ville, tol=2, bavard=0):
         # Devrait être très rare
         print(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).")
         return étape1, rue
-    else:
-        # L’adresse fournie n’était sûrement pas un nom de rue.
-        print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je renvoie {étape1}.")
+    
+    elif not persevérant :
+        LOG("Je laisse tomber", bavard=bavard)
         return étape1, rue
+    
+    else:
+        print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je lance une recherche Nominatim.")
+        lieu = cherche_lieu(Adresse(g, f"{rue} ({ville})", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
+        LOG(f"La recherche Nominatim a donné {lieu}.", bavard=bavard)
+        way_osm = [ t.raw for t in lieu if t.raw["osm_id"]=="way"]
+        if len(way_osm)>0:            
+            tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
+            nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
+            print(f"Nouvel essai avec le nom suivant : {nom}")
+            return normalise_rue(g, nom, ville, persevérant=False, tol=tol, bavard=bavard)
+        else:
+            LOG("Pas de way dans le résultat de la recherche Nominatim.")
+            return étape1, rue
     
 
 
@@ -213,7 +227,7 @@ class Adresse():
       - pays
     """
     
-    def __init__(self, texte, bavard=0):
+    def __init__(self, g, texte, norm_rue=True, bavard=0):
         """ 
         Entrée : texte d’une adresse. Format : (num)? rue (code_postal? ville)
         """
@@ -233,8 +247,11 @@ class Adresse():
 
         # Normalisation de la ville et de la rue
         if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville}")
-        ville_n = normalise_ville(ville)
-        rue_n, rue = normalise_rue(rue, ville_n)
+        ville_n = normalise_ville(g, ville)
+        if norm_rue:
+            rue_n, rue = normalise_rue(g, rue, ville_n)
+        else:
+            rue_n = rue
         
         if bavard>0: print(f"après normalisation : num={num}, rue_n={rue_n}, ville_n={ville_n}")
 
@@ -249,7 +266,7 @@ class Adresse():
         self.ville = ville_n
         self.pays=PAYS_DÉFAUT
 
-        
+
     def __str__(self):
         """
         Utilisé en particulier pour l’enregistrement dans chemins.csv, pour l’affichage pour vérification à l’utilisateur, et pour la recherche de coordonnése

@@ -7,7 +7,7 @@ tic0=time.perf_counter()
 
 from dijk.progs_python.params import LOG
 from petites_fonctions import chrono
-from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT, Adresse
+from dijk.progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
@@ -43,13 +43,13 @@ chrono(tic0, "Chargement total\n\n", bavard=3)
 
 # Utiliser as_view dans url.py pour remplacer les lignes ci-dessous
 def index(requête):
-    return render(requête, "dijk/index.html", {"ville":VILLE_DÉFAUT})
+    return render(requête, "dijk/index.html", {"ville":g.ville_défaut})
 
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
 
 def mode_demploi(requête):
-    return render(requête, "dijk/mode_demploi.html", {"ville_défaut":VILLE_DÉFAUT})
+    return render(requête, "dijk/mode_demploi.html", {"ville_défaut":g.ville_défaut})
 
 def contribution(requête):
     return render(requête, "dijk/contribution.html", {})

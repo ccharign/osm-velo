@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 #from module_graphe import Graphe
-from recup_donnees import coords_lieu
+#from recup_donnees import coords_lieu
 import dijkstra
 from params import LOG_PB
 
@@ -27,13 +27,14 @@ def dico_arêtes(iti):
 def lecture_meilleur_chemin(g, chemin, bavard=0):
     """ 
     Entrée : le chemin à suivre, instance de Chemin.
-    Effet : Compare chemin avec le chemin renvoyé par g.chemin. Augmente de ETA la cyclabilité de chaque arrête présente dans chemin mais pas dans l'autre et diminue de ETA chaque arrête présente dans l'autre et pas dans chemin.
+    Effet : Compare chemin avec le chemin renvoyé par g.chemin. Multiplie par 1+ETA la cyclabilité de chaque arrête présente dans chemin mais pas dans l'autre et multiplie par 1-ETA chaque arrête présente dans l'autre et pas dans chemin.
     Sortie : nb d'arêtes modifiées, longueur du trajet direct
 
     """
     
     #vieux_chemin = g.chemin_étapes_ensembles(chemin.direct())
-    chemin_complet, _ = g.chemin_étapes_ensembles(chemin)
+    
+    chemin_complet, _ = dijkstra.chemin_étapes_ensembles(g, chemin)
     # Pour vieux chemin, je prends le chemin qui utilise le même nœud de départ et d’arrivée que chemin_complet (pour éviter de biaiser l’apprentissage dans le cas de gros ensemble)
     départ = chemin_complet[0]
     arrivée = chemin_complet[-1]
@@ -47,14 +48,14 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
         if a not in arêtes_vieux_chemin:
             if bavard >0: print(f"j'augmente la cyclabilité de l'arête {a}")
             n_modif+=1
-            g.incr_cyclabilité(a, chemin.p_détour, ETA)
+            g.incr_cyclabilité(a, chemin.p_détour, 1+ETA)
 
     #Lecture du vieux chemin pour diminuer les coeffs :
     for a in liste_arêtes(vieux_chemin):
         if not a in arêtes_chemin:
             if bavard >0: print(f"je diminue la cyclabilité de l'arête {a}")
             n_modif += 1
-            g.incr_cyclabilité(a, chemin.p_détour, -ETA)
+            g.incr_cyclabilité(a, chemin.p_détour, 1-ETA)
             
     if bavard >= 0: print(f"nombre d'arêtes modifiées : {n_modif}")
     return n_modif, longueur

@@ -101,6 +101,12 @@ class Arête(models.Model):
     def __str__(self):
         return f"{self.id} : ({self.départ}, {self.arrivée}, longueur : {self.longueur}, géom : {self.geom}, nom : {self.nom})"
 
+    # Sert dans meilleure_arête en cas d’égalité des longueurs
+    def __lt__(self, autre):
+        return self.id < autre
+    def __gt__(self, autre):
+        return self.id > autre
+    
     def géométrie(self):
         """
         Sortie ( float*float list ) : liste de (lon, lat) qui décrit la géométrie de l'arête.
@@ -118,10 +124,12 @@ class Arête(models.Model):
             return self.cycla_défaut
 
     def incr_cyclabilité(self, dc):
+        assert dc > 0, f"j’ai reçu dc={dc}."
         if self.cycla is not None:
             self.cycla *= dc
         else:
-            self.cycla = dc
+            self.cycla = self.cycla_défaut * dc
+        self.save()
     
     def longueur_corrigée(self, p_détour):
         """
@@ -129,23 +137,24 @@ class Arête(models.Model):
         Sortie : Longueur corrigée par la cyclabilité.
         """
         cy = self.cyclabilité()
+        assert cy>0, f"cyclabilité ⩽ pour l’arête {self}"
         return self.longueur / cy**( p_détour*1.5)
 
-    def inverse(self):
-        """
-        Renvoie l’arête inverse. Elle a une cyclabilité_défaut de .8 * self.cycla_défaut
-        """
-        return Arête(
-            départ=self.arrivée,
-            arrivée=self.départ,
-            nom=self.nom,
-            longueur=self.longueur,
-            #zone=self.zone, # À faire après coup, en cas de bulk_create
-            cycla_défaut=.8*self.cycla_défaut,
-            #rue=self.rue,
-            geom=self.geom,
-            sensInterdit=True
-        )
+    # def inverse(self):
+    #     """
+    #     Renvoie l’arête inverse. Elle a une cyclabilité_défaut de .8 * self.cycla_défaut
+    #     """
+    #     return Arête(
+    #         départ=self.arrivée,
+    #         arrivée=self.départ,
+    #         nom=self.nom,
+    #         longueur=self.longueur,
+    #         #zone=self.zone, # À faire après coup, en cas de bulk_create
+    #         cycla_défaut=.8*self.cycla_défaut,
+    #         #rue=self.rue,
+    #         geom=self.geom,
+    #         sensInterdit=True
+    #     )
     
     
 
@@ -155,7 +164,7 @@ class Cache_Adresse(models.Model):
     Table d'association ville -> adresse -> chaîne de nœuds
     Note : tout ce qui correspond à des ways dans Nominatim sera enregistré dans la table Rue, via g.nœuds_of_rue.
     """
-    adresse = models.CharField(max_length=200)
+    adresse = models.CharField(max_length=200, unique=True)
     nœuds_à_découper = models.TextField()
     def __str__(self):
         return f"{self.ville}, {self.adresse}, {self.nœud}"
@@ -164,11 +173,21 @@ class Cache_Adresse(models.Model):
 
 
 class Chemin_d(models.Model):
+    """
+    Attributs:
+        - ar (bool)
+        - p_détour (float) proportion détour
+        - étapes_texte (str)
+        - interdites (str)
+        - utilisateur (str)
+        - dernier_p_modif (float) : nb d’arêtes modifiées / distance entre départ et arrivée lors du dernier apprentissage.
+    """
     ar=models.BooleanField(default=False)
     p_détour=models.FloatField()
     étapes_texte=models.TextField()
     interdites_texte=models.TextField(default=None, blank=True, null=True)
     utilisateur = models.CharField(max_length=100, default=None, blank=True, null=True)
+    dernier_p_modif = models.FloatField(default=None, blank=True, null=True)
     # def étapes(self):
     #     return map(Étape, self.étapes_texte.split(";"))
     # def interdites(self):
@@ -187,13 +206,13 @@ class Chemin_d(models.Model):
         Sauvegarde le chemin si pas déjà présent.
         Si déjà présent, et si un utilisateur est renseigné dans self, met à jour l’utisateur.
         """
-        c_d, créé = Chemin_d.objects.get_or_create(
-            p_détour=self.p_détour, ar=self.ar, étapes_texte=self.étapes_texte, interdites_texte=self.interdites_texte
-        )
-        if self.utilisateur is not None:
-            c_d.utilisateur=self.utilisateur
-            c_d.save()
-        if créé:
+        présents = Chemin_d.objects.filter(p_détour=self.p_détour, ar=self.ar, étapes_texte=self.étapes_texte, interdites_texte=self.interdites_texte)
+        if présents.exists():
+            if self.utilisateur is not None:
+                c_d = présents.first()
+                c_d.utilisateur=self.utilisateur
+                c_d.save()
+        else:
             self.save()
             
     

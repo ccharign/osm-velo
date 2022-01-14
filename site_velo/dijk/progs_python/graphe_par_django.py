@@ -2,11 +2,18 @@
 
 from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse, Zone
 import recup_donnees as rd
-from params import LOG
+from params import LOG, STR_VILLE_DÉFAUT, DONNÉES
 from petites_fonctions import deuxConséc, chrono, distance_euc
 from time import perf_counter
 from django.db.models import Max, Min
 import dijkstra
+from lecture_adresse.arbresLex import ArbreLex
+import os
+import lecture_adresse.normalisation as no
+
+
+class VillePasTrouvée(Exception):
+    pass
 
 
 class Graphe_django():
@@ -15,13 +22,45 @@ class Graphe_django():
     Attribut: 
         dico_voisins (dico int -> (int, Arête) list) associe à un id_osm la liste de ses (voisins, arête)
         dico_Sommet (dico int->Sommet) associe le sommet à chaque id_osm
+        arbre_villes : arbre lex des villes (toutes les villes de la base pour l’instant). Noms normalisée.
     """
     
     def __init__(self, zone="Pau"):
+        
         self.dico_voisins={}
+        
         #cycla min et max
         self.calcule_cycla_min_max()
         #chrono(tic, "calcul cycla min et max", force=True)
+
+        print("Chargement des arbres lex pour villes et rues...")
+        self.arbre_villes = ArbreLex()
+        self.arbres_des_rues={}
+        for v_d in Ville.objects.all():
+            self.arbre_villes.insère(v_d.nom_norm)
+            self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
+        self.ville_défaut = no.Ville(self, STR_VILLE_DÉFAUT)
+        print("fini.")
+
+
+        
+            
+    def ville_la_plus_proche(self, nom, tol=2):
+        """
+        Entrée : nom (str), nom normalisé par partie_commune ou pas d’une ville.
+        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom)
+        Paramètres :
+            tol (int) : nb max de fautes de frappe. Si aucune ville à au plus tol fautes de frappe, lève l’exception VillePasTrouvée.
+        """
+        noms_proches=self.arbre_villes.mots_les_plus_proches(no.partie_commune(nom), d_max=tol)[0]
+        if len(noms_proches)==0:
+            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {self.arbres_des_rues.keys()}.")
+        elif len(noms_proches)>1:
+            raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
+        else:
+            nom_norm,=noms_proches
+            return Ville.objects.get(nom_norm=nom_norm)
+
 
     def charge_zone(self, zone="Pau"):
         """
@@ -36,7 +75,8 @@ class Graphe_django():
             s = a.départ.id_osm
             t = a.arrivée.id_osm
             if s not in self.dico_voisins: self.dico_voisins[s]=[]
-            self.dico_voisins[s].append((t, a))
+            if a.cyclabilité()>0: # ceci supprime les autoroute actuellement
+                self.dico_voisins[s].append((t, a))
         tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone}.")
 
         #Sommets
@@ -192,13 +232,35 @@ class Graphe_django():
         except Exception as e:
             LOG(f"(graphe_par_django.nœuds_of_rue) Rue pas en mémoire : {adresse} (erreur reçue : {e}), je lance recup_donnees.nœuds_of_rue", bavard=bavard)
             # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
-            res = [ n for n in rd.nœuds_of_rue(adresse) if n in self]
-            LOG(f"nœuds trouvés : {res}", bavard=bavard)
+            
+            tout = rd.nœuds_of_rue(adresse)
+            print(f"Liste des nœuds osm : {tout}.")
+            res = [ n for n in tout if n in self]
             if len(res)>0:
+                LOG(f"nœuds trouvés : {res}", bavard=bavard)
                 self.ajoute_rue(adresse, res, bavard=bavard)
                 return res
+            else:
+                # essai 3 : recherche de tous les nœuds dans la bb enveloppante de tout.
+                bbe = rd.bb_enveloppante(tout, bavard=bavard-1)
+                tol=0
+                dtol=0.001
+                while len(res)==0:
+                    print(f"Recherche dans la bb enveloppante avec tol={tol}.")
+                    res = [ n for n in rd.nœuds_dans_bb(bbe, tol=tol) if n in self]
+                    tol+=dtol
+                return res
+            # else:
+            #     LOG("Aucun de ces nœuds n’est dans g :(. Je calcule les nœuds connectés:", bavard=bavard)
+            #     reliés = rd.nœuds_reliés(tout)
+            #     if bavard>0: print(f"nœuds reliés : {reliés}")
+            #     res = [n for n in rd.nœuds_reliés(tout) if n in self ]
+            #     if bavard>0: print(f"Parmi ceux-ci, voici ceux qui sont dans g : {res}")
+            #     if len(res)>0:
+            #         #self.ajoute_rue(adresse, res, bavard=bavard)
+            #         return res
 
-        
+    
     def ajoute_rue(self, adresse, nœuds, bavard=0):
         """
         Effet : ajoute la rue dans la base si elle n'y est pas encore.

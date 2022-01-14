@@ -5,12 +5,12 @@
 import geopy
 import overpy
 from params import LOG_PB, CHEMIN_XML, CHEMIN_RUE_NUM_COORDS
-from lecture_adresse.normalisation import normalise_rue, normalise_ville, VILLE_DÉFAUT, Adresse
+#from lecture_adresse.normalisation import normalise_rue, normalise_ville, Adresse
 from petites_fonctions import LOG
 import xml.etree.ElementTree as xml  # Manipuler le xml local
 import time
 import re
-from lecture_adresse.normalisation import normalise_rue, normalise_ville
+#from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import requests
 import json
 import urllib.parse
@@ -60,27 +60,32 @@ def rue_of_coords(c, bavard=0):
 
 ### Avec Nominatim ###
 
-def cherche_lieu(adresse, bavard=0):
+def cherche_lieu(adresse, seulement_structurée=False, seulement_non_structurée=False, bavard=0):
     """
     Entrée : adresse (instance de Adresse)
 
-    Renvoie la liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
+    Sortie : liste d'objets geopy enregistrées dans osm pour la rue dont le nom est passé en argument. On peut préciser un numéro dans nom_rue.
 
-    Utilise en premier essai adresse.rue, et en second essai adresse.pour_nominatim().
+    Premier essai : recherche structurée avec adresse.nom_rue et adresse.ville.avec_code
+    Deuxième essai, seulement si seulement_structurée==False : non structurée avec essai adresse.pour_nominatim().
     """
     nom_rue = adresse.rue
     ville = adresse.ville
     pays = adresse.pays
-    #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
-    if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}')
-    lieu = localisateur.geocode( {"street":nom_rue, "city":ville.avec_code(), "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
-    if lieu is not None:
-        return lieu
+    
+    if not seulement_non_structurée:
+        #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
+        if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}')
+        lieu = localisateur.geocode( {"street":nom_rue, "city":ville.avec_code(), "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
+        if lieu is not None:
+            return lieu
+        else:
+            LOG_PB(f"La recherche structurée a échouée pour {adresse}.")
 
-    else:
+    if not seulement_structurée:
         # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
-        LOG_PB(f"La recherche structurée a échouée pour {adresse}.")
-        print("Recherche Nominatim non structurée... Attention : résultat pas fiable.")
+
+        print("Recherche Nominatim non structurée. Attention...")
         print(f'Essai 2 : "{adresse.pour_nominatim()}" ')
         lieu = localisateur.geocode(f"{adresse.pour_nominatim()}", exactly_one=False)
         if lieu is not None:
@@ -94,33 +99,96 @@ def cherche_lieu(adresse, bavard=0):
 def nœuds_of_rue(adresse, bavard=0):
     """
     Sortie : liste des nœuds osm correspondant aux ways correspondant à l'adresse.
-    Attention : si l'adresse ne précise pas la ville, risque de résultats aberrants...
+    """
+    #api = overpy.Overpass()
+    lieu = cherche_lieu(adresse, seulement_non_structurée=True , bavard=bavard)
+    if bavard>0:print(f"rd.nœuds_of_rue : la recherche Nominatim pour {adresse} a donné {lieu}.")
+    res = []
+
+    ids_way = [truc.raw["osm_id"] for truc in lieu if truc.raw["osm_type"]=="way"]
+    if bavard>0:print(f"Voici les ids_way trouvés : {ids_way}")
+    return nœuds_of_idsrue(ids_way, bavard=bavard-1)
+    # for truc in lieu:
+    #     if truc.raw["osm_type"]=="way":
+    #         id_way = truc.raw["osm_id"]
+    #         res.extend(nœuds_of_idrue(id_way))
+    # return res
+
+def bb_enveloppante(nœuds, bavard=0):
+    """
+    Entrée : nœuds (int iterable), liste d’id_osm de nœuds
+    Sortie : la plus petite bounding box contenant ces nœuds.
     """
     api = overpy.Overpass()
-    lieu = cherche_lieu(adresse, bavard=bavard)
-    res = []
+    req = f"""
+    node(id:{",".join(map( str, nœuds))});
+    out;
+    """
+    if bavard>0: print(req)
+    rés = api.query(req).nodes
+    lons = [n.lon for n in rés]
+    lats = [n.lat for n in rés]
+    # bb :sone
+    return min(lats), min(lons), max(lats), max(lons)
+
+
+def nœuds_dans_bb(bb, tol=0):
+    """
+    Entrée : bb, bounding box (s,o,n,e)
+             tol (float>=0)
+             dtol (float >0)
+    Sortie : liste des nœuds osm trouvés dans la bb.
+    """
+    api=overpy.Overpass()
+    s,o,n,e = bb
+    req = f"node({s-tol}, {o-tol}, {n+tol}, {e+tol});out;"
+    return [n.id for n in api.query(req).nodes]
     
-    for truc in lieu:
-        if truc.raw["osm_type"]=="way":
-            id_way = truc.raw["osm_id"]
-            res.extend(nœuds_of_idrue(id_way))
+    
+
+def ways_contenant_nodes(nœuds):
+    """
+    Entrée : nœuds (int itérable), id_osm de nœuds
+    Sortie : liste des ways avec tag highwaycontenant au moins un élément de nœuds.
+    """
+    api = overpy.Overpass()
+    requête=f"""
+    node(id:{",".join(map( str, nœuds))});
+    way[highway](bn);
+    out;
+    """
+    return api.query(requête).ways
+
+
+def nœuds_reliés(nœuds):
+    """
+    Entrée : itérable de nœuds osm
+    Sortie : liste des nœuds sur un way contenant un des nœuds de nœuds.
+    """
+    ways = ways_contenant_nodes(nœuds)
+    res=[]
+    for w in ways:
+        res.extend(w._node_ids)
     return res
 
+# nœuds de place saint louis de gonzague = [782224313, 782408135, 8428498156, 782155281, 343660472, 782224313]
 
-def nœuds_of_idrue(id_rue, bavard=0):
+def nœuds_of_idsrue(ids_rue, bavard=0):
     """
-    Entrée : id_rue (int), id osm d'un way
-    Sortie : liste des nœuds d'icelle
+    Entrée : ids_rue (int itérable), ids osm de ways.
+    Sortie : liste des nœuds de celles-ci.
     """
+    assert len(list(ids_rue))>0, f"(rd.nœuds_of_idsrue) J’ai reçu ids_rue={list(ids_rue)}"
     api = overpy.Overpass()
-    requête=f"""(
-            way(id:{id_rue});
-            );
-            out body;"""
+    requête=f"""
+            way(id:{",".join(map(str, ids_rue))});
+            out;"""
     if bavard>0:print(requête)
     res_req = api.query(requête)
-    w = res_req.ways[0]
-    return w._node_ids
+    res=[]
+    for w in res_req.ways:
+        res.extend(w._node_ids)
+    return res
 
 
 def villes_of_bbox(bbox):
@@ -152,14 +220,12 @@ def coord_nœud(id_nœud):
     return float(n.lat), float(n.lon)
 
 
-def coords_lieu(nom_rue, ville= VILLE_DÉFAUT, pays="France", bavard=0):
-    """ Renvoie les coordonnées du lieu obtenues par une recherche Nominatim"""
-    lieu = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)[0]
-    return lieu.latitude, lieu.longitude
+# def coords_lieu(adresse, bavard=0):
+#     """ Renvoie les coordonnées du lieu obtenues par une recherche Nominatim"""
+    
+#     lieu = cherche_lieu(adresse, bavard=bavard)[0]
+#     return lieu.latitude, lieu.longitude
 
-
-#id_hédas="30845632"
-#id_hédas2="37770876"
 
 
 
@@ -189,9 +255,9 @@ def nœuds_sur_tronçon_local(id_rue):
     return []  #  Si rien de trouvé
 
 
-def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
-    LOG_PB(f"J’ai eu besoin de recup_donnees.nœuds_sur_rue_local pour {nom_rue}, {ville}.")
-    rue = cherche_lieu(nom_rue, ville=ville, pays=pays, bavard=bavard)
+def nœuds_sur_rue_local(adresse, bavard=0):
+    LOG_PB(f"J’ai eu besoin de recup_donnees.nœuds_sur_rue_local pour {adresse}.")
+    rue = cherche_lieu(adresse, bavard=bavard)
     if bavard: print(rue)
     res = []
     for tronçon in rue:  #  A priori, cherche_lieu renvoie une liste
@@ -212,13 +278,6 @@ def nœuds_sur_rue_local(nom_rue, ville=VILLE_DÉFAUT, pays="France", bavard=0):
             return res
     else:
         return nœuds_sur_tronçons[0]
-
-
-def nœuds_of_adresse(adresse, ville=VILLE_DÉFAUT, pays="France", bavard=0):
-    """ Entrée : une adresse, càd au minimum un numéro et un nom de rue.
-        Sortie : liste des nœuds osm récupérés via Nominatim.
-    """
-    pass
 
 
 

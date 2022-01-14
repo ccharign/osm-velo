@@ -4,12 +4,12 @@ from petites_fonctions import chrono
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
 from dijk.models import Sommet, Chemin_d
 tic=perf_counter()
-from recup_donnees import cherche_lieu, coords_lieu, coords_of_adresse
+from recup_donnees import cherche_lieu, coords_of_adresse
 chrono(tic, "recup_donnees")
 #import module_graphe
 import os
 tic=perf_counter()
-from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_adresse, normalise_rue, normalise_ville
+from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville
 chrono(tic, "lecture_adresse.normalisation")
 import re
 import dijkstra
@@ -97,7 +97,7 @@ class Chemin():
 
     @classmethod
     def of_django(cls, c_d, g, bavard=0):
-        return cls.of_données(c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
+        return cls.of_données(g, c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
 
     def vers_django(self, utilisateur=None):
         """
@@ -122,11 +122,11 @@ class Chemin():
         AR_t, pourcentage_détour_t, étapes_t,rues_interdites_t = ligne.strip().split("|")
         p_détour = int(pourcentage_détour_t)/100.
         AR = bool(AR_t)
-        return cls.of_données(AR, p_détour, étapes_t, rues_interdites_t, bavard=bavard)
+        return cls.of_données(g, AR, p_détour, étapes_t, rues_interdites_t, bavard=bavard)
 
         
     @classmethod
-    def of_données(cls, AR, p_détour, étapes_t, rues_interdites_t, bavard=0):
+    def of_données(cls, g, AR, p_détour, étapes_t, rues_interdites_t, bavard=0):
         """
         Entrée :
             - AR (bool)
@@ -136,21 +136,24 @@ class Chemin():
         """
         
         #rues interdites
-        noms_rues = rues_interdites_t.split(";")
-        interdites = arêtes_interdites(g, noms_rues, bavard=bavard)
+        if len(rues_interdites_t)>0:
+            noms_rues = rues_interdites_t.split(";")
+            interdites = arêtes_interdites(g, noms_rues, bavard=bavard)
+        else:
+            interdites = {}
         
         # étapes 
         noms_étapes = étapes_t.split(";")
         n_pb = 0
         étapes=[]
         for c in noms_étapes:
-            try:
+        #    try:                
                 étapes.append(Étape(c.strip(), g, bavard=bavard-1))
-            except Exception as e:
-                LOG_PB(f"Échec pour l’étape {c} : {e}")
-                n_pb+=1
-        if n_pb/len(noms_étapes) > tol:
-            raise ÉchecChemin(f"{n_pb} erreurs pour la lecture de {ligne}.")
+        #     except Exception as e:
+        #         LOG_PB(f"Échec pour l’étape {c} : {e}")
+        #         n_pb+=1
+        # if n_pb/len(noms_étapes) > tol:
+        #     raise ÉchecChemin(f"{n_pb} erreurs pour la lecture de {ligne}.")
 
         
         ## Création de l’objet Chemin

@@ -26,7 +26,7 @@ tic=perf_counter()
 import chemins  # classe chemin et lecture du csv
 chrono(tic, "chemins", bavard=2)
 
-from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
+from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import os
 
 
@@ -34,18 +34,9 @@ tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
 
-
-# def cheminsValides(chemins, g):
-#     """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
-#     res = []
-#     for c in chemins:
-#         try:
-#             dijkstra.chemin_étapes_ensembles(g, c)
-#             res.append(c)
-#         except dijkstra.PasDeChemin as e:
-#             print(e)
-#             print(f"Pas de chemin avec étapes pour {c}")
-#     return res
+from dijk.models import Chemin_d
+import apprentissage as ap
+from django.db import transaction
 
 
 def liste_Arête_of_iti(g, iti, p_détour):
@@ -299,3 +290,13 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     if ouvrir : ouvre_html(nom)
 
     
+### Apprentissage ###
+
+def lecture_tous_les_chemins(g, bavard=0):
+    for c_d in Chemin_d.objects.all():
+        c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
+        with transaction.atomic():
+            n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
+            c_d.dernier_p_modif = n_modif/l
+            c_d.save()
+            print(f"Lecture de {c}. {n_modif} arêtes modifiées, distance = {l}.")
