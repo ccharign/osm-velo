@@ -17,7 +17,7 @@ def est_sur_rueville(g, s, rue, ville):
     return False
 
 
-def prochaine_sphère(g, sph, rue, ville, déjàVu, boule, dmax):
+def prochaine_sphère(g, sph, rue, rue_n, ville, déjàVu, boule, dmax):
     """ sph est une sphère centrée en s.
         boule est la boule fermée correspondante.
         Renvoie les nœuds de rue qui sont sur la première sphère centrée en s qui contienne un nœud de rue. Recherche effectuée en partant de sph et en augmentant le rayon de 1 en 1 au plus dmax fois.
@@ -31,13 +31,13 @@ def prochaine_sphère(g, sph, rue, ville, déjàVu, boule, dmax):
         for t in sph:
             for u in g.voisins_nus(t):
                 if u not in boule:
-                    if est_sur_rueville(g, u, rue, ville) and u not in déjàVu[ville][rue]:
+                    if est_sur_rueville(g, u, rue, ville) and u not in déjàVu[ville][rue_n]:
                         fini = True
                         res_éventuel.append(u)
                     sph_suivante.append(u)
                     boule.add(u)
         if not fini:
-            return prochaine_sphère(g, sph_suivante, rue, ville, déjàVu, boule, dmax-1)
+            return prochaine_sphère(g, sph_suivante, rue, rue_n, ville, déjàVu, boule, dmax-1)
         else:
             return res_éventuel
                 
@@ -46,32 +46,41 @@ def prochaine_sphère(g, sph, rue, ville, déjàVu, boule, dmax):
 
 def extrait_nœuds_des_rues(g, bavard = 0):
     """
-    Sortie : dictionnaire ville -> rue -> liste nœuds
+    Sortie : dictionnaire ville -> rue_n -> liste nœuds
     La recherche est faite par des parcours de graphe pour avoir les sommets autant que possible dans l’ordre topologique.
+    Grosse complication presque gratuite oui, c’était pour le sport.
     """
     
     déjàVu = {} # dico (ville -> nom de rue -> set de nœuds). Ne sert que pour le cas d’une rue qui boucle.
     res = {} # dico (ville -> nom de rue -> liste des nœuds dans un ordre topologique )
     
-    def suivre_rue(s, ville, rue):
-        """ s (int) : sommet actuel
-            rue (str) : nom de la rue à suivre 
-           Effet : remplit déjàVu[ville][rue] ainsi que res[ville][rue]
+    def suivre_rue(s, ville, rue, rue_n):
         """
-
+        Entrées :
+            s (int), sommet actuel
+            rue (str), nom de la rue à suivre 
+            rue_n (str), nom de la rue passé par prétraitement_rue
+        Effet : remplit déjàVu[ville][rue] ainsi que res[ville][rue_n]
+        """
+        assert prétraitement_rue(rue_n) == rue_n, f"Rue non normalisée : {rue} (rue_n)"
         # Dans le cas d’une rue qui fourche on aura une branche après l’autre (parcours en profondeur de la rue).
-        for t in prochaine_sphère(g, [s], rue, ville, déjàVu, set([s]), D_MAX_SUITE_RUE): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe. Dans le cas basique, prochaine_sphère renvoie deux sommets, l’un d’eux étant sprec.
-            if t not in déjàVu[ville][rue]:
-                res[ville][rue].append(t)
-                déjàVu[ville][rue].add(t)
-                suivre_rue(t, ville, rue)
+        for t in prochaine_sphère(g, [s], rue, rue_n, ville, déjàVu, set([s]), D_MAX_SUITE_RUE): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe. Dans le cas basique, prochaine_sphère renvoie deux sommets, l’un d’eux étant sprec.
+            if t not in déjàVu[ville][rue_n]:
+                res[ville][rue_n].append(t)
+                déjàVu[ville][rue_n].add(t)
+                suivre_rue(t, ville, rue, rue_n)
 
-    def partir_dune_arête(s,t,ville,rue):
-        """ Lance suivre_rue dans le sens (s,t) puis dans le sens (t,s)."""
-        suivre_rue(s, rue, ville)
-        res[ville][rue].reverse()
-        suivre_rue(t, ville, rue)
-                
+    def partir_dune_arête(s, t, ville, rue, rue_n):
+        """ 
+        Précondition : s et t ont été marqués déjà vus et mis dans res.
+        Lance suivre_rue dans le sens (s,t) puis dans le sens (t,s).
+        """
+        assert prétraitement_rue(rue_n) == rue_n, f"Rue non normalisée : {rue} (rue_n=={rue_n}, prétraitement_rue(rue_n)=={prétraitement_rue(rue_n)})"
+        suivre_rue(s, ville, rue, rue_n)
+        res[ville][rue_n].reverse()
+        suivre_rue(t, ville, rue, rue_n)
+
+    
     for s in g.digraphe.nodes:
         villes = g.villes_dun_sommet(s, bavard=bavard-1)
         for ville in villes :
@@ -80,17 +89,19 @@ def extrait_nœuds_des_rues(g, bavard = 0):
                 déjàVu[ville] = {}
                 res[ville] = {}
             for t in g.voisins_nus(s):
-                rues = g.rue_dune_arête(s,t)
-                if rues is not None:
-                    for rue in rues:
-                        if rue not in res[ville]:
-                            res[ville][rue] = [t, s]
-                            déjàVu[ville][rue] = set((s,t))
-                            partir_dune_arête(s,t,ville,rue)
-                        if s not in déjàVu[ville][rue] or t not in déjàVu[ville][rue]:  # Cas d’un nouveau tronçon d’une ancienne rue
-                            partir_dune_arête(s,t,ville,rue)
-                            
-                            if bavard>1: print(f"J’ai suivi la {rue} à {ville}. Nœuds trouvés : {res[ville][rue]}")
+                rues = g.rue_dune_arête(s, t)
+                for rue in rues:
+                    rue_n = prétraitement_rue(rue)
+                    if rue_n not in res[ville]:
+                        #print(f"Nouvelle rue : {rue}, normalisée en {rue_n}")
+                        res[ville][rue_n] = [t, s]
+                        déjàVu[ville][rue_n] = set((s, t))
+                        partir_dune_arête(s, t, ville, rue, rue_n)
+                    elif s not in déjàVu[ville][rue_n] or t not in déjàVu[ville][rue_n]:  # Cas d’un nouveau tronçon d’une ancienne rue
+                        res[ville][rue_n].extend((t, s))
+                        déjàVu[ville][rue_n].update((s, t))
+                        partir_dune_arête(s,t,ville,rue, rue_n)
+                        if bavard>1: print(f"Nouveau tronçon de {rue} à {ville}. Nœuds trouvés : {res[ville][rue_n]}")
     return res
 
 

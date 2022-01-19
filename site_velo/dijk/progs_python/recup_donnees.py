@@ -106,14 +106,21 @@ def nœuds_of_rue(adresse, bavard=0):
     res = []
 
     ids_way = [truc.raw["osm_id"] for truc in lieu if truc.raw["osm_type"]=="way"]
+    ids_node = [truc.raw["osm_id"] for truc in lieu if truc.raw["osm_type"]=="node"]
     if bavard>0:print(f"Voici les ids_way trouvés : {ids_way}")
-    return nœuds_of_idsrue(ids_way, bavard=bavard-1)
+    if len(ids_way)>0:
+        return nœuds_of_idsrue(ids_way, bavard=bavard-1)
+    elif len(ids_node)>0:
+        return ids_node
+    else:
+        return []
     # for truc in lieu:
     #     if truc.raw["osm_type"]=="way":
     #         id_way = truc.raw["osm_id"]
     #         res.extend(nœuds_of_idrue(id_way))
     # return res
 
+    
 def bb_enveloppante(nœuds, bavard=0):
     """
     Entrée : nœuds (int iterable), liste d’id_osm de nœuds
@@ -129,7 +136,7 @@ def bb_enveloppante(nœuds, bavard=0):
     lons = [n.lon for n in rés]
     lats = [n.lat for n in rés]
     # bb :sone
-    return min(lats), min(lons), max(lats), max(lons)
+    return float(min(lats)), float(min(lons)), float(max(lats)), float(max(lons))
 
 
 def nœuds_dans_bb(bb, tol=0):

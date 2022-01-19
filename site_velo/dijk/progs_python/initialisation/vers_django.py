@@ -10,12 +10,18 @@
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
 from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d
-from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue, ARBRE_VILLES
-from dijk.progs_python.init_graphe import charge_graphe
+from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
+#from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
 from petites_fonctions import union, mesure_temps
 from time import perf_counter, sleep
 from django.db import transaction
+from lecture_adresse.arbresLex import ArbreLex
+
+
+ARBRE_VILLES = ArbreLex()
+for v_d in Ville.objects.all():
+    ARBRE_VILLES.insère(v_d.nom_norm)
 
 def nv_ville(nom, code, tol=3):
     """
@@ -26,11 +32,11 @@ def nv_ville(nom, code, tol=3):
     if len(noms_proches)>0:
         print(f"Ville(s) trouvée(s) dans l'arbre : {noms_proches}")
         nom_corrigé=noms_proches[0]
-        v_d=Ville.objects.get(nom_complet=nom_corrigé)
+        v_d=Ville.objects.get(nom_norm=nom_corrigé)
         return v_d
     else:
-        nom_n=partie_commune(nom_corrigé)
-        v_d = Ville(nom_complet=nom, code=code, nom_n=nom_n)
+        nom_n=partie_commune(nom)
+        v_d = Ville(nom_complet=nom, code=code, nom_norm=nom_n)
         v_d.save()
         ARBRE_VILLES.insère(nom)
         return v_d
@@ -169,8 +175,8 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
                         bonus+= critères[att][v]
 
     return 1.1**bonus
-    
-        
+
+
 def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     """
     Entrée : g (Graphe_nx)
@@ -252,12 +258,12 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     nb_appels={"correspondance":0, "remplace_arêtes":0, "màj_arêtes":0, "récup_nom":0}
     
     
-    @mesure_temps("récup_nom", temps, nb_appels)
+    #@mesure_temps("récup_nom", temps, nb_appels)
     def récup_noms(arêtes_d, nom):
         """ Renvoie le tuple des a∈arêtes_d qui ont pour nom 'nom'"""
         return [a_d for a_d in arêtes_d if nom==a_d.nom]
     
-    @mesure_temps("correspondance", temps, nb_appels)
+    #@mesure_temps("correspondance", temps, nb_appels)
     def correspondance(s_d, t_d, s, t, gx):
         """
         Entrées:
@@ -292,7 +298,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     à_créer=[]
     à_màj=[]
     
-    @mesure_temps("màj_arêtes", temps, nb_appels)
+    #@mesure_temps("màj_arêtes", temps, nb_appels)
     def màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x):
         """
         Entrées:
@@ -310,7 +316,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
             à_màj.append(a_d)
 
 
-    @mesure_temps("remplace_arêtes", temps, nb_appels)
+    #@mesure_temps("remplace_arêtes", temps, nb_appels)
     def remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx):
         """
         Supprime les arêtes de arêtes_d, et crée à la place celles venant de arêtes_nx.
@@ -342,7 +348,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         for t, arêtes in gx[s].items():
             if t!=s : # Suppression des boucles
                 nb+=1
-                if nb%500==0:print(f"    {nb} arêtes traitées\n {temps}\n{nb_appels}\n")
+                if nb%500==0:print(f"    {nb} arêtes traitées\n ") #{temps}\n{nb_appels}\n")
                 t_d = tous_les_sommets.get(id_osm=t)
                 correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
                 if not (rapide==2 and len(arêtes_d)>0):
@@ -386,12 +392,13 @@ def charge_dico_rues_nœuds(ville_d, dico):
         remplit la table dijk_rue. Si une rue était déjà présente, elle sera supprimée.
     """
     rues_à_créer=[]
-    for rue, nœuds in dico.items():
-        rue_n = prétraitement_rue(rue)
+    for rue_n, nœuds in dico.items():
+        #rue_n = prétraitement_rue(rue)
+        assert rue_n == prétraitement_rue(rue_n), f"La rue suivante n’était pas normalisée : {rue_n}"
         nœuds_texte = ",".join(map(str, nœuds))
         vieilles_rues = Rue.objects.filter(nom_norm=rue_n, ville=ville_d)
         vieilles_rues.delete()
-        rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_texte)
+        rue_d = Rue(nom_complet=rue_n, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_texte)
         rues_à_créer.append(rue_d)
     Rue.objects.bulk_create(rues_à_créer)
         
@@ -400,22 +407,22 @@ def charge_dico_rues_nœuds(ville_d, dico):
 
 
 
-def nv(nom_ville):
-    return normalise_ville(nom_ville).nom_norm
+def nv(g, nom_ville):
+    return normalise_ville(g, nom_ville).nom_norm
 
-code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
+#code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
 
 #Utiliser bulk_create
 #https://pmbaumgartner.github.io/blog/the-fastest-way-to-load-data-django-postgresql/
 
-def villes_vers_django():
+def villes_vers_django(g):
     """
     Effet : réinitialise la table dijk_ville
     """
     Ville.objects.all().delete()
     villes_à_créer=[]
     for nom, code in TOUTES_LES_VILLES.items():
-        villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(nom), code=code))
+        villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(g, nom), code=code))
     Ville.objects.bulk_create(villes_à_créer)
 
         

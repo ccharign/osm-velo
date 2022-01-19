@@ -18,7 +18,7 @@ from initialisation.crée_graphe import crée_graphe_bbox
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues, extrait_nœuds_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
-from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville
+from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, partie_commune
 from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier, chrono
 #from networkx import read_graphml
@@ -32,7 +32,6 @@ Script pour réinitialiser ou ajouter une nouvelle zone.
 Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
    -> À voir, peut être le cache ?
    -> Ou carrément recréer le cache...
-   De toute façon le cache est assez peu utilisé me semble-t-il maintenant.
 """
 
 def charge_multidigraph():
@@ -60,7 +59,9 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
     print(f"Récupération du graphe pour « {code} {nom}, {pays} » avec une marge")
     gr_avec_marge = osmnx.graph_from_place(
         {"city":f"{nom}", "postcode":code, "country":pays},
-        network_type="all", retain_all="True", buffer_dist=500
+        network_type="all",
+        retain_all="False", # Sinon il peut y avoir des enclaves déconnectées car accessibles seulement par chemin privé (ex: CSTJF)
+        buffer_dist=500
     )
     print("Récupération du graphe exact")
     gr_strict = osmnx.graph_from_place({"city":f"{nom}", "postcode":code, "country":pays}, network_type="all", retain_all="True")
@@ -78,7 +79,9 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
     dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
     print("Création de l'arbre lexicographique")
-    arbre_rue_dune_ville(ville_d, dico_rues.keys())
+    arbre_rue_dune_ville(ville_d,
+                         map(partie_commune, dico_rues[nom].keys())
+                         )
 
     ## désorientation
     print("Désorientation du graphe")
@@ -90,8 +93,8 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
 
 À_RAJOUTER_PAU={
     "Gelos": 64110,
-    #"Lée": 64320,
-    #"Pau":64000
+    "Lée": 64320,
+    "Pau":64000,
     "Lescar": 64230,
     "Billère": 64140,
     "Jurançon":64110,

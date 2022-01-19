@@ -102,12 +102,24 @@ def prétraitement_rue(rue):
     """ 
     Après l’étape "partie_commune", supprime les «de », «du », «de la ».
     Si deux espaces consécutives, supprime la deuxième.
+
+    À faire : remplacer les «avenue», «rue», «place», etc par des symboles utf8, de sorte que remplacer l’un par l’autre ne compte que pour une faute de frappe dans la distance d’édition.
     """
     
     étape1 = partie_commune(rue)
-    à_supprimer = [" du ", " de la ", " de ", " d'",  "  "] # Mettre "de la " avant "de ". Ne pas oublier les espaces.
+    # les chaînes suivantes seront remplacées par une espace.
+    à_supprimer = [" du ", " de la ", " de l'", " de ", " d'",  "  "] # Mettre "de la " avant "de ". Ne pas oublier les espaces.
     regexp = "|".join(à_supprimer)
-    return re.sub(regexp, " ", étape1)
+    fini = False
+    res = étape1
+    # Pour les cas comme « rue de du Forbeth »
+    while not fini:
+        suivant = re.sub(regexp, " ", res)
+        if suivant==res:
+            fini=True
+        else:
+            res=suivant
+    return res
 
 
 def créationArbre():

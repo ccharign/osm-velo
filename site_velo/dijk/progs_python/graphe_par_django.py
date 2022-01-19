@@ -43,8 +43,6 @@ class Graphe_django():
         print("fini.")
 
 
-        
-            
     def ville_la_plus_proche(self, nom, tol=2):
         """
         Entrée : nom (str), nom normalisé par partie_commune ou pas d’une ville.
@@ -240,7 +238,7 @@ class Graphe_django():
                 LOG(f"nœuds trouvés : {res}", bavard=bavard)
                 self.ajoute_rue(adresse, res, bavard=bavard)
                 return res
-            else:
+            elif len(tout)>0:
                 # essai 3 : recherche de tous les nœuds dans la bb enveloppante de tout.
                 bbe = rd.bb_enveloppante(tout, bavard=bavard-1)
                 tol=0
@@ -249,7 +247,10 @@ class Graphe_django():
                     print(f"Recherche dans la bb enveloppante avec tol={tol}.")
                     res = [ n for n in rd.nœuds_dans_bb(bbe, tol=tol) if n in self]
                     tol+=dtol
+                self.ajoute_rue(adresse, res, bavard=bavard)
                 return res
+            else:
+                return []
             # else:
             #     LOG("Aucun de ces nœuds n’est dans g :(. Je calcule les nœuds connectés:", bavard=bavard)
             #     reliés = rd.nœuds_reliés(tout)

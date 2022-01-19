@@ -100,18 +100,18 @@ class Graphe_nx():
 
     
     def rue_dune_arête(self, s, t, bavard=0):
-        """ Tuple des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
+        """ Liste des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
             Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
-        try:
-            res = self.digraphe[s][t]["name"]
-            if isinstance(res, str):
-                return res,
-            else:
-                return res
-        except KeyError:
-            if bavard>0:
-                print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
-            return ()
+        res = []
+        for a in self.multidigraphe[s][t].values():
+            if "name" in a:
+                if isinstance(a["name"], str):
+                    res.append(a["name"])
+                else:
+                    res.extend(a["name"])
+        if len(res)==0 and bavard>0:
+            print(f"L’arête {(s, t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
+        return res
 
     ### Remplacé par villes_dun_sommet
     # def ville_dune_arête(self, s, t, bavard=0):
