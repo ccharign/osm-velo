@@ -119,10 +119,13 @@ def tous_les_nœuds(g, adresse, bavard=0):
         if len(lieu)>0:
             truc = lieu[0].raw
             adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0]
+            essai = g.dans_le_cache(adresse)
+            if essai is not None:
+                return essai
             LOG(f"Essai 5 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
-            res=nœud_sur_rue_le_plus_proche(g, coords, Adresse(g, f"{rue} ({ville})", bavard=bavard))
+            res = nœud_sur_rue_le_plus_proche(g, coords, Adresse(g, f"{rue} ({ville})", bavard=bavard))
             if res is not None:
                 g.met_en_cache(adresse, [res])
                 return [res]
