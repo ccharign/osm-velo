@@ -4,11 +4,11 @@
 from petites_fonctions import deuxConséc
 from heapq import heappush, heappop  # pour faire du type List une structure de tas-min
 import copy
+from params import LOG_PB
 
 class PasDeChemin(Exception):
     pass
 
-## Pour passer à A* il faut connaître la cycla max.
 
 
 
@@ -141,11 +141,17 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
             boucle_par_arêtes_doubles(s)
         else:
             boucle_simple(s)
+            
+
+    if len(sommetsFinalsTraités)==0:
+        _, plus_proche = min((heuristique(g, s, arrivée), s) for s in dist.keys())
+        chemin = [plus_proche]
+        reconstruction(chemin, pred, départ)
+        raise PasDeChemin(f"Pas réussi à atteindre l’étape {arrivée}. Le sommet atteint le plus proche est {plus_proche}, le chemin pour y aller est {chemin}")
     if not fini:
-        raise PasDeChemin(f"Pas réussi à atteindre l’étape {arrivée}")
+        LOG_PB(f"Avertissement : je n’ai pas réussi à atteindre tous les sommets de {arrivée}.\n Sommets non atteints:{[s for s in arrivée if s not in sommetsFinalsTraités]}")
 
 
-                    
 def reconstruction(chemin, pred, départ):
     """ Entrées : - chemin, la fin du chemin retourné. chemin[0] est le point d’arrivée final, chemin[-1] est un sommet dans l’arrivée de cette étape.
                   - départ, sommets de départ de l’étape (structure permettant un «in»)
@@ -190,6 +196,7 @@ def chemin_étapes_ensembles(g, c, bavard=0):
         dist = {s: d for (s, d) in dist.items() if s in étapes[i].nœuds}  # On efface tout sauf les sommets de l’étape qu’on vient d’atteindre
 
     if all(s not in dist for s in arrivée):
+        
         raise PasDeChemin(f"Pas de chemin trouvé pour {c}.")
     else:
         _, fin = min(((dist[s], s) for s in arrivée if s in dist))

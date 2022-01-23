@@ -91,7 +91,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
 
     
     ## Essai 1
-    essai1 = g.nœuds_of_rue(adresse, bavard=bavard-1)
+    essai1 = g.nœuds_of_rue(adresse, persévérant=False, bavard=bavard-1) # Ne pas se lancer dans la bb enveloppante à ce stade.
     if essai1 is not None and len(essai1)>0:
         return essai1
     else :

@@ -146,6 +146,8 @@ def nœuds_dans_bb(bb, tol=0):
              dtol (float >0)
     Sortie : liste des nœuds osm trouvés dans la bb.
     """
+    print("J’attends 5s pour overpass.")
+    time.sleep(5)
     api=overpy.Overpass()
     s,o,n,e = bb
     req = f"node({s-tol}, {o-tol}, {n+tol}, {e+tol});out;"

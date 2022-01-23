@@ -95,8 +95,8 @@ def lecture_jusqu_à_perfection(g, chemins, n_max=50, bavard=0):
     print("Début de l’apprentissage")
     while n_modif>0 and n_étapes<n_max:  # La fonction lecture_plusieurs_chemins renvoie le nb d'arêtes modifiées.
         n_étapes += 1
-        n_modif, prop_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard) > 0
-        if bavard >0:
+        n_modif, prop_modif = lecture_plusieurs_chemins(g, chemins, bavard=bavard)
+        if bavard > 0:
             print(f" ----- Étape {n_étapes}, {n_modif} arêtes modifiées -----")
     print(f"Entraînement fini en {n_étapes} étapes.")
     if n_étapes==n_max:

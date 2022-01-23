@@ -28,4 +28,7 @@ False|15|rue des cordeliers (64000 Pau);rue saint jacques (64000 Pau);Halle des 
 False|15|16  rue des veroniques (64000 Pau);38  rue du gui (64000 Pau)|bd de la paix
 False|15|38  rue du gui (64000 Pau);avenue de montardon (64000 Pau);rue albert camus (64000 Pau);rue pasteur (64000 Pau);rue guichenne (64000 Pau);rue samonzet (64000 Pau);rue matthieux lalanne (64000 Pau);college marguerite de navarre (64000 Pau)|
 False|5|16  rue des veroniques (64000 Pau);piste cyclable leon blum (64000 Pau);rue gutemberg (64000 Pau)|
-True|25|14 boulevard de la paix (64000 Pau);impasse clos saint andre (64000 Pau);rue paul langevin (64000 Pau);avenue stravinsky (64000 Pau);avenue jean mermoz (64000 Pau)|
+True|25|14 boulevard de la paix (64000 Pau);impasse clos saint andre (64000 Pau);rue paul langevin (64000 Pau);avenue stravinsky (64000 Pau);avenue jean mermoz (64000 Pau)|False|15|rue des véroniques (64000 Pau);Piste cyclable du Balaïtous (64000 Pau);Chemin Lapassade (64000 Pau);rue benjamin Franklin  (64230 Lescar)|
+False|15|rue des véroniques (64000 Pau);Piste cyclable du Balaïtous (64000 Pau);Chemin Lapassade (64000 Pau);rue benjamin Franklin  (64230 Lescar)|
+False|15|rue des véroniques (64000 Pau);rue benjamin Franklin  (64230 Lescar)|allée de l’arrémoulit (Lons);allée d’Ansabère
+True|15|16 rue lagardère (64000 Pau);Place Georges Clemenceau (64000 Pau)|boulevard barbanègre

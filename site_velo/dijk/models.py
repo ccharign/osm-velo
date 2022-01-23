@@ -7,14 +7,16 @@ def découpe_chaîne_de_nœuds(c):
     return tuple(map(int, c.split(",")))
 
 
-
-    
 class Ville(models.Model):
     nom_complet = models.CharField(max_length=100)
     nom_norm = models.CharField(max_length=100)
     code = models.IntegerField()
+    #zone = models.ManyToManyField(Zone) # pb car la classe Zone n’est pas encore définie.
     def __str__(self):
         return self.nom_complet
+    def avec_code(self):
+        return f"{self.code} {self.nom_complet}"
+
 
 class Zone(models.Model):
     """
@@ -22,7 +24,23 @@ class Zone(models.Model):
     """
     nom = models.CharField(max_length=100, unique=True)
     ville_défaut = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    def villes(self):
+        return (rel.ville for rel in Ville_Zone.objects.filter(zone=self).prefetch_related("ville"))
+    def __str__(self):
+        return self.nom
 
+    
+class Ville_Zone(models.Model):
+    """
+    Table d’association
+    """
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(fields=["zone", "ville"], name = "Pas de relation en double.")
+        ]
+    
 class Sommet(models.Model):
     
     id_osm = models.IntegerField(unique=True)
@@ -52,6 +70,10 @@ class Sommet(models.Model):
 
     def coords(self):
         return self.lon, self.lat
+
+    def prédécesseurs(self):
+        arêtes = Arête.objects.filter(arrivée=self).select_related("départ")
+        return [a.départ for a in arêtes]
     
 #https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
 class Rue(models.Model):

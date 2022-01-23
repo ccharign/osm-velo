@@ -135,11 +135,6 @@ def confirme_nv_chemin(requête):
     c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
     c.sauv(bavard=1)
     n_lectures(nb_lectures, g, [c], bavard=1)
-    
-    #tousLesChemins = chemins_of_csv(g, bavard=1)
-    #n_lectures(nb_lectures, g, tousLesChemins, bavard=1) # Trop long... À mettre ailleurs ? Dans un cron ?
-    g.sauv_cache()
-    g.g.sauv_cycla()
     return render(requête, "dijk/merci.html", {"chemin":c})
 
 

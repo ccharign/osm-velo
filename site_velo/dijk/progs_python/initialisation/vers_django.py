@@ -9,7 +9,7 @@
 
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
-from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d
+from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
 #from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
@@ -19,26 +19,48 @@ from django.db import transaction
 from lecture_adresse.arbresLex import ArbreLex
 
 
-ARBRE_VILLES = ArbreLex()
-for v_d in Ville.objects.all():
-    ARBRE_VILLES.insère(v_d.nom_norm)
+# L’arbre contient les f"{nom_norm}|{code}"
+def à_mettre_dans_arbre(nom_n, code):
+    return f"{nom_n}|{code}"
 
-def nv_ville(nom, code, tol=3):
+
+def arbre_des_villes(zone_d=None):
+    """
+    Renvoie l’arbre lexicographique des villes de la base.
+    Si zone_d est précisé, seulement les villes de cette zone.
+    """
+    res = ArbreLex()
+    if zone_d is None:
+        villes = Ville.objects.all()
+    else:
+        villes = zone_d.villes()
+    for v_d in villes:
+        res.insère(à_mettre_dans_arbre(v_d.nom_norm, v_d.code))
+    return res
+
+
+def nv_ville(nom, code, zone_d, tol=3):
     """
     Effet : si pas déjà présente, rajoute la ville dans la base django et dans l'arbre lex ARBRE_VILLES.
-    Sortie : l'objet Ville créé.
+    Sortie : l'objet Ville créé ou récupéré dans la base.
     """
-    noms_proches=tuple(ARBRE_VILLES.mots_les_plus_proches(nom, d_max=tol)[0])
-    if len(noms_proches)>0:
-        print(f"Ville(s) trouvée(s) dans l'arbre : {noms_proches}")
-        nom_corrigé=noms_proches[0]
-        v_d=Ville.objects.get(nom_norm=nom_corrigé)
+    nom_norm = partie_commune(nom)
+    arbre = arbre_des_villes()
+    dans_arbre, d = arbre.mots_les_plus_proches(à_mettre_dans_arbre(nom_norm, code), d_max=tol)
+    
+    if len(dans_arbre) > 0:
+        print(f"Ville(s) trouvée(s) dans l'arbre : {tuple(dans_arbre)}")
+        nom_n_corrigé, code_corrigé = tuple(dans_arbre)[0].split("|")
+        if d>0:
+            LOG(f"Avertissement : la ville {nom_norm, code} a été corrigée en {nom_n_corrigé, code_corrigé}")
+        v_d = Ville.objects.get(nom_norm=nom_n_corrigé, code=code_corrigé)
         return v_d
+    
     else:
-        nom_n=partie_commune(nom)
-        v_d = Ville(nom_complet=nom, code=code, nom_norm=nom_n)
+        v_d = Ville(nom_complet=nom, code=code, nom_norm=nom_norm)
         v_d.save()
-        ARBRE_VILLES.insère(nom)
+        rel = Ville_Zone(ville=v_d, zone=zone_d)
+        rel.save()
         return v_d
 
     
@@ -383,6 +405,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     Arête.zone.through.objects.bulk_create(rel_àcréer)
 
 
+@transaction.atomic()
 def charge_dico_rues_nœuds(ville_d, dico):
     """
     Entrée :

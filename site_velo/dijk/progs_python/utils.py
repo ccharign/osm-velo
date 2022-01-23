@@ -4,7 +4,7 @@
 
 from time import perf_counter
 from petites_fonctions import chrono, deuxConséc
-
+import dijk.models as mo
 from params import TMP
 #from importlib import reload  # recharger un module après modif
 import subprocess
@@ -232,15 +232,17 @@ def affiche_rue(nom_ville, rue, g, bavard=0):
     sommets = g.nœuds[ville.nom][normalise_rue(rue, ville)]
     affiche_sommets(sommets, g)
 
+
 def moyenne(t):
     return sum(t)/len(t)
 
-def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
+
+def dessine_cycla(g, où_enregistrer=TMP, bavard=0):
     """
     Crée la carte de la cyclabilité.
     """
    
-    mini, maxi = min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
+    mini, maxi = g.cycla_min, g.cycla_max #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
     
     def num_paquet(val):
@@ -253,24 +255,13 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
         else:
             return int((val-1)/(maxi-1)*n_coul/2+n_coul/2)
 
-        
+    arêtes = []
 
-    #nœuds_par_cycla = [ set() for i in range(n_coul)]
-    arêtes=[]
-
-    for s in g.g.digraphe.nodes:
-        for t in g.voisins_nus(s):
-            vals=[]
-            if (s,t) in g.g.cyclabilité:
-                vals.append(g.g.cyclabilité[(s,t)])
-            if (t,s) in g.g.cyclabilité:
-                vals.append(g.g.cyclabilité[(t,s)])
-            if len(vals)>0:
-                val = moyenne(vals)
-                i=num_paquet(val)
-                #nœuds_par_cycla[i].add(s)
-                #nœuds_par_cycla[i].add(t)
-                arêtes.append((s, t, {"color":color_dict[i], "popup":val}))
+    for a in mo.Arête.objects.exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
+        i=num_paquet(a.cycla)
+        #nœuds_par_cycla[i].add(s)
+        #nœuds_par_cycla[i].add(t)
+        arêtes.append((a, {"color":color_dict[i], "popup":a.cycla}))
 
 
     # début=True
@@ -287,7 +278,6 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     carte = folium_of_arêtes(g, arêtes)
     nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)
-    if ouvrir : ouvre_html(nom)
 
     
 ### Apprentissage ###
@@ -299,4 +289,4 @@ def lecture_tous_les_chemins(g, bavard=0):
             n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
             c_d.dernier_p_modif = n_modif/l
             c_d.save()
-            print(f"Lecture de {c}. {n_modif} arêtes modifiées, distance = {l}.")
+            print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")

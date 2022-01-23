@@ -4,10 +4,10 @@
 import os
 import subprocess
 
-if os.getcwd()=="/home/moi/git/osm vélo":
-    os.chdir("site_velo/")
-else :
-    print(f"Dossier actuel: {os.getcwd()}")
+# if os.getcwd()=="/home/moi/git/osm vélo":
+#     os.chdir("site_velo/")
+# else :
+#     print(f"Dossier actuel: {os.getcwd()}")
     
 import osmnx
 
@@ -22,7 +22,7 @@ from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, 
 from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier, chrono
 #from networkx import read_graphml
-from dijk.models import Ville, Zone
+from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet
 import initialisation.vers_django as vd
 
 
@@ -34,49 +34,46 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
    -> Ou carrément recréer le cache...
 """
 
-def charge_multidigraph():
-    """
-    Renvoie le multidigraph de la zone défaut. Plutôt pour tests.
-    """
-    s,o,n,e = BBOX_DÉFAUT
-    nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
-    g = osmnx.load_graphml(nom_fichier)
-    return g
-
 
 
 def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavard=2):
 
-    ## Création de la ville dans Django et dans l'arbre lex
-    ville_d = vd.nv_ville(nom, code)
+
     ## Création ou récupération de la zone
     if ville_défaut is not None:
         zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_défaut))
     else:
         zone_d = Zone.objects.get(nom=zone)
+    ## Création de la ville dans Django
+    ville_d = vd.nv_ville(nom, code, zone_d)
+    ## Ajout de la zone de la ville
+    rel, _ = Ville_Zone.objects.get_or_create(ville=ville_d, zone=zone_d)
+    rel.save()
 
+    
     ## Récup des graphe via osmnx
     print(f"Récupération du graphe pour « {code} {nom}, {pays} » avec une marge")
     gr_avec_marge = osmnx.graph_from_place(
         {"city":f"{nom}", "postcode":code, "country":pays},
-        network_type="all",
+        network_type="all", # Tout sauf private
         retain_all="False", # Sinon il peut y avoir des enclaves déconnectées car accessibles seulement par chemin privé (ex: CSTJF)
-        buffer_dist=500
+        buffer_dist=500  # Marge de 500m
     )
-    print("Récupération du graphe exact")
+    print("\nRécupération du graphe exact")
     gr_strict = osmnx.graph_from_place({"city":f"{nom}", "postcode":code, "country":pays}, network_type="all", retain_all="True")
 
     g = Graphe_nx(gr_avec_marge)
     
     ## Noms des villes
-    print("Ajout du nom de ville.")
+    print("\nAjout du nom de ville.")
     for n in gr_strict.nodes:
         #if n not in g.villes_of_nœud: g.villes_of_nœud=[]
         g.villes_of_nœud[n] = [nom]
 
     ## nœuds des rues
-    print("Calcul des nœuds de chaque rue")
+    print("\nCalcul des nœuds de chaque rue")
     dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
+    print("Écriture des nœuds des rues dans la base.")
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
     print("Création de l'arbre lexicographique")
     arbre_rue_dune_ville(ville_d,
@@ -84,7 +81,7 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
                          )
 
     ## désorientation
-    print("Désorientation du graphe")
+    print("\nDésorientation du graphe")
     vd.désoriente(g, bavard=bavard-1)
     
     ## Transfert du graphe
@@ -106,92 +103,44 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
     "Mazères-Lezons": 64110
 }.items()
 
-def charge_zone(liste_villes, zone="Pau"):
+
+def charge_zone(liste_villes, réinit=False, zone="Pau", ville_défaut="Pau", code=64000):
+    """
+    Entrée : itérable de (nom de ville, code postal)
+    Effet : charge toutes ces ville dans la base, associées à la zone indiquée.
+            Si la zone n’existe pas, elle sera créée, en y associant ville_défaut et code.
+    Paramètres: 
+       Si réinit, tous les éléments associés à la zone (villes, rues, sommets, arêtes) ainsi que le cache sont au préalable supprimés.
+    """
+
+    ## Récupération ou création de la zone :
+    zs_d = Zone.objects.filter(nom=zone)
+    if zs_d.exists():
+        z_d=zs_d.first()
+    else:
+        ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
+        z_d = Zone(nom=zone, ville_défaut=ville_défaut_d)
+        z_d.save()
+
+    ## Réinitialisation de la zone :
+    if réinit:         
+        for v in z_d.villes():
+            v.delete()
+        Sommet.objects.filter(zone=z_d).delete()
+        Cache_Adresse.objects.all().delete()
+
+    ## Chargement des villes :
     for nom, code in liste_villes:
         charge_ville(nom, code, zone=zone)
 
 
 
 
-def initialisation_sans_overpass(bbox=BBOX_DÉFAUT, aussi_nœuds_des_villes=False, force_téléchargement=False, bavard=1):
+def charge_multidigraph():
     """
-    Entrée :
-        bbox : (o, s, e, n) bounding box de la zone de laquelle récupérer les données.
-        force_téléchargement : si True force la fonction à télécharger de nouveau le graphe depuis osm.
-        aussi_nœuds_des_villes (bool) : pour recharger également les nœuds de chaque ville. Passe par un téléchargement du graphe de chaque ville via osmnx : un peu long.
-    Effet :
-       Initialise les données qui ne nécessitent pas un gros téléchargement depuis openstreetmap mais qui passent uniquement par osmnx.
-       rema : Il faudrait voir comment s’y prend osmnx !
-
-       Précisément, cette procédure crée :
-             - le graphe au format graphml
-             - nœuds_ville.csv (CHEMIN_NŒUDS_VILLES) qui donne les nœuds de chaque ville
-             - nœuds_rues.csv (CHEMIN_NŒUDS_RUES) qui donne les nœuds de chaque rue
+    Renvoie le multidigraph de la zone défaut. Plutôt pour tests.
     """
-
-    ## Création du graphe networkx
-    s,o,n,e = bbox
-    nom_fichier=f'{DONNÉES}/{s}{o}{n}{e}.graphml'
-    if not force_téléchargement and os.path.exists(nom_fichier):
-        #gr = read_graphml(nom_fichier, node_type=int)
-        gr = osmnx.io.load_graphml(nom_fichier)
-        if bavard: print("Graphe en mémoire !")
-    else:
-        print("Création du graphe via osmnx.")
-        gr = crée_graphe_bbox(nom_fichier, bbox, bavard=bavard)
-    g=Graphe_nx(gr)
-
-
-    ## ville de chaque nœud. Va être nécessaire pour récupérer les nœuds des rues.
-    if aussi_nœuds_des_villes:
-        # Ville de chaque nœud
-        print("\n\nRecherche de la liste des nœuds de chaque ville.")
-        sauv_fichier(CHEMIN_NŒUDS_VILLES)
-        csv_nœuds_des_villes(g)
-    print(f"Création du csv villes_of_nœud")
-    crée_csv_villes_of_nœuds(g,bavard=bavard)
-    print("Ajout des villes de chaque nœud dans le graphe.")
-    ajoute_villes(g, bavard=bavard)
-
-
-    ## Nœuds de chaque rue
-    print("\n\nCréation de la liste des nœuds de chaque rue.")
-    sauv_fichier(CHEMIN_NŒUDS_RUES)
-    csv_nœud_des_rues(g, bavard=bavard-1)
-
-    ## Arbres lex des rues
-    print("\nArbres lexicographiques des rues")
-    créationArbre()
-    
+    s,o,n,e = BBOX_DÉFAUT
+    nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
+    g = osmnx.load_graphml(nom_fichier)
     return g
-
-
-def rajoute_donnée(bbox=BBOX_DÉFAUT, garder_le_osm_complet=True):
-    """
-    NB : maintenant que rue_num_coords n’est plus utilisé, cette fonction devient inutile.
-
-    Entrée : une bbox suffisamment petite pour être acceptée par overpass.
-    Effet : récupère le .osm correspondant à la bounding box indiquée, et l’utilise pour compléter les données suivantes :
-        - rue_num_coords (CHEMIN_RUE_NUM_COORDS)
-
-    Paramètres:
-       - garder_le_osm_complet : mettre à False pour forcer le retéléchargement  d’un fichier déjà présent.
-    """
-
-    print("J’essaie de télécharger le fichier .osm complet de la zone {bbox}, pour en extraire les coordonnées des numéros de rue disponibles. Sans cette étape, l’appli fonctionnera quand même, mais les numéros de rue seront ignorés.")
-    chemin_osm_complet = os.path.join(TMP, str(bbox)+"_complet.osm")
-    if garder_le_osm_complet and os.path.exists(chemin_osm_complet):
-        print(f"Le fichier {chemin_osm_complet} est déjà présent, je le garde. Mettre le paramètre « garder_le_osm_complet » à False pour forcer le retéléchargement des données.")
-    else:
-        print("Téléchargement du fichier .osm complet.")
-        
-        lien = f"https://overpass.openstreetmap.ru/cgi/xapi_meta?*[bbox={o},{s},{n},{e}]"
-        if bavard>0:print(lien)
-        subprocess.run(["wget", "-O", chemin_osm_complet, lien])
-
-
-    print("Recherche des coordonnées des numéros de rues disponibles. Au passage, servira pour la liste des villes.")
-    sauv_fichier(CHEMIN_RUE_NUM_COORDS)
-    extrait_rue_num_coords(chemin=chemin_osm_complet, bavard=1)
-
-

@@ -10,6 +10,7 @@ import dijkstra
 from lecture_adresse.arbresLex import ArbreLex
 import os
 import lecture_adresse.normalisation as no
+from django.db import transaction
 
 
 class VillePasTrouvée(Exception):
@@ -23,52 +24,42 @@ class Graphe_django():
         dico_voisins (dico int -> (int, Arête) list) associe à un id_osm la liste de ses (voisins, arête)
         dico_Sommet (dico int->Sommet) associe le sommet à chaque id_osm
         arbre_villes : arbre lex des villes (toutes les villes de la base pour l’instant). Noms normalisée.
+        cycla__min
+        cycla__max
+        zone (instance de Zone)
+        ville_défaut (instance de models.Ville)
+        arbres_des_rues : dico (ville_norm -> ArbreLex)
     """
     
-    def __init__(self, zone="Pau"):
-        
+    def __init__(self):
         self.dico_voisins={}
-        
-        #cycla min et max
-        self.calcule_cycla_min_max()
-        #chrono(tic, "calcul cycla min et max", force=True)
-
-        print("Chargement des arbres lex pour villes et rues...")
-        self.arbre_villes = ArbreLex()
+        self.cycla_max=1.
+        self.cycla_min=1.
+        self.arbre_villes=ArbreLex()
+        self.dico_Sommet={}
+        self.dico_voisins={}
         self.arbres_des_rues={}
-        for v_d in Ville.objects.all():
-            self.arbre_villes.insère(v_d.nom_norm)
-            self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
-        self.ville_défaut = no.Ville(self, STR_VILLE_DÉFAUT)
-        print("fini.")
-
-
-    def ville_la_plus_proche(self, nom, tol=2):
-        """
-        Entrée : nom (str), nom normalisé par partie_commune ou pas d’une ville.
-        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom)
-        Paramètres :
-            tol (int) : nb max de fautes de frappe. Si aucune ville à au plus tol fautes de frappe, lève l’exception VillePasTrouvée.
-        """
-        noms_proches=self.arbre_villes.mots_les_plus_proches(no.partie_commune(nom), d_max=tol)[0]
-        if len(noms_proches)==0:
-            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {self.arbres_des_rues.keys()}.")
-        elif len(noms_proches)>1:
-            raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
-        else:
-            nom_norm,=noms_proches
-            return Ville.objects.get(nom_norm=nom_norm)
-
-
-    def charge_zone(self, zone="Pau"):
+        
+    
+    def charge_zone(self, zone="Pau", bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
         """
-        zone_d = Zone.objects.get(nom=zone)
+        
+        self.zone = Zone.objects.get(nom=zone)
+        self.ville_défaut = self.zone.ville_défaut
+        
+        # Dicos des villes et des rues
+        print("Chargement des arbres lex pour villes et rues...")
+        for v_d in self.zone.villes():
+            #if bavard>0: print(v_d.nom_norm)
+            self.arbre_villes.insère(v_d.nom_norm)
+            self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
+        print("fini.")
         
         # Arêtes
-        tic=perf_counter()
-        arêtes = Arête.objects.filter(zone=zone_d).select_related("départ", "arrivée")
+        tic = perf_counter()
+        arêtes = Arête.objects.filter(zone=self.zone).select_related("départ", "arrivée")
         for a in arêtes:
             s = a.départ.id_osm
             t = a.arrivée.id_osm
@@ -79,10 +70,12 @@ class Graphe_django():
 
         #Sommets
         self.dico_Sommet={}
-        for s in Sommet.objects.filter(zone=zone_d):
+        for s in Sommet.objects.filter(zone=self.zone):
             self.dico_Sommet[s.id_osm] = s
         tic=chrono(tic, "Chargement des sommets")
 
+        #cycla min et max
+        self.calcule_cycla_min_max()
 
         
     def __contains__(self, s):
@@ -104,6 +97,35 @@ class Graphe_django():
         cs, ct = self.coords_of_id_osm(s), self.coords_of_id_osm(t)
         return distance_euc(cs, ct)
 
+    def supprime_sommets_isolés(self):
+        """
+        Supprime de la base les sommets desquels aucune arête ne part.
+        """
+        à_supprimer=[]
+        for s_d in self.dico_Sommet.values():
+            if len(s_d.voisins_nus())==0:
+                à_supprimer.append(s_d)
+        print(f"Sommets à supprimer : {à_supprimer}")
+        with transaction.atomic():
+            for s_d in à_supprimer:
+                s_d.delete()
+                
+
+    def ville_la_plus_proche(self, nom, tol=2):
+        """
+        Entrée : nom (str), nom normalisé par partie_commune ou pas d’une ville.
+        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom)
+        Paramètres :
+            tol (int) : nb max de fautes de frappe. Si aucune ville à au plus tol fautes de frappe, lève l’exception VillePasTrouvée.
+        """
+        noms_proches=self.arbre_villes.mots_les_plus_proches(no.partie_commune(nom), d_max=tol)[0]
+        if len(noms_proches)==0:
+            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {self.arbres_des_rues.keys()}.")
+        elif len(noms_proches)>1:
+            raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
+        else:
+            nom_norm,=noms_proches
+            return Ville.objects.get(nom_norm=nom_norm)
     
 
 
@@ -142,11 +164,11 @@ class Graphe_django():
 
     def calcule_cycla_min_max(self):
         
-        self.cycla_min = Arête.objects.aggregate(Min("cycla"))["cycla__min"]
+        self.cycla_min = Arête.objects.filter(zone=self.zone).aggregate(Min("cycla"))["cycla__min"]
         if self.cycla_min is None:
             self.cycla_min=1.
 
-        self.cycla_max = Arête.objects.aggregate(Max("cycla"))["cycla__max"]
+        self.cycla_max = Arête.objects.filter(zone=self.zone).aggregate(Max("cycla"))["cycla__max"]
         if self.cycla_max is None:
             self.cycla_max=1.
             
@@ -210,12 +232,13 @@ class Graphe_django():
         return [t for (t,_) in self.dico_voisins[s]]
 
         
-    def nœuds_of_rue(self, adresse, bavard=0):
+    def nœuds_of_rue(self, adresse, persévérant=True, bavard=0):
         """
         Entrées : adresse (Adresse)
         Sortie : la liste des nœuds pour la rue indiquée.
                  Essai 1 : recherche dans la base (utilise adresse.rue_norm)
                  Essai 2 : via Nominatim et overpass, par recup_donnees.nœuds_of_rue. Ceci récupère les nœuds des ways renvoyés par Nominatim.
+                 Essai 3 (si persévérant) recherche dans la bounding box enveloppante des nœuds trouvés à l’essai 2.
                     En cas d'essai 2 concluant, le résultat est rajouté dans la table des Rues.
         """
         
@@ -224,13 +247,13 @@ class Graphe_django():
             v = Ville.objects.get(nom_norm=adresse.ville.nom_norm)
             r = Rue.objects.get(nom_norm=adresse.rue_norm, ville=v)
             res = r.nœuds()
-            print(f"Trouvé {list(res)} pour {adresse}")
+            print(f"(g.nœuds_of_rue)Trouvé dans la base {list(res)} pour {adresse}")
             return res
         
         except Exception as e:
             LOG(f"(graphe_par_django.nœuds_of_rue) Rue pas en mémoire : {adresse} (erreur reçue : {e}), je lance recup_donnees.nœuds_of_rue", bavard=bavard)
-            # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
             
+            # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
             tout = rd.nœuds_of_rue(adresse)
             print(f"Liste des nœuds osm : {tout}.")
             res = [ n for n in tout if n in self]
@@ -238,7 +261,8 @@ class Graphe_django():
                 LOG(f"nœuds trouvés : {res}", bavard=bavard)
                 self.ajoute_rue(adresse, res, bavard=bavard)
                 return res
-            elif len(tout)>0:
+            
+            elif persévérant and len(tout)>0:
                 # essai 3 : recherche de tous les nœuds dans la bb enveloppante de tout.
                 bbe = rd.bb_enveloppante(tout, bavard=bavard-1)
                 tol=0

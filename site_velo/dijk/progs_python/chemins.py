@@ -220,7 +220,7 @@ class Chemin():
             return self.texte
         else:
             res = "Étapes : " + ";".join(map(str, self.étapes))
-            if self.noms_rues_interdites: res+=self.noms_rues_interdites
+            if self.noms_rues_interdites: res+=f"\n Rues interdites : {self.noms_rues_interdites}"
             return  res
 
     def texte_court(self, n_étapes=4):

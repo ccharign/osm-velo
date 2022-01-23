@@ -300,9 +300,9 @@ def polyline_of_arête(g, a, popup=None, **kwargs):
     """
     locations, nom = a.géométrie(), a.nom
     if popup is None:
-        popup=nom
+        popup = nom
     loc_à_lenvers = [(lat, lon) for lon, lat in locations]
-    pl=folium.PolyLine(locations=loc_à_lenvers, popup=popup, **kwargs)
+    pl = folium.PolyLine(locations=loc_à_lenvers, popup=popup, **kwargs)
     return pl
 
 
@@ -337,11 +337,12 @@ def folium_of_chemin(g, iti_d, p, carte=None, tiles="cartodbpositron", zoom=1, f
 
     return carte
 
+
 def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
     """
     Entrées : 
         g (graphe)
-        arêtes, liste de triplets (s,t, dico des args à passer à PolyLine)
+        arêtes, liste de couples (Arête, dico des args à passer à PolyLine)
         carte (folium.Map)
         zoom : niveau de zoom initial
         fit : si vrai, cadre la carte avec le départ et l’arrivée de iti
@@ -353,15 +354,15 @@ def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
     """
 
     if carte is None:
-        lon,lat = g.coords_of_nœud(arêtes[0][0])
+        lon, lat = arêtes[0][0].départ.coords()
         carte = folium.Map(location=(lat,lon), zoom_start=zoom, tiles=tiles)
 
     lons, lats = [], []
-    for s, t, kwargs in arêtes:
-        c1, c2 = s.coords, t.ccords
+    for a, kwargs in arêtes:
+        c1, c2 = a.départ.coords(), a.arrivée.coords()
         lons.extend((c1[0], c2[0]))
         lats.extend((c1[1], c2[1]))
-        pl=polyline_of_arête(g, s, t, **kwargs)
+        pl=polyline_of_arête(g, a, **kwargs)
         pl.add_to(carte)
     o=min(lons)
     e=max(lons)

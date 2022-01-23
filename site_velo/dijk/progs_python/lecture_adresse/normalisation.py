@@ -194,7 +194,7 @@ def normalise_rue(g, rue, ville, persevérant=True, tol=2, bavard=0):
         if rue_n!=étape1:
             #il y avait une faute de frappe
             #Retrouvons le nom complet initial
-            r=Rue.objects.get(nom_norm=rue_n)
+            r=Rue.objects.get(nom_norm=rue_n, ville__nom_norm=ville.nom_norm)
             return rue_n, r.nom_complet
         else:
             return rue_n, rue
@@ -212,7 +212,7 @@ def normalise_rue(g, rue, ville, persevérant=True, tol=2, bavard=0):
         print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je lance une recherche Nominatim.")
         lieu = cherche_lieu(Adresse(g, f"{rue} ({ville})", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
         LOG(f"La recherche Nominatim a donné {lieu}.", bavard=bavard)
-        way_osm = [ t.raw for t in lieu if t.raw["osm_id"]=="way"]
+        way_osm = [ t.raw for t in lieu if t.raw["osm_type"]=="way"]
         if len(way_osm)>0:            
             tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
             nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
