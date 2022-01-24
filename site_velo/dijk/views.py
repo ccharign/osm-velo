@@ -26,7 +26,7 @@ from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
 from graphe_par_django import Graphe_django
 g=Graphe_django()
-g.charge_zone()
+#g.charge_zone()
 from datetime import datetime
 from glob import glob
 import os
