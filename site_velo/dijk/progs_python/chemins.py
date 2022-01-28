@@ -41,9 +41,9 @@ class Étape():
         nœuds (Sommet set) : ensemble de nœuds
     """
     
-    def __init__(self, texte, g, bavard=0):
+    def __init__(self, texte, g, z_d, bavard=0):
         self.texte = texte
-        n, self.adresse = nœuds_of_étape(texte, g, bavard=bavard-1)
+        n, self.adresse = nœuds_of_étape(texte, g, z_d, bavard=bavard-1)
         self.nœuds = set(n)
         #for n in self.nœuds:
         #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
@@ -63,9 +63,10 @@ def dico_arête_of_nœuds(g, nœuds):
     }
 
 
-def arêtes_interdites(g, noms_rues, bavard=0):
+def arêtes_interdites(g, z_d, noms_rues, bavard=0):
     """
     Entrée : g (graphe)
+             z_d (Zone)
              noms_rues (str iterable), liste de noms de rues à éviter
     Sortie : dico des arêtes correspondant
     """
@@ -73,7 +74,7 @@ def arêtes_interdites(g, noms_rues, bavard=0):
     for r in noms_rues:
         interdites.update(
             dico_arête_of_nœuds(g,
-                                nœuds_of_étape(r, g, bavard=bavard)[0]
+                                nœuds_of_étape(r, g, z_d, bavard=bavard)[0]
             )
         )
     return interdites
@@ -86,8 +87,9 @@ class Chemin():
                     - noms_rues_interdites : str, noms des rues interdites séparées par ; (pour l’enregistrement en csv)
                     - AR (bool), indique si le retour est valable aussi.
                     - texte (None ou str), texte d'où vient le chemin (pour déboguage)
+                    - zone (models.Zone)
     """
-    def __init__(self, étapes, p_détour, AR, interdites={}, texte_interdites=""):
+    def __init__(self, z_d, étapes, p_détour, AR, interdites={}, texte_interdites=""):
         assert p_détour>=0 and p_détour<=2, "Y aurait-il confusion entre la proportion et le pourcentage de détour?"
         self.étapes = étapes
         self.p_détour = p_détour
@@ -95,6 +97,7 @@ class Chemin():
         self.texte = None
         self.interdites=interdites
         self.noms_rues_interdites=texte_interdites
+        self.zone=z_d
     
 
     @classmethod

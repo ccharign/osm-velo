@@ -182,7 +182,7 @@ def chemin_étapes_ensembles(g, c, bavard=0):
               - interdites : arêtes interdites. dico s->sommets interdits depuis s.
     Sortie (int list × float): plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins une arête de chaque étape intérmédiaire, longueur de l’itinéraire.
     """
-    correction_max = 1./formule_pour_correction_longueur(1., g.cycla_max, c.p_détour)
+    correction_max = 1./formule_pour_correction_longueur(1., g.cycla_max[c.zone], c.p_détour)
     if bavard>0:print("correction_max : {correction_max}")
     étapes = c.étapes
     départ = étapes[0].nœuds

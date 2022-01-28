@@ -83,13 +83,13 @@ class Ville():
 
 
 
-def normalise_ville(g, ville):
+def normalise_ville(g, z_d, ville):
     """
     Actuellement transforme la chaîne de car en un objet de la classe Ville.
     La chaîne vide "" est transformée en g.ville_défaut.
     """
     if ville == "":
-        return g.ville_défaut
+        return Ville(g, z_d.ville_défaut.nom_complet)
     else:
         return Ville(g, ville)
 
@@ -239,9 +239,12 @@ class Adresse():
       - pays
     """
     
-    def __init__(self, g, texte, norm_rue=True, bavard=0):
+    def __init__(self, g, z_d, texte, norm_rue=True, bavard=0):
         """ 
-        Entrée : texte d’une adresse. Format : (num)? rue (code_postal? ville)
+        Entrée :
+            g (graphe)
+            z_d (Zone)
+            texte d’une adresse. Format : (num)? rue (code_postal? ville)
         """
         
         # Lecture de la regexp
@@ -259,7 +262,7 @@ class Adresse():
 
         # Normalisation de la ville et de la rue
         if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville}")
-        ville_n = normalise_ville(g, ville)
+        ville_n = normalise_ville(g, z_d, ville)
         if norm_rue:
             rue_n, rue = normalise_rue(g, rue, ville_n)
         else:

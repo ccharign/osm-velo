@@ -26,7 +26,7 @@ class Graphe_django():
         arbre_villes : arbre lex des villes (toutes les villes de la base pour l’instant). Noms normalisée.
         cycla__min
         cycla__max
-        zone (instance de Zone)
+        zones (liste de Zone)
         ville_défaut (instance de models.Ville)
         arbres_des_rues : dico (ville_norm -> ArbreLex)
     """
@@ -39,44 +39,48 @@ class Graphe_django():
         self.dico_Sommet={}
         self.dico_voisins={}
         self.arbres_des_rues={}
+        self.zones=[]
+        self.cycla_max={}
+        self.cycla_min={}
         
     
     def charge_zone(self, zone_t="Pau", bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
         """
-        
-        self.zone = Zone.objects.get(nom=zone_t)
-        self.ville_défaut = self.zone.ville_défaut
-        
-        # Dicos des villes et des rues
-        print("Chargement des arbres lex pour villes et rues...")
-        for v_d in self.zone.villes():
-            #if bavard>0: print(v_d.nom_norm)
-            self.arbre_villes.insère(v_d.nom_norm)
-            self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
-        print("fini.")
-        
-        # Arêtes
-        tic = perf_counter()
-        arêtes = Arête.objects.filter(zone=self.zone).select_related("départ", "arrivée")
-        for a in arêtes:
-            s = a.départ.id_osm
-            t = a.arrivée.id_osm
-            if s not in self.dico_voisins: self.dico_voisins[s]=[]
-            if a.cyclabilité()>0: # ceci supprime les autoroute actuellement
-                self.dico_voisins[s].append((t, a))
-        tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
+        z_d = Zone.objects.get(nom=zone_t)
+        if z_d not in self.zones:
+            self.zones.append(z_d)
 
-        #Sommets
-        self.dico_Sommet={}
-        for s in Sommet.objects.filter(zone=self.zone):
-            self.dico_Sommet[s.id_osm] = s
-        tic=chrono(tic, "Chargement des sommets")
+            # Dicos des villes et des rues
+            print("Chargement des arbres lex pour villes et rues...")
+            for v_d in z_d.villes():
+                #if bavard>0: print(v_d.nom_norm)
+                self.arbre_villes.insère(v_d.nom_norm)
+                self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
+            print("fini.")
 
-        #cycla min et max
-        self.calcule_cycla_min_max()
+            # Arêtes
+            tic = perf_counter()
+            arêtes = Arête.objects.filter(zone=z_d).select_related("départ", "arrivée")
+            for a in arêtes:
+                s = a.départ.id_osm
+                t = a.arrivée.id_osm
+                if s not in self.dico_voisins: self.dico_voisins[s]=[]
+                if a.cyclabilité()>0: # ceci supprime les autoroute actuellement
+                    self.dico_voisins[s].append((t, a))
+            tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
+            #Sommets
+            self.dico_Sommet={}
+            for s in Sommet.objects.filter(zone=z_d):
+                self.dico_Sommet[s.id_osm] = s
+            tic=chrono(tic, "Chargement des sommets")
+
+            #cycla min et max
+            self.calcule_cycla_min_max(z_d)
+            
+        return z_d
         
     def __contains__(self, s):
         """
@@ -120,7 +124,7 @@ class Graphe_django():
         """
         noms_proches=self.arbre_villes.mots_les_plus_proches(no.partie_commune(nom), d_max=tol)[0]
         if len(noms_proches)==0:
-            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {self.arbres_des_rues.keys()}.")
+            raise VillePasTrouvée(f"Pas trouvé de ville à moins de {tol} fautes de frappe de {nom}. Voici les villes que je connais : {self.arbre_villes.tous_les_mots()}.")
         elif len(noms_proches)>1:
             raise VillePasTrouvée(f"Jai plusieurs villes à même distance de {nom}. Il s’agit de {noms_proches}.")
         else:
@@ -162,23 +166,24 @@ class Graphe_django():
         a_d.save()
         #self.cycla_max = max(self.cycla_max, a_d.cycla)
 
-    def calcule_cycla_min_max(self):
         
-        cycla_min = Arête.objects.filter(zone=self.zone).aggregate(Min("cycla"))["cycla__min"]
-        cycla_défaut_min = Arête.objects.filter(zone=self.zone, cycla_défaut__gt=0).aggregate(Min("cycla_défaut"))["cycla_défaut__min"]
+    def calcule_cycla_min_max(self, z_d):
+        
+        cycla_min = Arête.objects.filter(zone=z_d).aggregate(Min("cycla"))["cycla__min"]
+        cycla_défaut_min = Arête.objects.filter(zone=z_d, cycla_défaut__gt=0).aggregate(Min("cycla_défaut"))["cycla_défaut__min"]
         if cycla_min is None:
-            self.cycla_min=cycla_défaut_min
+            self.cycla_min[z_d]=cycla_défaut_min
         else:
-            self.cycla_min = min(cycla_défaut_min, cycla_min)
+            self.cycla_min[z_d] = min(cycla_défaut_min, cycla_min)
 
-        cycla_max = Arête.objects.filter(zone=self.zone).aggregate(Max("cycla"))["cycla__max"]
-        cycla_défaut_max = Arête.objects.filter(zone=self.zone).aggregate(Max("cycla_défaut"))["cycla_défaut__max"]
+        cycla_max = Arête.objects.filter(zone=z_d).aggregate(Max("cycla"))["cycla__max"]
+        cycla_défaut_max = Arête.objects.filter(zone=z_d).aggregate(Max("cycla_défaut"))["cycla_défaut__max"]
         if cycla_max is None:
-            self.cycla_max = cycla_défaut_max
+            self.cycla_max[z_d] = cycla_défaut_max
         else:
-            self.cycla_max = max(cycla_défaut_max, cycla_max)
+            self.cycla_max[z_d] = max(cycla_défaut_max, cycla_max)
             
-        print(f"Cycla min et max : {self.cycla_min}, {self.cycla_max}")
+        print(f"Cycla min et max : {self.cycla_min[z_d]}, {self.cycla_max[z_d]}")
         
     def liste_Arête_of_iti(self, iti, p_détour):
         return [self.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]

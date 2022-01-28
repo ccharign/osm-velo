@@ -15,5 +15,6 @@ urlpatterns = [
 
     path("cycla", views.carte_cycla, name="carte cycla"),
     
-    path('', views.index, name='index'), # Création d'une url pointant vers la vue « index », ou se trouve le formulaire d’itinéraire simple.
+    path('<str:zone_t>/', views.recherche, name='recherche'), # Création d'une url pointant vers la vue « index », ou se trouve le formulaire d’itinéraire simple.
+    path('', views.index, name='index'),
 ] + staticfiles_urlpatterns()

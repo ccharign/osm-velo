@@ -28,6 +28,8 @@ class Zone(models.Model):
         return (rel.ville for rel in Ville_Zone.objects.filter(zone=self).prefetch_related("ville"))
     def __str__(self):
         return self.nom
+    def __hash__(self):
+        return self.nom.__hash__()
 
     
 class Ville_Zone(models.Model):

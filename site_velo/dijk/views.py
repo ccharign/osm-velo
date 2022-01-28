@@ -26,11 +26,11 @@ from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
 from graphe_par_django import Graphe_django
 g=Graphe_django()
-g.charge_zone()
+#g.charge_zone()
 from datetime import datetime
 from glob import glob
 import os
-from dijk.models import Chemin_d
+from dijk.models import Chemin_d, Zone
 
 
 
@@ -42,11 +42,15 @@ chrono(tic0, "Chargement total\n\n", bavard=3)
 
 
 # Utiliser as_view dans url.py pour remplacer les lignes ci-dessous
-def index(requête):
-    return render(requête, "dijk/index.html", {"ville":g.ville_défaut})
+def recherche(requête, zone_t):
+    z_d = g.charge_zone(zone_t)
+    return render(requête, "dijk/recherche.html", {"ville":z_d.ville_défaut, "zone_t":zone_t})
 
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
+
+def index(requête):
+    return render(requête, "dijk/index.html", {})
 
 def mode_demploi(requête):
     return render(requête, "dijk/mode_demploi.html", {"ville_défaut":g.ville_défaut})
@@ -68,6 +72,7 @@ def vue_itinéraire(requête):
     # Récupération des données du post
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
+    z_d = Zone.objects.get(nom=requête.POST["zone_t"])
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
     texte_étapes = énumération_texte(noms_étapes)
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
@@ -78,7 +83,7 @@ def vue_itinéraire(requête):
     # Calcul des itinéraires
     try:
         stats, chemin = itinéraire(
-            d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0,
+            d, a, ps_détour, g, z_d, rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
             rues_interdites=rues_interdites,
             bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"

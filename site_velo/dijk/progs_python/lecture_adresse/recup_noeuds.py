@@ -16,9 +16,10 @@ class PasTrouvé(Exception):
 
 
 
-def nœuds_of_étape(c:str, g, bavard=0):
+def nœuds_of_étape(c:str, g, z_d, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
+        z_d (Zone) : pour la ville par défaut
         Sortie : (liste de nœuds (instance de Sommet) de g associé à cette adresse, l’adresse de type Adresse)
            Si un numéro est indiqué, la liste de nœuds est le singleton du nœud de la rue le plus proche.
            Sinon c’est la liste de tous les nœuds connus de la rue.
@@ -27,7 +28,7 @@ def nœuds_of_étape(c:str, g, bavard=0):
     # Lecture de l’adresse
     # c = normalise_adresse(c)
     assert c != ""
-    ad = Adresse(g, c, bavard=bavard-1)
+    ad = Adresse(g, z_d, c, bavard=bavard-1)
     
     # Recherche dans le cache
     essai = g.dans_le_cache(ad)

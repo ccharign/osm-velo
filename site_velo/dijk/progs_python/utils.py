@@ -51,12 +51,14 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 
-def itinéraire(départ, arrivée, ps_détour, g,
+def itinéraire(départ, arrivée, ps_détour, g, z_d,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
                où_enregistrer=os.path.join(TMP, "itinéraire.html"), bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
+      - g (graphe)
+      - z_d (Zone) : sert pour récupérer la ville défaut.
       - départ, arrivée : chaîne de caractère décrivant le départ et l’arrivée. Seront lues par chemins.Étape.
       - noms_étapes : liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
 
@@ -67,25 +69,25 @@ def itinéraire(départ, arrivée, ps_détour, g,
 
     ## Calcul des étapes
     tic0=perf_counter()
-    d = chemins.Étape(départ, g, bavard=bavard-1)
+    d = chemins.Étape(départ, g, z_d, bavard=bavard-1)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
         #print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
-    a = chemins.Étape(arrivée, g, bavard=bavard-1)
+    a = chemins.Étape(arrivée, g, z_d, bavard=bavard-1)
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
-    étapes = [chemins.Étape(é, g) for é in noms_étapes]
+    étapes = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
 
 
     ## Arêtes interdites
-    interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
+    interdites = chemins.arêtes_interdites(g, z_d, rues_interdites, bavard=bavard)
     tic=chrono(tic0, "Calcul des étapes et arêtes interdites.")
     
     np = len(ps_détour)
     à_dessiner = []
     res = []
     for i, p in enumerate(ps_détour):
-        c = chemins.Chemin([d]+étapes+[a], p, False, interdites=interdites)
+        c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti_d, coul, p))
@@ -95,7 +97,7 @@ def itinéraire(départ, arrivée, ps_détour, g,
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if rajouter_iti_direct:
-        cd = chemins.Chemin([d,a], 0, False)
+        cd = chemins.Chemin(z_d, [d,a], 0, False)
         iti_d, l_ressentie = g.itinéraire(cd, bavard=bavard-1)
         coul = "#000000"
         à_dessiner.append( (iti_d, coul, 0))
