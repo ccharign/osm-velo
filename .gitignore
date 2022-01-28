@@ -26,3 +26,4 @@ site_velo/dijk/migrations/**
 **.db
 **.sqlite3
 **/migrations**
+**/données**
