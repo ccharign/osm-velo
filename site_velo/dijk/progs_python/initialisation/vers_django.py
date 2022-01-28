@@ -231,7 +231,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         
     if not juste_arêtes:
         LOG("Chargement des sommets")
-        à_créer=[]
+        à_créer=set()
         à_màj=[]
         nb=0
         for s in g.digraphe.nodes:
@@ -241,7 +241,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
             essai = Sommet.objects.filter(id_osm=s).first()
             if essai is None:
                 s_d = Sommet(id_osm=s, lon=lon, lat=lat)
-                à_créer.append(s_d)
+                à_créer.add(s_d)
             else:
                 s_d = essai
                 #màj des coords au cas où...
