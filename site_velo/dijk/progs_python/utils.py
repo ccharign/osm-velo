@@ -89,7 +89,9 @@ def itinéraire(départ, arrivée, ps_détour, g,
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti_d, coul, p))
-        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti_d), int(l_ressentie), coul ))
+        res.append((f"Avec pourcentage détour de {100*p}",
+                    g.longueur_itinéraire(iti_d), int(l_ressentie), coul )
+                   )
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if rajouter_iti_direct:

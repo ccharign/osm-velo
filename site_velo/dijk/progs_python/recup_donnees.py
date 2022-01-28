@@ -193,6 +193,8 @@ def nœuds_of_idsrue(ids_rue, bavard=0):
             way(id:{",".join(map(str, ids_rue))});
             out;"""
     if bavard>0:print(requête)
+    print("J’attends 5s pour overpass.")
+    time.sleep(5)
     res_req = api.query(requête)
     res=[]
     for w in res_req.ways:

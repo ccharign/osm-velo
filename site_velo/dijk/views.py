@@ -26,7 +26,7 @@ from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
 from graphe_par_django import Graphe_django
 g=Graphe_django()
-#g.charge_zone()
+g.charge_zone()
 from datetime import datetime
 from glob import glob
 import os
@@ -119,8 +119,6 @@ def vue_itinéraire(requête):
 ### Ajout d’un nouvel itinéraire ###
 
 
-
-        
 def confirme_nv_chemin(requête):
     nb_lectures=50
     #(étapes, p_détour, AR) = requête.session["chemin_à_valider"]
@@ -133,13 +131,16 @@ def confirme_nv_chemin(requête):
     print(f"étapes : {noms_étapes}, pourcentage détour : {pourcentage_détour}, AR : {AR}, rues interdites : {rues_interdites}\n")
     
     c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
-    c.sauv(bavard=1)
-    n_lectures(nb_lectures, g, [c], bavard=1)
+    c.vers_django(bavard=1)
+    n_lectures(nb_lectures, g, [c], bavard=3)
     return render(requête, "dijk/merci.html", {"chemin":c})
 
 
 
+
+
 ### Carte cycla ###
+
 
 def carte_cycla(requête):
     dessine_cycla(g, où_enregistrer="dijk/templates/dijk")

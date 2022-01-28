@@ -168,7 +168,7 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
         "highway":{
             "residential":1,
             "cycleway":3,
-            "step":-2,
+            "step":-3,
             "pedestrian":1,
             "tertiary":1,
             "living_street":1,
@@ -499,5 +499,7 @@ def charge_csv_chemins(réinit=False):
             p_détour = int(pourcentage_détour_t)/100.
             if AR_t=="True": AR=True
             else: AR=False
-            c_d = Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t)
+            début, fin = étapes_t[:255], étapes_t[-255:]
+            interdites_début, interdites_fin = rues_interdites_t[:255], rues_interdites_t[-255:]
+            c_d = Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin)
             c_d.sauv()

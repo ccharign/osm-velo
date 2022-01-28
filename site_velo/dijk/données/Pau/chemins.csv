@@ -10,10 +10,9 @@ True|40|4 rue Ramond de Carbonnières; avenue Henry Russel;avenue Trespoey;Lycé
 False|30|rue d'Artouste; avenue d'Attigny; avenue de Montardon; rue du Pin; boulevard Recteur Jean Sarrailh; rue Victor Ladevèze; rue du père Pardies; rue Viard; rue Montpensier; rue Serviez; place Georges Clémenceau|
 False|30|place Georges Clémenceau; rue Serviez; rue Gassiot; rue Mourot; place Albert 1er; rue Duplaa; rue Perpignaa; rue de Monpezat; rue Montpensier; parc Lawrence; rue du père Pardies; rue Victor Ladevèze; boulevard Recteur Jean Sarrailh; rue du Pin; 71 avenue de Montardon; avenue d'Attigny; rue d'Artouste|
 False|20|rue Montpensier; rue Serviez; rue Latapie; rue Gambetta; allée Alfred de Musset|
-True|30|Rue du barthouil (64320 ousse);allée de l’église (64320 lee);Avenue beau soleil; Avenue trespoey;Avenue edouard VII;allée alfred de Musset;rue Louis Barthou|
+True|30|Rue dou barthouil (64320 ousse);allée de l’église (64320 lee);Avenue beau soleil; Avenue trespoey;Avenue edouard VII;allée alfred de Musset;rue Louis Barthou|
 True|30|rue des écoles (64140 Lons);Chemin des vignes (64140 Lons); Rue du Mohedan (Billère); rue des Muses ( Billère); Avenue de la République (64140 Billère); Rue Jeanne Lassansaa (64140 Billère); Rue Claverie (64140 Billère); Rue des Marnières (64140 Billère); Rue des Marnières (64000 Pau); Boulevard Edouard Herriot; 50 Boulevard Alsace Lorraine;Avenue Edouard VII|
 False|30|rue des veroniques;rue regina;parc beaumont|
-False|10|parc beaumont;allee anna de noailles;le galway|
 True|30|rue des veroniques;avenue de l’yser (bizanos);avenue de la paix (gelos);route des coteaux de guindalos (jurançon)|
 True|30|rue ramond de carbonnieres;rue du marechal joffre;rue des cordeliers;rue marca|
 True|20|rue serviez (64000 pau);rue jean jacques de monaix (64000 pau);avenue de buros (64000 pau)|
@@ -28,7 +27,6 @@ False|15|rue des cordeliers (64000 Pau);rue saint jacques (64000 Pau);Halle des 
 False|15|16  rue des veroniques (64000 Pau);38  rue du gui (64000 Pau)|bd de la paix
 False|15|38  rue du gui (64000 Pau);avenue de montardon (64000 Pau);rue albert camus (64000 Pau);rue pasteur (64000 Pau);rue guichenne (64000 Pau);rue samonzet (64000 Pau);rue matthieux lalanne (64000 Pau);college marguerite de navarre (64000 Pau)|
 False|5|16  rue des veroniques (64000 Pau);piste cyclable leon blum (64000 Pau);rue gutemberg (64000 Pau)|
-True|25|14 boulevard de la paix (64000 Pau);impasse clos saint andre (64000 Pau);rue paul langevin (64000 Pau);avenue stravinsky (64000 Pau);avenue jean mermoz (64000 Pau)|False|15|rue des véroniques (64000 Pau);Piste cyclable du Balaïtous (64000 Pau);Chemin Lapassade (64000 Pau);rue benjamin Franklin  (64230 Lescar)|
+True|25|14 boulevard de la paix (64000 Pau);impasse clos saint andre (64000 Pau);rue paul langevin (64000 Pau);avenue stravinsky (64000 Pau);avenue jean mermoz (64000 Pau)|
 False|15|rue des véroniques (64000 Pau);Piste cyclable du Balaïtous (64000 Pau);Chemin Lapassade (64000 Pau);rue benjamin Franklin  (64230 Lescar)|
-False|15|rue des véroniques (64000 Pau);rue benjamin Franklin  (64230 Lescar)|allée de l’arrémoulit (Lons);allée d’Ansabère
-True|15|16 rue lagardère (64000 Pau);Place Georges Clemenceau (64000 Pau)|boulevard barbanègre
+False|15|rue des véroniques (64000 Pau);rue benjamin Franklin  (64230 Lescar)|allée de l’arrémoulit (Lons)

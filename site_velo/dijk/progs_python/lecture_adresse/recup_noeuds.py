@@ -30,12 +30,12 @@ def nœuds_of_étape(c:str, g, bavard=0):
     ad = Adresse(g, c, bavard=bavard-1)
     
     # Recherche dans le cache
-    # essai = g.nœuds_of_cache(c)
-    # if essai is not None:  
-    #     if bavard > 1 : print(f"Adresse dans le cache : {c}")
-    #     return essai, ad
-    # else:
-    #     if bavard > 0 :print(f"Pas dans le cache : {c}")
+    essai = g.dans_le_cache(ad)
+    if essai is not None:  
+        if bavard > 1: print(f"Adresse dans le cache : {c}")
+        return essai, ad
+    else:
+        if bavard > 1: print(f"Pas dans le cache : {c}")
 
     def renvoie(res, mettre_en_cache=False):
         """
@@ -49,8 +49,8 @@ def nœuds_of_étape(c:str, g, bavard=0):
         #     if s not in g :
         #        raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res_d}.")
         if mettre_en_cache:
-            g.met_en_cache(c, res)
-            print(f"Mis en cache : {res} pour {c}")
+            g.met_en_cache(ad, res)
+            print(f"Mis en cache : {res} pour {ad}")
         return res, ad
 
     
@@ -97,31 +97,29 @@ def tous_les_nœuds(g, adresse, bavard=0):
     else :
         LOG(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.", bavard=bavard)
 
-
-        # Essai 2.0 : dans le cache
-        essai_cache = g.dans_le_cache(adresse)
-        if essai_cache is not None : return essai_cache
-
+        ## Recherche Nominatim
         lieu = cherche_lieu(adresse, bavard=bavard-1)
         
         ## Essai 4, avec les nodes trouvés
-        ## Mettre en cache dans ce cas.
         nœuds_osm = [t.raw for t in lieu if t.raw["osm_type"]=="node"]
         if nœuds_osm != []:
             LOG(f"essai 4 : La recherche Nominatim a donné les nœuds {nœuds_osm}", bavard=bavard+1)
             nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g]
             if len(nœuds_de_g) > 0:
+                g.met_en_cache(adresse, nœuds_de_g)
                 return nœuds_de_g
-
-            
+        
+        
         ## Essai 5 : en se basant sur les coords enregistrées dans osm pour le premier élément renvoyé par Nominatim
         ## Ce devrait être la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, bar, commerce...)
         if len(lieu)>0:
             truc = lieu[0].raw
-            adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0]
+            adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0] # Modif de l’adresse
+            
             essai = g.dans_le_cache(adresse)
             if essai is not None:
                 return essai
+            
             LOG(f"Essai 5 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)

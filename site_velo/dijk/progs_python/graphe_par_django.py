@@ -41,12 +41,12 @@ class Graphe_django():
         self.arbres_des_rues={}
         
     
-    def charge_zone(self, zone="Pau", bavard=0):
+    def charge_zone(self, zone_t="Pau", bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
         """
         
-        self.zone = Zone.objects.get(nom=zone)
+        self.zone = Zone.objects.get(nom=zone_t)
         self.ville_défaut = self.zone.ville_défaut
         
         # Dicos des villes et des rues
@@ -66,7 +66,7 @@ class Graphe_django():
             if s not in self.dico_voisins: self.dico_voisins[s]=[]
             if a.cyclabilité()>0: # ceci supprime les autoroute actuellement
                 self.dico_voisins[s].append((t, a))
-        tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone}.")
+        tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
         #Sommets
         self.dico_Sommet={}
@@ -164,13 +164,19 @@ class Graphe_django():
 
     def calcule_cycla_min_max(self):
         
-        self.cycla_min = Arête.objects.filter(zone=self.zone).aggregate(Min("cycla"))["cycla__min"]
-        if self.cycla_min is None:
-            self.cycla_min=1.
+        cycla_min = Arête.objects.filter(zone=self.zone).aggregate(Min("cycla"))["cycla__min"]
+        cycla_défaut_min = Arête.objects.filter(zone=self.zone, cycla_défaut__gt=0).aggregate(Min("cycla_défaut"))["cycla_défaut__min"]
+        if cycla_min is None:
+            self.cycla_min=cycla_défaut_min
+        else:
+            self.cycla_min = min(cycla_défaut_min, cycla_min)
 
-        self.cycla_max = Arête.objects.filter(zone=self.zone).aggregate(Max("cycla"))["cycla__max"]
-        if self.cycla_max is None:
-            self.cycla_max=1.
+        cycla_max = Arête.objects.filter(zone=self.zone).aggregate(Max("cycla"))["cycla__max"]
+        cycla_défaut_max = Arête.objects.filter(zone=self.zone).aggregate(Max("cycla_défaut"))["cycla_défaut__max"]
+        if cycla_max is None:
+            self.cycla_max = cycla_défaut_max
+        else:
+            self.cycla_max = max(cycla_défaut_max, cycla_max)
             
         print(f"Cycla min et max : {self.cycla_min}, {self.cycla_max}")
         
@@ -256,7 +262,7 @@ class Graphe_django():
             # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
             tout = rd.nœuds_of_rue(adresse)
             print(f"Liste des nœuds osm : {tout}.")
-            res = [ n for n in tout if n in self]
+            res = [ n for n in tout if n in self ]
             if len(res)>0:
                 LOG(f"nœuds trouvés : {res}", bavard=bavard)
                 self.ajoute_rue(adresse, res, bavard=bavard)

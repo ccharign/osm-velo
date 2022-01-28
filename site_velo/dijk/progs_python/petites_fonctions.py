@@ -8,7 +8,7 @@ Ces petites fonctions ne doivent pas dépendre d’autres modules, à part param
 """
 
 
-from math import pi
+from math import pi, cos
 from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, LOG
 import geopy
 import time
@@ -38,7 +38,7 @@ def recherche_inversée(coords, bavard=0):
     return(localisateur.reverse(coords))
 
 
-R_TERRE = 6378137  # en mètres
+R_TERRE = 6360000  # en mètres
 
 def distance_euc(c1, c2):
     """ 
@@ -47,10 +47,12 @@ def distance_euc(c1, c2):
     Formule simplifiée pour petites distances."""
     long1, lat1 = c1
     long2, lat2 = c2
-    assert lat1>40 and lat2>40, f"Je voulais des coordonnées au format (lon, lat) et j’ai reçu {c1} et {c2}"
-    dx = R_TERRE * (long2-long1) * pi / 180
+    #assert lat1>40 and lat2>40, f"Je voulais des coordonnées au format (lon, lat) et j’ai reçu {c1} et {c2}"
+    dx = R_TERRE * cos(lat1) * (long2-long1) * pi / 180
     dy = R_TERRE * (lat2-lat1) * pi / 180
+    # vraie formule : arccos(cos(lat1)cos(lat2)cos(lon2-lon1) + sin(lat1 lat2))
     return (dx**2+dy**2)**.5
+
 
 
 def distance_si_pas_trop(c1, c2):

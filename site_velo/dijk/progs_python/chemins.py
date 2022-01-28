@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from time import perf_counter
 from petites_fonctions import chrono
-from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
+from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES, LOG
 from dijk.models import Sommet, Chemin_d
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_of_adresse
@@ -28,9 +28,11 @@ def sans_guillemets(c):
     else:
         return c
 
+    
 class ÉchecChemin(Exception):
     pass
-    
+
+
 class Étape():
     """
     Attributs : 
@@ -38,13 +40,13 @@ class Étape():
         adresse (instance de Adresse)
         nœuds (Sommet set) : ensemble de nœuds
     """
+    
     def __init__(self, texte, g, bavard=0):
         self.texte = texte
         n, self.adresse = nœuds_of_étape(texte, g, bavard=bavard-1)
         self.nœuds = set(n)
         #for n in self.nœuds:
         #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
-        
         
     def __str__(self):
         return str(self.adresse)
@@ -53,7 +55,7 @@ class Étape():
 def dico_arête_of_nœuds(g, nœuds):
     """
     Entrée : nœuds (Sommet iterable), un ensemble de sommets
-    Sortie : dictionnaire s -> voisins de s qui sont dans nœuds
+    Sortie : dictionnaire (s -> voisins de s qui sont dans nœuds)
     """
     return {
         s: set((t for t in g.voisins_nus(s) if t in nœuds))
@@ -67,7 +69,7 @@ def arêtes_interdites(g, noms_rues, bavard=0):
              noms_rues (str iterable), liste de noms de rues à éviter
     Sortie : dico des arêtes correspondant
     """
-    interdites={}
+    interdites = {}
     for r in noms_rues:
         interdites.update(
             dico_arête_of_nœuds(g,
@@ -80,7 +82,7 @@ def arêtes_interdites(g, noms_rues, bavard=0):
 class Chemin():
     """ Attributs : - p_détour (float)
                     - étapes (Étape list), liste de nœuds
-                    - interdites : arêtes interdites. dico s->sommets interdits depuis s
+                    - interdites : arêtesi interdites. dico s->sommets interdits depuis s
                     - noms_rues_interdites : str, noms des rues interdites séparées par ; (pour l’enregistrement en csv)
                     - AR (bool), indique si le retour est valable aussi.
                     - texte (None ou str), texte d'où vient le chemin (pour déboguage)
@@ -99,17 +101,28 @@ class Chemin():
     def of_django(cls, c_d, g, bavard=0):
         return cls.of_données(g, c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
 
-    def vers_django(self, utilisateur=None):
+    
+    def vers_django(self, utilisateur=None, bavard=0):
         """
         Transfert le chemin dans la base.
         Sortie : l’instance de Chemin_d créée.
         """
-        étapes_texte = ";".join(map(str, étapes))
-        c_d = Chemin_d(
-            p_détour = self.p_détour, ar=self.AR, étapes_texte=étapes_texte, interdites_texte=self.noms_rues_interdites, utilisateur=utilisateur
-        )
-        c_d.save()
-        return c_d
+        étapes_t = ";".join(map(str, self.étapes))
+        rues_interdites_t=self.noms_rues_interdites
+        début, fin = étapes_t[:255], étapes_t[-255:]
+        interdites_début, interdites_fin = rues_interdites_t[:255], rues_interdites_t[-255:]
+
+        test = Chemin_d.objects.filter(p_détour = self.p_détour, ar=self.AR, début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin)
+        if test.exists():
+            LOG(f"Chemin déjà dans la base : {self}")
+            return test.first()
+        else:
+            c_d = Chemin_d(
+                p_détour = self.p_détour, ar=self.AR, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, utilisateur=utilisateur,début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin
+            )
+            c_d.save()
+            return c_d
+
     
     @classmethod
     def of_ligne(cls, ligne, g, tol=.25, bavard=0):
@@ -162,21 +175,22 @@ class Chemin():
         return chemin
 
     
-    def sauv(self, adresse=CHEMIN_CHEMINS, bavard=0):
-        """ Ajoute le chemin dans le csv, après avoir vérifié qu’il n’y est pas déjà."""
+    # def sauv(self, adresse=CHEMIN_CHEMINS, bavard=0):
+    #     """ Ajoute le chemin dans le csv, après avoir vérifié qu’il n’y est pas déjà."""
             
-        ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }|{self.noms_rues_interdites}\n"
+    #     ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }|{self.noms_rues_interdites}\n"
         
-        with open(adresse, encoding="utf-8") as entrée:
-            for ligne_e in entrée:
-                if ligne_e==ligne:
-                    print(f"Ligne déjà présente : {ligne}")
-                    return None
+    #     with open(adresse, encoding="utf-8") as entrée:
+    #         for ligne_e in entrée:
+    #             if ligne_e==ligne:
+    #                 print(f"Ligne déjà présente : {ligne}")
+    #                 return None
                 
-        with open(adresse, "a", encoding="utf-8") as sortie:
-            sortie.write(ligne)
-        if bavard>0:
-            print("Chemin {self} enregistré dans {adress}.")
+    #     with open(adresse, "a", encoding="utf-8") as sortie:
+    #         sortie.write(ligne)
+    #     if bavard>0:
+    #         print("Chemin {self} enregistré dans {adress}.")
+
     
     @classmethod
     def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
@@ -216,12 +230,9 @@ class Chemin():
         return Chemin([self.départ(), self.arrivée()], self.p_détour, True)
     
     def __str__(self):
-        if self.texte is not None:
-            return self.texte
-        else:
-            res = "Étapes : " + ";".join(map(str, self.étapes))
-            if self.noms_rues_interdites: res+=f"\n Rues interdites : {self.noms_rues_interdites}"
-            return  res
+        res = f"AR : {self.AR}\np_détour : {self.p_détour}\nÉtapes : " + ";".join(map(str, self.étapes))
+        if self.noms_rues_interdites: res+=f"\n Rues interdites : {self.noms_rues_interdites}"
+        return  res
 
     def texte_court(self, n_étapes=4):
         if len(self.étapes) <= n_étapes:

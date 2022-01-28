@@ -92,10 +92,20 @@ class Rue(models.Model):
     
     def __str__(self):
         return f"{self.nom_complet} ({self.ville})"
+    
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
     
+def formule_pour_correction_longueur(l, cy, p_détour):
+    """
+    Ceci peut être changé. Actuellement : l / cy**( p_détour*1.5)
+    Rappel : cy>1 == bien
+             cy<1 == pas bien
+    """
+    return l / cy**( p_détour*1.5)
+
+
 class Arête(models.Model):
     """
     Attributs:
@@ -103,7 +113,7 @@ class Arête(models.Model):
         arrivée (Sommet)
         longueur (float)
         cycla (float) : cyclabilité calculée par l'IA. None par défaut.
-        cycla_défaut (float) : cyclabilité obtenue par les données présentes dans osm. À terme dépendra de zone 30, piste cyclable, etc. Pour l'instant c'est 1.
+        cycla_défaut (float) : cyclabilité obtenue par les données présentes dans osm. Via la fonction vers_django.cycla_défaut lors du remplissage de la base.
         rue (Rue). Ce champ est-il utile ?
         geom (string). Couples lon,lat séparés par des ;
         nom (str)
@@ -159,8 +169,8 @@ class Arête(models.Model):
         Sortie : Longueur corrigée par la cyclabilité.
         """
         cy = self.cyclabilité()
-        assert cy>0, f"cyclabilité ⩽ pour l’arête {self}"
-        return self.longueur / cy**( p_détour*1.5)
+        assert cy>0, f"cyclabilité ⩽ pour l’arête {self}. Valeur : {cy}."
+        return formule_pour_correction_longueur(self.longueur, cy, p_détour)
 
     # def inverse(self):
     #     """
@@ -210,18 +220,25 @@ class Chemin_d(models.Model):
     interdites_texte=models.TextField(default=None, blank=True, null=True)
     utilisateur = models.CharField(max_length=100, default=None, blank=True, null=True)
     dernier_p_modif = models.FloatField(default=None, blank=True, null=True)
+
+    # Les quatre attributs suivant servent uniquement à empêcher les doublons. Mysql n’accepte pas les doublons sur des champs TextField...
+    début = models.CharField(max_length=255)
+    fin = models.CharField(max_length=255)
+    interdites_début=models.CharField(max_length=255)
+    interdites_fin=models.CharField(max_length=255)
+
+    
     # def étapes(self):
     #     return map(Étape, self.étapes_texte.split(";"))
     # def interdites(self):
     #     return map(Étape, self.interdites_texte.split(";"))
     class Meta:
         constraints=[
-            models.UniqueConstraint(fields=["ar", "p_détour", "étapes_texte", "interdites_texte"], name = "Pas de chemins en double.")
+            models.UniqueConstraint(fields=["ar", "p_détour", "début", "fin", "interdites_début", "interdites_fin"], name = "Pas de chemins en double.")
         ]
     
     def __str__(self):
-        é = self.étapes
-        return é[0] + "-->" + é[-1]
+        return f"Étapes : {self.étapes_texte}\n Interdites : {self.interdites_texte}\n p_détour : {self.p_détour}"
 
     def sauv(self):
         """
