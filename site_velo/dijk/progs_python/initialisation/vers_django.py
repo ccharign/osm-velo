@@ -135,6 +135,8 @@ def sauv_données(à_sauver):
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
     for o in à_sauver:
+        if o.id_osm == 2147483647:
+            print(f"Rencontré le sommet {o}")
         o.save()
 
 def géom_texte(s, t, a, g):
@@ -248,12 +250,12 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                 s_d.lon=lon
                 s_d.lat=lat
                 à_màj.append(s_d)
-        LOG("Ajout des nouveaux sommets dans la base")
-        #créés=Sommet.objects.bulk_create(à_créer) # Attention : il semble que les objets créés ne soient pas les même que les objets à créer !
+        LOG(f"Ajout des {len(à_créer)} nouveaux sommets dans la base")
+        #créés=Sommet.objects.bulk_create(à_créer) # Attention : les objets renvoyés par bulk_create n’ont pas d’id
         sauv_données(à_créer)
         #if len(créés) != len(à_créer):
         #    raise RuntimeError(f"{len(créés)} sommets créés par bulk_create alors qu’il fallait en créer {len(à_créer)}")
-        LOG("Mise à jour des sommets modifiés")
+        LOG(f"Mise à jour des {len(à_maj)} sommets modifiés")
         Sommet.objects.bulk_update(à_màj, ["lon", "lat"])
 
         LOG("Ajout de la zone à chaque sommet")
