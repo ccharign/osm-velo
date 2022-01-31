@@ -128,17 +128,15 @@ def désoriente(g, bavard=0):
                     if not existe_inverse(s, t, a):
                         ajoute_inverse(s,t,a)
                     
-@transaction.atomic
+#@transaction.atomic
 def sauv_données(à_sauver):
     """
     Sauvegarde les objets en une seule transaction.
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
     for o in à_sauver:
-        try:
-            o.save()
-        except Exception as e:
-            print(f"Problème pour enregistrer {o} : {e}.")
+        print(f"Sauvegarde de {o}")
+        o.save()
 
 def géom_texte(s, t, a, g):
     """
