@@ -138,6 +138,7 @@ def sauv_données(à_sauver):
         print(f"Sauvegarde de {o}")
         o.save()
 
+        
 def géom_texte(s, t, a, g):
     """
     Entrée : a (dico), arête de nx.
