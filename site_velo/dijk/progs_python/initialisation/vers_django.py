@@ -135,9 +135,10 @@ def sauv_données(à_sauver):
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
     for o in à_sauver:
-        if o.id_osm == 2147483647:
-            print(f"Rencontré le sommet {o}")
-        o.save()
+        try:
+            o.save()
+        except Exception as e:
+            print(f"Problème pour enregistrer {o} : {e}.")
 
 def géom_texte(s, t, a, g):
     """
