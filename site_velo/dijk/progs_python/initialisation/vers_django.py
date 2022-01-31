@@ -256,7 +256,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         sauv_données(à_créer)
         #if len(créés) != len(à_créer):
         #    raise RuntimeError(f"{len(créés)} sommets créés par bulk_create alors qu’il fallait en créer {len(à_créer)}")
-        LOG(f"Mise à jour des {len(à_maj)} sommets modifiés")
+        LOG(f"Mise à jour des {len(à_màj)} sommets modifiés")
         Sommet.objects.bulk_update(à_màj, ["lon", "lat"])
 
         LOG("Ajout de la zone à chaque sommet")
