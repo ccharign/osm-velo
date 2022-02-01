@@ -107,7 +107,7 @@ def désoriente(g, bavard=0):
                     raise RuntimeError(f"Arête en double : {s}, {t}, {a}")
                 
     def ajoute_inverse(s,t,a):
-        if bavard>0:
+        if bavard>1:
             print(f"ajout de l’arête inverse de {s}, {t}, {a}")
         a_i = {att:val for att,val in a.items()}
         a_i["sens_interdit"]=True
@@ -135,8 +135,9 @@ def sauv_données(à_sauver):
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
     for i, o in enumerate(à_sauver):
-        print(f"{i} Sauvegarde de {o}")
+        print(f"{i} Sauvegarde de {o}", end="")
         o.save()
+        print("fini")
     print("fin de sauv_données")
 
 def géom_texte(s, t, a, g):
