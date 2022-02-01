@@ -45,7 +45,7 @@ class Ville_Zone(models.Model):
     
 class Sommet(models.Model):
     
-    id_osm = models.IntegerField(unique=True)
+    id_osm = models.BigIntegerField(unique=True)
     lon = models.FloatField()
     lat = models.FloatField()
     zone = models.ManyToManyField(Zone)
