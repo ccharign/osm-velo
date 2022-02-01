@@ -135,7 +135,9 @@ def sauv_données(à_sauver):
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
     for i, o in enumerate(à_sauver):
-        print(f"{i} Sauvegarde de {o}", end="")
+        print(f"{i} Sauvegarde de {o} ({o.id_osm})", end="")
+        if o.id_osm== 2147483647:
+            print("rencontré {o.id_osm}")
         o.save()
         print("fini")
     print("fin de sauv_données")
