@@ -128,17 +128,17 @@ def désoriente(g, bavard=0):
                     if not existe_inverse(s, t, a):
                         ajoute_inverse(s,t,a)
                     
-@transaction.atomic
+#@transaction.atomic
 def sauv_données(à_sauver):
     """
     Sauvegarde les objets en une seule transaction.
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
     for o in à_sauver:
-        if o.id_osm == 2147483647:
-            print(f"Rencontré le sommet {o}")
+        print(f"Sauvegarde de {o}")
         o.save()
 
+        
 def géom_texte(s, t, a, g):
     """
     Entrée : a (dico), arête de nx.
@@ -255,7 +255,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         sauv_données(à_créer)
         #if len(créés) != len(à_créer):
         #    raise RuntimeError(f"{len(créés)} sommets créés par bulk_create alors qu’il fallait en créer {len(à_créer)}")
-        LOG(f"Mise à jour des {len(à_maj)} sommets modifiés")
+        LOG(f"Mise à jour des {len(à_màj)} sommets modifiés")
         Sommet.objects.bulk_update(à_màj, ["lon", "lat"])
 
         LOG("Ajout de la zone à chaque sommet")
