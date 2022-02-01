@@ -134,11 +134,11 @@ def sauv_données(à_sauver):
     Sauvegarde les objets en une seule transaction.
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
-    for o in à_sauver:
-        print(f"Sauvegarde de {o}")
+    for i, o in enumerate(à_sauver):
+        print(f"{i} Sauvegarde de {o}")
         o.save()
+    print("fin de sauv_données")
 
-        
 def géom_texte(s, t, a, g):
     """
     Entrée : a (dico), arête de nx.
