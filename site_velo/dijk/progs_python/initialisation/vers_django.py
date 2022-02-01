@@ -221,15 +221,6 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
 
     tous_les_sommets = Sommet.objects.all()
     print(f"{len(tous_les_sommets)} sommets dans la base")
-
-    dico_voisins={}
-    toutes_les_arêtes = Arête.objects.all().select_related("départ", "arrivée")
-    for a in toutes_les_arêtes:
-        s = a.départ.id_osm
-        t = a.arrivée.id_osm
-        if s not in dico_voisins: dico_voisins[s]=[]
-        dico_voisins[s].append((t, a))
-
         
     if not juste_arêtes:
         LOG("Chargement des sommets")
@@ -251,6 +242,9 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                 s_d.lat=lat
                 à_màj.append(s_d)
         LOG(f"Ajout des {len(à_créer)} nouveaux sommets dans la base")
+        if bavard>0:
+            print(f"à créer : {tuple(à_créer)}")
+            print(f"à màj : {à_maj}")
         #créés=Sommet.objects.bulk_create(à_créer) # Attention : les objets renvoyés par bulk_create n’ont pas d’id
         sauv_données(à_créer)
         #if len(créés) != len(à_créer):
@@ -281,7 +275,14 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     temps={"correspondance":0., "remplace_arêtes":0., "màj_arêtes":0., "récup_nom":0.}
     nb_appels={"correspondance":0, "remplace_arêtes":0, "màj_arêtes":0, "récup_nom":0}
     
-    
+    dico_voisins={}
+    toutes_les_arêtes = Arête.objects.all().select_related("départ", "arrivée")
+    for a in toutes_les_arêtes:
+        s = a.départ.id_osm
+        t = a.arrivée.id_osm
+        if s not in dico_voisins: dico_voisins[s]=[]
+        dico_voisins[s].append((t, a))
+
     #@mesure_temps("récup_nom", temps, nb_appels)
     def récup_noms(arêtes_d, nom):
         """ Renvoie le tuple des a∈arêtes_d qui ont pour nom 'nom'"""
