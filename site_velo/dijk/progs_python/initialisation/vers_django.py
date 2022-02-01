@@ -224,7 +224,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         
     if not juste_arêtes:
         LOG("Chargement des sommets")
-        à_créer=set()
+        à_créer = []
         à_màj=[]
         nb=0
         for s in g.digraphe.nodes:
@@ -234,7 +234,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
             essai = Sommet.objects.filter(id_osm=s).first()
             if essai is None:
                 s_d = Sommet(id_osm=s, lon=lon, lat=lat)
-                à_créer.add(s_d)
+                à_créer.append(s_d)
             else:
                 s_d = essai
                 #màj des coords au cas où...
@@ -243,8 +243,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                 à_màj.append(s_d)
         LOG(f"Ajout des {len(à_créer)} nouveaux sommets dans la base")
         if bavard>0:
-            print(f"à créer : {tuple(à_créer)}")
-            print(f"à màj : {à_maj}")
+            print(f"à créer : {à_créer}")
+            print(f"à màj : {à_màj}")
         #créés=Sommet.objects.bulk_create(à_créer) # Attention : les objets renvoyés par bulk_create n’ont pas d’id
         sauv_données(à_créer)
         #if len(créés) != len(à_créer):
