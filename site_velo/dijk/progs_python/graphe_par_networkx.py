@@ -17,7 +17,7 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN
 class Graphe_nx():
     """
     Classe de graphe basée sur le graphe networkx tiré d’osm.
-    Pour être utilisé lors de la phase d’initialisation quamd aucune donnée n’a encore été obtenue.
+    Pour être utilisé lors de la phase d’initialisation quand aucune donnée n’a encore été obtenue.
     Munie tout de même des méthodes rue_dune_arête et ville_dune_sommet. Le première fonctionne grâce au champ « name » présent dans les arêtes dans le graphe renvoyé par osm. La seconde grâce au dico ville_of_nœud, rempli par ajoute_villes.
 
     Attributs:

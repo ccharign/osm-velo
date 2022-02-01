@@ -15,7 +15,7 @@ from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, nor
 from params import CHEMIN_CHEMINS, LOG
 from petites_fonctions import union, mesure_temps
 from time import perf_counter, sleep
-from django.db import transaction
+from django.db import transaction, close_old_connections
 from lecture_adresse.arbresLex import ArbreLex
 
 
@@ -134,12 +134,13 @@ def sauv_données(à_sauver):
     Sauvegarde les objets en une seule transaction.
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
+    close_old_connections()
     for i, o in enumerate(à_sauver):
         print(f"{i} Sauvegarde de {o} ({o.id_osm})", end="")
         if o.id_osm== 2147483647:
             print("rencontré {o.id_osm}")
         o.save()
-        print("fini")
+        print("...fini")
     print("fin de sauv_données")
 
 def géom_texte(s, t, a, g):
@@ -230,7 +231,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         à_créer = []
         à_màj=[]
         nb=0
-        for s in g.digraphe.nodes:
+        for s in g.multidigraphe.nodes:
             if nb%100==0: print(f"    {nb} sommets vus")
             nb+=1
             lon, lat = g.coords_of_nœud(s)
