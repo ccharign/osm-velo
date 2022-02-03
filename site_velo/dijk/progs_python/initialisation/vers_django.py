@@ -9,7 +9,7 @@
 
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
-from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone
+from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone, Zone
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
 #from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
