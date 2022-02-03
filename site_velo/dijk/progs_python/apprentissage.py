@@ -85,6 +85,9 @@ def lecture_plusieurs_chemins(g, chemins, bavard=0):
 
 
 def n_lectures(n, g, chemins, bavard=0):
+    """
+    Sortie : prop_modif de la dernière lecture
+    """
     return lecture_jusqu_à_perfection(g, chemins, n_max=n, bavard=bavard)
 
 
@@ -92,6 +95,7 @@ def lecture_jusqu_à_perfection(g, chemins, n_max=50, bavard=0):
     """ 
     Modifie la cyclabilité jusqu'à ce que le chemin trouvé soit le bon pour tous ceux passés dans la liste chemins.
     n_max : nb max d’itérations
+    Sortie : prop_modif de la dernière lecture
     """
     n_étapes = 0
     n_modif=1
@@ -104,3 +108,4 @@ def lecture_jusqu_à_perfection(g, chemins, n_max=50, bavard=0):
     print(f"Entraînement fini en {n_étapes} étapes.")
     if n_étapes==n_max:
         LOG_PB(f"Nombre max d’itérations ({n_max}) atteint lors de l’apprentissage pour les chemins {chemins}.")
+    return prop_modif

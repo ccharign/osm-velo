@@ -137,8 +137,10 @@ def confirme_nv_chemin(requête):
     print(f"étapes : {noms_étapes}, pourcentage détour : {pourcentage_détour}, AR : {AR}, rues interdites : {rues_interdites}\n")
     
     c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
-    c.vers_django(bavard=1)
-    n_lectures(nb_lectures, g, [c], bavard=3)
+    c_d=c.vers_django(bavard=1)
+    prop_modif=n_lectures(nb_lectures, g, [c], bavard=3)
+    c_d.prop_modif=prop_modif
+    c_d.save()
     return render(requête, "dijk/merci.html", {"chemin":c})
 
 
