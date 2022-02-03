@@ -50,7 +50,7 @@ def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
 
 def index(requête):
-    return render(requête, "dijk/index.html", {})
+    return render(requête, "dijk/index.html", {"zones":Zone.objects.all()})
 
 def mode_demploi(requête):
     return render(requête, "dijk/mode_demploi.html", {"ville_défaut":g.ville_défaut})
@@ -155,18 +155,9 @@ def carte_cycla(requête):
     return render(requête, "dijk/cycla.html")
 
 
-### Admin ###
 
-def lisTousChemins(requête):
-    """
-    Lis une fois chaque chemin de la base
-    """
-    chemins=[]
-    for c_d in Chemin_d.objects.all():
-        chemins.append(Chemin.of_django(c_d))
-    n_modif, prop_modif = lecture_plusieurs_chemins(g, chemins, bavard=1)
-    print(n_modif, prop_modif)
 
+    
 ### Erreurs ###
 
 def vueLieuPasTrouvé(requête, e):

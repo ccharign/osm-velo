@@ -1,4 +1,10 @@
     {% extends "base.html" %}
 {% block contenu %}
-Rajouter la nom de la zone à l’adresse de cette page. Promis je mets des vrais liens un de ces jours.
+Choisissez votre zone (plus la zone est petite et plus le chargement est rapide (ou moins lent)) :
+
+<ul>
+{% for z in zones %}
+<li> <a href="{% url 'index'%}{{z}}"> {{z}} </a> </li>
+{% endfor %}
+</ul>
   {% endblock %}
