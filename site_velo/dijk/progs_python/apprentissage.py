@@ -3,7 +3,7 @@
 #from recup_donnees import coords_lieu
 import dijkstra
 from params import LOG_PB
-
+from django.db.transaction import atomic
 
 ETA = 0.1
 
@@ -12,6 +12,7 @@ def liste_arêtes(liste_nœuds):
         Sortie : itérateur sur les arêtes. """
     for i in range(len(liste_nœuds)-1):
         yield liste_nœuds[i], liste_nœuds[i+1]
+
 
 def dico_arêtes(iti):
     """
@@ -23,7 +24,7 @@ def dico_arêtes(iti):
         res.add(a)
     return res
 
-
+@atomic
 def lecture_meilleur_chemin(g, chemin, bavard=0):
     """ 
     Entrée : le chemin à suivre, instance de Chemin.

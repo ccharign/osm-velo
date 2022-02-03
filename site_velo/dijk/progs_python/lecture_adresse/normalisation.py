@@ -49,20 +49,24 @@ class Ville():
         """
 
         # Découpage de la chaîne
-        e = re.compile("([0-9]{5})? ?([^ 0-9].*)")
-        code, nom = re.fullmatch(e, texte.strip()).groups()
+        e = re.compile("([0-9]{5})? *([^ 0-9].*)")
+        res = re.fullmatch(e, texte.strip())
+        if res:
+            code, nom = res.groups()
+        else:
+            raise RuntimeError(f"nom de ville mal formé : {texte}")
         
 
         # Récupération du nom de la ville dans l’arbre
         v_d = g.ville_la_plus_proche(nom, tol=tol)
         nom_corrigé = v_d.nom_complet
         code_corrigé = v_d.code
-        if code is not None and int(code)!= code_corrigé:
+        if code and int(code)!= code_corrigé:
             LOG_PB(f"Avertissement : j’ai corrigé le code postal de {code} à {code_corrigé} pour la ville {nom_corrigé}. Chaîne initiale {texte}")
             
         # Enregistrement des données
         self.nom_complet = nom_corrigé
-        self.nom_norm= partie_commune(nom_corrigé)
+        self.nom_norm = partie_commune(nom_corrigé)
         self.code = code_corrigé
 
     def __str__(self):
@@ -171,9 +175,10 @@ def arbre_rue_dune_ville(ville_d, rues):
 # ---> dans g.arbres_des_rues
 
 
-def normalise_rue(g, rue, ville, persevérant=True, tol=2, bavard=0):
+def normalise_rue(g, z_d, rue, ville, persevérant=True, tol=2, bavard=0):
     """
     Entrées : 
+      - z_d (Zone)
       - ville (instance de Ville)
       - rue (str)
 
@@ -210,14 +215,14 @@ def normalise_rue(g, rue, ville, persevérant=True, tol=2, bavard=0):
     
     else:
         print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je lance une recherche Nominatim.")
-        lieu = cherche_lieu(Adresse(g, f"{rue} ({ville})", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
+        lieu = cherche_lieu(Adresse(g, z_d, f"{rue}, {ville}", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
         LOG(f"La recherche Nominatim a donné {lieu}.", bavard=bavard)
         way_osm = [ t.raw for t in lieu if t.raw["osm_type"]=="way"]
         if len(way_osm)>0:            
             tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
             nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
             print(f"Nouvel essai avec le nom suivant : {nom}")
-            return normalise_rue(g, nom, ville, persevérant=False, tol=tol, bavard=bavard)
+            return normalise_rue(g, z_d, nom, ville, persevérant=False, tol=tol, bavard=bavard)
         else:
             LOG("Pas de way dans le résultat de la recherche Nominatim.")
             return étape1, rue
@@ -247,24 +252,38 @@ class Adresse():
             texte d’une adresse. Format : (num)? rue (code_postal? ville)
         """
         
-        # Lecture de la regexp
-        e = re.compile("(^[0-9]*) *([^()]+)(\((.*)\))?")
-        essai = re.findall(e, texte)
-        if bavard > 1: print(f"Résultat de la regexp : {essai}")
-        if len(essai) == 1:
-            num, rue, _, ville = essai[0]
-        elif len(essai) == 0:
-            raise SyntaxError(f"adresse mal formée : {texte}")
-        else:
-            print(f"Avertissement : plusieurs interprétations de {texte} : {essai}.")
-            num, rue, _, ville = essai[0]
-            rue=rue.strip()
+        # # Lecture de la regexp
+        # e = re.compile("(^[0-9]*) *([^()]+)(\((.*)\))?")
+        # essai = re.findall(e, texte)
+        # if bavard > 1: print(f"Résultat de la regexp : {essai}")
+        # if len(essai) == 1:
+        #     num, rue, _, ville = essai[0]
+        # elif len(essai) == 0:
+        #     raise SyntaxError(f"adresse mal formée : {texte}")
+        # else:
+        #     print(f"Avertissement : plusieurs interprétations de {texte} : {essai}.")
+        #     num, rue, _, ville = essai[0]
+        #     rue=rue.strip()
 
+        # Découpage selon les virgules
+        trucs = texte.split(",")
+        if len(trucs)==1:
+            num_rue, ville_t = trucs[0], ""
+        elif len(trucs)==2:
+            num_rue, ville_t = trucs
+        elif len(trucs)==3:
+            nom_rue, ville_t, pays = trucs
+        ville_t = ville_t.strip()
+        
+        # numéro de rue et rue
+        num, rue = re.findall("(^[0-9]*) *(.*)", num_rue)[0]
+
+        if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville_t}")
+        
         # Normalisation de la ville et de la rue
-        if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville}")
-        ville_n = normalise_ville(g, z_d, ville)
+        ville_n = normalise_ville(g, z_d, ville_t) # ville_t doit-elle contenir le code postal ?
         if norm_rue:
-            rue_n, rue = normalise_rue(g, rue, ville_n)
+            rue_n, rue = normalise_rue(g, z_d, rue, ville_n)
         else:
             rue_n = rue
         
@@ -291,10 +310,9 @@ class Adresse():
         else:
             déb=""
         if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm} ({self.ville.avec_code()})"
+            return f"{déb}{self.rue_osm}, {self.ville.avec_code()}, {self.pays}"
         else:
-            return f"{déb}{self.rue} ({self.ville.avec_code()})"
-
+            return f"{déb}{self.rue}, {self.ville.avec_code()}, {self.pays}"
         
     def pour_nominatim(self):
         """

@@ -133,9 +133,10 @@ def confirme_nv_chemin(requête):
     pourcentage_détour = int(requête.POST["pourcentage_détour"])
     AR = bool_of_checkbox(requête.POST, "AR")
     rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
+    zone=Zone.objects.get(nom=requête.POST["zone_t"])
     print(f"étapes : {noms_étapes}, pourcentage détour : {pourcentage_détour}, AR : {AR}, rues interdites : {rues_interdites}\n")
     
-    c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
+    c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
     c.vers_django(bavard=1)
     n_lectures(nb_lectures, g, [c], bavard=3)
     return render(requête, "dijk/merci.html", {"chemin":c})

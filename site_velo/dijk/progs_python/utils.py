@@ -286,11 +286,19 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0):
     
 ### Apprentissage ###
 
-def lecture_tous_les_chemins(g, bavard=0):
-    for c_d in Chemin_d.objects.all():
-        c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
-        with transaction.atomic():
-            n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
-            c_d.dernier_p_modif = n_modif/l
-            c_d.save()
-            print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")
+def lecture_tous_les_chemins(g, z_d=None, bavard=0):
+    """
+    Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
+    """
+    if z_d is None:
+        à_parcourir = g.zones
+    else:
+        à_parcourir = [z_d]
+    for z in à_parcourir:
+        for c_d in Chemin_d.objects.filter(zone=z):
+            c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
+            with transaction.atomic():
+                n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
+                c_d.dernier_p_modif = n_modif/l
+                c_d.save()
+                print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")

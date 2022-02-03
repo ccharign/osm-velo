@@ -215,6 +215,7 @@ class Chemin_d(models.Model):
         - interdites (str)
         - utilisateur (str)
         - dernier_p_modif (float) : nb d’arêtes modifiées / distance entre départ et arrivée lors du dernier apprentissage.
+        - zone (Zone)
     """
     ar=models.BooleanField(default=False)
     p_détour=models.FloatField()
@@ -222,8 +223,9 @@ class Chemin_d(models.Model):
     interdites_texte=models.TextField(default=None, blank=True, null=True)
     utilisateur = models.CharField(max_length=100, default=None, blank=True, null=True)
     dernier_p_modif = models.FloatField(default=None, blank=True, null=True)
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
 
-    # Les quatre attributs suivant servent uniquement à empêcher les doublons. Mysql n’accepte pas les doublons sur des champs TextField...
+    # Les quatre attributs suivant servent uniquement à empêcher les doublons. Mysql n’accepte pas les contraintes Unique sur des champs TextField...
     début = models.CharField(max_length=255)
     fin = models.CharField(max_length=255)
     interdites_début=models.CharField(max_length=255)

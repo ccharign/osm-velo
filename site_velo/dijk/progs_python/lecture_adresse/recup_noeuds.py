@@ -62,7 +62,7 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
         if ad.rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
-            res = tous_les_nœuds(g, ad, bavard=bavard-1)
+            res = tous_les_nœuds(g, z_d, ad, bavard=bavard-1)
             return renvoie(res)
 
     else:
@@ -73,7 +73,7 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
 
 
 
-def tous_les_nœuds(g, adresse, bavard=0):
+def tous_les_nœuds(g, z_d, adresse, bavard=0):
     """ Entrée : g (graphe)
                  adresse : instance de Adresse
         Sortie : liste des nœuds de cette rue, dans l’ordre topologique si possible.
@@ -124,7 +124,7 @@ def tous_les_nœuds(g, adresse, bavard=0):
             LOG(f"Essai 5 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
-            res = nœud_sur_rue_le_plus_proche(g, coords, Adresse(g, f"{rue} ({ville})", bavard=bavard))
+            res = nœud_sur_rue_le_plus_proche(g, coords, Adresse(g, z_d, f"{rue}, {ville}", bavard=bavard))
             if res is not None:
                 g.met_en_cache(adresse, [res])
                 return [res]

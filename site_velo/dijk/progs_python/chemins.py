@@ -102,7 +102,7 @@ class Chemin():
 
     @classmethod
     def of_django(cls, c_d, g, bavard=0):
-        return cls.of_données(g, c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
+        return cls.of_données(g, c_d.zone, c_d.ar, c_d.p_détour, c_d.étapes_texte, c_d.interdites_texte, bavard=bavard)
 
     
     def vers_django(self, utilisateur=None, bavard=0):
@@ -121,7 +121,8 @@ class Chemin():
             return test.first()
         else:
             c_d = Chemin_d(
-                p_détour = self.p_détour, ar=self.AR, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, utilisateur=utilisateur,début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin
+                p_détour = self.p_détour, ar=self.AR, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, utilisateur=utilisateur,début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin,
+                zone=self.zone
             )
             c_d.save()
             return c_d
@@ -142,7 +143,7 @@ class Chemin():
 
         
     @classmethod
-    def of_données(cls, g, AR, p_détour, étapes_t, rues_interdites_t, bavard=0):
+    def of_données(cls, g, z_d, AR, p_détour, étapes_t, rues_interdites_t, bavard=0):
         """
         Entrée :
             - AR (bool)
@@ -154,7 +155,7 @@ class Chemin():
         #rues interdites
         if len(rues_interdites_t)>0:
             noms_rues = rues_interdites_t.split(";")
-            interdites = arêtes_interdites(g, noms_rues, bavard=bavard)
+            interdites = arêtes_interdites(g, z_d, noms_rues, bavard=bavard)
         else:
             interdites = {}
         
@@ -164,7 +165,7 @@ class Chemin():
         étapes=[]
         for c in noms_étapes:
         #    try:                
-                étapes.append(Étape(c.strip(), g, bavard=bavard-1))
+                étapes.append(Étape(c.strip(), g, z_d, bavard=bavard-1))
         #     except Exception as e:
         #         LOG_PB(f"Échec pour l’étape {c} : {e}")
         #         n_pb+=1
@@ -173,7 +174,7 @@ class Chemin():
 
         
         ## Création de l’objet Chemin
-        chemin = cls(étapes, p_détour, AR, interdites=interdites, texte_interdites=rues_interdites_t)
+        chemin = cls(z_d, étapes, p_détour, AR, interdites=interdites, texte_interdites=rues_interdites_t)
         chemin.texte = étapes_t
         return chemin
 
@@ -196,7 +197,7 @@ class Chemin():
 
     
     @classmethod
-    def of_étapes(cls, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
+    def of_étapes(cls, z_d, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
         """
         Entrées : noms_étapes (str list).
                   pourcentage_détour (int)
@@ -204,12 +205,12 @@ class Chemin():
                   g (Graphe)
         Sortie : instance de Chemin
         """
-        étapes = [Étape(é, g) for é in noms_étapes]
+        étapes = [Étape(é, g, z_d) for é in noms_étapes]
         if bavard>0:
             print(f"List des étapes obtenues : {étapes}")
         
-        return cls(étapes, pourcentage_détour/100, AR,
-                   interdites=arêtes_interdites(g, noms_rues_interdites),
+        return cls(z_d, étapes, pourcentage_détour/100, AR,
+                   interdites=arêtes_interdites(g, z_d, noms_rues_interdites),
                    texte_interdites=";".join(noms_rues_interdites)
                    )
     
@@ -221,7 +222,7 @@ class Chemin():
 
     def renversé(self):
         assert self.AR, "chemin pas réversible"
-        return Chemin(list(reversed(self.étapes)), self.p_détour, self.AR)
+        return Chemin(self.zone, list(reversed(self.étapes)), self.p_détour, self.AR)
 
     def chemin_direct_sans_cycla(self, g):
         """ Renvoie le plus court chemin du départ à l’arrivée."""

@@ -17,7 +17,7 @@ from petites_fonctions import union, mesure_temps
 from time import perf_counter, sleep
 from django.db import transaction, close_old_connections
 from lecture_adresse.arbresLex import ArbreLex
-
+import re
 
 # L’arbre contient les f"{nom_norm}|{code}"
 def à_mettre_dans_arbre(nom_n, code):
@@ -486,7 +486,7 @@ def charge_rues(bavard=0):
 @transaction.atomic
 def charge_csv_chemins(réinit=False):
     """
-    Effet : charge le csv de CHEMIN_CHEMINS dans la base
+    Effet : charge le csv de CHEMIN_CHEMINS dans la base. Dans celui-ci, les villes sont supposées être entre parenthèses.
     Si réinit, vide au prélable la table.
     """
     if réinit:
@@ -499,7 +499,44 @@ def charge_csv_chemins(réinit=False):
             p_détour = int(pourcentage_détour_t)/100.
             if AR_t=="True": AR=True
             else: AR=False
+            if étapes_t: étapes_t = conversion_ligne(étapes_t)
+            if rues_interdites_t: rues_interdites_t = conversion_ligne(rues_interdites_t)
             début, fin = étapes_t[:255], étapes_t[-255:]
             interdites_début, interdites_fin = rues_interdites_t[:255], rues_interdites_t[-255:]
             c_d = Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin)
             c_d.sauv()
+
+
+def conversion_étape(texte, bavard=0):
+    """
+    Entrée : texte d’une étape où la ville est entre parenthèses
+    Sortie : texte d’une étape avec la ville séparée par une virgule.
+    """
+    # Lecture de la regexp
+    e = re.compile("(^[0-9]*) *([^()]+)(\((.*)\))?")
+    essai = re.findall(e, texte)
+    if bavard > 1: print(f"Résultat de la regexp : {essai}")
+    if len(essai) == 1:
+        num, rue, _, ville = essai[0]
+    elif len(essai) == 0:
+        raise SyntaxError(f"adresse mal formée : {texte}")
+    else:
+        print(f"Avertissement : plusieurs interprétations de {texte} : {essai}.")
+    num, rue, _, ville = essai[0]
+    rue=rue.strip()
+    ville=ville.strip()
+
+    if not num:
+        res=""
+    else:
+        res= f"{int(num)} "
+    return res + f"{rue}, {ville}"
+
+
+def conversion_ligne(ligne):
+    """
+    Entrée : ligne (str) étapes séparées par des ; où les villes sont entre parenthèses
+    Sortie (str) : idem mais où les villes sont séparées par des virgules.
+    """
+    étapes = ligne.split(";")
+    return ";".join(conversion_étape(é) for é in étapes)
