@@ -484,11 +484,12 @@ def charge_rues(bavard=0):
 
 
 @transaction.atomic
-def charge_csv_chemins(réinit=False):
+def charge_csv_chemins(zone_t, réinit=False):
     """
     Effet : charge le csv de CHEMIN_CHEMINS dans la base. Dans celui-ci, les villes sont supposées être entre parenthèses.
     Si réinit, vide au prélable la table.
     """
+    z_d = Zone.objects.get(nom=zone_t)
     if réinit:
         Chemin_d.objects.all().delete()
     with open(CHEMIN_CHEMINS) as entrée:
@@ -503,7 +504,7 @@ def charge_csv_chemins(réinit=False):
             if rues_interdites_t: rues_interdites_t = conversion_ligne(rues_interdites_t)
             début, fin = étapes_t[:255], étapes_t[-255:]
             interdites_début, interdites_fin = rues_interdites_t[:255], rues_interdites_t[-255:]
-            c_d = Chemin_d(ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin)
+            c_d = Chemin_d(zone=z_d, ar=AR, p_détour=p_détour, étapes_texte=étapes_t, interdites_texte=rues_interdites_t, début=début, fin = fin, interdites_début=interdites_début, interdites_fin=interdites_fin)
             c_d.sauv()
 
 
