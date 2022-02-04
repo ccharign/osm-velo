@@ -261,7 +261,7 @@ def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
 
     arêtes = []
 
-    for a in mo.Arête.objects.exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
+    for a in mo.Arête.objects.filter(zone=z_d).exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
         i=num_paquet(a.cycla)
         #nœuds_par_cycla[i].add(s)
         #nœuds_par_cycla[i].add(t)
