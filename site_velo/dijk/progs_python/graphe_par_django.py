@@ -210,9 +210,9 @@ class Graphe_django():
     def longueur_itinéraire(self, iti_d):
         """
         Entrée : iti_d (Arête list)
-        Sortie : la vraie longueur de l'itinéraire.
+        Sortie : la vraie longueur de l'itinéraire. Arrondie à l’entier inférieur.
         """
-        return sum(a.longueur for a in iti_d)
+        return int(sum(a.longueur for a in iti_d))
 
 
     def tous_les_nœuds(self):
