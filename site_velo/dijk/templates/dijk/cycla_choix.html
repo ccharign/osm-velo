@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titre %}
+Carte de la cyclabilité
+{% endblock %}
+{% block contenu %}
+Choisissez la zone de laquelle afficher la carte de la cyclabilité :
+
+<ul>
+{% for z in zones %}
+<li> <a href="{% url 'cycla'%}{{z}}"> {{z}} </a> </li>
+{% endfor %}
+</ul>
+  {% endblock %}

@@ -241,12 +241,12 @@ def moyenne(t):
     return sum(t)/len(t)
 
 
-def dessine_cycla(g, où_enregistrer=TMP, bavard=0):
+def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
     """
     Crée la carte de la cyclabilité.
     """
    
-    mini, maxi = g.cycla_min, g.cycla_max #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
+    mini, maxi = g.cycla_min[z_d], g.cycla_max[z_d] #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
     
     def num_paquet(val):
@@ -297,8 +297,7 @@ def lecture_tous_les_chemins(g, z_d=None, bavard=0):
     for z in à_parcourir:
         for c_d in Chemin_d.objects.filter(zone=z):
             c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
-            with transaction.atomic():
-                n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
-                c_d.dernier_p_modif = n_modif/l
-                c_d.save()
-                print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")
+            n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
+            c_d.dernier_p_modif = n_modif/l
+            c_d.save()
+            print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")

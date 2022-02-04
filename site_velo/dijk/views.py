@@ -53,7 +53,7 @@ def index(requête):
     return render(requête, "dijk/index.html", {"zones":Zone.objects.all()})
 
 def mode_demploi(requête):
-    return render(requête, "dijk/mode_demploi.html", {"ville_défaut":g.ville_défaut})
+    return render(requête, "dijk/mode_demploi.html", {})
 
 def contribution(requête):
     return render(requête, "dijk/contribution.html", {})
@@ -149,9 +149,21 @@ def confirme_nv_chemin(requête):
 
 ### Carte cycla ###
 
+def cycla_choix(requête):
+    """
+    Renvoie la page de choix de la zone pour laquelle afficher la cycla.
+    """
+    zones = Zone.objects.all()
+    return render(requête, "dijk/cycla_choix.html", {"zones":zones})
 
-def carte_cycla(requête):
-    dessine_cycla(g, où_enregistrer="dijk/templates/dijk")
+
+def carte_cycla(requête, zone_t):
+    """
+    Renvoie la carte de la cyclabilité de la zone indiquée.
+    """
+    z_d = Zone.objects.get(nom=zone_t)
+    if zone_t not in g.zones : g.charge_zone(zone_t)
+    dessine_cycla(g, z_d, où_enregistrer="dijk/templates/dijk")
     return render(requête, "dijk/cycla.html")
 
 
