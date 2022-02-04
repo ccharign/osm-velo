@@ -113,7 +113,7 @@ def vue_itinéraire(requête):
                    "départ":d, "arrivée":a,
                    "étapes": texte_étapes,
                    "rues_interdites": énumération_texte(rues_interdites),
-                   "chemin":str(chemin),
+                   "chemin":chemin.str_joli(),
                    "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
                    }
                   )

@@ -219,9 +219,6 @@ class Graphe_django():
         return Sommet.objects.all()
 
 
-    
-
-        
     def voisins(self, s, p_détour, interdites={}):
         """
         La méthode utilisée par dijkstra.
@@ -239,6 +236,7 @@ class Graphe_django():
         else:
             return tout
 
+        
     def voisins_nus(self, s):
         return [t for (t,_) in self.dico_voisins[s]]
 

@@ -179,23 +179,6 @@ class Chemin():
         return chemin
 
     
-    # def sauv(self, adresse=CHEMIN_CHEMINS, bavard=0):
-    #     """ Ajoute le chemin dans le csv, après avoir vérifié qu’il n’y est pas déjà."""
-            
-    #     ligne = f"{self.AR}|{int(self.p_détour*100)}|{ ';'.join(map(str, self.étapes)) }|{self.noms_rues_interdites}\n"
-        
-    #     with open(adresse, encoding="utf-8") as entrée:
-    #         for ligne_e in entrée:
-    #             if ligne_e==ligne:
-    #                 print(f"Ligne déjà présente : {ligne}")
-    #                 return None
-                
-    #     with open(adresse, "a", encoding="utf-8") as sortie:
-    #         sortie.write(ligne)
-    #     if bavard>0:
-    #         print("Chemin {self} enregistré dans {adress}.")
-
-    
     @classmethod
     def of_étapes(cls, z_d, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
         """
@@ -221,7 +204,7 @@ class Chemin():
         return self.étapes[-1]
 
     def renversé(self):
-        assert self.AR, "chemin pas réversible"
+        assert self.AR, "chemin pas réversible (AR est faux)"
         return Chemin(self.zone, list(reversed(self.étapes)), self.p_détour, self.AR)
 
     def chemin_direct_sans_cycla(self, g):
@@ -237,6 +220,16 @@ class Chemin():
         res = f"AR : {self.AR}\np_détour : {self.p_détour}\nÉtapes : " + ";".join(map(str, self.étapes))
         if self.noms_rues_interdites: res+=f"\n Rues interdites : {self.noms_rues_interdites}"
         return  res
+
+    def str_joli(self):
+        res = f"Itinéraire de {self.départ()} à {self.arrivée()}"
+        milieu = self.étapes[1:-1]
+        if milieu:
+            res+= f" en passant par {','.join(milieu)}"
+        if self.noms_rues_interdites:
+            res+=f" et en évitant {','.join(self.noms_rues_interdites)}"
+        return res+"."
+        
 
     def texte_court(self, n_étapes=4):
         if len(self.étapes) <= n_étapes:
