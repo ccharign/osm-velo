@@ -66,8 +66,10 @@ class Graphe_django():
             for a in arêtes:
                 s = a.départ.id_osm
                 t = a.arrivée.id_osm
+                #if z_d not in a.départ.zone.all() or z_d not in a.arrivée.zone.all():
+                #    raise RuntimeError(f"Un sommet de l’arête {a} n’était pas dans la même zone que celle-ci ({z_d}).")
                 if s not in self.dico_voisins: self.dico_voisins[s]=[]
-                if a.cyclabilité()>0: # ceci supprime les autoroute actuellement
+                if a.cyclabilité()>0: # ceci supprime les autoroutes actuellement
                     self.dico_voisins[s].append((t, a))
             tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
@@ -79,7 +81,8 @@ class Graphe_django():
 
             #cycla min et max
             self.calcule_cycla_min_max(z_d)
-            
+        else:
+            print(f"Zone déjà en mémoire : {z_d}.")
         return z_d
         
     def __contains__(self, s):

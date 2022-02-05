@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}
+Pourcentages de voies piétonnes et de pistes cyclables
+{% endblock %}
+
+{% block contenu %}
+<table border=1px>
+  <tr>
+    <th> Ville </th> <th> Pourcentage de voies piétonnes </th> <th> Pourcentage de pistes cyclables </th>
+  </tr>
+  
+  {% for x in stats %}
+  <tr>
+    <th> {{x.0}}</th> <th> {{x.1}} </th> <th> {{x.2}} </th>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

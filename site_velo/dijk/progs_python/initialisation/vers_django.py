@@ -13,7 +13,7 @@ from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Vil
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
 #from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
-from petites_fonctions import union, mesure_temps
+from petites_fonctions import union, mesure_temps, intersection
 from time import perf_counter, sleep
 from django.db import transaction, close_old_connections
 from lecture_adresse.arbresLex import ArbreLex
@@ -217,11 +217,10 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
 
     gx = g.multidigraphe
 
-    ### Chargement des arêtes###
-
     tous_les_sommets = Sommet.objects.all()
     print(f"{len(tous_les_sommets)} sommets dans la base")
-        
+
+    ### Sommets ###
     if not juste_arêtes:
         LOG("Chargement des sommets")
         à_créer = []
@@ -266,7 +265,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         Sommet.zone.through.objects.bulk_create(rel_àcréer)
 
 
-    ### Transfert des arêtes ###
+    ### Arêtes ###
 
     # pour profiling
     temps={"correspondance":0., "remplace_arêtes":0., "màj_arêtes":0., "récup_nom":0.}
@@ -382,19 +381,20 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     LOG("Ajout des nouvelles arêtes dans la base")
     #créées=Arête.objects.bulk_create(à_créer)
     sauv_données(à_créer)
-    #print(f"{len(créées)} arêtes créées")
-    #if len(créées)!=len(à_créer):
-    #    raise RuntimeError(f"Pas le bon nombre d’arêtes créées.")
     LOG("Mise à jour des anciennes arêtes")
     Arête.objects.bulk_update(à_màj, ["cycla_défaut"])
 
+    
+    ### Zone des arêtes
     LOG("Ajout de la zone à chaque arête")
     nb=0
+    ## nouvelles arêtes
     rel_àcréer=[]
     for i, a_d in enumerate(à_créer):
         rel = Arête.zone.through(arête_id = a_d.id, zone_id = zone_d.id)
         rel_àcréer.append(rel)
     Arête.zone.through.objects.bulk_create(rel_àcréer)
+    ## Anciennes arêtes mises à jour
     rel_àcréer=[]
     for a_d in à_màj:
         if zone_d not in a_d.zone.all() :

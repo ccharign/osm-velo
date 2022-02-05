@@ -63,6 +63,7 @@ def distance_si_pas_trop(c1, c2):
     else:
         return d
 
+    
 def deuxConséc(t):
     """ Renvoie un itérateur sur les couples d'éléments consécutifs de t."""
     n = len(t)
@@ -71,14 +72,24 @@ def deuxConséc(t):
 
 def union(t1, t2):
     """
-    Entrée : t1, t2 deux itérateur
-    Sortie : itérateur sur t1 ∪ t2
+    Entrée : t1 itérable, t2 itérable ou itérateur.
+    Sortie : itérateur sur t1 ∪ t2, doublons enlevés.
+    Utilisation de « in t1 ».
     """
     for x in t1:
         yield x
     for x in t2:
-        yield x
-        
+        if x not in t1:
+            yield x
+
+
+def intersection(t1, t2):
+    """ Itérateur sur t1 ∩ t2."""
+    for x in t1:
+        if x in t2:
+            yield x
+
+
 def ajouteDico(d, clef, val):
     """d est un dico de listes.
        Ajoute val à la liste de clef donnée si pas encore présente."""
