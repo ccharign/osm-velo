@@ -291,26 +291,26 @@ from petites_fonctions import deuxConséc
 #     return pl
 
 
-def polyline_of_arête(g, s, t, popup=None, **kwargs):
+def polyline_of_arête(g, a, popup=None, **kwargs):
     """
     Entrées:
         g (graphe)
-        s, t deux sommets formant une arête
+        a (Arête)
         popup : texte à afficher. Si None, on prendra le nom de l’arête si disponible.
     """
-    locations, nom = g.geom_arête(s,t)
+    locations, nom = a.géométrie(), a.nom
     if popup is None:
-        popup=nom
+        popup = nom
     loc_à_lenvers = [(lat, lon) for lon, lat in locations]
-    pl=folium.PolyLine(locations=loc_à_lenvers, popup=popup, **kwargs)
+    pl = folium.PolyLine(locations=loc_à_lenvers, popup=popup, **kwargs)
     return pl
 
 
-def folium_of_chemin(g, iti, carte=None, tiles="cartodbpositron", zoom=1, fit=False, **kwargs):
+def folium_of_chemin(g, iti_d, p, carte=None, tiles="cartodbpositron", zoom=1, fit=False, **kwargs):
     """
     Entrées : 
         g (graphe)
-        iti (int list) : itinéraire, càd liste de sommets adjacents
+        iti_d (Arête list) : itinéraire
         carte (folium.Map)
         zoom : niveau de zoom initial
         fit : si vrai, cadre la carte avec le départ et l’arrivée de iti
@@ -318,15 +318,16 @@ def folium_of_chemin(g, iti, carte=None, tiles="cartodbpositron", zoom=1, fit=Fa
     Sortie : carte de folium.Map
     """
 
-    cd, cf = g.coords_of_nœud(iti[0]), g.coords_of_nœud(iti[-1])
+    #cd, cf = g.coords_of_id_osm(iti[0]), g.coords_of_id_osm(iti[-1])
+    cd, cf = iti_d[0].départ.coords(), iti_d[-1].arrivée.coords() # 
     cm = (cd[0]+cf[0])/2., (cd[1]+cf[1])/2.
     
     if carte is None:
         carte = folium.Map(location=(cm[1], cm[0]), zoom_start=zoom, tiles=tiles) #Dans folium les coords sont lat, lon au lieu de lon, lat
     
 
-    for s,t in deuxConséc(iti):
-        pl=polyline_of_arête(g, s, t, **kwargs)
+    for a in iti_d:
+        pl=polyline_of_arête(g, a, **kwargs)
         pl.add_to(carte)
 
     if fit:
@@ -336,11 +337,12 @@ def folium_of_chemin(g, iti, carte=None, tiles="cartodbpositron", zoom=1, fit=Fa
 
     return carte
 
+
 def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
     """
     Entrées : 
         g (graphe)
-        arêtes, liste de triplets (s,t, dico des args à passer à PolyLine)
+        arêtes, liste de couples (Arête, dico des args à passer à PolyLine)
         carte (folium.Map)
         zoom : niveau de zoom initial
         fit : si vrai, cadre la carte avec le départ et l’arrivée de iti
@@ -352,15 +354,15 @@ def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
     """
 
     if carte is None:
-        lon,lat = g.coords_of_nœud(arêtes[0][0])
+        lon, lat = arêtes[0][0].départ.coords()
         carte = folium.Map(location=(lat,lon), zoom_start=zoom, tiles=tiles)
 
     lons, lats = [], []
-    for s, t, kwargs in arêtes:
-        c1, c2 = g.coords_of_nœud(s), g.coords_of_nœud(t)
+    for a, kwargs in arêtes:
+        c1, c2 = a.départ.coords(), a.arrivée.coords()
         lons.extend((c1[0], c2[0]))
         lats.extend((c1[1], c2[1]))
-        pl=polyline_of_arête(g, s, t, **kwargs)
+        pl=polyline_of_arête(g, a, **kwargs)
         pl.add_to(carte)
     o=min(lons)
     e=max(lons)

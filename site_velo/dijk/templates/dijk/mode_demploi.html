@@ -9,21 +9,20 @@
 <h2>Qu’est-ce que c’est ?</h2>
 
 <p>
-Ce site permet de calculer des itinéraires à vélo dans l’ogglomération de {{ville_défaut}}. Sa spécificité est d’être basée sur une intelligence artificielle : en apprenant des trajets rentrés par les utilisateurs, il donne des résultats de plus en plus pertinents.
+Ce site permet de calculer des itinéraires à vélo. Sa spécificité est d’être basée sur une intelligence artificielle : en apprenant des trajets rentrés par les utilisateurs, il donne des résultats de plus en plus pertinents.
 </p>
 
 <p>
-  Avantage : les trajets sont calculés en tenant compte de l’expérience des autres utilisateurs, donc de vrais cyclistes. Une rue sera décrétée adaptée aux vélos si et seulement si elle a été choisie par d’autres cyclistes, et non selon des critères plus facile à obtenir mais moins fiables tels que la présence « officielle » d’une bande cyclable, la limite de vittesse « théoriquement » respectée par les automobilistes, etc.
+  Ainsi les trajets sont calculés en tenant compte de l’expérience des autres utilisateurs, donc de vrais cyclistes. Une rue sera décrétée adaptée aux vélos si et seulement si elle a été choisie par d’autres cyclistes, et non selon des critères plus facile à obtenir mais moins fiables tels que la présence « officielle » d’une bande cyclable, une limite de vitesse « théoriquement » respectée par les automobilistes, etc.
 
   Ainsi les itinéraires calculés seront-ils choisis pour être, dans la mesure du possible, sécurisé et agréables, selon les critères de la communauté des utilisateurs.
 </p>
 
 <p>
-  Inconvénients :
-  <ul>
-    <li>Dans les zones où l’IA n’a pas encore été suffisamment entraînée, l’algo affichera juste le plus court chemin</li>
-    <li>Toujours dans ces zones, l’algo peut renvoyer un passage en sens interdit. Et dans une zone entraînée, l’algo renverra un sens interdit si la plupart des utilisateurs le prennent... 
-  </ul>
+Cepemdant dans les zones où l’IA n’a pas encore été suffisamment entraînée, elle se rabat sur les critères simples tels que la présence d’une piste cyclable ou d’une zone 30 ou piétonne.
+
+Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s’il permet de gagner beaucoup de temps ou si la plupart des utilisateurs le prennent... 
+
 </p>
 
 <p>La carte de la cyclabilité permet de se rendre compte de l’état de L’IA. Les rues à favoriser apparaissent en vert, et celles à éviter en rouge.</p>
@@ -32,7 +31,7 @@ Ce site permet de calculer des itinéraires à vélo dans l’ogglomération de 
 <p>Remplir le champ « départ », le champ « arrivée », taper sur « entrée ». Bon vous aviez déjà deviné.</p>
 
 <p>
-  Par défaut, les étapes sont recherchées dans {{ville_défaut}}. Pour indiquer une autre ville, la mettre entre parenthèses. Par exemple : « 12 rue de l’église (Lons) », « europub (billère) », ou encore « boulangerie (Bizanos) ». (Pour ce dernier exemple, l’algo renverra la première boulangerie de Bizanos qu’il aura trouvé.)<br>
+  Pour indiquer une autre ville que la velle par défaut de la zone choisie, la mettre après une virgule. Par exemple : « 12 rue de l’église, Lons », « europub, billère », ou encore « boulangerie, Bizanos ». (Pour ce dernier exemple, l’algo renverra la première boulangerie de Bizanos qu’il aura trouvé. Un jour je travaillerai à lui faire renvoyer la plus proche.)<br>
 
   Pour les noms de rue et de ville, l’algo est tolérant à deux fautes de frappe (« plac Clamenceau » au lieu de « place Clémenceau ») et ne fait pas attention aux majuscules.
 
@@ -56,17 +55,15 @@ Ce site permet de calculer des itinéraires à vélo dans l’ogglomération de 
   C’est que l’IA est peu ou mal entrainée dans ce quartier !<br>
   
   Pour la guider, vous pouvez remplir les champs « étapes » ou « rues interdites » par une ou plusieurs rues, séparées par des point-virgules. Après une première recherche, ces champs sont disponibles en dessous de la carte.
-  </p>
+</p>
+
+
 
 
 <h2>Entraîner l’IA</h2>
 
 
-<p>
-  L’algo est basé sur une intelligence artifielle. Cela signifie que c’est en analysant les trajets qui lui ont été présentés comme adaptés aux vélos qu’il déduit quels tronçons de rues sont à favoriser et lesquels sont à éviter.
-</p>
-
-<p>C’est pourquoi il est important, pour l’efficacité de l’appli que les utilisateurs comme vous indiquent les itinéraires qu’ils recommandent !
+<p>Il est important, pour l’efficacité de l’appli que les utilisateurs comme vous indiquent les itinéraires qu’ils recommandent !
   <br>
   Pour ce, effectuer une recherche sur un trajet que vous connaissez bien (domicile-travail par exemple). Si l’itinéraire proposé vous semble moins adapté que le votre, renseignez les champs « étapes » et « rues interdites » jusqu’à obtenir l’itinéraire souhaité. Si le même itinéraire est valable dans les deux sens (pas de sens interdit notamment), cochez la case idoine. Enfin, remplissez la case « pourcentage détour » pour préciser le profil de cyclistes auxquels s’adresse votre trajet. Puis cliquez sur « enregistrez votre contribution » : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
 </p>
@@ -78,7 +75,7 @@ Ce site permet de calculer des itinéraires à vélo dans l’ogglomération de 
 
   Subtilité : la notion de cyclabilité employée par l’algo est « locale », ainsi un tronçon de rue apparaît en vert lorsqu’il est plus agréable, ou juste moins désagréable, que ses voisins : cela ne signifie pas qu’il est agréable dans l’absolu. En particulier deux rues d’une même couleur dans deux quartiers différents peuvent être très différentes.<br>
 
-  De part la conception même de l’algo il y a à peu près autant de rouge que de vert. Mais si on comparait Pau à une ville un peu axée sur les mobilités douces, la carte serait à peu près entièrement rouge.
+  De part la conception même de l’algo il y a à peu près autant de rouge que de vert. Mais si on comparait Pau à une ville un peu axée sur les mobilités douces, la carte serait majoritairement rouge.
   </p>
 
 

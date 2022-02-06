@@ -1,1 +1,9 @@
 # -*- coding:utf-8 -*-
+"""
+Fonctions permettant de remplir la base.
+Ce module ne sera pas chargé lors d’une utilisation de routine de l’appli. Il utilise la bibliotèque osmnx qui est longue à charger.
+"""
+
+from .initialisation import charge_ville
+from .initialisation import charge_zone
+from .stats import pourcentage_piéton_et_pistes_cyclables

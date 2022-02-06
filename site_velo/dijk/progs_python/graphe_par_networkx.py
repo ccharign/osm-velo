@@ -14,10 +14,10 @@ from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN
 # from osmnx import nearest_nodes
 # chrono(tic, "osmnx (pour nearest_nodes)", bavard=1)
 
-class Graphe_nw():
+class Graphe_nx():
     """
     Classe de graphe basée sur le graphe networkx tiré d’osm.
-    Pour être utilisé lors de la phase d’initialisation quamd aucune donnée n’a encore été obtenue.
+    Pour être utilisé lors de la phase d’initialisation quand aucune donnée n’a encore été obtenue.
     Munie tout de même des méthodes rue_dune_arête et ville_dune_sommet. Le première fonctionne grâce au champ « name » présent dans les arêtes dans le graphe renvoyé par osm. La seconde grâce au dico ville_of_nœud, rempli par ajoute_villes.
 
     Attributs:
@@ -82,7 +82,7 @@ class Graphe_nw():
         """ Renvoie le couple (lon, lat)
          dans osmnx : x=lon, y=lat.
         """
-        return self.digraphe.nodes[n]["x"], self.digraphe.nodes[n]["y"]
+        return self.multidigraphe.nodes[n]["x"], self.multidigraphe.nodes[n]["y"]
 
 
     def simplifie(self):
@@ -100,18 +100,18 @@ class Graphe_nw():
 
     
     def rue_dune_arête(self, s, t, bavard=0):
-        """ Tuple des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
+        """ Liste des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
             Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
-        try:
-            res = self.digraphe[s][t]["name"]
-            if isinstance(res, str):
-                return res,
-            else:
-                return res
-        except KeyError:
-            if bavard>0:
-                print(f"L’arête {(s,t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
-            return ()
+        res = []
+        for a in self.multidigraphe[s][t].values():
+            if "name" in a:
+                if isinstance(a["name"], str):
+                    res.append(a["name"])
+                else:
+                    res.extend(a["name"])
+        if len(res)==0 and bavard>0:
+            print(f"L’arête {(s, t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
+        return res
 
     ### Remplacé par villes_dun_sommet
     # def ville_dune_arête(self, s, t, bavard=0):
@@ -168,9 +168,9 @@ class Graphe_nw():
     def voisins(self, s, p_détour, interdites={}):
         """
         La méthode utilisée par dijkstra. Renvoie les couples (voisin, longueur de l'arrête) issus du sommet s.
-        La longueur de l'arrête (s,t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
+        La longueur de l'arrête (s, t) est sa longueur physique divisée par sa cyclabilité (s'il y en a une).
         Paramètres :
-             - p_détour (float) : pourcentage de détour accepté.
+             - p_détour (float) : proportion de détour accepté.
              - interdites : arêtes interdites.
         """
         #assert s in self.digraphe.nodes, f"le sommet {s} reçu par la méthode voisins n’est pas dans le graphe"

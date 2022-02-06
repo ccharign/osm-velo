@@ -3,8 +3,8 @@
 ### Fonctions diverses pour utiliser le logiciel
 
 from time import perf_counter
-from petites_fonctions import chrono
-
+from petites_fonctions import chrono, deuxConséc
+import dijk.models as mo
 from params import TMP
 #from importlib import reload  # recharger un module après modif
 import subprocess
@@ -26,92 +26,89 @@ tic=perf_counter()
 import chemins  # classe chemin et lecture du csv
 chrono(tic, "chemins", bavard=2)
 
-from lecture_adresse.normalisation import VILLE_DÉFAUT, normalise_rue, normalise_ville
+from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import os
-#import recup_donnees
-#import module_graphe
-#import webbrowser
-#from matplotlib import cm
+
 
 tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
 
-# def flatten(c):
-#     """ Ne sert que pour dessine_chemins qui lui même ne sert presque à rien."""
-#     res = []
-#     for x in c:
-#         res.extend(x)
-#     return res
+from dijk.models import Chemin_d
+import apprentissage as ap
+from django.db import transaction
 
 
-# def ouvre_html(fichier):
-#     webbrowser.open(fichier)
-
-
-def cheminsValides(chemins, g):
-    """ Renvoie les chemins pour lesquels dijkstra.chemin_étapes a fonctionné sans erreur."""
-    res = []
-    for c in chemins:
-        try:
-            dijkstra.chemin_étapes_ensembles(g, c)
-            res.append(c)
-        except dijkstra.PasDeChemin as e:
-            print(e)
-            print(f"Pas de chemin avec étapes pour {c}")
+def liste_Arête_of_iti(g, iti, p_détour):
+    """
+    Entrée : iti (int list), liste d'id osm
+    Sortie : liste d'Arêtes
+    """
+    tic=perf_counter()
+    res = [g.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
+    chrono(tic, "conversion de l'itinéraire en liste d'Arêtes.")
     return res
 
 
-def itinéraire(départ, arrivée, ps_détour, g,
+
+def itinéraire(départ, arrivée, ps_détour, g, z_d,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
                où_enregistrer=os.path.join(TMP, "itinéraire.html"),
                bavard=0, ouvrir=False):
     """ 
     Entrées :
       - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
+      - g (graphe)
+      - z_d (Zone) : sert pour récupérer la ville défaut.
       - départ, arrivée : chaîne de caractère décrivant le départ et l’arrivée. Seront lues par chemins.Étape.
       - noms_étapes : liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
              Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
-    Sortie : liste de (légend, longeur, longueur ressentie, couleur) pour les itinéraires obtenus
+    Sortie : liste de (légende, longueur, longueur ressentie, couleur) pour les itinéraires obtenus.
     """
 
     ## Calcul des étapes
-    d = chemins.Étape(départ, g, bavard=bavard-1)
+    tic0=perf_counter()
+    d = chemins.Étape(départ, g, z_d, bavard=bavard-1)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
         #print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
-    a = chemins.Étape(arrivée, g, bavard=bavard-1)
+    a = chemins.Étape(arrivée, g, z_d, bavard=bavard-1)
     if bavard>0:
         print(f"Arrivée trouvé : {a}")
-    étapes = [chemins.Étape(é, g) for é in noms_étapes]
+    étapes = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
 
 
     ## Arêtes interdites
-    interdites = chemins.arêtes_interdites(g, rues_interdites, bavard=bavard)
-
+    interdites = chemins.arêtes_interdites(g, z_d, rues_interdites, bavard=bavard)
+    tic=chrono(tic0, "Calcul des étapes et arêtes interdites.")
     
     np = len(ps_détour)
     à_dessiner = []
     res = []
     for i, p in enumerate(ps_détour):
-        c = chemins.Chemin([d]+étapes+[a], p, False, interdites=interdites)
-        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, c, bavard=bavard-1)
-        if bavard>1:print(iti)
+        c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
+        iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
-        à_dessiner.append( (iti, coul))
-        res.append((f"Avec pourcentage détour de {100*p}", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
+        à_dessiner.append( (iti_d, coul, p))
+        res.append((f"Avec pourcentage détour de {100*p}",
+                    g.longueur_itinéraire(iti_d), int(l_ressentie), coul )
+                   )
+        tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if rajouter_iti_direct:
-        cd = chemins.Chemin([d,a], 0, False)
-        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(g, cd, bavard=bavard-1)
+        cd = chemins.Chemin(z_d, [d,a], 0, False)
+        iti_d, l_ressentie = g.itinéraire(cd, bavard=bavard-1)
         coul = "#000000"
-        à_dessiner.append( (iti, coul))
-        res.append(("Itinéraire direct", g.longueur_itinéraire(iti), int(l_ressentie), coul ))
+        à_dessiner.append( (iti_d, coul, 0))
+        res.append(("Itinéraire direct", g.longueur_itinéraire(iti_d), int(l_ressentie), coul ))
+        tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
-        
+    tic=perf_counter()
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    chrono(tic, "Dessin")
+    chrono(tic0, f"Total pour l'itinéraire {c}")
     return res, c
     
 
@@ -129,26 +126,26 @@ def itinéraire(départ, arrivée, ps_détour, g,
 def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     """
     Entrées :
-      - listes_chemins : liste de couples (liste de sommets, couleur)
+      - listes_chemins : liste de couples (liste d'Arêtes, couleur)
       - g (instance de Graphe)
       - où_enregistrer : adresse du fichier html à créer
     Effet:
       Crée le fichier html de la carte superposant tous les itinéraires fournis.
     """
 
-    l, coul = listes_chemins[0]
+    l, coul, p = listes_chemins[0]
     #sous_graphe = g.g.multidigraphe.subgraph(l)
     #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
-    carte = folium_of_chemin(g, l, fit=True, color=coul)
+    carte = folium_of_chemin(g, l, p, fit=True, color=coul)
     #carte = plot_route_folium(g.g.multidigraphe, l, popup_attribute="name", color=coul) # Ne marche pas...
-    for l, coul in listes_chemins[1:]:
+    for l, coul, p in listes_chemins[1:]:
         #sous_graphe = g.g.multidigraphe.subgraph(l)
         #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
-        carte = folium_of_chemin(g, l, carte=carte, color=coul)
+        carte = folium_of_chemin(g, l, p, carte=carte, color=coul)
     
     
-    ajoute_marqueur(g.coords_of_nœud(l[0]), carte)
-    ajoute_marqueur(g.coords_of_nœud(l[-1]), carte)
+    ajoute_marqueur(l[0].départ.coords(), carte)
+    ajoute_marqueur(l[-1].arrivée.coords(), carte)
     
     carte.save(où_enregistrer)
     if ouvrir : ouvre_html(où_enregistrer)
@@ -185,13 +182,13 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
 
     # Calcul des chemins
     c_complet, _ = dijkstra.chemin_étapes_ensembles(g, c)
-    longueur = g.longueur_itinéraire(c_complet)
+    longueur = g.longueur_itinéraire(c_complet, c.p_détour)
     
     départ, arrivée = c_complet[0], c_complet[-1]
     c_direct, _ = dijkstra.chemin(g, départ, arrivée, 0)
-    longueur_direct = g.longueur_itinéraire(c_direct)
+    longueur_direct = g.longueur_itinéraire(c_direct, 0)
 
-    dessine([(c_complet, "blue"), (c_direct,"red")], g, où_enregistrer, ouvrir=ouvrir)
+    dessine([(c_complet, "blue", c.p_détour), (c_direct,"red", 0)], g, où_enregistrer, ouvrir=ouvrir)
     return longueur, longueur_direct
 
     
@@ -240,15 +237,17 @@ def affiche_rue(nom_ville, rue, g, bavard=0):
     sommets = g.nœuds[ville.nom][normalise_rue(rue, ville)]
     affiche_sommets(sommets, g)
 
+
 def moyenne(t):
     return sum(t)/len(t)
 
-def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
+
+def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
     """
     Crée la carte de la cyclabilité.
     """
    
-    mini, maxi = min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
+    mini, maxi = g.cycla_min[z_d], g.cycla_max[z_d] #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
     
     def num_paquet(val):
@@ -261,24 +260,13 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
         else:
             return int((val-1)/(maxi-1)*n_coul/2+n_coul/2)
 
-        
+    arêtes = []
 
-    #nœuds_par_cycla = [ set() for i in range(n_coul)]
-    arêtes=[]
-
-    for s in g.g.digraphe.nodes:
-        for t in g.voisins_nus(s):
-            vals=[]
-            if (s,t) in g.g.cyclabilité:
-                vals.append(g.g.cyclabilité[(s,t)])
-            if (t,s) in g.g.cyclabilité:
-                vals.append(g.g.cyclabilité[(t,s)])
-            if len(vals)>0:
-                val = moyenne(vals)
-                i=num_paquet(val)
-                #nœuds_par_cycla[i].add(s)
-                #nœuds_par_cycla[i].add(t)
-                arêtes.append((s, t, {"color":color_dict[i], "popup":val}))
+    for a in mo.Arête.objects.filter(zone=z_d).exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
+        i=num_paquet(a.cycla)
+        #nœuds_par_cycla[i].add(s)
+        #nœuds_par_cycla[i].add(t)
+        arêtes.append((a, {"color":color_dict[i], "popup":a.cycla}))
 
 
     # début=True
@@ -295,6 +283,22 @@ def dessine_cycla(g, où_enregistrer=TMP, bavard=0, ouvrir=False ):
     carte = folium_of_arêtes(g, arêtes)
     nom = os.path.join(où_enregistrer, "cycla.html")
     carte.save(nom)
-    if ouvrir : ouvre_html(nom)
 
     
+### Apprentissage ###
+
+def lecture_tous_les_chemins(g, z_d=None, bavard=0):
+    """
+    Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
+    """
+    if z_d is None:
+        à_parcourir = g.zones
+    else:
+        à_parcourir = [z_d]
+    for z in à_parcourir:
+        for c_d in Chemin_d.objects.filter(zone=z):
+            c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
+            n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
+            c_d.dernier_p_modif = n_modif/l
+            c_d.save()
+            print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 
-#################### Rajouter la ville aux données des nœuds ####################
+#################### Rajoter la ville aux données des nœuds ####################
 
 
 import overpy

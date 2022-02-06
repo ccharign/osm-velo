@@ -7,37 +7,46 @@ tic0=time.perf_counter()
 
 from dijk.progs_python.params import LOG
 from petites_fonctions import chrono
-from dijk.progs_python.lecture_adresse.normalisation import VILLE_DÉFAUT, Adresse
-chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
+from dijk.progs_python.lecture_adresse.normalisation import Adresse
+tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
+<<<<<<< HEAD
+=======
+from dijk.progs_python.chemins import Chemin, chemins_of_csv
+tic=chrono(tic, "chemins", bavard=3)
+>>>>>>> sommets_par_django
 
-tic=time.perf_counter()
-from dijk.progs_python.init_graphe import charge_graphe
-chrono(tic, "charge_graphe", bavard=3)
+#from dijk.progs_python.init_graphe import charge_graphe
+#tic=chrono(tic, "charge_graphe", bavard=3)
 
-tic=time.perf_counter()
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from dijk.progs_python.recup_donnees import LieuPasTrouvé
-from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection
+from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
-chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
+tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
-tic=time.perf_counter()
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
+<<<<<<< HEAD
 
 tic=time.perf_counter()
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
 chrono(tic, "chemins", bavard=3)
 
 
+=======
+from graphe_par_django import Graphe_django
+g=Graphe_django()
+#g.charge_zone()
+>>>>>>> sommets_par_django
 from datetime import datetime
 from glob import glob
 import os
+from dijk.models import Chemin_d, Zone
 
-tic=time.perf_counter()
-g=charge_graphe()
-LOG(f"{time.perf_counter()-tic}s pour le chargement du graphe", "perfs", bavard=3)
+
+
+#g=charge_graphe()
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
@@ -45,14 +54,18 @@ chrono(tic0, "Chargement total\n\n", bavard=3)
 
 
 # Utiliser as_view dans url.py pour remplacer les lignes ci-dessous
-def index(requête):
-    return render(requête, "dijk/index.html", {"ville":VILLE_DÉFAUT})
+def recherche(requête, zone_t):
+    z_d = g.charge_zone(zone_t)
+    return render(requête, "dijk/recherche.html", {"ville":z_d.ville_défaut, "zone_t":zone_t})
 
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
 
+def index(requête):
+    return render(requête, "dijk/index.html", {"zones":Zone.objects.all()})
+
 def mode_demploi(requête):
-    return render(requête, "dijk/mode_demploi.html", {"ville_défaut":VILLE_DÉFAUT})
+    return render(requête, "dijk/mode_demploi.html", {})
 
 def contribution(requête):
     return render(requête, "dijk/contribution.html", {})
@@ -71,6 +84,7 @@ def vue_itinéraire(requête):
     # Récupération des données du post
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
+    z_d = Zone.objects.get(nom=requête.POST["zone_t"])
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
     texte_étapes = énumération_texte(noms_étapes)
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
@@ -81,7 +95,7 @@ def vue_itinéraire(requête):
     # Calcul des itinéraires
     try:
         stats, chemin = itinéraire(
-            d, a, ps_détour, g, rajouter_iti_direct=len(noms_étapes)>0,
+            d, a, ps_détour, g, z_d, rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
             rues_interdites=rues_interdites,
             bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
@@ -111,7 +125,7 @@ def vue_itinéraire(requête):
                    "départ":d, "arrivée":a,
                    "étapes": texte_étapes,
                    "rues_interdites": énumération_texte(rues_interdites),
-                   "chemin":str(chemin),
+                   "chemin":chemin.str_joli(),
                    "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
                    }
                   )
@@ -122,8 +136,6 @@ def vue_itinéraire(requête):
 ### Ajout d’un nouvel itinéraire ###
 
 
-
-        
 def confirme_nv_chemin(requête):
     nb_lectures=50
     #(étapes, p_détour, AR) = requête.session["chemin_à_valider"]
@@ -133,28 +145,64 @@ def confirme_nv_chemin(requête):
     pourcentage_détour = int(requête.POST["pourcentage_détour"])
     AR = bool_of_checkbox(requête.POST, "AR")
     rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
+    zone=Zone.objects.get(nom=requête.POST["zone_t"])
     print(f"étapes : {noms_étapes}, pourcentage détour : {pourcentage_détour}, AR : {AR}, rues interdites : {rues_interdites}\n")
     
-    c = Chemin.of_étapes([d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
-    c.sauv(bavard=1)
-    n_lectures(nb_lectures, g, [c], bavard=1)
-    
-    #tousLesChemins = chemins_of_csv(g, bavard=1)
-    #n_lectures(nb_lectures, g, tousLesChemins, bavard=1) # Trop long... À mettre ailleurs ? Dans un cron ?
-    g.sauv_cache()
-    g.g.sauv_cycla()
+    c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
+    c_d=c.vers_django(bavard=1)
+    prop_modif=n_lectures(nb_lectures, g, [c], bavard=3)
+    c_d.prop_modif=prop_modif
+    c_d.save()
     return render(requête, "dijk/merci.html", {"chemin":c})
+
+
 
 
 
 ### Carte cycla ###
 
-def carte_cycla(requête):
-    dessine_cycla(g, où_enregistrer="dijk/templates/dijk")
+def cycla_choix(requête):
+    """
+    Renvoie la page de choix de la zone pour laquelle afficher la cycla.
+    """
+    zones = Zone.objects.all()
+    return render(requête, "dijk/cycla_choix.html", {"zones":zones})
+
+
+def carte_cycla(requête, zone_t):
+    """
+    Renvoie la carte de la cyclabilité de la zone indiquée.
+    """
+    z_d = Zone.objects.get(nom=zone_t)
+    if zone_t not in g.zones : g.charge_zone(zone_t)
+    dessine_cycla(g, z_d, où_enregistrer="dijk/templates/dijk")
     return render(requête, "dijk/cycla.html")
 
 
+
+
+    
 ### Erreurs ###
 
 def vueLieuPasTrouvé(requête, e):
     return render(requête, "dijk/LieuPasTrouvé.html", {"msg": f"{e}"})
+
+
+### Stats ###
+
+def recherche_pourcentages(requête):
+    return render(requête, "dijk/recherche_pourcentages.html")
+
+def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
+    """
+    Renvoie un tableau avec les pourcentages de voies piétonnes et de pistes cyclables pour les villes dans requête.POSTE["villes"]. Lequel est un str contenant les villes séparées par des virgules.
+    """
+    from dijk.progs_python.initialisation import pourcentage_piéton_et_pistes_cyclables
+    if ville:
+        villes=[ville]
+    else:
+        villes = requête.POST["villes"].split(";")
+    res = []
+    for v in villes:
+        res.append( (v,) + pourcentage_piéton_et_pistes_cyclables(v))
+    return render(requête, "dijk/pourcentages.html", {"stats":res})
