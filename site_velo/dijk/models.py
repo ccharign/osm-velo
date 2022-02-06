@@ -67,7 +67,7 @@ class Sommet(models.Model):
         return [(a.arrivée, a.longueur_corrigée(p_détour)) for a in arêtes]
 
     def voisins_nus(self):
-        arêtes = Arête.objects.filter(départ=self)
+        arêtes = Arête.objects.filter(départ=self).select_related("arrivée")
         return [a.arrivée for a in arêtes]
 
     def coords(self):
@@ -76,6 +76,7 @@ class Sommet(models.Model):
     def prédécesseurs(self):
         arêtes = Arête.objects.filter(arrivée=self).select_related("départ")
         return [a.départ for a in arêtes]
+
     
 #https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
 class Rue(models.Model):

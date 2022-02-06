@@ -388,13 +388,14 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     ### Zone des arêtes
     LOG("Ajout de la zone à chaque arête")
     nb=0
-    ## nouvelles arêtes
+    ## nouvelles arêtes -> rajouter zone_d mais aussi les éventuelles anciennes zones.
     rel_àcréer=[]
-    for i, a_d in enumerate(à_créer):
-        rel = Arête.zone.through(arête_id = a_d.id, zone_id = zone_d.id)
-        rel_àcréer.append(rel)
+    for a_d in à_créer:
+        for z in union([zone_d], intersection(a_d.départ.zone.all(), a_d.arrivée.zone.all())):
+            rel = Arête.zone.through(arête_id = a_d.id, zone_id = z.id)
+            rel_àcréer.append(rel)
     Arête.zone.through.objects.bulk_create(rel_àcréer)
-    ## Anciennes arêtes mises à jour
+    ## anciennes arêtes mises à jour -> rajouter zone_d
     rel_àcréer=[]
     for a_d in à_màj:
         if zone_d not in a_d.zone.all() :

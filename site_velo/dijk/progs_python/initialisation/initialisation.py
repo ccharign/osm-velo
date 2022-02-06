@@ -45,6 +45,7 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
     else:
         zone_d = Zone.objects.get(nom=zone)
     ## Création de la ville dans Django
+    # NB : le nom et le code peuvent avor été corrigés.
     ville_d = vd.nv_ville(nom, code, zone_d)
     ## Ajout de la zone de la ville
     rel, _ = Ville_Zone.objects.get_or_create(ville=ville_d, zone=zone_d)
@@ -52,9 +53,9 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
 
     
     ## Récup des graphe via osmnx
-    print(f"Récupération du graphe pour « {code} {nom}, {pays} » avec une marge")
+    print(f"Récupération du graphe pour « {ville_d.code} {ville_d.nom_complet}, {pays} » avec une marge")
     gr_avec_marge = osmnx.graph_from_place(
-        {"city":f"{nom}", "postcode":code, "country":pays},
+        {"city":f"{ville_d.nom_complet}", "postcode":ville_d.code, "country":pays},
         network_type="all", # Tout sauf private
         retain_all="False", # Sinon il peut y avoir des enclaves déconnectées car accessibles seulement par chemin privé (ex: CSTJF)
         buffer_dist=500  # Marge de 500m
