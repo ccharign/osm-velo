@@ -14,10 +14,7 @@
 Installation
 ============
 
- - cloner le dépôt
- - se placer dans le dossier site_velo
- - dans dijk/progs_python/params.py régler la zone géographique. Il faut préciser la bounding box de la zone géographique à charger sur openstreetmap, la ville par défaut dans les recherches d’adresses, le pays par défaut, et la liste des villes qui apparaissent dans la zone avec leur code postal.
- - Lancer dijk/progs_python/initialisation/initialisation.py pour télécharger et extraire les données de la zone indiquée.
- - Pour tester l’appli, python3 manage.py runserver. Ouvrir alors dans un navigateur http://localhost:8000/itineraires.
- - Pour l’installer pour de vrai, je vous laisse vous reporter à la doc de votre hébergeur et de Django... Il faudra éditer site_velo/settings.py pour régler les paramètres de sécurité et de la base de données notamment.
- 
+ - Une fois le dépôt cloné, le settings.py configuré (notamment pour paramétrer le serveur de base de données), le 'python manage.py makemigrations' et le 'python manage.py migrate' effectués, ouvrir un shell pour remplir la base ('python manage.py shell')
+ - 'import dijk.pour_shell'
+ - 'charge_zone([("ville 1", code postal1), ("ville2", code postal 2), ...], zone = "nom_de_la_zone", ville_défaut = "nom_de_la_ville_par_défaut", code = code_postal_de_la_ville_par_défaut)
+ - patience, l’appli va télécharger et analyser les données osm de toutes les villes indiquées...
