@@ -50,4 +50,4 @@ def graphe_communes(chemin):
     Sommets : communes
     Arêtes : communes voisines
     """
-    g = nx.
+    pass
