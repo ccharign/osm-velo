@@ -8,13 +8,6 @@
 
 
 
-<<<<<<< HEAD
-from dijk.progs_python.params import CHEMIN_NŒUDS_RUES, CHEMIN_CHEMINS
-from dijk.models import Ville, Rue, Sommet, Arête, Nœud_of_Rue, Cache_Adresse, Ville_of_Sommet
-from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, TOUTES_LES_VILLES, prétraitement_rue
-from dijk.progs_python.init_graphe import charge_graphe
-import chemin
-=======
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
 from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone, Zone
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
@@ -223,7 +216,6 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     """
 
     gx = g.multidigraphe
->>>>>>> sommets_par_django
 
     tous_les_sommets = Sommet.objects.all()
     print(f"{len(tous_les_sommets)} sommets dans la base")
@@ -491,21 +483,10 @@ def charge_rues(bavard=0):
             
     print("Chargement des rues vers django fini.")
 
-<<<<<<< HEAD
-    
-def chemins_vers_django():
-    with open(CHEMIN_CHEMINS) as entrée:
-        for ligne in entrée:
-            c=chemin.of_ligne(ligne)
-            c.sauv_bdd()
 
-
-def transfert(g):
-=======
 
 @transaction.atomic
 def charge_csv_chemins(zone_t, réinit=False):
->>>>>>> sommets_par_django
     """
     Effet : charge le csv de CHEMIN_CHEMINS dans la base. Dans celui-ci, les villes sont supposées être entre parenthèses.
     Si réinit, vide au prélable la table.

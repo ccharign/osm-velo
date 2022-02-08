@@ -1,13 +1,10 @@
 # -*- coding:utf-8 -*-
 from time import perf_counter
 from petites_fonctions import chrono
-<<<<<<< HEAD
-from models import Chemin_d
-from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES
-=======
+
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES, LOG
 from dijk.models import Sommet, Chemin_d
->>>>>>> sommets_par_django
+
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_of_adresse
 chrono(tic, "recup_donnees")

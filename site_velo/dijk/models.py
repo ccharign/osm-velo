@@ -73,8 +73,6 @@ class Sommet(models.Model):
     def coords(self):
         return self.lon, self.lat
 
-<<<<<<< HEAD
-=======
     def prédécesseurs(self):
         arêtes = Arête.objects.filter(arrivée=self).select_related("départ")
         return [a.départ for a in arêtes]
@@ -100,7 +98,6 @@ class Rue(models.Model):
     
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
->>>>>>> sommets_par_django
 
     
 def formule_pour_correction_longueur(l, cy, p_détour):
@@ -145,14 +142,7 @@ class Arête(models.Model):
     def __gt__(self, autre):
         return self.id > autre
     
-<<<<<<< HEAD
-class Chemin_d(models.Model):
-    ar = models.BooleanField(default=False)
-    étapes = models.TextField(null=False)
-    p_détour = models.FloatField()
-    p_modif = models.FloatField()
-    interdites = models.TextField()
-=======
+
     def géométrie(self):
         """
         Sortie ( float*float list ) : liste de (lon, lat) qui décrit la géométrie de l'arête.
@@ -203,7 +193,6 @@ class Chemin_d(models.Model):
     #     )
     
     
->>>>>>> sommets_par_django
 
     
 class Cache_Adresse(models.Model):

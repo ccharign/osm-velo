@@ -105,7 +105,7 @@ def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavar
 }.items()
 
 
-def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau", ville_défaut="Pau", code=64000, bavard=2):
+def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_défaut="Pau", code=64000, bavard=2):
     """
     Entrée : itérable de (nom de ville, code postal)
     Effet : charge toutes ces ville dans la base, associées à la zone indiquée.

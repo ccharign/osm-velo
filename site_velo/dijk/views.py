@@ -10,11 +10,8 @@ from petites_fonctions import chrono
 from dijk.progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
-<<<<<<< HEAD
-=======
 from dijk.progs_python.chemins import Chemin, chemins_of_csv
 tic=chrono(tic, "chemins", bavard=3)
->>>>>>> sommets_par_django
 
 #from dijk.progs_python.init_graphe import charge_graphe
 #tic=chrono(tic, "charge_graphe", bavard=3)
@@ -27,18 +24,11 @@ tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
 from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
-<<<<<<< HEAD
 
-tic=time.perf_counter()
-from dijk.progs_python.chemins import Chemin, chemins_of_csv
-chrono(tic, "chemins", bavard=3)
-
-
-=======
 from graphe_par_django import Graphe_django
 g=Graphe_django()
 #g.charge_zone()
->>>>>>> sommets_par_django
+
 from datetime import datetime
 from glob import glob
 import os
