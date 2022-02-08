@@ -27,3 +27,4 @@ site_velo/dijk/migrations/**
 **.sqlite3
 **/migrations**
 **/données**
+passenger.log
