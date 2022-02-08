@@ -241,7 +241,7 @@ class Chemin():
         res = f"Itinéraire de {self.départ()} à {self.arrivée()}"
         milieu = self.étapes[1:-1]
         if milieu:
-            res+= f" en passant par {','.join(milieu)}"
+            res+= f" en passant par {','.join(map(str,milieu))}"
         if self.noms_rues_interdites:
             res+=f" et en évitant {','.join(self.noms_rues_interdites)}"
         return res+"."
