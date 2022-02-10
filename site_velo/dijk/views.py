@@ -187,7 +187,7 @@ def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
     """
     Renvoie un tableau avec les pourcentages de voies piétonnes et de pistes cyclables pour les villes dans requête.POSTE["villes"]. Lequel est un str contenant les villes séparées par des virgules.
     """
-    from dijk.progs_python.initialisation import pourcentage_piéton_et_pistes_cyclables
+    from dijk.progs_python.stats import pourcentage_piéton_et_pistes_cyclables
     if ville:
         villes=[ville]
     else:
