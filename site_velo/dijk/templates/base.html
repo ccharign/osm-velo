@@ -6,6 +6,7 @@
 
 
     <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <!-- jQuery library -->
@@ -14,8 +15,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
     
     <!-- Ma feuille de style -->
     <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/>
@@ -26,40 +25,50 @@
     {% block head_début %} {% endblock %}
   </head>
 
+
+  
   <body>
 
 
-<header>
-  <nav>
-    <ul>
-      <li><a href="{% url 'index'%}"> Entrée </a> </li>
-      
-      <li> Comment ça marche
-	<ul>
-	  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </li>
-	  <li><a href="{% url 'limitations'%}"> Problèmes connus </a> </li>
-	  <li> Sous le capot </li>
-	</ul>
-      </li>
-      
-      <li> <a href="{% url 'cycla'%}"> Cartes de cyclabilité </a>
+    <!-- <header> -->
+      <nav class="navbar navbar-default">
+	<div class="container-fluid">
 
-	
-      <li><a href="{% url 'contribution' %}"> Contribution </a>
+	  <div class="navbar-header">
+	    <a class="navbar-brand" href="{% url 'index'%}"> Entrée </a>
+	  </div>
+	  <ul class="nav navbar-nav">
+	    
+	    <li class="dropdown">
+	      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	      Comment ça marche
+	      <span class="caret"></span></a>
+		<ul class="dropdown-menu">
+		  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </li>
+		  <li><a href="{% url 'limitations'%}"> Problèmes connus </a> </li>
+		  <!-- <li> Sous le capot </li> -->
+		</ul>
+	      </li>
+	      
+	      <li> <a href="{% url 'cycla'%}"> Cartes de cyclabilité </a>
 
-      <li><a href="{% url 'recherche pourcentages' %}"> Pourcentages de rues piétonnes / cyclables </a>
-    </ul>
-    
-  </nav>
-</header>
-</br>
-<br>
+		
+	      <li><a href="{% url 'contribution' %}"> Contribution </a>
+
+	      <li><a href="{% url 'recherche pourcentages' %}"> Pourcentages de rues piétonnes / cyclables </a>
+	    </ul>
+	  
+	</div>
+      </nav>
+    <!-- </header> -->
+<!-- </br> -->
+<!-- <br> -->
 
 
-  {% block contenu %} {% endblock %}
+{% block contenu %} {% endblock %}
 
   </body>
 
-{% block script %} {% endblock %}
+  {% block script %} {% endblock %}
 
 </html>
