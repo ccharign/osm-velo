@@ -38,6 +38,7 @@ from dijk.models import Chemin_d
 import apprentissage as ap
 from django.db import transaction
 
+import gpxpy
 
 def liste_Arête_of_iti(g, iti, p_détour):
     """
@@ -90,6 +91,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d,
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
+        gpx_of_iti(iti_d, où_enregistrer+".gpx", bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
         à_dessiner.append( (iti_d, coul, p))
         res.append((f"Avec pourcentage détour de {100*p}",
@@ -110,8 +112,29 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d,
     chrono(tic, "Dessin")
     chrono(tic0, f"Total pour l'itinéraire {c}")
     return res, c
-    
 
+
+### création du gpx ###
+# https://pypi.org/project/gpxpy/
+def gpx_of_iti(iti_d, chemin_sortie, bavard=0):
+    """
+    Entrée : iti_d (Arête list)
+    Sortie : le .gpx est enregistré dans chemin_sortie
+    """
+    
+    res = gpxpy.gpx.GPX()
+    tronçon = gpxpy.gpx.GPXTrack()
+    res.tracks.append(tronçon)
+    segment=gpxpy.gpx.GPXTrackSegment()
+    tronçon.segments.append(segment)
+    
+    for a in iti_d:
+        for lon,lat in a.géométrie():
+            segment.points.append( gpxpy.gpx.GPXTrackPoint(lat, lon) )
+
+    with open(chemin_sortie, "w") as sortie:
+        sortie.write(res.to_xml())
+        print(f"gpx enregistré à {chemin_sortie}")
 
     
 #################### Affichage ####################
@@ -191,41 +214,6 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
     dessine([(c_complet, "blue", c.p_détour), (c_direct,"red", 0)], g, où_enregistrer, ouvrir=ouvrir)
     return longueur, longueur_direct
 
-    
-# def dessine_chemins(chemins, g, où_enregistrer=TMP):
-#     """ 
-#     Affiche les chemins directs en rouge, et les chemins compte tenu de la cyclabilité en bleu.
-#     Peu pertinent dès qu’il y a trop de chemins.
-#     """
-#     chemins_directs = []
-#     for c in chemins:
-#         try:
-#             chemins_directs.append(c.chemin_direct_sans_cycla(g))
-#         except dijkstra.PasDeChemin:
-#             print(f"Pas de chemin pour {c}")
-#     graphe_c_directs = g.multidigraphe.subgraph(flatten(chemins_directs))
-#     carte = plot_graph_folium(graphe_c_directs, popup_attribute="name", color="red")
-
-#     chemins_complets = []
-#     for c in chemins:
-#         try:
-#             chemins_complets.append(dijkstra.chemin_étapes_ensembles(g, c))
-#         except dijkstra.PasDeChemin as e:
-#             print(e)
-#             print(f"Pas de chemin avec étapes pour {c}")
-#     graphe_c_complet = g.multidigraphe.subgraph(flatten(chemins_complets))
-#     carte = plot_graph_folium(graphe_c_complet, popup_attribute="name", color="blue", graph_map=carte)  # On rajoute ce graphe par-dessus le précédent dans le folium
-    
-#     nom = os.path.join(où_enregistrer, "dessine_chemins.html")
-#     carte.save(nom)
-#     ouvre_html(nom)
-
-
-# Ne marche plus si s n’est pas un chemin dans le graphe
-# def affiche_sommets(s, g, où_enregistrer=os.path.join(TMP, "sommets"), ouvrir = True):
-#     """ Entrée : s, liste de sommets """
-#     dessine([(s, "blue")], g, où_enregistrer=où_enregistrer, ouvrir=ouvrir)
-
 
 def affiche_rue(nom_ville, rue, g, bavard=0):
     """
@@ -264,21 +252,7 @@ def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
 
     for a in mo.Arête.objects.filter(zone=z_d).exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
         i=num_paquet(a.cycla)
-        #nœuds_par_cycla[i].add(s)
-        #nœuds_par_cycla[i].add(t)
         arêtes.append((a, {"color":color_dict[i], "popup":a.cycla}))
-
-
-    # début=True
-    # for i, nœuds in enumerate(nœuds_par_cycla):
-    #     if len(nœuds) > 0:
-    #         print(len(nœuds))
-    #         à_rajouter = g.g.multidigraphe.subgraph(list(nœuds))
-    #         if début:
-    #             carte = plot_graph_folium(à_rajouter, color=color_dict[i])
-    #             début=False
-    #         else:
-    #             carte = plot_graph_folium(à_rajouter, color=color_dict[i], graph_map=carte)
 
     carte = folium_of_arêtes(g, arêtes)
     nom = os.path.join(où_enregistrer, "cycla.html")
