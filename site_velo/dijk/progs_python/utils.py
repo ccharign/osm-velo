@@ -114,7 +114,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)
         coul = "#000000"
-        traite_un_chemin(cd, coud, "Trajet direct")
+        traite_un_chemin(cd, coul, "Trajet direct")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
     tic=perf_counter()
