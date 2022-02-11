@@ -234,6 +234,12 @@ class Chemin():
         if self.noms_rues_interdites: res+=f"\n Rues interdites : {self.noms_rues_interdites}"
         return  res
 
+    def __hash__(self):
+        return hash(str(self))
+
+    def str_sans_retour_charriot(self):
+        return str(self).replace("\n","")
+    
     def str_joli(self):
         res = f"Itinéraire de {self.départ()} à {self.arrivée()}"
         milieu = self.étapes[1:-1]

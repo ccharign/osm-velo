@@ -46,6 +46,7 @@ chrono(tic0, "Chargement total\n\n", bavard=3)
 # Utiliser as_view dans url.py pour remplacer les lignes ci-dessous
 def recherche(requête, zone_t):
     z_d = g.charge_zone(zone_t)
+    requête.session["zone"]=zone_t
     return render(requête, "dijk/recherche.html", {"ville":z_d.ville_défaut, "zone_t":zone_t})
 
 def limitations(requête):
@@ -85,7 +86,8 @@ def vue_itinéraire(requête):
     # Calcul des itinéraires
     try:
         stats, chemin = itinéraire(
-            d, a, ps_détour, g, z_d, rajouter_iti_direct=len(noms_étapes)>0,
+            d, a, ps_détour, g, z_d, requête.session,
+            rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
             rues_interdites=rues_interdites,
             bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
@@ -110,7 +112,8 @@ def vue_itinéraire(requête):
         """)
 
     # Chargement du template
-    return render(requête, f"dijk/résultat_itinéraire_complet{suffixe}.html",
+    return render(requête,
+                  f"dijk/résultat_itinéraire_complet{suffixe}.html",
                   {"stats": stats,
                    "départ":d, "arrivée":a,
                    "étapes": texte_étapes,
@@ -147,7 +150,17 @@ def confirme_nv_chemin(requête):
     return render(requête, "dijk/merci.html", {"chemin":c, "zone_t":zone.nom})
 
 
-
+def téléchargement(requête):
+    """
+    Fournit le fichier texte contenu dans requête.session[requête.POST["clef"]]
+    """
+    return HttpResponse(
+        requête.session[requête.POST["clef"]],
+        headers={
+            'Content-Type': "application/gpx+xml",
+            'Content-Disposition': 'attachment; filename="trajet.gpx"'
+            }
+    )
 
 
 ### Carte cycla ###

@@ -52,25 +52,28 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 
-def itinéraire(départ, arrivée, ps_détour, g, z_d,
+def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
                où_enregistrer=os.path.join(TMP, "itinéraire.html"),
                bavard=0, ouvrir=False):
     """ 
     Entrées :
-      - ps_détour (float list) : liste des proportion de détour pour lesquels afficher un chemin.
+      - ps_détour (float list), liste des proportion de détour pour lesquels afficher un chemin.
       - g (graphe)
-      - z_d (Zone) : sert pour récupérer la ville défaut.
-      - départ, arrivée : chaîne de caractère décrivant le départ et l’arrivée. Seront lues par chemins.Étape.
-      - noms_étapes : liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
+      - z_d (Zone), sert pour récupérer la ville défaut.
+      - session (dic), le dico de la session Django
+      - départ, arrivée (str) Seront lues par chemins.Étape.
+      - noms_étapes (str list), liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
-             Si ouvrir est vrai, ouvre de plus un navigateur sur cette page.
-    Sortie : liste de (légende, longueur, longueur ressentie, couleur) pour les itinéraires obtenus.
+
+    Sortie : (liste de dicos (légende, longueur, longueur ressentie, couleur, nom_gpx) pour les itinéraires obtenus,
+              objet Chemin correspondant au dernier p_détour
+             )
     """
 
     ## Calcul des étapes
-    tic0=perf_counter()
+    tic0 = perf_counter()
     d = chemins.Étape(départ, g, z_d, bavard=bavard-1)
     if bavard>0:
         print(f"Départ trouvé : {d}, {d.nœuds}")
@@ -83,28 +86,35 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d,
 
     ## Arêtes interdites
     interdites = chemins.arêtes_interdites(g, z_d, rues_interdites, bavard=bavard)
-    tic=chrono(tic0, "Calcul des étapes et arêtes interdites.")
+    tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
     
     np = len(ps_détour)
     à_dessiner = []
     res = []
+
+    def traite_un_chemin(c, coul, légende):
+        iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
+        à_dessiner.append( (iti_d, coul, p))
+        nom_gpx = hash(c)
+        gpx_of_iti(iti_d, nom_gpx, session, bavard=bavard-1)
+        res.append({"légende": légende,
+                    "longueur":g.longueur_itinéraire(iti_d),
+                    "longueur_ressentie":int(l_ressentie),
+                    "couleur":coul,
+                    "nom_gpx": nom_gpx}
+                   )
+        #tic = chrono(tic, f"dijkstra {c} et sa longueur")
+
+        
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
-        iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
-        gpx_of_iti(iti_d, où_enregistrer+".gpx", bavard=bavard-1)
         coul = color_dict[ (i*n_coul)//np ]
-        à_dessiner.append( (iti_d, coul, p))
-        res.append((f"Avec pourcentage détour de {100*p}",
-                    g.longueur_itinéraire(iti_d), int(l_ressentie), coul )
-                   )
-        tic = chrono(tic, f"dijkstra {c} et sa longueur")
+        traite_un_chemin(c, coul, f"Avec pourcentage détour de {100*p}")
 
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)
-        iti_d, l_ressentie = g.itinéraire(cd, bavard=bavard-1)
         coul = "#000000"
-        à_dessiner.append( (iti_d, coul, 0))
-        res.append(("Itinéraire direct", g.longueur_itinéraire(iti_d), int(l_ressentie), coul ))
+        traite_un_chemin(cd, coud, "Trajet direct")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
     tic=perf_counter()
@@ -116,10 +126,12 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d,
 
 ### création du gpx ###
 # https://pypi.org/project/gpxpy/
-def gpx_of_iti(iti_d, chemin_sortie, bavard=0):
+def gpx_of_iti(iti_d, nom, session, dossier_sortie="dijk/tmp", bavard=0):
     """
     Entrée : iti_d (Arête list)
-    Sortie : le .gpx est enregistré dans chemin_sortie
+             session (dic), le dictionnaire de la session Django
+
+    Effet : le gpx est enregistré dans session[nom]
     """
     
     res = gpxpy.gpx.GPX()
@@ -132,9 +144,12 @@ def gpx_of_iti(iti_d, chemin_sortie, bavard=0):
         for lon,lat in a.géométrie():
             segment.points.append( gpxpy.gpx.GPXTrackPoint(lat, lon) )
 
-    with open(chemin_sortie, "w") as sortie:
-        sortie.write(res.to_xml())
-        print(f"gpx enregistré à {chemin_sortie}")
+    #chemin_sortie = os.path.join(dossier_sortie, nom)
+    # with open(chemin_sortie , "w") as sortie:
+    #     sortie.write(res.to_xml())
+    #     print(f"gpx enregistré à {chemin_sortie}")
+    session[nom] = res.to_xml()
+    #return nom
 
     
 #################### Affichage ####################

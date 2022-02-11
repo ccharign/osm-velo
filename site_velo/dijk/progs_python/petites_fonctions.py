@@ -103,7 +103,7 @@ def chrono(tic, tâche, bavard=1, force=False):
     """
     Entrée : tic, float
              tâche, str
-             froce, bool
+             force, bool
     Effet : log (time.perf_counter()-tic) pour la tâche précisée
             Si force est faux, ne log que pour un temps>.1s
     Sortie : instant où a été lancé cette fonction. 
