@@ -20,7 +20,7 @@ urlpatterns = [
     path("cycla/<str:zone_t>", views.carte_cycla, name="carte cycla"),
     path("cycla/", views.cycla_choix, name = "cycla"),    
 
-    path("téléchargement/", views.téléchargement, name = "téléchargement"),
+    path("telechargement/", views.téléchargement, name = "téléchargement"),
     
     path('<str:zone_t>/', views.recherche, name='recherche'),
     path('', views.index, name='index'),
