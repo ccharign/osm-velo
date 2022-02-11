@@ -36,7 +36,7 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
 
 
 
-def charge_ville(nom, code, zone="Pau", ville_défaut=None, pays="France", bavard=2):
+def charge_ville(nom, code, zone="Pau", ville_defaut=None, pays="France", bavard=2):
 
 
     ## Création ou récupération de la zone
