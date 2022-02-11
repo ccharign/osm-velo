@@ -35,14 +35,22 @@
 	<div class="container-fluid">
 
 	  <div class="navbar-header">
-	    <a class="navbar-brand" href="{% url 'index'%}"> Entrée </a>
+	    <!-- Remplacer le menu par un seul bouton si petit écran -->
+	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+	    </button>
+	    <a class="navbar-brand" href="{% url 'index'%}"> Itinéraires cyclistes </a>
 	  </div>
-	  <ul class="nav navbar-nav">
-	    
-	    <li class="dropdown">
-	      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-	      Comment ça marche
-	      <span class="caret"></span></a>
+
+	  <div class="collapse navbar-collapse" id="myNavbar">
+	    <ul class="nav navbar-nav">
+	      
+	      <li class="dropdown">
+		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+		  Comment ça marche
+		  <span class="caret"></span></a>
 		<ul class="dropdown-menu">
 		  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </li>
 		  <li><a href="{% url 'limitations'%}"> Problèmes connus </a> </li>
@@ -51,13 +59,15 @@
 	      </li>
 	      
 	      <li> <a href="{% url 'cycla'%}"> Cartes de cyclabilité </a>
-
 		
 	      <li><a href="{% url 'contribution' %}"> Contribution </a>
+	    </ul>
 
+	    <ul class="nav navbar-nav navbar-right">
 	      <li><a href="{% url 'recherche pourcentages' %}"> Pourcentages de rues piétonnes / cyclables </a>
 	    </ul>
-	  
+	    
+	  </div>
 	</div>
       </nav>
     <!-- </header> -->
