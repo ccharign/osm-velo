@@ -11,47 +11,43 @@
 
   <form action = "{% url 'résultat' %}" method="post">
     {% csrf_token %}
-    <ul>
 
-      <div class="row">
-	<div class="col-sm-4">
-	<li>
-	  <label for="départ"><b>Départ</b> : </label>      <input type="text" id="départ" name="départ">
-	</li><br>
-	</div>
+    <div class="form-group">
+      <label class="sr-only" for="départ"><b>Départ</b> : </label>      <input type="text" class="form-control" id="départ" name="départ" placeholder="Départ">
+      <label class="sr-only" for="arrivée"> <b>Arrivée</b> : </label>    <input type="text" class="form-control" id="arrivée" name="arrivée" placeholder="Arrivée"><br>
+    </div>
 
-	<div class="col-sm-4">
-	<li>
-	  <label for="arrivée"> <b>Arrivée</b> : </label>    <input type="text" id="arrivée" name="arrivée"><br>
-	</li>
-	</div>
-      </div>
-      
-      <li>   
-	<label for="pourcentage_détour"> <b>Pourcentage détour</b>  : </label><br>
-	<input type="text" id="pourcentage_détour" name="pourcentage_détour" value = "0;15;30"><br>
-	Il s’agit du pourcentage duquel vous acceptez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé (référence : Rue Faisans) à un itinéraire entièrement en piste cyclable (référence : la piste cyclable de Fébus).<br>
+    <input type="submit" class="btn btn-default" value="C’est parti!">
+    
+    <div class="form-group">
+      <label for="pourcentage_détour"> <b>Pourcentage détour</b>  : </label><br>
+      <input type="text" id="pourcentage_détour" class="form-control" name="pourcentage_détour" placeholder="Pourcentage de détour" value="0;15;30"><br>
+    Il s’agit du pourcentage duquel vous acceptez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé (référence : Rue Faisans) à un itinéraire entièrement en piste cyclable (référence : la piste cyclable de Fébus).<br>
 
-	On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.
-      </li><br><br>
+    On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.
+</div>
 
-      
-      <li>
-	<label for="étapes"> Facultatif : <b>étapes</b>, séparées par des point-virgules </label><br>
-	<input type="text" id="étapes" name="étapes" size=100><br>
-	L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.
-      </li><br>
+    
+    <div class="form-group">
+      <label for="étapes"> Facultatif : <b>étapes</b>, séparées par des point-virgules </label><br>
+      <input type="text" class="form-control" id="étapes" name="étapes" placeHolder="Étapes" size=100><br>
+      L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.
+    </div>
 
-      
-      <li>
-	<label for="rues_interdites"> Facultatif : <b>rues à éviter</b>, séparées par des point-virgules </label><br>
-	<input type="text" id="rues_interdites" name="rues_interdites" size=100><br>
-	L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.
-      </li><br>
-      
-      <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
-    </ul>
-    <input type="submit" value="C’est parti!">
+    
+    <div class="form-group">
+      <label for="rues_interdites"> Facultatif : <b>rues à éviter</b>, séparées par des point-virgules </label><br>
+      <input type="text" class="form-control" id="rues_interdites" name="rues_interdites" placeholder="Rues à éviter" size=100><br>
+      L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.
+    </div>
+
+    
+    <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
+
+    
+    <input type="submit" class="btn btn-default" value="C’est parti!">
+
+
   </form>
 
   

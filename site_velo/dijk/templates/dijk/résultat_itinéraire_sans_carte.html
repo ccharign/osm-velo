@@ -34,17 +34,22 @@
 <p>
     <form action = "{% url 'confirme nv chemin' %}" method="post">
       {% csrf_token %}
+      
       <input type="hidden" id="départ" name="départ" value="{{départ}}">
       <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
       <input type="hidden" id="étapes" name="étapes" value="{{post_préc.étapes}}">
       <input type="hidden" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}">
       <input type="hidden" id="zone_t" name="zone_t" value="{{post_préc.zone_t}}">
-      
-      <label for="pourcentage_détour"> Pourcentage de détour : </label>
-      <input type="number" id="pourcentage_détour" name="pourcentage_détour" value = "{{p_détour_moyen}}"><br>
-      <label for="AR"> Valable aussi pour le retour ? </label>
-      <input type="checkbox" id="AR" name="AR"><br>
 
+      <div class="form-group">
+	<label for="pourcentage_détour"> Pourcentage de détour : </label>
+	<input type="number" id="pourcentage_détour" name="pourcentage_détour" value = "{{p_détour_moyen}}"><br>
+      </div>
+
+      <div class="checkbox">
+	<label for="AR">  <input type="checkbox" id="AR" name="AR"> Valable aussi pour le retour ? </label>
+      </div>
+      
       <input type="submit" value="Enregistrer la contribution"><br>
      
     </form>
@@ -83,26 +88,29 @@
 
 
 <section>
+  
 <!-- Formulaire pour relancer le calcul -->
-<p>
     <form action = "{% url 'résultat' %}" method="post">
       {% csrf_token %}
+      
       <input type="hidden" id="départ" name="départ" value="{{départ}}">
-
       <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
-
       <input type="hidden" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}"><br><br>
       <input type="hidden" id="zone_t" name="zone_t" value="{{post_préc.zone_t}}">
-      
-      <label for="étapes"> Ajouter ou modifier les étapes ? </label><br>
-      <input type="text" id="étapes" name="étapes" value="{{post_préc.étapes}}" size=100 ><br><br>
 
-      <label for="rue_interdites"> Ajouter ou modifier des rues interdites ? </label><br>
-      <input type="text" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" size=100 ><br><br>
+      <div class="from-group">
+	<label for="étapes"> Ajouter ou modifier les étapes ? </label><br>
+	<input type="text" class="form-control" id="étapes" name="étapes" value="{{post_préc.étapes}}" size=100 ><br><br>
+      </div>
+
+      <div class="form-group">
+	<label for="rue_interdites"> Ajouter ou modifier des rues interdites ? </label><br>
+	<input type="text" class="form-control" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" size=100 ><br><br>
+      </div>
       
       <input type="submit" value="Recalculer l’itinéraire">
     </form>
-</p>
+
 </section>
 
 {% endblock contenu %}

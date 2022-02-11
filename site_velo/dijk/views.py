@@ -116,7 +116,8 @@ def vue_itinéraire(requête):
                    "étapes": texte_étapes,
                    "rues_interdites": énumération_texte(rues_interdites),
                    "chemin":chemin.str_joli(),
-                   "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen
+                   "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen,
+                   "zone_t":z_d.nom
                    }
                   )
 
@@ -143,7 +144,7 @@ def confirme_nv_chemin(requête):
     prop_modif=n_lectures(nb_lectures, g, [c], bavard=3)
     c_d.prop_modif=prop_modif
     c_d.save()
-    return render(requête, "dijk/merci.html", {"chemin":c})
+    return render(requête, "dijk/merci.html", {"chemin":c, "zone_t":zone.nom})
 
 
 

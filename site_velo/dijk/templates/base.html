@@ -46,13 +46,17 @@
 
 	  <div class="collapse navbar-collapse" id="myNavbar">
 	    <ul class="nav navbar-nav">
+
+	      {% if zone_t %}
+	      <li><a href="{% url 'index' %}{{zone_t}}"> Nouvelle recherche </a></li>
+	      {% endif %}
 	      
 	      <li class="dropdown">
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
 		  Comment ça marche
 		  <span class="caret"></span></a>
 		<ul class="dropdown-menu">
-		  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </li>
+		  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </a></li>
 		  <li><a href="{% url 'limitations'%}"> Problèmes connus </a> </li>
 		  <!-- <li> Sous le capot </li> -->
 		</ul>
