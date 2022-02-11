@@ -1,54 +1,29 @@
-<html>
+
+<html lang="fr">
   {% load static %}
   <head>
     <meta charset="utf-8">
-    <title>{% block titre %}Recherche d’itinéraire{% endblock %}</title>
-    <!-- <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/> -->
-    {% block head_début %} {% endblock %}
+
+
+    <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <!-- Ma feuille de style -->
     <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/>
-
     
-    <!-- N’ayant pas pris le temps de voir comment sont gérés les fichiers statiques par Django, je mets le css ici -->
-    <style>
-      .carte {
-	  width 95%;height: 70%;margin: 0;padding: 0; border:2px solid black;
-      }
-      .stats{
-	 
-      }
-      nav{
-	  text-align:center;border:2px solid lightblue
-      }
+    <title>{% block titre %}Recherche d’itinéraire{% endblock %}</title>
 
-      nav ul{
-	  padding:0;
-	  margin:auto;
-	  list-style-type:none;
-	  text-align:center;
-      }
-      nav li {
-	  margin-left:5px;
-	  float:left; /*pour IE*/
-      }
-      nav ul li ul{
-	  display:none
-      }
-      nav ul li:hover ul { /*Au survol d’un élément du menu par la souris*/
-	  display:block;
-      }
-      nav li:hover ul li {
-	  float:none; /*Annuler le float left du menu principal pour remettre un vertical*/
-      }
-      nav li ul{
-	  position : absolute;
-	  background-color:white;
-	  box-shadow:1px 2px 3px #CCC
-      }
-      nav li a:hover { /*Changer la couleur quand la souris passe*/
-	  color:#FFD700;
-      }
-    </style>
-    
+    <!-- Pour d’autres params -->
+    {% block head_début %} {% endblock %}
   </head>
 
   <body>

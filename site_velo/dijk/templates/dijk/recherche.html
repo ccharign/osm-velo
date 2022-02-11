@@ -1,53 +1,60 @@
-    {% extends "base.html" %}
+{% extends "base.html" %}
 
 
 
 {% block contenu %}
 
-<p>
-  Bienvenue dans le calculateur participatif d’itinéraires cyclables de {{ville}}. La ville par défaut est {{ville}}. Pour indiquer un emplacement dans une autre ville, préciser celle-ci après une virgule. Par exemple : « rue du souvenir, Lons » ou « médiathèque, Billère ».
-</p>
+<div class="container-fluid">
+  <p>
+    Bienvenue dans le calculateur participatif d’itinéraires cyclables de {{ville}}. La ville par défaut est {{ville}}. Pour indiquer un emplacement dans une autre ville, préciser celle-ci après une virgule. Par exemple : « rue du souvenir, Lons » ou « médiathèque, Billère ».
+  </p>
 
 
-<form action = "{% url 'résultat' %}" method="post">
-  {% csrf_token %}
-  <ul>
-    
-    <li>
-      <label for="départ"><b>Départ</b> : </label>      <input type="text" id="départ" name="départ">
-    </li><br>
+  <form action = "{% url 'résultat' %}" method="post">
+    {% csrf_token %}
+    <ul>
 
-    
-    <li>
-      <label for="arrivée"> <b>Arrivée</b> : </label>    <input type="text" id="arrivée" name="arrivée"><br>
-    </li><br>
-    
-    
-    <li>   
-      <label for="pourcentage_détour"> <b>Pourcentage détour</b>  : </label><br>
-      <input type="text" id="pourcentage_détour" name="pourcentage_détour" value = "0;15;30"><br>
-      Il s’agit du pourcentage duquel vous acceptez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé (référence : Rue Faisans) à un itinéraire entièrement en piste cyclable (référence : la piste cyclable de Fébus).<br>
+      <div class="row">
+	<div class="col-sm-4">
+	<li>
+	  <label for="départ"><b>Départ</b> : </label>      <input type="text" id="départ" name="départ">
+	</li><br>
+	</div>
 
-      On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.
-    </li><br><br>
+	<div class="col-sm-4">
+	<li>
+	  <label for="arrivée"> <b>Arrivée</b> : </label>    <input type="text" id="arrivée" name="arrivée"><br>
+	</li>
+	</div>
+      </div>
+      
+      <li>   
+	<label for="pourcentage_détour"> <b>Pourcentage détour</b>  : </label><br>
+	<input type="text" id="pourcentage_détour" name="pourcentage_détour" value = "0;15;30"><br>
+	Il s’agit du pourcentage duquel vous acceptez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé (référence : Rue Faisans) à un itinéraire entièrement en piste cyclable (référence : la piste cyclable de Fébus).<br>
 
-    
-    <li>
-      <label for="étapes"> Facultatif : <b>étapes</b>, séparées par des point-virgules </label><br>
-      <input type="text" id="étapes" name="étapes" size=100><br>
-      L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.
-    </li><br>
+	On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.
+      </li><br><br>
 
-    
-    <li>
-      <label for="rues_interdites"> Facultatif : <b>rues à éviter</b>, séparées par des point-virgules </label><br>
-      <input type="text" id="rues_interdites" name="rues_interdites" size=100><br>
-      L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.
-    </li><br>
-    
-    <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
-  </ul>
-  <input type="submit" value="C’est parti!">
-</form>
+      
+      <li>
+	<label for="étapes"> Facultatif : <b>étapes</b>, séparées par des point-virgules </label><br>
+	<input type="text" id="étapes" name="étapes" size=100><br>
+	L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.
+      </li><br>
 
-    {% endblock %}
+      
+      <li>
+	<label for="rues_interdites"> Facultatif : <b>rues à éviter</b>, séparées par des point-virgules </label><br>
+	<input type="text" id="rues_interdites" name="rues_interdites" size=100><br>
+	L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.
+      </li><br>
+      
+      <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
+    </ul>
+    <input type="submit" value="C’est parti!">
+  </form>
+
+</div>
+  
+  {% endblock %}
