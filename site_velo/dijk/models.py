@@ -10,14 +10,31 @@ def découpe_chaîne_de_nœuds(c):
 class Ville(models.Model):
     nom_complet = models.CharField(max_length=100)
     nom_norm = models.CharField(max_length=100)
-    code = models.IntegerField()
+    code = models.IntegerField(null=True)
+    code_insee = models.IntegerField()
+    population = models.IntegerField()
+    densité = models.SmallIntegerField()
+    géom_texte = models.TextField(null=True)
     #zone = models.ManyToManyField(Zone) # pb car la classe Zone n’est pas encore définie.
     def __str__(self):
         return self.nom_complet
     def avec_code(self):
         return f"{self.code} {self.nom_complet}"
+    def voisine(self):
+        rels = Ville_Ville.objects.filter(ville1=self).select_related("ville2")
+        return  tuple(r.ville2 for r in rels)
+    
+    
+class Ville_Ville(models.Model):
+    """ table d’association pour indiquer les villes voisines."""
+    ville1 = models.ForeignKey(Ville, related_name="ville1", on_delete=models.CASCADE)
+    ville2 = models.ForeignKey(Ville, related_name="ville2", on_delete=models.CASCADE)
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(fields=["ville1", "ville2"], name = "Pas de relation ville_ville en double."),
+        ]
 
-
+        
 class Zone(models.Model):
     """
     Une zone délimite une zone dont le graphe sera mis en mémoire au chargement.

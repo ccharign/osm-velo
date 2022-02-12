@@ -8,8 +8,8 @@
 
 
 
-from dijk.progs_python.params import CHEMIN_NŒUDS_RUES
-from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone, Zone
+from dijk.progs_python.params import CHEMIN_NŒUDS_RUES, RACINE_PROJET
+from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone, Zone, Ville_Ville
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
 #from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
@@ -18,6 +18,8 @@ from time import perf_counter, sleep
 from django.db import transaction, close_old_connections
 from lecture_adresse.arbresLex import ArbreLex
 import re
+import os
+import json
 
 # L’arbre contient les f"{nom_norm}|{code}"
 def à_mettre_dans_arbre(nom_n, code):
@@ -427,61 +429,162 @@ def charge_dico_rues_nœuds(ville_d, dico):
     Rue.objects.bulk_create(rues_à_créer)
         
 
+    
+### Données INSEE ###
+
+
+def int_of_code_insee(c):
+    """
+    Entrée : (str) code INSEE
+    Sortie (int) : entier obtenu en remplaçant A par 00 et B par 01 ( à cause de la Corse) et en convertissant le résultat en int.
+    """
+    return int(c.replace("A","00").replace("B","01"))
+
+
+def charge_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/densité_communes.csv"), bavard=0 ):
+    dico_densité={"Communes très peu denses":0,
+                  "Communes peu denses":1,
+                  "Communes de densité intermédiaire":2,
+                  "Communes densément peuplées":3
+                  }
+    with open(chemin) as entrée:
+        à_maj=[]
+        à_créer=[]
+        entrée.readline()
+        for ligne in entrée:
+            code_insee, nom, région, densité, population = ligne.strip().split(";")
+            code_insee = int_of_code_insee(code_insee)
+            population = int(population.replace(" ",""))
+            i_densité = dico_densité[densité]
+            essai = Ville.objects.filter(nom_complet=nom).first()
+
+            if essai:
+                essai.population=population
+                essai.code_insee=code_insee
+                essai.densité=i_densité
+                à_maj.append(essai)
+            else:
+                v_d = Ville(nom_complet=nom,
+                            nom_norm=partie_commune(nom),
+                            population=population,
+                            code_insee=code_insee,
+                            code=None,
+                            densité=i_densité
+                            )
+                à_créer.append(v_d)
+    print(f"Enregistrement des {len(à_maj)} modifs")
+    Ville.objects.bulk_update(à_maj, ["population", "code_insee", "densité"])
+    print(f"Enregistrement des {len(à_créer)} nouvelles villes")
+    Ville.objects.bulk_create(à_créer)
+
+
+def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/géom_villes.json")):
+    
+    def géom_vers_texte(g):
+        """
+        Enlève d’éventuelles paires de crochets inutiles avant de tout convertir en une chaîne de (lon, lat) séparées par des ;.
+        """
+        if len(g)==1:
+            return géom_vers_texte(g[0])
+        else:
+            return ";".join(map(
+                lambda c: ",".join(map(str, c)),
+                g
+            ))
+        
+    with open(chemin) as entrée:
+        à_maj=[]
+        données = json.load(entrée)
+        for v in données["features"]:
+            code_insee = int_of_code_insee(v["properties"]["codgeo"])
+            géom = géom_vers_texte(v["geometry"]["coordinates"])
+            nom = v["properties"]["libgeo"].strip().replace("?","'")
+            essai = Ville.objects.filter(code_insee=code_insee, nom_complet=nom).first()
+            if essai:
+                essai.géom_texte = géom
+                à_maj.append(essai)
+            else:
+                print(f"Avertissement : ville pas trouvée : {nom} {code_insee}")
+    Ville.objects.bulk_update(à_maj, ["géom_texte"])
+
+
+def ajoute_villes_voisines():
+    dico_coords = {} # dico coord -> liste de villes
+    à_ajouter=[]
+    print("Recherche des voisinages")
+    for v in Ville.objects.all():
+        for c in v.géom_texte.split(";"):
+            if c in dico_coords:
+                for v2 in dico_coords[c]:
+                    à_ajouter.append(Ville_Ville(ville1=v, ville2=v2))
+                    à_ajouter.append(Ville_Ville(ville1=v2, ville2=v))
+                    dico_coords[c].append(v)
+            else:
+                dico_coords[c] = [v]
+    print("Élimination des relations déjà présente")
+    à_ajouter_vraiment=[]
+    for r in à_ajouter:
+        if not Ville_Ville.objects.filter(ville1=r.ville1, ville2=r.ville2).exists():
+            à_ajouter_vraiment.append(r)
+    print("Enregistrement")
+    Ville_Ville.objects.bulk_create(à_ajouter_vraiment)
+
+
 ### vieux trucs ###
 
 
 
-def nv(g, nom_ville):
-    return normalise_ville(g, nom_ville).nom_norm
+# def nv(g, nom_ville):
+#     return normalise_ville(g, nom_ville).nom_norm
 
-#code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
+# #code_postal_norm = {nv(v):code for v,code in TOUTES_LES_VILLES.items()}
 
-#Utiliser bulk_create
-#https://pmbaumgartner.github.io/blog/the-fastest-way-to-load-data-django-postgresql/
+# #Utiliser bulk_create
+# #https://pmbaumgartner.github.io/blog/the-fastest-way-to-load-data-django-postgresql/
 
-def villes_vers_django(g):
-    """
-    Effet : réinitialise la table dijk_ville
-    """
-    Ville.objects.all().delete()
-    villes_à_créer=[]
-    for nom, code in TOUTES_LES_VILLES.items():
-        villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(g, nom), code=code))
-    Ville.objects.bulk_create(villes_à_créer)
+# def villes_vers_django(g):
+#     """
+#     Effet : réinitialise la table dijk_ville
+#     """
+#     Ville.objects.all().delete()
+#     villes_à_créer=[]
+#     for nom, code in TOUTES_LES_VILLES.items():
+#         villes_à_créer.append( Ville(nom_complet=nom, nom_norm=nv(g, nom), code=code))
+#     Ville.objects.bulk_create(villes_à_créer)
 
         
-def charge_rues(bavard=0):
-    """ 
-    Transfert le contenu du csv CHEMIN_NŒUDS_RUES dans la base.
-    Réinitialise la table Rue (dijk_rue)
-    """
+# def charge_rues(bavard=0):
+#     """ 
+#     Transfert le contenu du csv CHEMIN_NŒUDS_RUES dans la base.
+#     Réinitialise la table Rue (dijk_rue)
+#     """
 
-    # Vidage des tables
-    Rue.objects.all().delete()
-    #Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
+#     # Vidage des tables
+#     Rue.objects.all().delete()
+#     #Sommet.objects.all().delete() # À cause du on_delete=models.CASCADE, ceci devrait vider les autres en même temps
     
-    rues_à_créer=[]
-    with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
-        compte=0
-        nb_lignes_lues=0
-        for ligne in entrée:
-            nb_lignes_lues+=1
-            if nb_lignes_lues%100==0:
-                print(f"ligne {nb_lignes_lues}")
-            if bavard>1:print(ligne)
-            ville_t, rue, nœuds_à_découper = ligne.strip().split(";")
+#     rues_à_créer=[]
+#     with open(CHEMIN_NŒUDS_RUES, "r") as entrée:
+#         compte=0
+#         nb_lignes_lues=0
+#         for ligne in entrée:
+#             nb_lignes_lues+=1
+#             if nb_lignes_lues%100==0:
+#                 print(f"ligne {nb_lignes_lues}")
+#             if bavard>1:print(ligne)
+#             ville_t, rue, nœuds_à_découper = ligne.strip().split(";")
 
-            ville=normalise_ville(ville_t)
-            ville_n = ville.nom_norm
-            ville_d = Ville.objects.get(nom_norm=ville_n) # l’objet Django. # get renvoie un seul objet, et filter plusieurs (à confirmer...)
+#             ville=normalise_ville(ville_t)
+#             ville_n = ville.nom_norm
+#             ville_d = Ville.objects.get(nom_norm=ville_n) # l’objet Django. # get renvoie un seul objet, et filter plusieurs (à confirmer...)
             
-            rue_n = prétraitement_rue(rue)
-            rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
-            rues_à_créer.append(rue_d)
+#             rue_n = prétraitement_rue(rue)
+#             rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+#             rues_à_créer.append(rue_d)
             
-        Rue.objects.bulk_create(rues_à_créer)
+#         Rue.objects.bulk_create(rues_à_créer)
             
-    print("Chargement des rues vers django fini.")
+#     print("Chargement des rues vers django fini.")
 
 
 

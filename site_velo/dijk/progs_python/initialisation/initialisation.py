@@ -41,11 +41,11 @@ def charge_ville(nom, code, zone="Pau", ville_defaut=None, pays="France", bavard
 
     ## Création ou récupération de la zone
     if ville_défaut is not None:
-        zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_défaut))
+        zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_defaut))
     else:
         zone_d = Zone.objects.get(nom=zone)
     ## Création de la ville dans Django
-    # NB : le nom et le code peuvent avor été corrigés.
+    # NB : le nom et le code peuvent avoir été corrigés.
     ville_d = vd.nv_ville(nom, code, zone_d)
     ## Ajout de la zone de la ville
     rel, _ = Ville_Zone.objects.get_or_create(ville=ville_d, zone=zone_d)
