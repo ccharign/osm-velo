@@ -280,7 +280,7 @@ def lecture_tous_les_chemins(g, z_t=None, bavard=0):
     """
     Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
     """
-    if z_d is None:
+    if z_t is None:
         à_parcourir = g.zones
     else:
         à_parcourir = [Zone.objects.get(nom=z_t)]
