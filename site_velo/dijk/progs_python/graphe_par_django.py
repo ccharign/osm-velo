@@ -259,7 +259,7 @@ class Graphe_django():
             v = Ville.objects.get(nom_norm=adresse.ville.nom_norm)
             r = Rue.objects.get(nom_norm=adresse.rue_norm, ville=v)
             res = r.nœuds()
-            print(f"(g.nœuds_of_rue)Trouvé dans la base {list(res)} pour {adresse}")
+            if bavard>1: print(f"(g.nœuds_of_rue)Trouvé dans la base {list(res)} pour {adresse}")
             return res
         
         except Exception as e:

@@ -21,6 +21,9 @@ urlpatterns = [
     path("cycla/", views.cycla_choix, name = "cycla"),    
 
     path("telechargement/", views.téléchargement, name = "téléchargement"),
+
+    path("chemins/", views.affiche_chemins, name = "affiche chemins"),
+    path("modif_chemin/", views.action_chemin, name = "modif chemin"),
     
     path('<str:zone_t>/', views.recherche, name='recherche'),
     path('', views.index, name='index'),

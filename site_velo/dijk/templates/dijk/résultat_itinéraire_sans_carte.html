@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-	    
+
 {% block contenu %}
 
 <p> <!-- Trajet de {{départ}} à {{arrivée}} -->
@@ -39,7 +39,7 @@
       <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
       <input type="hidden" id="étapes" name="étapes" value="{{post_préc.étapes}}">
       <input type="hidden" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}">
-      <input type="hidden" id="zone_t" name="zone_t" value="{{post_préc.zone_t}}">
+      <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
 
       <div class="form-group">
 	<label for="pourcentage_détour"> Pourcentage de détour : </label>
@@ -64,7 +64,7 @@
       <!-- La carte -->
       <div class="carte">
 	{% block carte %}
-	{% endblock carte %}
+	{% endblock %}
       </div>
     </div>
 
@@ -98,11 +98,13 @@
 <!-- Formulaire pour relancer le calcul -->
     <form action = "{% url 'résultat' %}" method="post">
       {% csrf_token %}
-      
-      <input type="hidden" id="départ" name="départ" value="{{départ}}">
-      <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
-      <input type="hidden" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}"><br><br>
-      <input type="hidden" id="zone_t" name="zone_t" value="{{post_préc.zone_t}}">
+
+      <div class="form-group">
+	<input type="text" id="départ" name="départ" value="{{départ}}">
+	<input type="text" id="arrivée" name="arrivée" value="{{arrivée}}">
+	<input type="text" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}"><br><br>
+      </div>
+      <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
 
       <div class="from-group">
 	<label for="étapes"> Ajouter ou modifier les étapes ? </label><br>

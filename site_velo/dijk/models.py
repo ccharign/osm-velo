@@ -279,6 +279,11 @@ class Chemin_d(models.Model):
         else:
             self.save()
             
+    def étapes(self):
+        return self.étapes_texte.split(";")
+    
+    def rues_interdites(self):
+        return [r for r in self.interdites_texte.split(";") if len(r)>0]
     
     @classmethod
     def of_ligne_csv(cls, ligne, utilisateur=None):

@@ -88,12 +88,16 @@ def vue_itinéraire(requête):
     #z_d = Zone.objects.get(nom=requête.POST["zone_t"])
     
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
-    texte_étapes = énumération_texte(noms_étapes)
-    ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
-    p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
+    
+    ps_détour = list(map( lambda x: float(x)/100, requête.POST["pourcentage_détour"].split(";")) )
+
     rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
     print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
 
+    return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)
+
+
+def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
     # Calcul des itinéraires
     try:
         stats, chemin = itinéraire(
@@ -105,16 +109,23 @@ def vue_itinéraire(requête):
         )
     except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
-    except Exception as e:
-       return autreErreur(requête, e)
+    # except Exception as e:
+    #    return autreErreur(requête, e)
     
     # Création du template
+    texte_étapes = énumération_texte(noms_étapes)
     suffixe = d+texte_étapes+a+"".join(rues_interdites)
+
     vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire_complet**")
     for f in vieux_fichier:
         os.remove(f)
     head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
-    with open(f"dijk/templates/dijk/résultat_itinéraire_complet{suffixe}.html", "w") as sortie:
+
+    nom_fichier_html = f"dijk/résultat_itinéraire_complet{suffixe}"
+    if len(nom_fichier_html)>230: nom_fichier_html=nom_fichier_html[:230]
+    nom_fichier_html+=".html"
+        
+    with open(os.path.join("dijk/templates", nom_fichier_html), "w") as sortie:
         sortie.write(f"""
         {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
         {{% block head_début %}}  {head}  {{% endblock %}}
@@ -122,16 +133,21 @@ def vue_itinéraire(requête):
         {{% block script %}} <script> {script} </script> {{% endblock %}}
         """)
 
+    
     # Chargement du template
+    p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
+    données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
+               "pourcentage_détour": ";".join(map(lambda p : str(p*100), ps_détour))
+               }
     return render(requête,
-                  f"dijk/résultat_itinéraire_complet{suffixe}.html",
+                  nom_fichier_html,
                   {"stats": stats,
                    "départ":d, "arrivée":a,
                    "étapes": texte_étapes,
                    "rues_interdites": énumération_texte(rues_interdites),
                    "chemin":chemin.str_joli(),
-                   "post_préc":requête.POST, "p_détour_moyen":p_détour_moyen,
-                   "zone_t":z_d.nom
+                   "post_préc":données, "p_détour_moyen":p_détour_moyen,
+                   "zone_t":z_d.nom,
                    }
                   )
 
@@ -194,7 +210,28 @@ def carte_cycla(requête, zone_t):
     return render(requête, "dijk/cycla.html")
 
 
+### Gestion des chemins ###
 
+def affiche_chemins(requête):
+    cs = Chemin_d.objects.all()
+    print(f"Nombre de chemins : {len(cs)}")
+    return render(requête, "dijk/affiche_chemins.html", {"chemins": cs })
+
+
+def action_chemin(requête):
+    if requête.POST["action"]=="voir":
+        c = Chemin_d.objects.get(id=requête.POST["id_chemin"])
+        g.charge_zone(c.zone.nom)
+        étapes = c.étapes()
+        d = étapes[0]
+        a = étapes[-1]
+        return calcul_itinéraires(
+            requête, d, a,
+            [c.p_détour],
+            c.zone,
+            étapes[1:-1],
+            c.rues_interdites()
+        )
 
     
 ### Erreurs ###

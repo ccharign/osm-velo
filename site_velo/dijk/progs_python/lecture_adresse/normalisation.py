@@ -272,7 +272,7 @@ class Adresse():
         elif len(trucs)==2:
             num_rue, ville_t = trucs
         elif len(trucs)==3:
-            nom_rue, ville_t, pays = trucs
+            num_rue, ville_t, pays = trucs
         ville_t = ville_t.strip()
         
         # numéro de rue et rue
@@ -310,9 +310,9 @@ class Adresse():
         else:
             déb=""
         if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm}, {self.ville.avec_code()}, {self.pays}"
+            return f"{déb}{self.rue_osm}, {self.ville}"
         else:
-            return f"{déb}{self.rue}, {self.ville.avec_code()}, {self.pays}"
+            return f"{déb}{self.rue}, {self.ville}"
         
     def pour_nominatim(self):
         """
