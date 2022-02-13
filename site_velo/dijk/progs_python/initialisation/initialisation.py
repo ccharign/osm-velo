@@ -141,7 +141,7 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
     if zs_d.exists():
         z_d=zs_d.first()
     else:
-        ville_défaut_d = ville.objects.get(nom_complet=ville_defaut)
+        ville_défaut_d = Ville.objects.get(nom_complet=ville_defaut)
         #ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
         z_d = Zone(nom=zone, ville_défaut=ville_défaut_d)
         z_d.save()
