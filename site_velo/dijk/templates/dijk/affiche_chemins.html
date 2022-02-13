@@ -30,6 +30,14 @@ Liste des chemins en mémoire
 	<input type="hidden" id="id_chemin" value="{{c.id}}" name="id_chemin">
 	<input type="submit" value="voir">
       </form>
+
+      <form action="{% url 'modif chemin'%}" method="post">
+	{% csrf_token %}
+	<input type="hidden" id="action" value="effacer" name="action">
+	<input type="hidden" id="id_chemin" value="{{c.id}}" name="id_chemin">
+	<input type="submit" value="effacer">
+      </form>
+      
     </th>
   </tr>
 {% endfor %}

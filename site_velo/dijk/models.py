@@ -261,6 +261,7 @@ class Chemin_d(models.Model):
         constraints=[
             models.UniqueConstraint(fields=["ar", "p_détour", "début", "fin", "interdites_début", "interdites_fin"], name = "Pas de chemins en double.")
         ]
+        ordering = ["-dernier_p_modif"]
     
     def __str__(self):
         return f"Étapes : {self.étapes_texte}\n Interdites : {self.interdites_texte}\n p_détour : {self.p_détour}"

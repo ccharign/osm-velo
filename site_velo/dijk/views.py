@@ -222,6 +222,7 @@ def affiche_chemins(requête):
 
 
 def action_chemin(requête):
+    
     if requête.POST["action"]=="voir":
         c = Chemin_d.objects.get(id=requête.POST["id_chemin"])
         g.charge_zone(c.zone.nom)
@@ -235,6 +236,11 @@ def action_chemin(requête):
             étapes[1:-1],
             c.rues_interdites()
         )
+
+    elif requête.POST["action"]=="effacer":
+        c = Chemin_d.objects.get(id=requête.POST["id_chemin"])
+        c.delete()
+        return affiche_chemins(requête)
 
     
 ### Erreurs ###
