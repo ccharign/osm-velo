@@ -35,7 +35,7 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
     
     if bavard>0: print(f"\n\n(lecture_meilleur_chemin) Chemin reçu : {chemin}")
     iti_complet, _ = dijkstra.chemin_étapes_ensembles(g, chemin, bavard=bavard-1)
-    print(f" Nouvel itinéraire :\n {iti_complet}")
+    if bavard>0:print(f" Nouvel itinéraire :\n {iti_complet}")
     # Pour vieux chemin, je prends le chemin qui utilise le même nœud de départ et d’arrivée que chemin_complet (pour éviter de biaiser l’apprentissage dans le cas de gros ensembles)
     départ = iti_complet[0]
     arrivée = iti_complet[-1]

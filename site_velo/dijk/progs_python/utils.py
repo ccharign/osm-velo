@@ -276,14 +276,14 @@ def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
     
 ### Apprentissage ###
 
-def lecture_tous_les_chemins(g, z_d=None, bavard=0):
+def lecture_tous_les_chemins(g, z_t=None, bavard=0):
     """
     Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
     """
     if z_d is None:
         à_parcourir = g.zones
     else:
-        à_parcourir = [z_d]
+        à_parcourir = [Zone.objects.get(nom=z_t)]
     for z in à_parcourir:
         for c_d in Chemin_d.objects.filter(zone=z):
             c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)

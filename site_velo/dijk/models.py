@@ -1,4 +1,5 @@
 from django.db import models
+from params import CHEMIN_CHEMINS, LOG
 
 # Create your models here.
 
@@ -285,3 +286,15 @@ class Chemin_d(models.Model):
         p_détour = int(pourcentage_détour_t)/100.
         AR = bool(AR_t)
         return cls(p_détour=p_détour, ar=AR, étapes_texte=étapes_t, interdites_texte=rues_interdites_t,utilisateur=utilisateur)
+
+    
+    @classmethod
+    def sauv_csv(cls, chemin=CHEMIN_CHEMINS):
+        """
+        Enregistre les chemins de la base dans le csv indiqué.
+        Attention : pour l’instant cette fonction n’est pas compatible avec of_ligne_csv car elle rajoute les champs utilisateur et zone.
+        """
+        with open(chemin, "w") as sortie :
+            for c in cls.objects.all():
+                ligne = "|".join(map(str, (c.ar, c.p_détour, c.étapes_texte, c.interdites_texte, c.utilisateur, c.zone )))
+                sortie.write(ligne+"\n")
