@@ -91,6 +91,9 @@ def désoriente(g, bavard=0):
     """
     
     def existe_inverse(s,t,a):
+        """
+        Indique si l’arête inverse de (s,t,a) est présente dans gx.
+        """
         if s not in gx[t]:
             return False
         else:
@@ -107,19 +110,17 @@ def désoriente(g, bavard=0):
                     return False
                 else:
                     raise RuntimeError(f"Arête en double : {s}, {t}, {a}")
-                
+
+    
     def ajoute_inverse(s,t,a):
         if bavard>1:
             print(f"ajout de l’arête inverse de {s}, {t}, {a}")
         a_i = {att:val for att,val in a.items()}
-        a_i["sens_interdit"]=True
+        if "maxspeed" in a and a["maxspeed"] in ["10", "20", "30"]:
+            a_i["contresens cyclable"]=True
+        else:
+            a_i["sens_interdit"]=True
         gx.add_edge(t,s,**a_i )
-        # 
-        # if s not in gx[t]:
-        #     gx[t][s] = {0:a_i}
-        # else:
-        #     ind = max(gx[t][s].keys())
-        #     gx[t][s] [ind+1] = a_i
 
         
     gx=g.multidigraphe
@@ -127,7 +128,7 @@ def désoriente(g, bavard=0):
         for t in gx[s].keys():
             if t!=s:  # Il semble qu’il y ait des doublons dans les boucles dans les graphes venant de osmnx
                 for a in gx[s][t].values():
-                    if not existe_inverse(s, t, a):
+                    if a["highway"]!="cycleway" and not any("rond point" in c for c in  map(partie_commune, tuple_valeurs(a, "name"))) and not existe_inverse(s, t, a):
                         ajoute_inverse(s,t,a)
                     
 @transaction.atomic
@@ -187,7 +188,7 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
             "90":-4,
             "130":-float("inf")
         },
-        "sens_interdit":{True:-3}
+        "sens_interdit":{True:-5}
     }
     bonus = 0
     for att in critères.keys():
@@ -203,6 +204,38 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
     return 1.1**bonus
 
 
+def a_la_valeur(a, att, val):
+    """
+    Entrée : a (arête nx)
+             att
+             val
+    Indique si l’arête a à la valeur val pour l’attribut att
+    """
+    if att in a:
+        if isinstance(a[att], str):
+            return a[att]==val
+        elif isinstance(a[att], list):
+            return val in a[att]
+        else:
+            print(f"Avertissement : l’attribut {att} pour l’arête {a} n’était ni un str ni un list.")
+            return False
+    else:
+        return False
+
+    
+def tuple_valeurs(a, att):
+    """
+    Renvoie le tuple des valeurs de l’attribut att dans l’arête a.
+    """
+    if att in a:
+        if isinstance(a[att], list):
+            return tuple(a[att])
+        else:
+            return (a[att],)
+    else:
+        return ()
+
+    
 def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     """
     Entrée : g (Graphe_nx)
@@ -212,7 +245,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         rapide (int) : pour tout  (s,t) sommets voisins dans g,
                             0 -> efface toutes les arêtes de s vers t et remplace par celles de g
                             1 -> regarde si les arête entre s et t dans g correspondent à celles dans la base, et dans ce cas ne rien faire.
-                        « correspondent » signifie : même nombre et même noms.
+                        « correspondent » signifie : même nombre et mêmes noms.
                             2 -> si il y a quelque chose dans la base pour (s,t), ne rien faire.
         juste_arêtes (bool) : si vrai, ne recharge pas les sommets.
     """

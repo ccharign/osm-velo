@@ -17,7 +17,7 @@ tic=chrono(tic, "chemins", bavard=3)
 #tic=chrono(tic, "charge_graphe", bavard=3)
 
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
-from dijk.progs_python.recup_donnees import LieuPasTrouvé
+from dijk.progs_python import recup_donnees
 from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
@@ -41,6 +41,15 @@ from dijk.models import Chemin_d, Zone
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
 # Create your views here.
+
+
+#https://stackoverflow.com/questions/18176602/how-to-get-the-name-of-an-exception-that-was-caught-in-python
+def get_full_class_name(obj):
+    module = obj.__class__.__module__
+    if module is None or module == str.__class__.__module__:
+        return obj.__class__.__name__
+    return module + '.' + obj.__class__.__name__
+
 
 
 # Utiliser as_view dans url.py pour remplacer les lignes ci-dessous
@@ -75,7 +84,9 @@ def vue_itinéraire(requête):
     # Récupération des données du post
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
-    z_d = Zone.objects.get(nom=requête.POST["zone_t"])
+    z_d = g.charge_zone(requête.POST["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
+    #z_d = Zone.objects.get(nom=requête.POST["zone_t"])
+    
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
     texte_étapes = énumération_texte(noms_étapes)
     ps_détour = list(map( lambda x: int(x)/100, requête.POST["pourcentage_détour"].split(";")) )
@@ -92,10 +103,10 @@ def vue_itinéraire(requête):
             rues_interdites=rues_interdites,
             bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
-    except (PasTrouvé, LieuPasTrouvé) as e:
+    except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
-    #except Exception as e:
-    #    return vueLieuPasTrouvé(requête, e)
+    except Exception as e:
+       return autreErreur(requête, e)
     
     # Création du template
     suffixe = d+texte_étapes+a+"".join(rues_interdites)
@@ -190,6 +201,9 @@ def carte_cycla(requête, zone_t):
 
 def vueLieuPasTrouvé(requête, e):
     return render(requête, "dijk/LieuPasTrouvé.html", {"msg": f"{e}"})
+
+def autreErreur(requête, e):
+    return render(requête, "dijk/autreErreur.html", {"msg": f"{e.__class__.__name__} : {e}"})
 
 
 ### Stats ###

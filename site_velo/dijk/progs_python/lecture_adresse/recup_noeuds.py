@@ -68,7 +68,7 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
     else:
         ## Numéro de rue -> renvoyer un singleton
         if bavard > 0 : print("Numéro de rue présent : je vais renvoyer un seul nœud")
-        return renvoie(un_seul_nœud(g, ad, bavard=bavard-1))
+        return renvoie(un_seul_nœud(g, z_d, ad, bavard=bavard-1))
 
 
 
@@ -149,7 +149,7 @@ def filtre_nœuds(nœuds, g):
 
     
 
-def un_seul_nœud(g, adresse, bavard=0):
+def un_seul_nœud(g, z_d, adresse, bavard=0):
     """ Renvoie un singleton si on dispose d’assez de données pour localiser le numéro. Sinon renvoie tous les nœuds de la rue."""
     try:
         #if bavard > 0: print(f"Je lance coords_of_adresse pour {adresse}.")
@@ -161,7 +161,7 @@ def un_seul_nœud(g, adresse, bavard=0):
     except Exception as e:
         LOG_PB(f"Échec dans cherche_adresse_complète : {e}. Je vais renvoyer tous les nœuds pour {adresse}). J’efface le numéro de l’adresse.")
         adresse.num=None
-        return tous_les_nœuds(g, adresse, bavard=bavard)
+        return tous_les_nœuds(g, z_d, adresse, bavard=bavard)
         
 
     
