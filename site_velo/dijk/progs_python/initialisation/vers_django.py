@@ -20,6 +20,7 @@ from lecture_adresse.arbresLex import ArbreLex
 import re
 import os
 import json
+from functools import reduce
 
 # L’arbre contient les f"{nom_norm}|{code}"
 def à_mettre_dans_arbre(nom_n, code):
@@ -508,9 +509,14 @@ def charge_villes(chemin_pop=os.path.join(RACINE_PROJET, "progs_python/stats/doc
         """
         Enlève d’éventuelles paires de crochets inutiles avant de tout convertir en une chaîne de (lon, lat) séparées par des ;.
         """
+        assert isinstance(g, list), f"{g} n’est pas une liste"
         if len(g)==1:
             return géom_vers_texte(g[0])
+        elif isinstance(g[0][0], list):
+            nv_g = reduce(lambda x,y : x+y, g, [])
+            return géom_vers_texte(nv_g)
         else:
+            assert len(g[0])==2, f"{g} n’est pas une liste de couples.\n Sa longueur est {len(g)}"
             return ";".join(map(
                 lambda c: ",".join(map(str, c)),
                 g
@@ -543,12 +549,10 @@ def charge_villes(chemin_pop=os.path.join(RACINE_PROJET, "progs_python/stats/doc
             i_densité = dico_densité[densité]
             essai = Ville.objects.filter(nom_complet=nom).first()
             if code_insee in dico_géom:
-                nom_dans_géom, géom_à_traiter = dico_géom[code_insee]
+                nom_dans_géom, géom = dico_géom[code_insee]
                 if nom!=nom_dans_géom:
                     print(f"Avertissement : nom différent dans les deux fichiers : {nom_dans_géom} et {nom}")
                     géom=None
-                else:
-                    géom = géom_vers_texte(géom_à_traiter)
             else:
                 print(f"Avertissement : ville pas présente dans {chemin_géom} : {nom}")
                 géom = None

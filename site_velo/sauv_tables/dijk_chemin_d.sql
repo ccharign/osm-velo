@@ -24,24 +24,6 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Structure de la table `dijk_chemin_d`
---
-
-CREATE TABLE `dijk_chemin_d` (
-  `id` bigint(20) NOT NULL,
-  `ar` tinyint(1) NOT NULL,
-  `p_détour` double NOT NULL,
-  `étapes_texte` longtext NOT NULL,
-  `interdites_texte` longtext DEFAULT NULL,
-  `utilisateur` varchar(100) DEFAULT NULL,
-  `dernier_p_modif` double DEFAULT NULL,
-  `début` varchar(255) NOT NULL,
-  `fin` varchar(255) NOT NULL,
-  `interdites_début` varchar(255) NOT NULL,
-  `interdites_fin` varchar(255) NOT NULL,
-  `zone_id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `dijk_chemin_d`

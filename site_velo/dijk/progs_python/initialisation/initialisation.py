@@ -167,8 +167,7 @@ def init_totale():
     print("Chargement des données osm")
     charge_zone()
     
-    print("Lecture des chemins")
-    lecture_tous_les_chemins()
+
 
 
 def charge_multidigraph():
