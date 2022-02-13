@@ -1,5 +1,5 @@
 from django.db import models
-from params import CHEMIN_CHEMINS, LOG
+from dijk.progs_python.params import CHEMIN_CHEMINS, LOG
 
 # Create your models here.
 
