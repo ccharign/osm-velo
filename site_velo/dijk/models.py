@@ -15,6 +15,7 @@ class Ville(models.Model):
     population = models.IntegerField()
     densité = models.SmallIntegerField()
     géom_texte = models.TextField(null=True)
+    données_présentes = models.BooleanField(default=False)
     #zone = models.ManyToManyField(Zone) # pb car la classe Zone n’est pas encore définie.
     def __str__(self):
         return self.nom_complet

@@ -24,7 +24,7 @@ from petites_fonctions import sauv_fichier, chrono
 #from networkx import read_graphml
 from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet
 import initialisation.vers_django as vd
-
+from utils import lecture_tous_les_chemins
 
 """
 Script pour réinitialiser ou ajouter une nouvelle zone.
@@ -37,19 +37,33 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
 
 
 def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", bavard=2):
+    """
+    Entrées : nom (str)
+              code (int)
+              zone (str)
+    Effet : 
+        Charge les données osm de la ville dans la base, à savoir:
+           - Sommets
+           - Arêtes
+           - Rues
+        Le tout associé à la zone indiquée, qui est créée si besoin.
+        Le code postal est rajouté à la base s’il n’y était pas.
+    """
 
 
     ## Création ou récupération de la zone
     if ville_defaut is not None:
-        zone_d, _= Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_defaut))
+        zone_d, créée = Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_defaut))
+        if créée:
+            zone_d.save()
     else:
         zone_d = Zone.objects.get(nom=zone)
-    ## Création de la ville dans Django
-    # NB : le nom et le code peuvent avoir été corrigés.
-    ville_d = vd.nv_ville(nom, code, zone_d)
-    ## Ajout de la zone de la ville
-    rel, _ = Ville_Zone.objects.get_or_create(ville=ville_d, zone=zone_d)
-    rel.save()
+
+        
+    ## Ville : ajout du code postal et de la zone
+    ville_d = vd.ajoute_code_postal(nom, code)
+    rel, créée = Ville_Zone.objects.get_or_create(ville=ville_d, zone=zone_d)
+    if créée: rel.save()
 
     
     ## Récup des graphe via osmnx
@@ -87,15 +101,19 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
     
     ## Transfert du graphe
     vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False)
+
+    
+    ville_d.données_présentes = True
+    ville_d.save()
     
 
 À_RAJOUTER_PAU={
     "Gelos": 64110,
     "Lée": 64320,
-    "Pau":64000,
+    "Pau": 64000,
     "Lescar": 64230,
     "Billère": 64140,
-    "Jurançon":64110,
+    "Jurançon": 64110,
     "Ousse": 64320,
     "Idron": 64320,
     "Lons": 64140 ,
@@ -105,11 +123,15 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
 }.items()
 
 
-def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_défaut="Pau", code=64000, bavard=2):
+def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2):
     """
-    Entrée : itérable de (nom de ville, code postal)
+    Entrée : liste_villes, itérable de (nom de ville, code postal)
+             zone (str), nom de la zone
+             ville_defaut (str), nom de la ville par défaut de la zone. Utilisé uniquement si la zone est créée.
+
     Effet : charge toutes ces ville dans la base, associées à la zone indiquée.
-            Si la zone n’existe pas, elle sera créée, en y associant ville_défaut et code.
+            Si la zone n’existe pas, elle sera créée, en y associant ville_défaut.
+
     Paramètres: 
        Si réinit, tous les éléments associés à la zone (villes, rues, sommets, arêtes) ainsi que le cache sont au préalable supprimés.
     """
@@ -119,7 +141,8 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
     if zs_d.exists():
         z_d=zs_d.first()
     else:
-        ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
+        ville_défaut_d = ville.objects.get(nom_complet=ville_defaut)
+        #ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
         z_d = Zone(nom=zone, ville_défaut=ville_défaut_d)
         z_d.save()
 
@@ -135,6 +158,17 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
         charge_ville(nom, code, zone=zone, bavard=bavard)
 
 
+
+def init_totale():
+    
+    print("Chargement des villes depuis les fichiers INSEE")
+    vd.charge_villes()
+ 
+    print("Chargement des données osm")
+    charge_zone()
+    
+    print("Lecture des chemins")
+    lecture_tous_les_chemins()
 
 
 def charge_multidigraph():

@@ -31,6 +31,7 @@ def arbre_des_villes(zone_d=None):
     Renvoie l’arbre lexicographique des villes de la base.
     Si zone_d est précisé, seulement les villes de cette zone.
     """
+    print("Création de l’arbre des villes")
     res = ArbreLex()
     if zone_d is None:
         villes = Ville.objects.all()
@@ -38,16 +39,32 @@ def arbre_des_villes(zone_d=None):
         villes = zone_d.villes()
     for v_d in villes:
         res.insère(à_mettre_dans_arbre(v_d.nom_norm, v_d.code))
+    print("--- fini")
     return res
 
 
+def ajoute_code_postal(nom, code):
+    """
+    Ajoute s’il n’y est pas déjà déjà, le code postal de la ville.
+    Sortie (models.Ville)
+    """
+    essai = Ville.objects.filter(nom_complet=nom, code = code).first()
+    if essai:
+        return essai
+    else:
+        v = Ville.objects.get(nom_complet=nom, code=None)
+        v.code=code
+        v.save()
+        return v
+
+        
 def nv_ville(nom, code, zone_d, tol=3):
     """
     Effet : si pas déjà présente, rajoute la ville dans la base django et dans l'arbre lex ARBRE_VILLES.
     Sortie : l'objet Ville créé ou récupéré dans la base.
     """
     nom_norm = partie_commune(nom)
-    arbre = arbre_des_villes()
+    arbre = arbre_des_villes(zone_d=zone_d)
     dans_arbre, d = arbre.mots_les_plus_proches(à_mettre_dans_arbre(nom_norm, code), d_max=tol)
     
     if len(dans_arbre) > 0:
@@ -474,45 +491,19 @@ def int_of_code_insee(c):
     return int(c.replace("A","00").replace("B","01"))
 
 
-def charge_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/densité_communes.csv"), bavard=0 ):
+def charge_villes(chemin_pop=os.path.join(RACINE_PROJET, "progs_python/stats/docs/densité_communes.csv"),
+                  chemin_géom=os.path.join(RACINE_PROJET, "progs_python/stats/docs/géom_villes.json"),
+                  bavard=0 ):
+    """
+    Remplit la table des villes à l’aide des deux fichiers insee. (Il manque le code postal.)
+    """
+    
     dico_densité={"Communes très peu denses":0,
                   "Communes peu denses":1,
                   "Communes de densité intermédiaire":2,
                   "Communes densément peuplées":3
                   }
-    with open(chemin) as entrée:
-        à_maj=[]
-        à_créer=[]
-        entrée.readline()
-        for ligne in entrée:
-            code_insee, nom, région, densité, population = ligne.strip().split(";")
-            code_insee = int_of_code_insee(code_insee)
-            population = int(population.replace(" ",""))
-            i_densité = dico_densité[densité]
-            essai = Ville.objects.filter(nom_complet=nom).first()
 
-            if essai:
-                essai.population=population
-                essai.code_insee=code_insee
-                essai.densité=i_densité
-                à_maj.append(essai)
-            else:
-                v_d = Ville(nom_complet=nom,
-                            nom_norm=partie_commune(nom),
-                            population=population,
-                            code_insee=code_insee,
-                            code=None,
-                            densité=i_densité
-                            )
-                à_créer.append(v_d)
-    print(f"Enregistrement des {len(à_maj)} modifs")
-    Ville.objects.bulk_update(à_maj, ["population", "code_insee", "densité"])
-    print(f"Enregistrement des {len(à_créer)} nouvelles villes")
-    Ville.objects.bulk_create(à_créer)
-
-
-def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/géom_villes.json")):
-    
     def géom_vers_texte(g):
         """
         Enlève d’éventuelles paires de crochets inutiles avant de tout convertir en une chaîne de (lon, lat) séparées par des ;.
@@ -524,20 +515,76 @@ def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/d
                 lambda c: ",".join(map(str, c)),
                 g
             ))
-        
-    with open(chemin) as entrée:
-        à_maj=[]
+
+    dico_géom = {} # dico code_insee -> (nom, géom)
+
+    print(f"Lecture de {chemin_géom} ")
+    with open(chemin_géom) as entrée:
         données = json.load(entrée)
         for v in données["features"]:
             code_insee = int_of_code_insee(v["properties"]["codgeo"])
             géom = géom_vers_texte(v["geometry"]["coordinates"])
             nom = v["properties"]["libgeo"].strip().replace("?","'")
-            essai = Ville.objects.filter(code_insee=code_insee, nom_complet=nom).first()
+            dico_géom[code_insee] = (nom, géom)
+    
+
+    print(f"Lecture de {chemin_pop}")
+    with open(chemin_pop) as entrée:
+        à_maj=[]
+        à_créer=[]
+        n=-1
+        entrée.readline()
+        for ligne in entrée:
+            n+=1
+            if n % 500 ==0: print(f"{n} lignes traitées")
+            code_insee, nom, région, densité, population = ligne.strip().split(";")
+            code_insee = int_of_code_insee(code_insee)
+            population = int(population.replace(" ",""))
+            i_densité = dico_densité[densité]
+            essai = Ville.objects.filter(nom_complet=nom).first()
+            if code_insee in dico_géom:
+                nom_dans_géom, géom_à_traiter = dico_géom[code_insee]
+                if nom!=nom_dans_géom:
+                    print(f"Avertissement : nom différent dans les deux fichiers : {nom_dans_géom} et {nom}")
+                    géom=None
+                else:
+                    géom = géom_vers_texte(géom_à_traiter)
+            else:
+                print(f"Avertissement : ville pas présente dans {chemin_géom} : {nom}")
+                géom = None
+
             if essai:
+                essai.population=population
+                essai.code_insee=code_insee
+                essai.densité=i_densité
                 essai.géom_texte = géom
                 à_maj.append(essai)
             else:
-                print(f"Avertissement : ville pas trouvée : {nom} {code_insee}")
+                v_d = Ville(nom_complet=nom,
+                            nom_norm=partie_commune(nom),
+                            population=population,
+                            code_insee=code_insee,
+                            code=None,
+                            densité=i_densité,
+                            géom_texte=géom
+                            )
+                à_créer.append(v_d)
+    print(f"Enregistrement des {len(à_maj)} modifs")
+    Ville.objects.bulk_update(à_maj, ["population", "code_insee", "densité"])
+    print(f"Enregistrement des {len(à_créer)} nouvelles villes")
+    Ville.objects.bulk_create(à_créer)
+
+
+def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/géom_villes.json")):
+    """
+    Rajoute la géométrie des villes à partir du json INSEE.
+    """
+    
+
+        
+    with open(chemin) as entrée:
+        à_maj=[]
+        
     Ville.objects.bulk_update(à_maj, ["géom_texte"])
 
 
