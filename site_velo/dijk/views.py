@@ -181,13 +181,16 @@ def téléchargement(requête):
     """
     Fournit le fichier texte contenu dans requête.session[requête.POST["clef"]]
     """
-    return HttpResponse(
-        requête.session[requête.POST["clef"]],
-        headers={
-            'Content-Type': "application/gpx+xml",
-            'Content-Disposition': 'attachment; filename="trajet.gpx"'
-            }
-    )
+    try :
+        return HttpResponse(
+            requête.session[requête.POST["clef"]],
+            headers={
+                'Content-Type': "application/gpx+xml",
+                'Content-Disposition': 'attachment; filename="trajet.gpx"'
+                }
+        )
+    except Exception as e:
+        return autreErreur(requête, e)
 
 
 ### Carte cycla ###
