@@ -28,7 +28,7 @@ Liste des chemins en mémoire
 	{% csrf_token %}
 	<input type="hidden" id="action" value="voir" name="action">
 	<input type="hidden" id="id_chemin" value="{{c.id}}" name="id_chemin">
-	<input type="submit" value="voir">
+	<input type="submit" value="voir"  target="_blank">
       </form>
 
       <form action="{% url 'modif chemin'%}" method="post">

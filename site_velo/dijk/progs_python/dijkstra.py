@@ -150,7 +150,7 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
             
 
     if len(sommetsFinalsTraités)==0:
-        _, plus_proche = min((heuristique(g, s, arrivée), s) for s in dist.keys())
+        _, plus_proche = min((heuristique(g, s, arrivée, correction_max), s) for s in dist.keys())
         chemin = [plus_proche]
         reconstruction(chemin, pred, départ)
         raise PasDeChemin(f"Pas réussi à atteindre l’étape {arrivée}. Le sommet atteint le plus proche est {plus_proche}, le chemin pour y aller est {chemin}")
