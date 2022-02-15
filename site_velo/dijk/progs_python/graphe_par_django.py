@@ -42,7 +42,6 @@ class Graphe_django():
         self.zones=[]
         self.cycla_max={}
         self.cycla_min={}
-        
     
     def charge_zone(self, zone_t="Pau", bavard=0):
         """
@@ -50,6 +49,7 @@ class Graphe_django():
         """
         z_d = Zone.objects.get(nom=zone_t)
         if z_d not in self.zones:
+            print(f"Zone pas en mémoire : {z_d}. Voici les zones que j’ai chargées : {self.zones}")
             self.zones.append(z_d)
 
             # Dicos des villes et des rues
@@ -60,12 +60,18 @@ class Graphe_django():
                 self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
             print("fini.")
 
+            tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
+            print(f"{len(tous_les_sommets)} sommets dans la base pour {z_d}")
             # Arêtes
+            print("Chargement des arêtes")
             tic = perf_counter()
             arêtes = Arête.objects.filter(zone=z_d).select_related("départ", "arrivée")
+            print(f"{len(arêtes)} arêtes dans la base pour la zone {z_d}")
             for a in arêtes:
+
                 s = a.départ.id_osm
                 t = a.arrivée.id_osm
+                assert s in tous_les_sommets and t in tous_les_sommets, f"l’arête {a} de la zone {z_d} n’a pas ses deux sommets dans la zone"
                 #if z_d not in a.départ.zone.all() or z_d not in a.arrivée.zone.all():
                 #    raise RuntimeError(f"Un sommet de l’arête {a} n’était pas dans la même zone que celle-ci ({z_d}).")
                 if s not in self.dico_voisins: self.dico_voisins[s]=[]
@@ -74,7 +80,8 @@ class Graphe_django():
             tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
             #Sommets
-            self.dico_Sommet={}
+            print("Chargement des sommets")
+
             for s in Sommet.objects.filter(zone=z_d):
                 self.dico_Sommet[s.id_osm] = s
             tic=chrono(tic, "Chargement des sommets")

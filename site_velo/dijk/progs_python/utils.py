@@ -51,6 +51,11 @@ def liste_Arête_of_iti(g, iti, p_détour):
     return res
 
 
+DICO_PROFIl={
+    0:"Itinéraire direct",
+    15:"Petits détours",
+    30:"Gros détours"
+}
 
 def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
@@ -109,7 +114,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
         coul = color_dict[ (i*n_coul)//np ]
-        traite_un_chemin(c, coul, f"Avec pourcentage détour de {100*p}")
+        traite_un_chemin(c, coul, f"Avec pourcentage détour de {int(100*p)}")
 
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)

@@ -74,11 +74,14 @@
 	  Longueur des trajets :<br>
 	  <ul>
 	    {% for x in stats %}
-	    <li> <span style = "color: {{x.couleur}};"> {{x.légende}} :  {{x.longueur}} m<!-- , ressentie : {{x.2}} m --> </span>
+	    <li> 
 	      <form action="{% url 'téléchargement' %}" method="post">
 		{% csrf_token %}
-		<input type="hidden" id="clef" name="clef" value={{x.nom_gpx}}>
-		<input type="submit" class="btn btn-default" value="gpx">
+		<div class="input-group">
+		  <span style = "color: {{x.couleur}};" class="input-group-addon"> {{x.légende}} :  {{x.longueur}} m </span>
+		  <input type="hidden" id="clef" name="clef" value={{x.nom_gpx}}>
+		  <input type="submit" class="btn btn-default" value="gpx">
+		</div>
 	      </form>
 	    </li>
 	    {% endfor %}

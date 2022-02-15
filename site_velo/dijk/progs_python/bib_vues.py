@@ -25,6 +25,7 @@ def énumération_texte(l):
     else:
         return ", ".join(l[:-1]) + " et " + l[-1]
 
+    
 def sans_style(texte):
     """
     Entrée : du code html (str)
@@ -37,6 +38,7 @@ def sans_style(texte):
     else:
         return texte
 
+    
 def récup_head_body_script(chemin):
     """ Entrée : adresse d’un fichier html
         Sortie : la partie body de celui-ci
@@ -45,11 +47,17 @@ def récup_head_body_script(chemin):
         tout=entrée.read()
         
         head, suite = tout.split("</head>")
-        head = head.split("<head>")[1]
+        lignes_head = head.split("<head>")[1].split("\n")
+        à_garder = []
+        for ligne in lignes_head:
+            if not ("bootstrap in ligne"):
+                à_garder.append(ligne)
+        head_final = "\n".join(à_garder)
+        
         
         body, suite = suite.split("</body>")
         body = body.split("<body>")[1]
 
         script = suite.split("<script>")[1].split("</script>")[0]
-    return (head), body, script
+    return head, body, script
 

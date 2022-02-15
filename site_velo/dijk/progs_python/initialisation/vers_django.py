@@ -127,7 +127,8 @@ def désoriente(g, bavard=0):
                 elif len(inverses_de_a) == 0:
                     return False
                 else:
-                    raise RuntimeError(f"Arête en double : {s}, {t}, {a}")
+                    print(f"Avertissement : Arête en double : {s}, {t}, {inverses_de_a}")
+                    return True
 
     
     def ajoute_inverse(s,t,a):

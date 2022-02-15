@@ -137,7 +137,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
     # Chargement du template
     p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
     données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
-               "pourcentage_détour": ";".join(map(lambda p : str(p*100), ps_détour))
+               "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour))
                }
     return render(requête,
                   nom_fichier_html,
