@@ -1,36 +1,34 @@
-{% extends "base.html" %}
+{% extends "dijk/résultat_itinéraire_base.html" %}
 
 
-{% block contenu %}
-
-<p> <!-- Trajet de {{départ}} à {{arrivée}} -->
-  <!-- {% if étapes %} -->
-  <!-- en passant par {{étapes}}. -->
-  <!-- {% endif %} -->
-{{chemin}}
-</p>
 
 
-<p>
-  <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire en plein écran dans un onglet séparé </a>
-</p>
+
 
 <!-- Formulaire pour enregistrer la contribution -->
-{% if étapes or post_préc.rues_interdites %}
-</br>
+{% block enregistrer_contrib %}
+<h4 class="alert-info">
+  Entraînez l’IA et améliorez l’appli pour les prochains utilisateurs !
+</h4>
 
 <p>
-  Si l’itinéraire affiché vous paraît judicieux, autrement dit si pour aller de « {{départ}} » à « {{arrivée}} » il vous semble judicieux de
+  Sélectionnez les profils cyclistes pour lesquels il vous semble pertinent, pour aller de « {{départ}} » à « {{arrivée}} »,
   {% if étapes %}
-  passer par « {{étapes}} »
+  de passer par « {{étapes}} »
   {% endif %}
   {% if étapes and post_préc.rues_interdites %}
-  et/ou
+  et
   {% endif %}
   {% if post_préc.rues_interdites %}
   d’éviter « {{rues_interdites}} »
-  {% endif%}, enregistrez-le dans la base de données, afin d’entraîner l’IA et améliorer ainsi l’appli pour les prochains utilisateurs !
+{% endif%}.
 </p>
+<!-- Autoriser les popover -->
+<script>
+$(document).ready(function(){
+  $('[data-toggle="popover"]').popover();
+});
+</script>
 <p>
     <form action = "{% url 'confirme nv chemin' %}" method="post">
       {% csrf_token %}
@@ -41,90 +39,80 @@
       <input type="hidden" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}">
       <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
 
-      <div class="form-group">
-	<label for="pourcentage_détour"> Pourcentage de détour : </label>
-	<input type="number" id="pourcentage_détour" name="pourcentage_détour" value = "{{p_détour_moyen}}"><br>
-      </div>
-
+      <ul>
+      {% for x in stats %}
+      {% if x.id != "ps0" %}
+      <li>
+	  <label for="{{x.id}}" ><input type="checkbox" id="{{x.id}}" name="{{x.id}}" > {{x.légende}} </label>
+	  <span class="btn-sm btn-default" data-toggle="popover" title="{{x.légende}}" data-trigger="hover" data-content="{{x.aide}}">?</span>
+      </li>
+      {% endif %}
+      {% endfor %}
+      </ul>
       <div class="checkbox">
 	<label for="AR">  <input type="checkbox" id="AR" name="AR"> Valable aussi pour le retour ? </label>
       </div>
       
-      <input type="submit" class="btn btn-default" value="Enregistrer la contribution"><br>
+      <input type="submit" class="btn btn-default" value="Enregistrer">
      
     </form>
 </p>
 
-{% endif %}
+{% endblock %}
 
 
-  <div class="row">
-    
-    <div class="col-md-9">
-      <!-- La carte -->
-      <div class="carte">
-	{% block carte %}
-	{% endblock %}
-      </div>
-    </div>
-
-    <div class="col-sm-3">
-      <!-- Statistiques -->
-	<p>
-	  Longueur des trajets :<br>
-	  <ul>
-	    {% for x in stats %}
-	    <li> 
-	      <form action="{% url 'téléchargement' %}" method="post">
-		{% csrf_token %}
-		<div class="input-group">
-		  <span style = "color: {{x.couleur}};" class="input-group-addon"> {{x.légende}} :  {{x.longueur}} m </span>
-		  <input type="hidden" id="clef" name="clef" value={{x.nom_gpx}}>
-		  <input type="submit" class="btn btn-default" value="gpx">
-		</div>
-	      </form>
-	    </li>
-	    {% endfor %}
-	  </ul>
-	</p>
-
-    </div>
-    
-  </div>
 
 
-</br>
-
-
-<section>
-  
-<!-- Formulaire pour relancer le calcul -->
-    <form action = "{% url 'résultat' %}" method="post">
+<!-- Statistiques -->
+{% block stats %}
+<ul>
+  {% for x in stats %}
+  <li> 
+    <form action="{% url 'téléchargement' %}" method="post">
       {% csrf_token %}
+	<span style = "color: {{x.couleur}};"> {{x.légende}} :  {{x.longueur}} m </span>
+	<input type="hidden" id="clef" name="clef" value={{x.nom_gpx}}>
+	<input type="submit" class="btn btn-link" value="gpx">
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
 
-      <div class="form-group">
+
+
+<!-- Formulaire pour relancer le calcul -->
+{% block relancer_calcul %}
+<form action = "{% url 'résultat' %}" method="post">
+  {% csrf_token %}
+
+  
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-4">
 	<label for="départ">Départ</label>
 	<input type="text" class="form-control" id="départ" name="départ" value="{{départ}}">
+      </div>
+      <div class="col-sm-4">
 	<label for="arrivée"> Arrivée </label>
 	<input type="text" class="form-control" id="arrivée" name="arrivée" value="{{arrivée}}">
-	<label for="pourcentage_détour">Pourcentage détour </label>
-	<input type="text" class="form-control" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}"><br><br>
       </div>
-      <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
+    </div>
+  </div>
+  
+  <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
+  <input type="hidden" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}">
+  
+  <div class="from-group">
+    <label for="étapes"> Étapes </label>
+    <input type="text" class="form-control" id="étapes" name="étapes" value="{{post_préc.étapes}}" >
+  </div>
 
-      <div class="from-group">
-	<label for="étapes"> Ajouter ou modifier les étapes ? </label><br>
-	<input type="text" class="form-control" id="étapes" name="étapes" value="{{post_préc.étapes}}" size=100 ><br><br>
-      </div>
-
-      <div class="form-group">
-	<label for="rue_interdites"> Ajouter ou modifier des rues interdites ? </label><br>
-	<input type="text" class="form-control" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" size=100 ><br><br>
-      </div>
-      
-      <input type="submit" class="btn btn-default" value="Recalculer l’itinéraire">
-    </form>
-
-</section>
-
-{% endblock contenu %}
+  <div class="form-group">
+    <label for="rue_interdites"> Rues interdites </label>
+    <input type="text" class="form-control" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" >
+  </div>
+  
+  <input type="submit" class="btn btn-default" value="Recalculer l’itinéraire">
+</form>
+{% endblock %}

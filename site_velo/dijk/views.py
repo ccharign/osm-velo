@@ -158,23 +158,35 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
 
 
 def confirme_nv_chemin(requête):
+    """
+    Traitement du formulaire d’enregistrement d’un nouveau chemin.
+    """
     nb_lectures=50
     #(étapes, p_détour, AR) = requête.session["chemin_à_valider"]
     d=requête.POST["départ"]
     a=requête.POST["arrivée"]
     noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
-    pourcentage_détour = int(requête.POST["pourcentage_détour"])
+    #pourcentage_détour = int(requête.POST["pourcentage_détour"])
     AR = bool_of_checkbox(requête.POST, "AR")
     rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
     zone=Zone.objects.get(nom=requête.POST["zone_t"])
-    print(f"étapes : {noms_étapes}, pourcentage détour : {pourcentage_détour}, AR : {AR}, rues interdites : {rues_interdites}\n")
-    
-    c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
-    c_d=c.vers_django(bavard=1)
-    prop_modif=n_lectures(nb_lectures, g, [c], bavard=3)
-    c_d.prop_modif=prop_modif
-    c_d.save()
-    return render(requête, "dijk/merci.html", {"chemin":c, "zone_t":zone.nom})
+    print(f"étapes : {noms_étapes}, AR : {AR}, rues interdites : {rues_interdites}\n")
+
+
+    chemins=[]
+    for id_chemin in requête.POST.keys():
+        if id_chemin[:2]=="ps" and requête.POST[id_chemin]=="on":
+            pourcentage_détour = int(id_chemin[2:])
+            print(f"pourcentage_détour : {pourcentage_détour}")
+            c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
+            chemins.append(c)
+            c_d=c.vers_django(bavard=1)
+            prop_modif=n_lectures(nb_lectures, g, [c], bavard=1)
+            print(prop_modif)
+            c_d.dernier_p_modif=prop_modif
+            c_d.save()
+            
+    return render(requête, "dijk/merci.html", {"chemin":chemins, "zone_t":zone.nom})
 
 
 def téléchargement(requête):

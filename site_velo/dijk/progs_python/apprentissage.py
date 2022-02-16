@@ -108,4 +108,4 @@ def lecture_jusqu_à_perfection(g, chemins, n_max=50, bavard=0):
     print(f"Entraînement fini en {n_étapes} étapes.")
     if n_étapes==n_max:
         LOG_PB(f"Nombre max d’itérations ({n_max}) atteint lors de l’apprentissage pour les chemins {chemins}.")
-    return prop_modif
+    return prop_modif[-1]

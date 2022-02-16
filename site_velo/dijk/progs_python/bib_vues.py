@@ -4,15 +4,14 @@ import re
 
 
 def bool_of_checkbox(dico, clef):
-    """Transforme la valeur venue d’une checkbox via un POST en un brave booléen."""
-    try:
-        if dico[clef]=="on":
-            return True
-        else:
-            return False
-    except KeyError:
-        return False
+    """
+    Entrée : dico issu d’un POST
+             clef
+    Renvoie True si la clef est présente dans le dico et la valeur associée est  'on'
+    """
+    return clef in dico and dico[clef]=="on"
 
+    
 def énumération_texte(l):
     """
     Entrée : liste de str

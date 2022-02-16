@@ -52,10 +52,18 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 DICO_PROFIl={
-    0:"Itinéraire direct",
-    15:"Petits détours",
-    30:"Gros détours"
+    0:("Trajet direct", ""),
+    15:("Petits détours", "Un cycliste de profil « petits détours » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."),
+    30:("Gros détours", "Un cycliste de profil « gros détours » rallonge en moyenn ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
 }
+
+def légende_et_aide(p_détour):
+    pourcent = int(100*p_détour)
+    if pourcent in DICO_PROFIl:
+        return DICO_PROFIl[pourcent]
+    else:
+        return f"Profil détour {pourcent}%", ""
+
 
 def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
@@ -72,9 +80,11 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
 
-    Sortie : (liste de dicos (légende, longueur, longueur ressentie, couleur, nom_gpx) pour les itinéraires obtenus,
+    Sortie : (liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, nom_gpx) pour les itinéraires obtenus,
               objet Chemin correspondant au dernier p_détour
              )
+             id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
+             aide sera affichée en infobulle dans les pages de résultat.
     """
 
     ## Calcul des étapes
@@ -97,12 +107,14 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     à_dessiner = []
     res = []
 
-    def traite_un_chemin(c, coul, légende):
+    def traite_un_chemin(c, coul, légende, aide):
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         à_dessiner.append( (iti_d, coul, p))
         nom_gpx = hash(c)
         gpx_of_iti(iti_d, nom_gpx, session, bavard=bavard-1)
         res.append({"légende": légende,
+                    "aide":aide,
+                    "id": f"ps{int(100*c.p_détour)}",
                     "longueur":g.longueur_itinéraire(iti_d),
                     "longueur_ressentie":int(l_ressentie),
                     "couleur":coul,
@@ -114,12 +126,12 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
         coul = color_dict[ (i*n_coul)//np ]
-        traite_un_chemin(c, coul, f"Avec pourcentage détour de {int(100*p)}")
+        traite_un_chemin(c, coul, *légende_et_aide(p))
 
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)
         coul = "#000000"
-        traite_un_chemin(cd, coul, "Trajet direct")
+        traite_un_chemin(cd, coul, "Trajet direct", "Le trajet le plus court")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
     tic=perf_counter()
