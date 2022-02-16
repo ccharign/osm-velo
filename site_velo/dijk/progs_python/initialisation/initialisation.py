@@ -98,10 +98,12 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
                          )
 
     ## désorientation
+    close_old_connections()
     print("\nDésorientation du graphe")
     vd.désoriente(g, bavard=bavard-1)
     
     ## Transfert du graphe
+    close_old_connections()
     vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False)
 
     
