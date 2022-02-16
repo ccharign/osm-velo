@@ -353,6 +353,10 @@ def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
     Si carte est None, création d’une nouvelle carte positionnée en le premier sommet.
     """
 
+    if len(arêtes)==0:
+        # carte vide si aucune arête
+        return folium.Map()
+    
     if carte is None:
         lon, lat = arêtes[0][0].départ.coords()
         carte = folium.Map(location=(lat,lon), zoom_start=zoom, tiles=tiles)

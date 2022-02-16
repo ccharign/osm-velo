@@ -1,13 +1,18 @@
 {% extends "base.html" %}
+
 {% block titre %}
 Carte de la cyclabilité
 {% endblock %}
+
 {% block contenu %}
 Choisissez la zone de laquelle afficher la carte de la cyclabilité :
 
-<ul>
-{% for z in zones %}
-<li> <a href="{% url 'cycla'%}{{z}}"> {{z}} </a> </li>
-{% endfor %}
-</ul>
-  {% endblock %}
+<form action="/cycla/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="C’est parti">
+</form>
+
+L’option « force_calcul » force le calcul de la carte, même si elle est déjà présente en mémoire (pour le cas où les données auraient changé depuis le dernier calcul).
+
+{% endblock %}

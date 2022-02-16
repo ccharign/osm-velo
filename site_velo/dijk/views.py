@@ -33,7 +33,7 @@ from datetime import datetime
 from glob import glob
 import os
 from dijk.models import Chemin_d, Zone
-
+import forms
 
 
 #g=charge_graphe()
@@ -207,27 +207,42 @@ def téléchargement(requête):
 
 ### Carte cycla ###
 
+# def cycla_choix(requête):
+#     """
+#     Renvoie la page de choix de la zone pour laquelle afficher la cycla.
+#     """
+#     zones = Zone.objects.all()
+#     return render(requête, "dijk/cycla_choix.html", {"zones":zones})
+
+
+
+# Version formulaire de Django
 def cycla_choix(requête):
-    """
-    Renvoie la page de choix de la zone pour laquelle afficher la cycla.
-    """
-    zones = Zone.objects.all()
-    return render(requête, "dijk/cycla_choix.html", {"zones":zones})
+    if requête.method == "POST":
+        # On est arrivé ici après remplissage du formulaire
+        form = forms.FormCycla(requête.POST)
+        if form.is_valid():
+            return carte_cycla(requête)
+    else:
+        form = forms.FormCycla()
+    return render(requête, "dijk/cycla_choix.html", {"form":form})
 
 
-def carte_cycla(requête, zone_t):
+def carte_cycla(requête):
     """
     Renvoie la carte de la cyclabilité de la zone indiquée.
     """
-    z_d = Zone.objects.get(nom=zone_t)
+    z_d = Zone.objects.get(id=requête.POST["zone"])
     nom = f"dijk/cycla{z_d}.html"
-    if zone_t not in g.zones : g.charge_zone(zone_t)
+    if not os.path.exists("dijk/templates/"+nom) or "force_calcul" in requête.POST:
+        if z_d.nom not in g.zones : g.charge_zone(z_d.nom)
     
-    dessine_cycla(g, z_d, où_enregistrer="dijk/templates/"+nom, bavard=1)
+        dessine_cycla(g, z_d, où_enregistrer="dijk/templates/"+nom, bavard=1)
     return render(requête, nom)
 
 
-### Gestion des chemins ###
+
+### Gestion des chemins (admin) ###
 
 def affiche_chemins(requête):
     cs = Chemin_d.objects.all()
