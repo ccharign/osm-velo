@@ -23,6 +23,7 @@ from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier, chrono
 #from networkx import read_graphml
 from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet
+from django.db import close_old_connections
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
 
@@ -89,6 +90,7 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
     print("\nCalcul des nœuds de chaque rue")
     dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
     print("Écriture des nœuds des rues dans la base.")
+    close_old_connections()
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
     print("Création de l'arbre lexicographique")
     arbre_rue_dune_ville(ville_d,
