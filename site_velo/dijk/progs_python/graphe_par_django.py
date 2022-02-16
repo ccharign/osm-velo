@@ -42,7 +42,8 @@ class Graphe_django():
         self.zones=[]
         self.cycla_max={}
         self.cycla_min={}
-    
+
+        
     def charge_zone(self, zone_t="Pau", bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
@@ -60,8 +61,8 @@ class Graphe_django():
                 self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
             print("fini.")
 
-            tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
-            print(f"{len(tous_les_sommets)} sommets dans la base pour {z_d}")
+            #tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
+            #print(f"{len(tous_les_sommets)} sommets dans la base pour {z_d}")
             # Arêtes
             print("Chargement des arêtes")
             tic = perf_counter()
@@ -71,7 +72,7 @@ class Graphe_django():
 
                 s = a.départ.id_osm
                 t = a.arrivée.id_osm
-                assert s in tous_les_sommets and t in tous_les_sommets, f"l’arête {a} de la zone {z_d} n’a pas ses deux sommets dans la zone"
+                #assert s in tous_les_sommets and t in tous_les_sommets, f"l’arête {a} de la zone {z_d} n’a pas ses deux sommets dans la zone"
                 #if z_d not in a.départ.zone.all() or z_d not in a.arrivée.zone.all():
                 #    raise RuntimeError(f"Un sommet de l’arête {a} n’était pas dans la même zone que celle-ci ({z_d}).")
                 if s not in self.dico_voisins: self.dico_voisins[s]=[]

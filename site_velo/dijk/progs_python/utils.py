@@ -262,14 +262,15 @@ def moyenne(t):
     return sum(t)/len(t)
 
 
-def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
+def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
     """
-    Crée la carte de la cyclabilité.
+    Entrée : où_enregistrer (str) adresse et nom du fichier à créer.
+    Effet : Crée la carte de la cyclabilité.
     """
-   
+
     mini, maxi = g.cycla_min[z_d], g.cycla_max[z_d] #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
-    
+
     def num_paquet(val):
         """Renvoie un entier dans [|0, n_coul[|. 1 est associé à n_coul//2, mini à 0, maxi à 1."""
 
@@ -287,9 +288,11 @@ def dessine_cycla(g, z_d, où_enregistrer=TMP, bavard=0):
         arêtes.append((a, {"color":color_dict[i], "popup":a.cycla}))
 
     carte = folium_of_arêtes(g, arêtes)
-    nom = os.path.join(où_enregistrer, "cycla.html")
-    carte.save(nom)
 
+    carte.save(où_enregistrer)
+    print(f"Carte enregistrée à {où_enregistrer}")
+
+    
     
 ### Apprentissage ###
 

@@ -13,13 +13,11 @@ Ce site permet de calculer des itinéraires à vélo. Sa spécificité est d’�
 </p>
 
 <p>
-  Ainsi les trajets sont calculés en tenant compte de l’expérience des autres utilisateurs, donc de vrais cyclistes. Une rue sera décrétée adaptée aux vélos si et seulement si elle a été choisie par d’autres cyclistes, et non selon des critères plus facile à obtenir mais moins fiables tels que la présence « officielle » d’une bande cyclable, une limite de vitesse « théoriquement » respectée par les automobilistes, etc.
-
-  Ainsi les itinéraires calculés seront-ils choisis pour être, dans la mesure du possible, sécurisé et agréables, selon les critères de la communauté des utilisateurs.
+  Ainsi les trajets sont-ils calculés en tenant compte de l’expérience des autres utilisateurs, donc de vrais cyclistes. Une rue sera décrétée adaptée aux vélos si et seulement si elle a été choisie par d’autres cyclistes, et non selon des critères plus facile à obtenir mais moins fiables tels que la présence « officielle » d’une bande cyclable, une limite de vitesse « théoriquement » respectée par les automobilistes, etc.
 </p>
 
 <p>
-Cepemdant dans les zones où l’IA n’a pas encore été suffisamment entraînée, elle se rabat sur les critères simples tels que la présence d’une piste cyclable ou d’une zone 30 ou piétonne.
+Cependant dans les zones où l’IA n’a pas encore été suffisamment entraînée, elle se rabat sur les critères simples tels que la présence d’une piste cyclable ou d’une zone 30 ou piétonne.
 
 Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s’il permet de gagner beaucoup de temps ou si la plupart des utilisateurs le prennent... 
 
@@ -27,8 +25,10 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 
 <p>La carte de la cyclabilité permet de se rendre compte de l’état de L’IA. Les rues à favoriser apparaissent en vert, et celles à éviter en rouge.</p>
 
+
 <h2>Recherche simple d’itinéraire</h2>
-<p>Remplir le champ « départ », le champ « arrivée », taper sur « entrée ». Bon vous aviez déjà deviné.</p>
+
+
 
 <p>
   Pour indiquer une autre ville que la velle par défaut de la zone choisie, la mettre après une virgule. Par exemple : « 12 rue de l’église, Lons », « europub, billère », ou encore « boulangerie, Bizanos ». (Pour ce dernier exemple, l’algo renverra la première boulangerie de Bizanos qu’il aura trouvé. Un jour je travaillerai à lui faire renvoyer la plus proche.)<br>
@@ -40,12 +40,6 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 
 <p>Si vous indiquez une rue sans préciser de numéro, l’algo ira au point le plus proche de cette rue.</p>
 
-<p>Enfin, le paramètre « pourcentage détour » définit votre profil de cycliste. Plus vous réglez ce paramètre haut, et plus l’appli vous proposera des trajets longs mais agréable et sécurisés.</br>
-
-  Précisément, le paramètre « pourcentage détour » est le pourcentage duquel vous êtes prêt à rallonger votre parcours pour remplacer un trajet entièrement sur des rues de centre-ville limitées à 50km/h non aménagées, par un trajet entièrement sur des vraies pistes cyclables. Par « piste cyclable » on entend « voie réservée aux vélos (pas aux piétons en particulier) et physiquement séparée de la chaussée des voiture » (ce qui à Pau n’existe grosso-modo que le long du Fébus).</br>
-
-  Vous pouvez indiquer plusieurs pourcentages de détour, séparés par des point-virgules, auquel cas l’appli affichera tous les trajets correspondants.
-  </p>
 
 
 <h2>Je trouve l’itinéraire proposé peu adapté</h2>
@@ -65,8 +59,21 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 
 <p>Il est important, pour l’efficacité de l’appli que les utilisateurs comme vous indiquent les itinéraires qu’ils recommandent !
   <br>
-  Pour ce, effectuer une recherche sur un trajet que vous connaissez bien (domicile-travail par exemple). Si l’itinéraire proposé vous semble moins adapté que le votre, renseignez les champs « étapes » et « rues interdites » jusqu’à obtenir l’itinéraire souhaité. Si le même itinéraire est valable dans les deux sens (pas de sens interdit notamment), cochez la case idoine. Enfin, remplissez la case « pourcentage détour » pour préciser le profil de cyclistes auxquels s’adresse votre trajet. Puis cliquez sur « enregistrez votre contribution » : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
+  Pour ce, effectuer une recherche sur un trajet que vous connaissez bien (domicile-travail par exemple). Si l’itinéraire proposé vous semble moins adapté que le votre, renseignez les champs « étapes » et « rues interdites » jusqu’à obtenir l’itinéraire souhaité.
+
+  Cochez les profils de cyclistes à qui vous semble pouvoir s’adresser votre itinéraire (plus de détails sur les profils cyclistes ci-dessous); si le même itinéraire est valable dans les deux sens (pas de sens interdit notamment), cochez la case idoine; et validez  : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
 </p>
+
+
+<h2> Profils de cyclistes </h2>
+
+
+<p>Les différents types de cyclistes sont représentés dans le code pour un nombre qui représente un pourcentage de détour accepté pour gagner en confort. Plus ce nombre sera élelé et plus l’algo proposera de détours.</br>
+
+  Précisément, le nombre utilisé est le pourcentage duquel le cycliste est prêt à rallonger son parcours pour remplacer un trajet entièrement sur des rues de centre-ville limitées à 50km/h non aménagées, par un trajet entièrement sur des vraies pistes cyclables.</br>
+
+  On peut indiquer plusieurs pourcentages de détour, séparés par des point-virgules, auquel cas l’appli affichera tous les trajets correspondants.
+  </p>
 
 
 <h2>Qu’est-ce que la carte de la cyclabilité ?</h2>
@@ -75,7 +82,7 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 
   Subtilité : la notion de cyclabilité employée par l’algo est « locale », ainsi un tronçon de rue apparaît en vert lorsqu’il est plus agréable, ou juste moins désagréable, que ses voisins : cela ne signifie pas qu’il est agréable dans l’absolu. En particulier deux rues d’une même couleur dans deux quartiers différents peuvent être très différentes.<br>
 
-  De part la conception même de l’algo il y a à peu près autant de rouge que de vert. Mais si on comparait Pau à une ville un peu axée sur les mobilités douces, la carte serait majoritairement rouge.
+  De part la conception même de l’algo il y a toujours à peu près autant de rouge que de vert : ces cartes ne peuvent servir à comparer différentes villes.
   </p>
 
 

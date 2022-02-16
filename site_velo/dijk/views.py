@@ -220,9 +220,11 @@ def carte_cycla(requête, zone_t):
     Renvoie la carte de la cyclabilité de la zone indiquée.
     """
     z_d = Zone.objects.get(nom=zone_t)
+    nom = f"dijk/cycla{z_d}.html"
     if zone_t not in g.zones : g.charge_zone(zone_t)
-    dessine_cycla(g, z_d, où_enregistrer="dijk/templates/dijk")
-    return render(requête, "dijk/cycla.html")
+    
+    dessine_cycla(g, z_d, où_enregistrer="dijk/templates/"+nom, bavard=1)
+    return render(requête, nom)
 
 
 ### Gestion des chemins ###
