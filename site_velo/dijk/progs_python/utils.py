@@ -52,9 +52,9 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 DICO_PROFIl={
-    0:("Trajet direct", "Le trajet le plus court tenant compte des cortraintes indiquées."),
+    0:("Trajet direct", "Le trajet le plus court tenant compte des contraintes indiquées."),
     15:("Petits détours", "Un cycliste de profil « petits détours » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."),
-    30:("Gros détours", "Un cycliste de profil « gros détours » rallonge en moyenn ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
+    30:("Gros détours", "Un cycliste de profil « gros détours » rallonge en moyenne ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
 }
 
 def légende_et_aide(p_détour):
@@ -137,7 +137,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     tic=perf_counter()
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
     chrono(tic, "Dessin")
-    chrono(tic0, f"Total pour l'itinéraire {c}")
+    chrono(tic0, f"Total pour le chemin {c}")
     return res, c
 
 

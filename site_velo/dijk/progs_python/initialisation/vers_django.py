@@ -536,44 +536,46 @@ def charge_villes(chemin_pop=os.path.join(RACINE_PROJET, "progs_python/stats/doc
     
 
     print(f"Lecture de {chemin_pop}")
-    with open(chemin_pop) as entrée:
-        à_maj=[]
-        à_créer=[]
-        n=-1
-        entrée.readline()
-        for ligne in entrée:
-            n+=1
-            if n % 500 ==0: print(f"{n} lignes traitées")
-            code_insee, nom, région, densité, population = ligne.strip().split(";")
-            code_insee = int_of_code_insee(code_insee)
-            population = int(population.replace(" ",""))
-            i_densité = dico_densité[densité]
-            essai = Ville.objects.filter(nom_complet=nom).first()
-            if code_insee in dico_géom:
-                nom_dans_géom, géom = dico_géom[code_insee]
-                if nom!=nom_dans_géom:
-                    print(f"Avertissement : nom différent dans les deux fichiers : {nom_dans_géom} et {nom}")
-                    géom=None
-            else:
-                print(f"Avertissement : ville pas présente dans {chemin_géom} : {nom}")
-                géom = None
+    close_old_connections()
+    with transaction.atomic():
+        with open(chemin_pop) as entrée:
+            à_maj=[]
+            à_créer=[]
+            n=-1
+            entrée.readline()
+            for ligne in entrée:
+                n+=1
+                if n % 500 ==0: print(f"{n} lignes traitées")
+                code_insee, nom, région, densité, population = ligne.strip().split(";")
+                code_insee = int_of_code_insee(code_insee)
+                population = int(population.replace(" ",""))
+                i_densité = dico_densité[densité]
+                essai = Ville.objects.filter(nom_complet=nom).first()
+                if code_insee in dico_géom:
+                    nom_dans_géom, géom = dico_géom[code_insee]
+                    if nom!=nom_dans_géom:
+                        print(f"Avertissement : nom différent dans les deux fichiers : {nom_dans_géom} et {nom}")
+                        géom=None
+                else:
+                    print(f"Avertissement : ville pas présente dans {chemin_géom} : {nom}")
+                    géom = None
 
-            if essai:
-                essai.population=population
-                essai.code_insee=code_insee
-                essai.densité=i_densité
-                essai.géom_texte = géom
-                à_maj.append(essai)
-            else:
-                v_d = Ville(nom_complet=nom,
-                            nom_norm=partie_commune(nom),
-                            population=population,
-                            code_insee=code_insee,
-                            code=None,
-                            densité=i_densité,
-                            géom_texte=géom
-                            )
-                à_créer.append(v_d)
+                if essai:
+                    essai.population=population
+                    essai.code_insee=code_insee
+                    essai.densité=i_densité
+                    essai.géom_texte = géom
+                    à_maj.append(essai)
+                else:
+                    v_d = Ville(nom_complet=nom,
+                                nom_norm=partie_commune(nom),
+                                population=population,
+                                code_insee=code_insee,
+                                code=None,
+                                densité=i_densité,
+                                géom_texte=géom
+                                )
+                    à_créer.append(v_d)
     print(f"Enregistrement des {len(à_maj)} modifs")
     Ville.objects.bulk_update(à_maj, ["population", "code_insee", "densité"])
     print(f"Enregistrement des {len(à_créer)} nouvelles villes")
