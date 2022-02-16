@@ -52,7 +52,7 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 DICO_PROFIl={
-    0:("Trajet direct", ""),
+    0:("Trajet direct", "Le trajet le plus court tenant compte des cortraintes indiquées."),
     15:("Petits détours", "Un cycliste de profil « petits détours » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."),
     30:("Gros détours", "Un cycliste de profil « gros détours » rallonge en moyenn ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
 }
@@ -131,7 +131,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)
         coul = "#000000"
-        traite_un_chemin(cd, coul, "Trajet direct", "Le trajet le plus court")
+        traite_un_chemin(cd, coul, "Trajet direct", "Le trajet le plus court, sans prendre en compte les étapes imposées.")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
     tic=perf_counter()
