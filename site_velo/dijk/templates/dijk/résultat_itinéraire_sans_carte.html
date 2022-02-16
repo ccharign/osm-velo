@@ -71,9 +71,9 @@ $(document).ready(function(){
     <form action="{% url 'téléchargement' %}" method="post">
       {% csrf_token %}
       <span class="btn-xs btn-default" data-toggle="popover" title="{{x.légende}}" data-trigger="hover" data-content="{{x.aide}}">?</span>
-	<span style = "color: {{x.couleur}};"> {{x.légende}} :  {{x.longueur}} m </span>
-	<input type="hidden" id="clef" name="clef" value={{x.nom_gpx}}>
-	<input type="submit" class="btn btn-link" value="gpx">
+      <span style="color: {{x.couleur}};"> {{x.légende}} :  {{x.longueur}} m </span>
+      <input type="hidden" id="clef" name="clef" value={{x.nom_gpx}}>
+      <input type="submit" class="btn btn-link" value="gpx">
     </form>
   </li>
   {% endfor %}

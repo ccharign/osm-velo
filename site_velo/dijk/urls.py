@@ -31,3 +31,4 @@ urlpatterns = [
 
 
 ] + staticfiles_urlpatterns()
+

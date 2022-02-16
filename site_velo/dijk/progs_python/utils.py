@@ -287,6 +287,8 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
         i=num_paquet(a.cycla)
         arêtes.append((a, {"color":color_dict[i], "popup":a.cycla}))
 
+    
+    
     carte = folium_of_arêtes(g, arêtes)
 
     carte.save(où_enregistrer)
