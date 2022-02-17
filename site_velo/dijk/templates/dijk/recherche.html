@@ -35,12 +35,13 @@
     </div>
 
     <br>
-<h4> Plus d’options </h4>
+<h4> Plus d’options : </h4>
 
+<br>
     
     <div class="form-group">
-      <label for="étapes" class="col-sm-3"> Étapes, séparées par des point-virgules </label>
-      <div class="input-group col-sm-9">
+      <label for="étapes" class="col-sm-4"> Étapes, séparées par des point-virgules </label>
+      <div class="input-group col-sm-8">
 	<input type="text" class="form-control" id="étapes" name="étapes" >
 	<span class="input-group-addon" data-toggle="popover" title="Étapes" data-trigger="hover" data-placement="left" 
 	      data-content="L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.">?</span>
@@ -49,19 +50,21 @@
 
     
     <div class="form-group">
-      <label for="rues_interdites" class="col-sm-3"> Rues à éviter, séparées par des point-virgules </label>
-      <div class="input-group col sm-9">
+      <label for="rues_interdites" class="col-sm-4"> Rues à éviter, séparées par des point-virgules </label>
+      <div class="input-group col sm-8">
 	<input type="text" class="form-control" id="rues_interdites" name="rues_interdites" > 
 	<span class="input-group-addon" data-toggle="popover" data-placement="left" title="Rues à éviter" data-trigger="hover"
 	      data-content="L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.">?</span>
       </div>
     </div>
 
+    <br>
     
     <div class="form-group">
-      <label for="pourcentage_détour"> Profil cycliste  : </label>
-      <input type="text" id="pourcentage_détour" class="form-control" name="pourcentage_détour"
-	     placeholder="Profil cycliste" value="0;15;30"><br>
+      <label class="col-sm-4" for="pourcentage_détour"> Profil cycliste  : </label>
+      <input type="text" id="pourcentage_détour" class="form-control col-sm-8" name="pourcentage_détour"
+	     placeholder="Profil cycliste" value="0;15;30">
+      
       <div class="help-block"> Il s’agit du pourcentage duquel vous accepteriez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé à un itinéraire entièrement en piste cyclable.
 
     On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.</div>
