@@ -40,17 +40,22 @@
     
     
     <div class="form-group">
-      <label for="étapes" class="sr-only"> Étapes, séparées par des point-virgules </label><br>
-      <input type="text" class="form-control" id="étapes" name="étapes" placeHolder="Étapes, séparées par les points-virgules">
-      <div class="help-block">L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.</div>
+      <label for="étapes" > Étapes, séparées par des point-virgules </label>
+      <div class="input-group">
+	<input type="text" class="form-control" id="étapes" name="étapes" >
+	<span class="btn-sm btn-default" data-toggle="popover" title="étapes" data-trigger="hover"
+	      data-content="L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.">?</span>
+	</div>
     </div>
 
     
     <div class="form-group">
-      <label for="rues_interdites" class="sr-only"> Rues à éviter, séparées par des point-virgules </label>
-      <input type="text" class="form-control" id="rues_interdites" name="rues_interdites"
-	     placeholder="Rues à éviter, séparées par des virgules" >
-      <div class="help-block">L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.</div>
+      <label for="rues_interdites"> Rues à éviter, séparées par des point-virgules </label>
+      <div class="input-group">
+	<input type="text" class="form-control" id="rues_interdites" name="rues_interdites" > 
+	<span class="btn-sm btn-default" data-toggle="popover" title="étapes" data-trigger="hover"
+	      data-content="L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.">?</span>
+      </div>
     </div>
 
     
@@ -58,7 +63,7 @@
       <label for="pourcentage_détour"> Profil cycliste  : </label>
       <input type="text" id="pourcentage_détour" class="form-control" name="pourcentage_détour"
 	     placeholder="Profil cycliste" value="0;15;30"><br>
-      <div class="help-block"> Il s’agit du pourcentage duquel vous acceptez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé à un itinéraire entièrement en piste cyclable.
+      <div class="help-block"> Il s’agit du pourcentage duquel vous accepteriez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé à un itinéraire entièrement en piste cyclable.
 
     On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés.</div>
 </div>
