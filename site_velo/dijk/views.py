@@ -195,7 +195,8 @@ def téléchargement(requête):
     """
     try :
         return HttpResponse(
-            requête.session[requête.POST["clef"]],
+            #requête.session[requête.POST["clef"]],
+            requête.POST["gpx"],
             headers={
                 'Content-Type': "application/gpx+xml",
                 'Content-Disposition': 'attachment; filename="trajet.gpx"'

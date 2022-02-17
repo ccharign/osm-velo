@@ -52,9 +52,12 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 DICO_PROFIl={
-    0:("Trajet direct", "Le trajet le plus court tenant compte des contraintes indiquées."),
-    15:("Petits détours", "Un cycliste de profil « petits détours » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."),
-    30:("Gros détours", "Un cycliste de profil « gros détours » rallonge en moyenne ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
+    0:("Trajet direct",
+       "Le trajet le plus court tenant compte des contraintes indiquées."),
+    15:("Petits détours",
+        "Un cycliste de profil « petits détours » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."),
+    30:("Gros détours",
+        "Un cycliste de profil « gros détours » rallonge en moyenne ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
 }
 
 def légende_et_aide(p_détour):
@@ -111,13 +114,14 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         à_dessiner.append( (iti_d, coul, p))
         nom_gpx = hash(c)
-        gpx_of_iti(iti_d, nom_gpx, session, bavard=bavard-1)
+        
         res.append({"légende": légende,
                     "aide":aide,
                     "id": f"ps{int(100*c.p_détour)}",
                     "longueur":g.longueur_itinéraire(iti_d),
                     "longueur_ressentie":int(l_ressentie),
                     "couleur":coul,
+                    "gpx": gpx_of_iti(iti_d, nom_gpx, session, bavard=bavard-1),
                     "nom_gpx": nom_gpx}
                    )
         #tic = chrono(tic, f"dijkstra {c} et sa longueur")
@@ -165,7 +169,8 @@ def gpx_of_iti(iti_d, nom, session, dossier_sortie="dijk/tmp", bavard=0):
     # with open(chemin_sortie , "w") as sortie:
     #     sortie.write(res.to_xml())
     #     print(f"gpx enregistré à {chemin_sortie}")
-    session[nom] = res.to_xml()
+    # session[nom] = res.to_xml()
+    return res.to_xml()
     #return nom
 
     
