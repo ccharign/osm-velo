@@ -81,20 +81,23 @@ def visualisation_nv_chemin(requête):
 def vue_itinéraire(requête):
     """ Doit récupérer le résultat du formulaire via un post."""
 
-    # Récupération des données du post
-    d=requête.POST["départ"]
-    a=requête.POST["arrivée"]
-    z_d = g.charge_zone(requête.POST["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
-    #z_d = Zone.objects.get(nom=requête.POST["zone_t"])
-    
-    noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
-    
-    ps_détour = list(map( lambda x: float(x)/100, requête.POST["pourcentage_détour"].split(";")) )
+    try :
+        # Récupération des données du post
+        d=requête.POST["départ"]
+        a=requête.POST["arrivée"]
+        z_d = g.charge_zone(requête.POST["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
+        #z_d = Zone.objects.get(nom=requête.POST["zone_t"])
 
-    rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
-    print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
+        noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
 
-    return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)
+        ps_détour = list(map( lambda x: float(x)/100, requête.POST["pourcentage_détour"].split(";")) )
+
+        rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
+        print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
+
+        return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)
+    except Exception as e:
+        return autreErreur(requête, e)
 
 
 def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
@@ -109,8 +112,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
         )
     except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
-    # except Exception as e:
-    #    return autreErreur(requête, e)
+    except Exception as e:
+        return autreErreur(requête, e)
     
     # Création du template
     texte_étapes = énumération_texte(noms_étapes)
