@@ -79,9 +79,9 @@ def visualisation_nv_chemin(requête):
 
     
 def vue_itinéraire(requête):
-    """ Doit récupérer le résultat du formulaire via un post."""
+        """ Doit récupérer le résultat du formulaire via un post."""
 
-    try :
+    #try :
         # Récupération des données du post
         d=requête.POST["départ"]
         a=requête.POST["arrivée"]
@@ -97,8 +97,8 @@ def vue_itinéraire(requête):
 
         return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)
     
-    except Exception as e:
-        return autreErreur(requête, e)
+    #except Exception as e:
+    #    return autreErreur(requête, e)
 
 
 def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
@@ -153,8 +153,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
 
     except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
-    #except Exception as e:
-    #    return autreErreur(requête, e)
+    except Exception as e:
+        return autreErreur(requête, e)
 
 
 
