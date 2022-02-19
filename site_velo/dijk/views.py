@@ -96,6 +96,7 @@ def vue_itinéraire(requête):
         print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
 
         return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)
+    
     except Exception as e:
         return autreErreur(requête, e)
 
@@ -110,50 +111,50 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
             rues_interdites=rues_interdites,
             bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
+    
+        # Création du template
+        texte_étapes = énumération_texte(noms_étapes)
+        suffixe = d+texte_étapes+a+"".join(rues_interdites)
+
+        vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire_complet**")
+        for f in vieux_fichier:
+            os.remove(f)
+        head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
+
+        nom_fichier_html = f"dijk/résultat_itinéraire_complet{suffixe}"
+        if len(nom_fichier_html)>230: nom_fichier_html=nom_fichier_html[:230]
+        nom_fichier_html+=".html"
+
+        with open(os.path.join("dijk/templates", nom_fichier_html), "w") as sortie:
+            sortie.write(f"""
+            {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
+            {{% block head_début %}}  {head}  {{% endblock %}}
+            {{% block carte %}} {body} {{% endblock %}}
+            {{% block script %}} <script> {script} </script> {{% endblock %}}
+            """)
+
+
+        # Chargement du template
+        p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
+        données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
+                   "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour))
+                   }
+        return render(requête,
+                      nom_fichier_html,
+                      {"stats": stats,
+                       "départ":d, "arrivée":a,
+                       "étapes": texte_étapes,
+                       "rues_interdites": énumération_texte(rues_interdites),
+                       "chemin":chemin.str_joli(),
+                       "post_préc":données, "p_détour_moyen":p_détour_moyen,
+                       "zone_t":z_d.nom,
+                       }
+                      )
+
     except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
-    except Exception as e:
-        return autreErreur(requête, e)
-    
-    # Création du template
-    texte_étapes = énumération_texte(noms_étapes)
-    suffixe = d+texte_étapes+a+"".join(rues_interdites)
-
-    vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire_complet**")
-    for f in vieux_fichier:
-        os.remove(f)
-    head, body, script = récup_head_body_script("dijk/templates/dijk/iti_folium.html")
-
-    nom_fichier_html = f"dijk/résultat_itinéraire_complet{suffixe}"
-    if len(nom_fichier_html)>230: nom_fichier_html=nom_fichier_html[:230]
-    nom_fichier_html+=".html"
-        
-    with open(os.path.join("dijk/templates", nom_fichier_html), "w") as sortie:
-        sortie.write(f"""
-        {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
-        {{% block head_début %}}  {head}  {{% endblock %}}
-        {{% block carte %}} {body} {{% endblock %}}
-        {{% block script %}} <script> {script} </script> {{% endblock %}}
-        """)
-
-    
-    # Chargement du template
-    p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
-    données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
-               "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour))
-               }
-    return render(requête,
-                  nom_fichier_html,
-                  {"stats": stats,
-                   "départ":d, "arrivée":a,
-                   "étapes": texte_étapes,
-                   "rues_interdites": énumération_texte(rues_interdites),
-                   "chemin":chemin.str_joli(),
-                   "post_préc":données, "p_détour_moyen":p_détour_moyen,
-                   "zone_t":z_d.nom,
-                   }
-                  )
-
+    #except Exception as e:
+    #    return autreErreur(requête, e)
 
 
 
