@@ -34,7 +34,7 @@ from glob import glob
 import os
 from dijk.models import Chemin_d, Zone
 import forms
-
+import traceback
 
 #g=charge_graphe()
 
@@ -154,6 +154,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
     except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
     except Exception as e:
+        traceback.print_exc()
         return autreErreur(requête, e)
 
 

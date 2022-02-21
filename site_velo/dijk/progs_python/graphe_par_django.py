@@ -44,7 +44,7 @@ class Graphe_django():
         self.cycla_min={}
     
     
-    def charge_zone(self, zone_t="Pau", bavard=0):
+    def charge_zone(self, zone_t, bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
         """
@@ -63,29 +63,32 @@ class Graphe_django():
 
             #tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
             #print(f"{len(tous_les_sommets)} sommets dans la base pour {z_d}")
+
+            #Sommets
+            tic = perf_counter()
+            print("Chargement des sommets")
+
+            for s in Sommet.objects.filter(zone=z_d):
+                self.dico_Sommet[s.id_osm] = s
+                self.dico_voisins[s.id_osm] = []
+            tic=chrono(tic, "Chargement des sommets")
+
+            
             # Arêtes
             print("Chargement des arêtes")
-            tic = perf_counter()
+
             arêtes = Arête.objects.filter(zone=z_d).select_related("départ", "arrivée")
             print(f"{len(arêtes)} arêtes dans la base pour la zone {z_d}")
             for a in arêtes:
-
                 s = a.départ.id_osm
                 t = a.arrivée.id_osm
                 #assert s in tous_les_sommets and t in tous_les_sommets, f"l’arête {a} de la zone {z_d} n’a pas ses deux sommets dans la zone"
                 #if z_d not in a.départ.zone.all() or z_d not in a.arrivée.zone.all():
                 #    raise RuntimeError(f"Un sommet de l’arête {a} n’était pas dans la même zone que celle-ci ({z_d}).")
-                if s not in self.dico_voisins: self.dico_voisins[s]=[]
                 if a.cyclabilité()>0: # ceci supprime les autoroutes actuellement
                     self.dico_voisins[s].append((t, a))
             tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
-            #Sommets
-            print("Chargement des sommets")
-
-            for s in Sommet.objects.filter(zone=z_d):
-                self.dico_Sommet[s.id_osm] = s
-            tic=chrono(tic, "Chargement des sommets")
 
             #cycla min et max
             self.calcule_cycla_min_max(z_d)
@@ -122,6 +125,7 @@ class Graphe_django():
     def coords_of_id_osm(self, s):
         #return Sommet.objects.get(id_osm=s).coords()
         return self.dico_Sommet[s].coords()
+
 
     def d_euc(self, s, t):
         cs, ct = self.coords_of_id_osm(s), self.coords_of_id_osm(t)
