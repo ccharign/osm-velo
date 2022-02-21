@@ -1,5 +1,6 @@
 from django.db import models
 from dijk.progs_python.params import CHEMIN_CHEMINS, LOG
+from dijk.progs_python.lecture_adresse.normalisation0 import partie_commune
 
 # Create your models here.
 
@@ -18,13 +19,21 @@ class Ville(models.Model):
     géom_texte = models.TextField(null=True)
     données_présentes = models.BooleanField(default=False)
     #zone = models.ManyToManyField(Zone) # pb car la classe Zone n’est pas encore définie.
+
     def __str__(self):
         return self.nom_complet
+
     def avec_code(self):
         return f"{self.code} {self.nom_complet}"
+
     def voisine(self):
         rels = Ville_Ville.objects.filter(ville1=self).select_related("ville2")
         return  tuple(r.ville2 for r in rels)
+
+    @classmethod
+    def of_nom(cls, nom):
+        """ Renvoie la ville telle que partie_commune(nom) = ville.nom_norm"""
+        return cls.objects.get(nom_norm=partie_commune(nom))
     
     
 class Ville_Ville(models.Model):

@@ -49,11 +49,11 @@ def ajoute_code_postal(nom, code):
     Ajoute s’il n’y est pas déjà déjà, le code postal de la ville.
     Sortie (models.Ville)
     """
-    essai = Ville.objects.filter(nom_complet=nom, code = code).first()
+    essai = Ville.objects.filter(nom_norm = partie_commune(nom), code = code).first()
     if essai:
         return essai
     else:
-        v = Ville.objects.get(nom_complet=nom, code=None)
+        v = Ville.objects.get(nom_norm= partie_commune(nom), code=None)
         v.code=code
         v.save()
         return v

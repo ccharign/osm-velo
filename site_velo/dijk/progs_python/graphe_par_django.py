@@ -42,8 +42,8 @@ class Graphe_django():
         self.zones=[]
         self.cycla_max={}
         self.cycla_min={}
-
-        
+    
+    
     def charge_zone(self, zone_t="Pau", bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
@@ -92,7 +92,22 @@ class Graphe_django():
         else:
             print(f"Zone déjà en mémoire : {z_d}.")
         return z_d
-        
+
+
+    def vérif_zone(self, z_t):
+        """
+        Indique si toutes les arêtes de la zone ont leurs extrémités dans la zone.
+        """
+        z_d = Zone.objects.get(nom=z_t)
+        arêtes = Arête.objects.filter(zone=z_d).prefetch_related("départ", "arrivée")
+        for a in arêtes:
+            if a.départ.id_osm not in self:
+                raise RuntimeError(f"Le départ de l’arête {a} n’est pas dans le graphe pour la zone {z_d}")
+            if a.arrivée.id_osm not in self:
+                raise RuntimeError(f"L’arrivée de l’arête {a} n’est pas dans le graphe pour la zone {z_d}")
+        return True
+
+    
     def __contains__(self, s):
         """
         Entrée : s (int)

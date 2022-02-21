@@ -54,7 +54,7 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
 
     ## Création ou récupération de la zone
     if ville_defaut is not None:
-        zone_d, créée = Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_complet=ville_defaut))
+        zone_d, créée = Zone.objects.get_or_create(nom=zone, ville_défaut=Ville.objects.get(nom_norm= partie_commune( ville_defaut)))
         if créée:
             zone_d.save()
     else:
@@ -124,6 +124,14 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
     "Bizanos": 64320,
     "Artigueloutan": 64420,
     "Mazères-Lezons": 64110
+}.items()
+
+ZONE_VOIRON={
+    "saint étienne de crossey":38960,
+    "coublevie":38500,
+    "la buisse":38500,
+    "saint aupre":38960,
+    "voiron":38500
 }.items()
 
 
