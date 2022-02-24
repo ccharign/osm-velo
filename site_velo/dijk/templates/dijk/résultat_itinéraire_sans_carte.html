@@ -86,12 +86,16 @@
   <div class="form-group">
     <div class="row">
       <div class="col-sm-4">
-	<label for="départ">Départ</label>
-	<input type="text" class="form-control" id="départ" name="départ" value="{{départ}}">
+	<div class="input-group">
+	  <span class="input-group-addon">De </span>
+	  <input type="text" class="form-control" id="départ" name="départ" value="{{départ}}">
+	</div>
       </div>
       <div class="col-sm-4">
-	<label for="arrivée"> Arrivée </label>
-	<input type="text" class="form-control" id="arrivée" name="arrivée" value="{{arrivée}}">
+	<div class="input-group">
+	  <span class="input-group-addon">À </span>
+	  <input type="text" class="form-control" id="arrivée" name="arrivée" value="{{arrivée}}">
+	</div>
       </div>
     </div>
   </div>
@@ -101,12 +105,20 @@
   
   <div class="from-group">
     <label for="étapes"> Étapes </label>
-    <input type="text" class="form-control" id="étapes" name="étapes" value="{{post_préc.étapes}}" >
+    <div class="input-group">
+      <input type="text" class="form-control" id="étapes" name="étapes" value="{{post_préc.étapes}}" >
+      <span class="input-group-addon" data-toggle="popover" title="Étapes" data-trigger="hover" data-placement="left" 
+	    data-content="L’algo renverra un itinéraire passant par au moins un tronçon de chacune des étapes indiquées.">?</span>
+    </div>
   </div>
 
   <div class="form-group">
     <label for="rue_interdites"> Rues interdites </label>
-    <input type="text" class="form-control" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" >
+    <div class="input-group">
+      <input type="text" class="form-control" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" >
+      <span class="input-group-addon" data-toggle="popover" data-placement="left" title="Rues à éviter" data-trigger="hover"
+	    data-content="L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.">?</span>
+    </div>
   </div>
   
   <input type="submit" class="btn btn-default" value="Recalculer l’itinéraire">
