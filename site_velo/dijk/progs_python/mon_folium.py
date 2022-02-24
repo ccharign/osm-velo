@@ -335,6 +335,7 @@ def folium_of_chemin(g, iti_d, p, carte=None, tiles="cartodbpositron", zoom=1, f
         s,n = sorted([cd[1], cf[1]])#lat
         carte.fit_bounds([(s, o), (n, e)])
 
+
     return carte
 
 
