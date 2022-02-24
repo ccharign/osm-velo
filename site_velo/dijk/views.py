@@ -111,6 +111,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
             rues_interdites=rues_interdites,
             bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
+
+        #print(stats[0]["gpx"])
     
         # Création du template
         texte_étapes = énumération_texte(noms_étapes)
@@ -146,7 +148,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        "étapes": texte_étapes,
                        "rues_interdites": énumération_texte(rues_interdites),
                        "chemin":chemin.str_joli(),
-                       "post_préc":données, "p_détour_moyen":p_détour_moyen,
+                       "post_préc":données,
+                       "p_détour_moyen": p_détour_moyen,
                        "zone_t":z_d.nom,
                        }
                       )
@@ -196,11 +199,11 @@ def confirme_nv_chemin(requête):
 
 def téléchargement(requête):
     """
-    Fournit le fichier texte contenu dans requête.session[requête.POST["clef"]]
+    Fournit le .gpx, consément dans requête.POST["gpx"]
     """
     try :
         return HttpResponse(
-            requête.session[requête.POST["clef"]],
+            requête.POST["gpx"].replace("%20", " ").replace("ν", "\n"),
             headers={
                 'Content-Type': "application/gpx+xml",
                 'Content-Disposition': 'attachment; filename="trajet.gpx"'

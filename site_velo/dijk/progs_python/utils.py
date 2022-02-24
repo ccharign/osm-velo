@@ -80,7 +80,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
 
-    Sortie : (liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, nom_gpx) pour les itinéraires obtenus,
+    Sortie : (liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
               objet Chemin correspondant au dernier p_détour
              )
              id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
@@ -110,15 +110,16 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     def traite_un_chemin(c, coul, légende, aide):
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         à_dessiner.append( (iti_d, coul, p))
-        nom_gpx = hash(c)
-        gpx_of_iti(iti_d, nom_gpx, session, bavard=bavard-1)
+        #nom_gpx = hash(c)
+        
         res.append({"légende": légende,
                     "aide":aide,
                     "id": f"ps{int(100*c.p_détour)}",
                     "longueur":g.longueur_itinéraire(iti_d),
                     "longueur_ressentie":int(l_ressentie),
                     "couleur":coul,
-                    "nom_gpx": nom_gpx}
+                    #"nom_gpx": nom_gpx,
+                    "gpx": gpx_of_iti(iti_d, session, bavard=bavard-1)}
                    )
         #tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
@@ -143,12 +144,12 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
 
 ### création du gpx ###
 # https://pypi.org/project/gpxpy/
-def gpx_of_iti(iti_d, nom, session, dossier_sortie="dijk/tmp", bavard=0):
+def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
     """
     Entrée : iti_d (Arête list)
              session (dic), le dictionnaire de la session Django
 
-    Effet : le gpx est enregistré dans session[nom]
+    Sortie : le gpx où les \n sont remplacés par des ν
     """
     
     res = gpxpy.gpx.GPX()
@@ -165,7 +166,10 @@ def gpx_of_iti(iti_d, nom, session, dossier_sortie="dijk/tmp", bavard=0):
     # with open(chemin_sortie , "w") as sortie:
     #     sortie.write(res.to_xml())
     #     print(f"gpx enregistré à {chemin_sortie}")
-    session[nom] = res.to_xml()
+    res_str = res.to_xml().replace(" ", "%20").replace("\n","ν")
+    #print(res_str)
+    return res_str
+    #session[nom] = res.to_xml()
     #return nom
 
     
