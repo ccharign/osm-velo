@@ -11,7 +11,7 @@ import subprocess
 #import networkx as nx  # graphe
 from dijk.models import Zone
 #from osmnx import plot_graph_folium
-from folium.plugins import Fullscreen
+from folium.plugins import Fullscreen, LocateControl
 
 tic=perf_counter()
 from mon_folium import  folium_of_chemin, ajoute_marqueur, folium_of_arêtes
@@ -207,6 +207,7 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     ajoute_marqueur(l[0].départ.coords(), carte)
     ajoute_marqueur(l[-1].arrivée.coords(), carte)
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
+    LocateControl().add_to(carte)
     carte.save(où_enregistrer)
     if ouvrir : ouvre_html(où_enregistrer)
 
