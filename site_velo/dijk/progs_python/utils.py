@@ -207,7 +207,7 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
     ajoute_marqueur(l[0].départ.coords(), carte)
     ajoute_marqueur(l[-1].arrivée.coords(), carte)
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
-    LocateControl().add_to(carte)
+    LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
     carte.save(où_enregistrer)
     if ouvrir : ouvre_html(où_enregistrer)
 
