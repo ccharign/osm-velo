@@ -58,6 +58,11 @@ def recherche(requête, zone_t):
     requête.session["zone"]=zone_t
     return render(requête, "dijk/recherche.html", {"ville":z_d.ville_défaut, "zone_t":zone_t})
 
+
+def fouine(requête):
+    requête.session["fouine"] = True
+    return index(requête) 
+
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
 
@@ -103,6 +108,7 @@ def vue_itinéraire(requête):
 
 def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
     # Calcul des itinéraires
+    print(dict(requête.session))
     try:
         stats, chemin = itinéraire(
             d, a, ps_détour, g, z_d, requête.session,
@@ -151,6 +157,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        "post_préc":données,
                        "p_détour_moyen": p_détour_moyen,
                        "zone_t":z_d.nom,
+                       "fouine": requête.session.get("fouine", None)
                        }
                       )
 

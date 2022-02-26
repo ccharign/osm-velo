@@ -137,7 +137,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
 
     tic=perf_counter()
-    dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard)
+    dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     chrono(tic0, f"Total pour le chemin {c}")
     return res, c
@@ -183,7 +183,7 @@ def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
+def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0, fouine=False):
     """
     Entrées :
       - listes_chemins : liste de couples (liste d'Arêtes, couleur)
@@ -204,8 +204,8 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0):
         carte = folium_of_chemin(g, l, p, carte=carte, color=coul)
     
     
-    ajoute_marqueur(l[0].départ.coords(), carte)
-    ajoute_marqueur(l[-1].arrivée.coords(), carte)
+    ajoute_marqueur(l[0].départ.coords(), carte, fouine=fouine)
+    ajoute_marqueur(l[-1].arrivée.coords(), carte, fouine=fouine)
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
     carte.save(où_enregistrer)
