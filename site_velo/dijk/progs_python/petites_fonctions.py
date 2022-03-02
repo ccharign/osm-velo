@@ -16,6 +16,7 @@ import shutil
 import os
 import datetime
 import re
+import geopy.distance
 
 
 def sauv_fichier(chemin):
@@ -41,11 +42,14 @@ def sauv_fichier(chemin):
 
 R_TERRE = 6360000  # en mètres
 
+#geopy.distance.distance
+
 def distance_euc(c1, c2):
     """ 
-    Entrée : deux coords
+    Entrée : deux coords sous la forme (lon, lat)
     Sortie : distance en mètres.
     Formule simplifiée pour petites distances."""
+    return geopy.distance.distance(c1,c2).km
     long1, lat1 = c1
     long2, lat2 = c2
     #assert lat1>40 and lat2>40, f"Je voulais des coordonnées au format (lon, lat) et j’ai reçu {c1} et {c2}"
