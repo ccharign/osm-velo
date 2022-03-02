@@ -18,11 +18,11 @@ from initialisation.crée_graphe import crée_graphe_bbox
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues, extrait_nœuds_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
-from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, partie_commune
+from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, partie_commune, prétraitement_rue
 from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier, chrono
 #from networkx import read_graphml
-from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet
+from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet, Rue
 from django.db import close_old_connections
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
@@ -92,10 +92,12 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
     print("Écriture des nœuds des rues dans la base.")
     close_old_connections()
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
+    
     print("Création de l'arbre lexicographique")
-    arbre_rue_dune_ville(ville_d,
-                         map(partie_commune, dico_rues[nom].keys())
-                         )
+    arbre_rue_dune_ville(
+        ville_d,
+        dico_rues[nom].keys()
+    )
 
     ## désorientation
     close_old_connections()
@@ -111,6 +113,26 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
     ville_d.save()
     
 
+def crée_tous_les_arbres_des_rues():
+    """
+    Effet : crée tous les arbres lexicographiques des rues des villes qui appartiennent à au moins une zone, en repartant du nom complet présent dans la base.
+    """
+
+    dico_arbres = {} # dico id_ville -> liste des rues
+    for id_v, in Ville_Zone.objects.values_list("ville_id").distinct():
+        dico_arbres[id_v] = []
+
+    for nom_rue, id_v in Rue.objects.values_list("nom_complet", "ville_id"):
+        dico_arbres[id_v].append(nom_rue)
+    for id_v, l in dico_arbres.items():
+        ville_d = Ville.objects.get(pk=id_v)
+        arbre_rue_dune_ville(
+            ville_d,
+            map(prétraitement_rue, l)
+        )
+    
+
+    
 À_RAJOUTER_PAU={
     "Gelos": 64110,
     "Lée": 64320,

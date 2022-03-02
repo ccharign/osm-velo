@@ -11,9 +11,10 @@
 Installation
 ============
 
- - Une fois le dépôt cloné, le settings.py configuré (notamment pour paramétrer le serveur de base de données), le 'python manage.py makemigrations' et le `python manage.py migrate` effectués, ouvrir un shell pour remplir la base (`python manage.py shell`)
+ - Une fois le dépôt cloné, le settings.py configuré (notamment pour paramétrer le serveur de base de données) et le `python manage.py migrate` effectués pour initialiser la base, ouvrir un shell pour la remplir (`python manage.py shell`)
  - `from dijk.pour_shell import *`
+ - `charge_ville()` charge les données INSEE sur les villes de France. Patience...
  - `charge_zone([("ville 1", code postal1), ("ville2", code postal 2), ...], zone = "nom_de_la_zone", ville_défaut = "nom_de_la_ville_par_défaut", code = code_postal_de_la_ville_par_défaut)`
- - patience, l’appli va télécharger et analyser les données osm de toutes les villes indiquées...
+ - patience encore, l’appli va télécharger et analyser les données osm de toutes les villes indiquées...
 
 

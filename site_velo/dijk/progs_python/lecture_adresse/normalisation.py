@@ -110,8 +110,8 @@ def créationArbre():
 
 def arbre_rue_dune_ville(ville_d, rues):
     """
-    Entrée : ville_d (Ville)
-             rues (str iterable)
+    Entrée : ville_d (mo.Ville)
+             rues (str iterable), rues déjà normalisées
     Effet: crée le fichier contenant l'arbre des rue de la ville. Le fichier porte le nom ville_d.nom_norm
     """
     res = ArbreLex()

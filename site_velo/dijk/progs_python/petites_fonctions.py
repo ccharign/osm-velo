@@ -15,6 +15,7 @@ import time
 import shutil
 import os
 import datetime
+import re
 
 
 def sauv_fichier(chemin):
@@ -30,12 +31,12 @@ def sauv_fichier(chemin):
         os.path.join(dossier_sauv, nom_sauv)
     )
 
-geopy.geocoders.options.default_user_agent = "pau à vélo"
-localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
-def recherche_inversée(coords, bavard=0):
-    if bavard>0:print("Pause de 1s avant la recherche inversée")
-    time.sleep(1)
-    return(localisateur.reverse(coords))
+# geopy.geocoders.options.default_user_agent = "pau à vélo"
+# localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
+# def recherche_inversée(coords, bavard=0):
+#     if bavard>0:print("Pause de 1s avant la recherche inversée")
+#     time.sleep(1)
+#     return(localisateur.reverse(coords))
 
 
 R_TERRE = 6360000  # en mètres
@@ -88,6 +89,18 @@ def intersection(t1, t2):
     for x in t1:
         if x in t2:
             yield x
+
+
+def multi_remplace(d, texte):
+    """
+    Entrées : d (str -> str dict)
+              texte (str)
+    Sortie : texte où chaque itération d’une clef de d a été remplacée par la valeur correspondante.
+    """
+    #https://stackoverflow.com/questions/6116978/how-to-replace-multiple-substrings-of-a-string
+    remp = { re.escape(c):v for c,v in d.items()}
+    regexp = re.compile("|".join(remp.keys()))
+    return regexp.sub(lambda m:remp[re.escape(m.group(0))], texte)
 
 
 def ajouteDico(d, clef, val):

@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 
 ### Programmes de normalisation qui n’utilisent pas les modèles (pour éviter les dépendances circulaires) ###
+
 import re
+from petites_fonctions import multi_remplace
 
 
 def partie_commune(c):
@@ -19,6 +21,13 @@ def normalise_adresse(c):
     Actuellement c’est partie_commune(c)"""
     return partie_commune(c)
 
+
+DICO_REMP={
+    "avenue":"α",
+    "rue":"ρ",
+    "boulevard":"β",
+    "allée":"λ",
+}
 
 
 def prétraitement_rue(rue):
@@ -42,5 +51,6 @@ def prétraitement_rue(rue):
             fini=True
         else:
             res=suivant
-    return res
+            
+    return multi_remplace(DICO_REMP, res)
 
