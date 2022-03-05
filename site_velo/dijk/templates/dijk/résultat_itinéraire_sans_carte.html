@@ -101,7 +101,18 @@
   </div>
   
   <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
-  <input type="hidden" id="pourcentage_détour" name="pourcentage_détour" value = "{{post_préc.pourcentage_détour}}">
+
+  
+  <div class="form-group">
+      <label for="pourcentage_détour"> Profil cycliste  : </label>
+      <input type="text" id="pourcentage_détour" class="form-control" name="pourcentage_détour"
+	     placeholder="Profil cycliste" value="0;15;30">
+      
+      <!-- <div class="help-block"> Il s’agit du pourcentage duquel vous accepteriez de rallonger votre trajet pour passer d’un itinéraire entièrement non aménagé à un itinéraire entièrement en piste cyclable. -->
+
+      <!-- 	On peut rentrer plusieurs valeurs séparées par des points-virgules, auquel cas plusieurs chemins seront affichés. -->
+      <!-- </div> -->
+    </div>
   
   <div class="from-group">
     <label for="étapes"> Étapes </label>

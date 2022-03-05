@@ -37,7 +37,7 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
 
 
 
-def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", bavard=2):
+def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, rapide = 1):
     """
     Entrées : nom (str)
               code (int)
@@ -49,6 +49,13 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
            - Rues
         Le tout associé à la zone indiquée, qui est créée si besoin.
         Le code postal est rajouté à la base s’il n’y était pas.
+    Paramètres:
+        - rapide (int) : indique la stratégie en cas de données déjà présentes.
+             pour tout  (s,t) sommets voisins dans g,
+                0 -> efface toutes les arêtes de s vers t et remplace par celles de g
+                1 -> regarde si les arête entre s et t dans g correspondent à celles dans la base, et dans ce cas ne rien faire.
+                        « correspondent » signifie : même nombre et mêmes noms.
+                2 -> si il y a quelque chose dans la base pour (s,t), ne rien faire.
     """
 
 
@@ -86,7 +93,7 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
         #if n not in g.villes_of_nœud: g.villes_of_nœud=[]
         g.villes_of_nœud[n] = [nom]
 
-    ## nœuds des rues
+    ## Nœuds des rues
     print("\nCalcul des nœuds de chaque rue")
     dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
     print("Écriture des nœuds des rues dans la base.")
@@ -99,14 +106,14 @@ def charge_ville(nom, code, zone="Pau_agglo", ville_defaut=None, pays="France", 
         dico_rues[nom].keys()
     )
 
-    ## désorientation
+    ## Désorientation
     close_old_connections()
     print("\nDésorientation du graphe")
     vd.désoriente(g, bavard=bavard-1)
     
     ## Transfert du graphe
     close_old_connections()
-    vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False)
+    vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False, rapide=rapide)
 
     
     ville_d.données_présentes = True
@@ -189,7 +196,7 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
 
     ## Chargement des villes :
     for nom, code in liste_villes:
-        charge_ville(nom, code, zone=zone, bavard=bavard)
+        charge_ville(nom, code, zone, bavard=bavard)
 
 
 
@@ -206,7 +213,7 @@ def init_totale():
 
 def charge_multidigraph():
     """
-    Renvoie le multidigraph de la zone défaut. Plutôt pour tests.
+    Renvoie le multidigraph de la zone défaut, supposé enregistré sur le disque. Plutôt pour tests.
     """
     s,o,n,e = BBOX_DÉFAUT
     nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'

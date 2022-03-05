@@ -43,7 +43,7 @@ class Graphe_django():
         self.cycla_max={}
         self.cycla_min={}
     
-    
+        
     def charge_zone(self, zone_t, bavard=0):
         """
         Charge les données présentes dans la base concernant la zone indiquée.
@@ -351,3 +351,16 @@ class Graphe_django():
             return res[0].nœuds()
         elif len(res)>1:
             LOG_PB(f"Plusieurs valeurs en cache pour {adresse}")
+
+
+    def vérif_longeurs_arêtes(self):
+        """
+        Sortie : le max des rapports (d_euc(s,t) / longueur enregistrée de (s,t))
+        """
+        rapport_max = 1.
+        for s, voisins in self.dico_voisins.items():
+            for (t,a) in voisins:
+                if a.longueur < self.d_euc(s,t):
+                    #raise RuntimeError(f"La longeur de {a} est < à la distance euc entre ses sommets {s} et {t} ({self.d_euc(s, t)}))")
+                    rapport_max = max(rapport_max,self.d_euc(s,t)/a.longueur )
+        return rapport_max

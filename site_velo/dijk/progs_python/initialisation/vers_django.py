@@ -260,6 +260,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     Entrée : g (Graphe_nx)
              zone_d (instance de Zone)
     Effet : transfert le graphe dans la base Django.
+    
     Paramètres:
         rapide (int) : pour tout  (s,t) sommets voisins dans g,
                             0 -> efface toutes les arêtes de s vers t et remplace par celles de g
