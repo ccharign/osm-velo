@@ -13,7 +13,7 @@ from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Vil
 from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
 #from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
-from petites_fonctions import union, mesure_temps, intersection
+from petites_fonctions import union, mesure_temps, intersection, distance_euc
 from time import perf_counter, sleep
 from django.db import transaction, close_old_connections
 from lecture_adresse.arbresLex import ArbreLex
@@ -254,12 +254,28 @@ def tuple_valeurs(a, att):
     else:
         return ()
 
+
+def longueur_arête(s, t, a, gx):
+    """
+    Entrées : a (dic), arête de nx
+              gx (nx.Multidigraph)
+    Sortie : min(a["length"], d_euc(s,t))
+    """
+    deuc = distance_euc(gx.coords_of_nœud(s), gx.coords_of_nœud(t))
+    if a["length"]<deuc:
+        print(f"Distance euc ({deuc}) > a['length'] ({a['length']}) pour l’arête {a} de {s} à {t}")
+        return deuc
+    else:
+        return a["length"]
+    
     
 def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     """
     Entrée : g (Graphe_nx)
              zone_d (instance de Zone)
+
     Effet : transfert le graphe dans la base Django.
+    La longueur des arêtes est mise à min(champ "length", d_euc de ses sommets).
     
     Paramètres:
         rapide (int) : pour tout  (s,t) sommets voisins dans g,
@@ -406,11 +422,11 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
             arêtes_nx=[]
         res=[]
         for a_nx in arêtes_nx:
-            a_d = Arête(départ=s_d, arrivée=t_d,
-                        nom=a_nx.get("name", None),
-                        longueur=round(a_nx["length"], 3),  # On enregistre les longueurs avec 3 décimales.
-                        cycla_défaut=cycla_défaut(a_nx),
-                        geom =géom_texte(s, t, a_nx, g)
+            a_d = Arête(départ = s_d, arrivée=t_d,
+                        nom = a_nx.get("name", None),
+                        longueur = longueur_arête(s, t, a_nx, gx),
+                        cycla_défaut = cycla_défaut(a_nx),
+                        geom = géom_texte(s, t, a_nx, g)
             )
             res.append(a_d)
         à_créer.extend(res)
@@ -429,7 +445,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                 correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
                 if not (rapide==2 and len(arêtes_d)>0):
                     if rapide==0 or not correspondent:
-                        arêtes_d=remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
+                        arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
                     else:
                         màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x)
     
