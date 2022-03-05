@@ -250,14 +250,14 @@ class Adresse():
         else:
             rue_n = rue
         
-        if bavard>0: print(f"après normalisation : num={num}, rue_n={rue_n}, ville_n={ville_n}")
+        if bavard>0: print(f"après normalisation : num={num}, rue_n={rue_n}, rue={rue}, ville_n={ville_n}")
 
         # Initialisation des attributs
         if num=="":
             self.num=None
         else:
             self.num=int(num)
-        self.rue=rue
+        self.rue = rue
         self.rue_norm = rue_n
         self.rue_osm = None
         self.ville = ville_n

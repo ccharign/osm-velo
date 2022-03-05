@@ -192,7 +192,7 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
         "highway":{
             "residential":1,
             "cycleway":3,
-            "step":-3,
+            "step":-5,
             "pedestrian":1,
             "tertiary":1,
             "living_street":1,
@@ -489,13 +489,13 @@ def charge_dico_rues_nœuds(ville_d, dico):
         remplit la table dijk_rue. Si une rue était déjà présente, elle sera supprimée.
     """
     rues_à_créer=[]
-    for rue_n, nœuds in dico.items():
+    for rue_n, (rue, nœuds) in dico.items():
         #rue_n = prétraitement_rue(rue)
         assert rue_n == prétraitement_rue(rue_n), f"La rue suivante n’était pas normalisée : {rue_n}"
         nœuds_texte = ",".join(map(str, nœuds))
         vieilles_rues = Rue.objects.filter(nom_norm=rue_n, ville=ville_d)
         vieilles_rues.delete()
-        rue_d = Rue(nom_complet=rue_n, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_texte)
+        rue_d = Rue(nom_complet=rue, nom_norm=rue_n, ville=ville_d, nœuds_à_découper=nœuds_texte)
         rues_à_créer.append(rue_d)
     Rue.objects.bulk_create(rues_à_créer)
         

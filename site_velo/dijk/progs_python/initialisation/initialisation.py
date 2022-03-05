@@ -37,7 +37,7 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
 
 
 
-def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, rapide = 1):
+def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, rapide = 0):
     """
     Entrées : nom (str)
               code (int)
@@ -86,6 +86,7 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
     gr_strict = osmnx.graph_from_place({"city":f"{nom}", "postcode":code, "country":pays}, network_type="all", retain_all="True")
 
     g = Graphe_nx(gr_avec_marge)
+
     
     ## Noms des villes
     print("\nAjout du nom de ville.")
@@ -93,9 +94,10 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
         #if n not in g.villes_of_nœud: g.villes_of_nœud=[]
         g.villes_of_nœud[n] = [nom]
 
+        
     ## Nœuds des rues
     print("\nCalcul des nœuds de chaque rue")
-    dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue -> liste nœuds # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
+    dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue_n -> (rue, liste nœuds) # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
     print("Écriture des nœuds des rues dans la base.")
     close_old_connections()
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
@@ -164,7 +166,7 @@ ZONE_VOIRON={
 }.items()
 
 
-def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=1):
+def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=0):
     """
     Entrée : liste_villes, itérable de (nom de ville, code postal)
              zone (str), nom de la zone

@@ -88,10 +88,12 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
 
     Sortie : (liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
-              objet Chemin correspondant au dernier p_détour
+              objet Chemin correspondant au dernier p_détour,
+             d, a, noms_étapes
              )
              id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
              aide sera affichée en infobulle dans les pages de résultat.
+             départ, arrivée, noms_étapes sont les valeurs après correction d’éventuelles fautes de frappe
     """
 
     ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
@@ -157,7 +159,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     chrono(tic0, f"Total pour le chemin {c}")
-    return res, c
+    return res, c, str(d), str(a), [str(é) for é in étapes]
 
 
 ### création du gpx ###

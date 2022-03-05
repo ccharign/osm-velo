@@ -1,8 +1,9 @@
 
 À FAIRE :
 
+afficher quand l’adresse a été corrigée. Et cfanger valeur défaut dans recalcul.
 
-
+vue générique chemins
 
 modif du graphe:
       - place_en_clique

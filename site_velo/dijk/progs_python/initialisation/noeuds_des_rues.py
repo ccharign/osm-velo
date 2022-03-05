@@ -46,7 +46,7 @@ def prochaine_sphère(g, sph, rue, rue_n, ville, déjàVu, boule, dmax):
 
 def extrait_nœuds_des_rues(g, bavard = 0):
     """
-    Sortie : dictionnaire ville -> rue_n -> liste nœuds
+    Sortie : dictionnaire ville -> rue_n -> (rue, liste nœuds)
     La recherche est faite par des parcours de graphe pour avoir les sommets autant que possible dans l’ordre topologique.
     Grosse complication presque gratuite oui, c’était pour le sport.
     """
@@ -66,7 +66,7 @@ def extrait_nœuds_des_rues(g, bavard = 0):
         # Dans le cas d’une rue qui fourche on aura une branche après l’autre (parcours en profondeur de la rue).
         for t in prochaine_sphère(g, [s], rue, rue_n, ville, déjàVu, set([s]), D_MAX_SUITE_RUE): # Au cas où la rue serait découpées en plusieurs morceaux dans le graphe. Dans le cas basique, prochaine_sphère renvoie deux sommets, l’un d’eux étant sprec.
             if t not in déjàVu[ville][rue_n]:
-                res[ville][rue_n].append(t)
+                res[ville][rue_n][1].append(t)
                 déjàVu[ville][rue_n].add(t)
                 suivre_rue(t, ville, rue, rue_n)
 
@@ -77,7 +77,7 @@ def extrait_nœuds_des_rues(g, bavard = 0):
         """
         assert prétraitement_rue(rue_n) == rue_n, f"Rue non normalisée : {rue} (rue_n=={rue_n}, prétraitement_rue(rue_n)=={prétraitement_rue(rue_n)})"
         suivre_rue(s, ville, rue, rue_n)
-        res[ville][rue_n].reverse()
+        res[ville][rue_n][1].reverse()
         suivre_rue(t, ville, rue, rue_n)
 
     
@@ -94,11 +94,11 @@ def extrait_nœuds_des_rues(g, bavard = 0):
                     rue_n = prétraitement_rue(rue)
                     if rue_n not in res[ville]:
                         #print(f"Nouvelle rue : {rue}, normalisée en {rue_n}")
-                        res[ville][rue_n] = [t, s]
+                        res[ville][rue_n] = (rue, [t, s])
                         déjàVu[ville][rue_n] = set((s, t))
                         partir_dune_arête(s, t, ville, rue, rue_n)
                     elif s not in déjàVu[ville][rue_n] or t not in déjàVu[ville][rue_n]:  # Cas d’un nouveau tronçon d’une ancienne rue
-                        res[ville][rue_n].extend((t, s))
+                        res[ville][rue_n][1].extend((t, s))
                         déjàVu[ville][rue_n].update((s, t))
                         partir_dune_arête(s,t,ville,rue, rue_n)
                         if bavard>1: print(f"Nouveau tronçon de {rue} à {ville}. Nœuds trouvés : {res[ville][rue_n]}")
