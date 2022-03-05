@@ -244,6 +244,7 @@ class Chemin_d(models.Model):
         - étapes_texte (str)
         - interdites (str)
         - utilisateur (str)
+        - date (DateField) : date de création
         - dernier_p_modif (float) : nb d’arêtes modifiées / distance entre départ et arrivée lors du dernier apprentissage.
         - zone (Zone)
     """
@@ -254,6 +255,7 @@ class Chemin_d(models.Model):
     utilisateur = models.CharField(max_length=100, default=None, blank=True, null=True)
     dernier_p_modif = models.FloatField(default=None, blank=True, null=True)
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
 
     # Les quatre attributs suivant servent uniquement à empêcher les doublons. Mysql n’accepte pas les contraintes Unique sur des champs TextField...
     début = models.CharField(max_length=255)
