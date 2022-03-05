@@ -107,6 +107,7 @@ def vue_itinéraire(requête):
 
 
 def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
+    
     # Calcul des itinéraires
     print(dict(requête.session))
     try:
@@ -115,10 +116,9 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
             rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
             rues_interdites=rues_interdites,
-            bavard=10, où_enregistrer="dijk/templates/dijk/iti_folium.html"
+            bavard=10,
+            où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
-
-        #print(stats[0]["gpx"])
     
         # Création du template
         texte_étapes = énumération_texte(noms_étapes)
@@ -161,7 +161,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        }
                       )
 
-    except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
+    # Renvoi sur la page d’erreur
+    except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e: # Ceci ne fonctionne pas...
         return vueLieuPasTrouvé(requête, e)
     except Exception as e:
         traceback.print_exc()
@@ -263,7 +264,7 @@ def affiche_chemins(requête):
     cs = Chemin_d.objects.all()
     n_cs = len(cs)
     print(f"Nombre de chemins : {len(cs)}")
-    return render(requête, "dijk/affiche_chemins.html", {"chemins": cs, "nb chemins":n_cs })
+    return render(requête, "dijk/affiche_chemins.html", {"chemins": cs, "nb_chemins":n_cs })
 
 
 def action_chemin(requête):

@@ -94,6 +94,8 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
              aide sera affichée en infobulle dans les pages de résultat.
     """
 
+    ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
+    
     ## Calcul des étapes
     tic0 = perf_counter()
 
@@ -130,18 +132,26 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
                    )
 
 
-        
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
         coul = color_dict[ (i*n_coul)//np ]
         traite_un_chemin(c, coul, *légende_et_aide(p))
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
+    if ps_détour[0]==0.:
+        longueur_ch_direct = res[0]["longueur"]    
+    
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)
         coul = "#000000"
         traite_un_chemin(cd, coul, "Trajet direct", "Le trajet le plus court, sans prendre en compte les étapes imposées.")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
+        longueur_ch_direct = res[-1]["longueur"]
+
+    # Calculer les pourcentages de détour effectifs
+    if rajouter_iti_direct or ps_détour[0]==0.:
+        for s in res:
+            s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct- 1.) * 100.)
 
     tic=perf_counter()
     dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
