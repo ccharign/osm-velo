@@ -255,13 +255,13 @@ def tuple_valeurs(a, att):
         return ()
 
 
-def longueur_arête(s, t, a, gx):
+def longueur_arête(s, t, a, g):
     """
     Entrées : a (dic), arête de nx
-              gx (nx.Multidigraph)
+              g (graphe_par_django)
     Sortie : min(a["length"], d_euc(s,t))
     """
-    deuc = distance_euc(gx.coords_of_nœud(s), gx.coords_of_nœud(t))
+    deuc = distance_euc(g.coords_of_nœud(s), g.coords_of_nœud(t))
     if a["length"]<deuc:
         print(f"Distance euc ({deuc}) > a['length'] ({a['length']}) pour l’arête {a} de {s} à {t}")
         return deuc
@@ -424,7 +424,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         for a_nx in arêtes_nx:
             a_d = Arête(départ = s_d, arrivée=t_d,
                         nom = a_nx.get("name", None),
-                        longueur = longueur_arête(s, t, a_nx, gx),
+                        longueur = longueur_arête(s, t, a_nx, g),
                         cycla_défaut = cycla_défaut(a_nx),
                         geom = géom_texte(s, t, a_nx, g)
             )

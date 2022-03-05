@@ -261,8 +261,9 @@ def carte_cycla(requête):
 
 def affiche_chemins(requête):
     cs = Chemin_d.objects.all()
+    n_cs = len(cs)
     print(f"Nombre de chemins : {len(cs)}")
-    return render(requête, "dijk/affiche_chemins.html", {"chemins": cs })
+    return render(requête, "dijk/affiche_chemins.html", {"chemins": cs, "nb chemins":n_cs })
 
 
 def action_chemin(requête):
