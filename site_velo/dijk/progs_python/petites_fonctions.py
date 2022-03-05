@@ -7,8 +7,7 @@ Ces petites fonctions ne doivent pas dépendre d’autres modules, à part param
 
 """
 
-
-#from math import pi, cos
+from math import pi, cos, acos, sin
 from params import D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, LOG
 import geopy
 import time
@@ -40,7 +39,7 @@ def sauv_fichier(chemin):
 #     return(localisateur.reverse(coords))
 
 
-#R_TERRE = 6360000  # en mètres
+R_TERRE = 6360000  # en mètres
 
 #geopy.distance.distance
 
@@ -49,15 +48,24 @@ def distance_euc(c1, c2):
     Entrée : deux coords sous la forme (lon, lat)
     Sortie : distance en mètres.
     """
-    return geopy.distance.distance(c1,c2).km
+    
+    #return geopy.distance.distance(c1,c2).km
+    
+    lon1, lat1 = c1
+    lon2, lat2 = c2
 
-    long1, lat1 = c1
-    long2, lat2 = c2
+    lat1*=pi/180
+    lat2*=pi/180
+    lon1*=pi/180
+    lon2*=pi/180
     #assert lat1>40 and lat2>40, f"Je voulais des coordonnées au format (lon, lat) et j’ai reçu {c1} et {c2}"
-    dx = R_TERRE * cos(lat1) * (long2-long1) * pi / 180
-    dy = R_TERRE * (lat2-lat1) * pi / 180
-    # vraie formule : arccos(cos(lat1)cos(lat2)cos(lon2-lon1) + sin(lat1 lat2))
+    dx = R_TERRE * cos(lat1) * (lon2-lon1)
+    dy = R_TERRE * (lat2-lat1)
     return (dx**2+dy**2)**.5
+    
+    # vraie formule :
+    return R_TERRE * acos(cos(lat1)*cos(lat2)*cos(lon2-lon1) + sin(lat1 * lat2))
+
 
 
 

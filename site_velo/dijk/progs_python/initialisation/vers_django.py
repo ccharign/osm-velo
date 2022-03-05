@@ -387,8 +387,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                     
                 return True, arêtes_ordre, arêtes
 
-    à_créer=[]
-    à_màj=[]
+    à_créer = []
+    à_màj = []
     
     #@mesure_temps("màj_arêtes", temps, nb_appels)
     def màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x):
@@ -404,7 +404,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         for a_d, a_x in zip(arêtes_d, arêtes_x):
             #a_d.geom = géom_texte(s, t, a_x, g)
             #a_d.zone.add(zone_d)
-            a_d.cycla_défaut= cycla_défaut(a_x)
+            a_d.cycla_défaut = cycla_défaut(a_x)
             à_màj.append(a_d)
 
 
@@ -422,7 +422,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
             arêtes_nx=[]
         res=[]
         for a_nx in arêtes_nx:
-            a_d = Arête(départ = s_d, arrivée=t_d,
+            a_d = Arête(départ = s_d,
+                        arrivée=t_d,
                         nom = a_nx.get("name", None),
                         longueur = longueur_arête(s, t, a_nx, g),
                         cycla_défaut = cycla_défaut(a_nx),
@@ -434,20 +435,21 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
 
     LOG("Chargement des arêtes depuis le graphe osmnx")
     nb=0
-    
-    for s in gx.nodes:
-        s_d = tous_les_sommets.get(id_osm=s)
-        for t, arêtes in gx[s].items():
-            if t!=s : # Suppression des boucles
-                nb+=1
-                if nb%500==0:print(f"    {nb} arêtes traitées\n ") #{temps}\n{nb_appels}\n")
-                t_d = tous_les_sommets.get(id_osm=t)
-                correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
-                if not (rapide==2 and len(arêtes_d)>0):
-                    if rapide==0 or not correspondent:
-                        arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
-                    else:
-                        màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x)
+
+    with transaction.atomic():
+        for s in gx.nodes:
+            s_d = tous_les_sommets.get(id_osm=s)
+            for t, arêtes in gx[s].items():
+                if t!=s : # Suppression des boucles
+                    nb+=1
+                    if nb%500==0:print(f"    {nb} arêtes traitées\n ") #{temps}\n{nb_appels}\n")
+                    t_d = tous_les_sommets.get(id_osm=t)
+                    correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
+                    if not (rapide==2 and len(arêtes_d)>0):
+                        if rapide==0 or not correspondent:
+                            arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
+                        else:
+                            màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x)
     
     LOG("Ajout des nouvelles arêtes dans la base")
     #créées=Arête.objects.bulk_create(à_créer)

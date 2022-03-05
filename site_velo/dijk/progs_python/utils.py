@@ -53,9 +53,15 @@ def liste_Arête_of_iti(g, iti, p_détour):
 
 
 DICO_PROFIl={
-    0:("Trajet direct", "Le trajet le plus court tenant compte des contraintes indiquées."),
-    15:("Petits détours", "Un cycliste de profil « petits détours » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."),
-    30:("Gros détours", "Un cycliste de profil « gros détours » rallonge en moyenne ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable.")
+    0:("Le plus court",
+       "Le trajet le plus court tenant compte des contraintes indiquées."
+       ),
+    15:("Intermédiaire",
+        "Un cycliste de profil « intermédiaire » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."
+        ),
+    30:("Priorité confort",
+        "Un cycliste de profil « priorité confort » rallonge en moyenne ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."
+        )
 }
 
 def légende_et_aide(p_détour):
@@ -90,13 +96,13 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
 
     ## Calcul des étapes
     tic0 = perf_counter()
+
     d = chemins.Étape(départ, g, z_d, bavard=bavard-1)
-    if bavard>0:
-        print(f"Départ trouvé : {d}, {d.nœuds}")
-        #print(f"Voisins de {list(d.nœuds)[0]} : {list(g.voisins(list(d.nœuds)[0], .3))}")
+    if bavard>0: print(f"Départ trouvé : {d}, {d.nœuds}")
+
     a = chemins.Étape(arrivée, g, z_d, bavard=bavard-1)
-    if bavard>0:
-        print(f"Arrivée trouvé : {a}")
+    if bavard>0: print(f"Arrivée trouvé : {a}")
+    
     étapes = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
 
 
@@ -122,13 +128,14 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
                     #"nom_gpx": nom_gpx,
                     "gpx": gpx_of_iti(iti_d, session, bavard=bavard-1)}
                    )
-        #tic = chrono(tic, f"dijkstra {c} et sa longueur")
+
 
         
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
         coul = color_dict[ (i*n_coul)//np ]
         traite_un_chemin(c, coul, *légende_et_aide(p))
+        tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)

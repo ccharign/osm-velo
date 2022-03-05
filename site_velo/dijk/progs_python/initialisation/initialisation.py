@@ -164,7 +164,7 @@ ZONE_VOIRON={
 }.items()
 
 
-def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2):
+def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=1):
     """
     Entrée : liste_villes, itérable de (nom de ville, code postal)
              zone (str), nom de la zone
@@ -196,7 +196,7 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
 
     ## Chargement des villes :
     for nom, code in liste_villes:
-        charge_ville(nom, code, zone, bavard=bavard)
+        charge_ville(nom, code, zone, bavard=bavard, rapide=rapide)
 
 
 

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from petites_fonctions import recherche_inversée
+#from petites_fonctions import recherche_inversée
 from lecture_adresse.normalisation import normalise_rue, normalise_ville
 import re
 import xml.etree.ElementTree as xml
