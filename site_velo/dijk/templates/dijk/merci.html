@@ -6,7 +6,12 @@
 Contribution enregistrée, un grand merci !
 
 <p>
-  Chemin mis en mémoire : {{chemin}}
+  Chemin(s) mis en mémoire :
+  <ul>
+    {% for c in chemin %}
+    <li>{{c}}</li>
+    {% endfor %}
+  </ul>
 </p>
 {% endblock %}
 

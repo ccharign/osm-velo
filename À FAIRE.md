@@ -1,7 +1,7 @@
 
 À FAIRE :
 
-afficher quand l’adresse a été corrigée. Et cfanger valeur défaut dans recalcul.
+afficher quand l’adresse a été corrigée.
 
 vue générique chemins
 
@@ -14,6 +14,7 @@ Graphe des villes
 Recherche dans ville voisine
 
 arbre lex des cles du cache
+Plus de cache. Dès que recherche nominatim
 
 
 NOTES :
