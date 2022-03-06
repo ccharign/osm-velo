@@ -292,7 +292,7 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
     Entrée : où_enregistrer (str) adresse et nom du fichier à créer.
     Effet : Crée la carte de la cyclabilité.
     """
-
+    g.calcule_cycla_min_max(z_d)
     mini, maxi = g.cycla_min[z_d], g.cycla_max[z_d] #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
 

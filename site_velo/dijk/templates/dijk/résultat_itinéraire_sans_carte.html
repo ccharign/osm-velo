@@ -79,7 +79,7 @@
 
 <!-- Formulaire pour relancer le calcul -->
 {% block relancer_calcul %}
-<form action = "{% url 'résultat' %}" method="post">
+<form action = "{% url 'résultat' %}" method="get">
   {% csrf_token %}
 
   
