@@ -84,20 +84,20 @@ def visualisation_nv_chemin(requête):
 
     
 def vue_itinéraire(requête):
-        """ Doit récupérer le résultat du formulaire via un post."""
+        """ Doit récupérer le résultat du formulaire via un get."""
 
     #try :
         # Récupération des données du post
-        d=requête.POST["départ"]
-        a=requête.POST["arrivée"]
-        z_d = g.charge_zone(requête.POST["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
-        #z_d = Zone.objects.get(nom=requête.POST["zone_t"])
+        d=requête.GET["départ"]
+        a=requête.GET["arrivée"]
+        z_d = g.charge_zone(requête.GET["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
+        #z_d = Zone.objects.get(nom=requête.GET["zone_t"])
 
-        noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
+        noms_étapes = [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0]
 
-        ps_détour = list(map( lambda x: float(x)/100, requête.POST["pourcentage_détour"].split(";")) )
+        ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
 
-        rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
+        rues_interdites = [r for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
         print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
 
         return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)

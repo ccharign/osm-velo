@@ -9,7 +9,7 @@
   </p>
 
 
-  <form action = "{% url 'résultat' %}" method="post">
+  <form action = "{% url 'résultat' %}" method="get">
     {% csrf_token %}
 
     <div class="form-group">
