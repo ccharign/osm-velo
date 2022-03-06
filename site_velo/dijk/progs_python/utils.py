@@ -35,7 +35,7 @@ tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
 
-from dijk.models import Chemin_d
+from dijk.models import Chemin_d, Arête
 import apprentissage as ap
 from django.db import transaction
 
@@ -330,7 +330,8 @@ def lecture_tous_les_chemins(g, z_t=None, bavard=0):
     if z_t is None:
         à_parcourir = g.zones
     else:
-        à_parcourir = [Zone.objects.get(nom=z_t)]
+        z=g.charge_zone(z_t)
+        à_parcourir = [z]
     for z in à_parcourir:
         for c_d in Chemin_d.objects.filter(zone=z):
             c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
@@ -338,3 +339,23 @@ def lecture_tous_les_chemins(g, z_t=None, bavard=0):
             c_d.dernier_p_modif = n_modif/l
             c_d.save()
             print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")
+
+            
+def réinit_cycla(g, z_t=None, nb_lectures=6, bavard=0):
+    """
+    Vide la la cyclabilité des arêtes puis lance nb_lectures lectures des chemins.
+    Pour la zone z_t si indiquée, sinon pour toutes les zones chargée dans g.
+    """
+    if z_t is None:
+        à_parcourir = g.zones
+    else:
+        z=g.charge_zone(z_t)
+        à_parcourir = [z]
+    for z in à_parcourir:
+        print(f"Effaçage de la cyclabilité des arêtes de la zone {z}")
+        with transaction.atomic():
+            arêtes = Arête.objects.filter(zone=z)
+            for a in arêtes:
+                a.cycla=None
+        for _ in range(nb_lectures):
+            lecture_tous_les_chemins(g, z.nom, bavard=bavard-1)

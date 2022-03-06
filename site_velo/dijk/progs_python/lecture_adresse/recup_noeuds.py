@@ -26,7 +26,6 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
     """
 
     # Lecture de l’adresse
-    # c = normalise_adresse(c)
     assert c != ""
     ad = Adresse(g, z_d, c, bavard=bavard-1)
     
@@ -44,7 +43,7 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
         Sortie : res, adresse
         Effet : si mettre_en_cache, rajoute res dans le cache.
         """
-        assert res != []
+        assert len(res)>0
         #res_d = [Sommet.objects.get(id_osm=s) for s in res]
         # for s in res_d:
         #     if s not in g :

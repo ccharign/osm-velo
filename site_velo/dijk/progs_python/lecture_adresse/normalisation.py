@@ -11,6 +11,10 @@ from recup_donnees import cherche_lieu
 from .normalisation0 import partie_commune, normalise_adresse, prétraitement_rue
 
 
+class AdresseMalFormée(Exception):
+    pass
+
+
 ### Villes ###
 
 #tic=time.perf_counter()
@@ -149,7 +153,7 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, tol=2, bavard=0):
     Params:
         persevérant : si True, lance une recherche Nominatim en cas d’échec de la recherche dans g.arbres_des_rues.
     
-    Fonction finale de normalisation d’un nom de rue. Applique partie_commune puis prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue), auquel cas c’est ce nom qui sera renvoyé.
+    Fonction finale de normalisation d’un nom de rue. Applique prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue) dans l’arbre lex g.arbres_des_rues[ville.nom_norm], auquel cas c’est ce nom qui sera renvoyé.
     """
 
     étape1 = prétraitement_rue(rue)
@@ -215,19 +219,6 @@ class Adresse():
             texte d’une adresse. Format : (num)? rue (code_postal? ville)
         """
         
-        # # Lecture de la regexp
-        # e = re.compile("(^[0-9]*) *([^()]+)(\((.*)\))?")
-        # essai = re.findall(e, texte)
-        # if bavard > 1: print(f"Résultat de la regexp : {essai}")
-        # if len(essai) == 1:
-        #     num, rue, _, ville = essai[0]
-        # elif len(essai) == 0:
-        #     raise SyntaxError(f"adresse mal formée : {texte}")
-        # else:
-        #     print(f"Avertissement : plusieurs interprétations de {texte} : {essai}.")
-        #     num, rue, _, ville = essai[0]
-        #     rue=rue.strip()
-
         # Découpage selon les virgules
         trucs = texte.split(",")
         if len(trucs)==1:
@@ -236,6 +227,8 @@ class Adresse():
             num_rue, ville_t = trucs
         elif len(trucs)==3:
             num_rue, ville_t, pays = trucs
+        else:
+            raise AdresseMalFormée(f"Trop de virgules dans {texte}.")
         ville_t = ville_t.strip()
         
         # numéro de rue et rue
