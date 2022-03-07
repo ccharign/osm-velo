@@ -80,7 +80,7 @@
 <!-- Formulaire pour relancer le calcul -->
 {% block relancer_calcul %}
 <form action = "{% url 'résultat' %}" method="get">
-  {% csrf_token %}
+  <!-- {% csrf_token %} -->
 
   
   <div class="form-group">

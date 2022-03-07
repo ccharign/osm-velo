@@ -84,16 +84,18 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
       - session (dic), le dico de la session Django
       - départ, arrivée (str) Seront lues par chemins.Étape.
       - noms_étapes (str list), liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
+      - rues_interdites (str list) : liste des noms du rues à éviter.
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
 
     Sortie : (liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
               objet Chemin correspondant au dernier p_détour,
-             d, a, noms_étapes
+              d, a, noms_étapes, # À FAIRE : rues_interdites
              )
              id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
              aide sera affichée en infobulle dans les pages de résultat.
-             départ, arrivée, noms_étapes sont les valeurs après correction d’éventuelles fautes de frappe
+             départ, arrivée, noms_étapes et rues_interdites sont les valeurs après correction d’éventuelles fautes de frappe,
+             
     """
 
     ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
