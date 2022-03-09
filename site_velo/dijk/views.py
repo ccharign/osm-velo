@@ -107,6 +107,12 @@ def vue_itinéraire(requête):
 
 
 def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
+    """
+    Entrées : ps_détour (float list)
+              z_d (models.Zone)
+              noms_étapes (str list)
+              rues_interdites (str list)
+    """
     
     # Calcul des itinéraires
     print(dict(requête.session))

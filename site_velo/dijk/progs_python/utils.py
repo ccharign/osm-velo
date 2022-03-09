@@ -113,7 +113,8 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
 
 
     ## Arêtes interdites
-    interdites = chemins.arêtes_interdites(g, z_d, rues_interdites, bavard=bavard)
+    étapes_interdites = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
+    interdites = chemins.arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
     tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
     
     np = len(ps_détour)

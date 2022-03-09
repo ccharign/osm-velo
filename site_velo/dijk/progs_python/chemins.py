@@ -65,18 +65,18 @@ def dico_arête_of_nœuds(g, nœuds):
     }
 
 
-def arêtes_interdites(g, z_d, noms_rues, bavard=0):
+def arêtes_interdites(g, z_d, étapes_interdites, bavard=0):
     """
     Entrée : g (graphe)
              z_d (Zone)
-             noms_rues (str iterable), liste de noms de rues à éviter
+             étapes_interdites (Étapes iterable), liste de noms de rues à éviter
     Sortie : dico des arêtes correspondant
     """
     interdites = {}
-    for r in noms_rues:
+    for é in étapes_interdites:
         interdites.update(
             dico_arête_of_nœuds(g,
-                                nœuds_of_étape(r, g, z_d, bavard=bavard)[0]
+                                é.nœuds
             )
         )
     return interdites
