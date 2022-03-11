@@ -100,7 +100,7 @@ def nœuds_of_rue(adresse, bavard=0):
     """
     Sortie : liste des nœuds osm correspondant aux ways correspondant à l'adresse.
     """
-    #api = overpy.Overpass()
+
     lieu = cherche_lieu(adresse, seulement_non_structurée=True , bavard=bavard)
     if bavard>0:print(f"rd.nœuds_of_rue : la recherche Nominatim pour {adresse} a donné {lieu}.")
     res = []

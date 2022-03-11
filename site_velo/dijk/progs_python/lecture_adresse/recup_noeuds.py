@@ -16,27 +16,28 @@ class PasTrouvé(Exception):
 
 
 
-def nœuds_of_étape(c:str, g, z_d, bavard=0):
+def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
     """ c : chaîne de caractères décrivant une étape. Optionnellement un numéro devant le nom de la rue, ou une ville entre parenthèses.
         g : graphe.
         z_d (Zone) : pour la ville par défaut
+        nv_cache (int), niveau de mise en cache
         Sortie : (liste de nœuds (instance de Sommet) de g associé à cette adresse, l’adresse de type Adresse)
            Si un numéro est indiqué, la liste de nœuds est le singleton du nœud de la rue le plus proche.
            Sinon c’est la liste de tous les nœuds connus de la rue.
     """
-
+    
     # Lecture de l’adresse
     assert c != ""
-    ad = Adresse(g, z_d, c, bavard=bavard-1)
+    ad = Adresse(g, z_d, c, nv_cache=nv_cache, bavard=bavard-1) # Actuellement, ceci lance déjà un nominatim si la rue n’est pas dans la base.
     
     # Recherche dans le cache
     essai = g.dans_le_cache(ad)
     if essai is not None:  
-        if bavard > 1: print(f"Adresse dans le cache : {c}")
+        if bavard > 1: print(f"(nœuds_of_étape) Adresse dans le cache : {c}")
         return essai, ad
     else:
-        if bavard > 1: print(f"Pas dans le cache : {c}")
-
+        if bavard > 1: print(f"(nœuds_of_étape) Pas dans le cache : {c}")
+    
     def renvoie(res, mettre_en_cache=False):
         """
         Entrée : res (int list)
@@ -49,7 +50,7 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
         #     if s not in g :
         #        raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res_d}.")
         if mettre_en_cache:
-            g.met_en_cache(ad, res)
+            g.met_en_cache(ad, z_d, res)
             print(f"Mis en cache : {res} pour {ad}")
         return res, ad
 
@@ -72,64 +73,77 @@ def nœuds_of_étape(c:str, g, z_d, bavard=0):
 
 
 
-def tous_les_nœuds(g, z_d, adresse, bavard=0):
+def tous_les_nœuds(g, z_d, adresse, nv_cache=1, bavard=0):
     """ Entrée : g (graphe)
-                 adresse : instance de Adresse
-        Sortie : liste des nœuds de cette rue, dans l’ordre topologique si possible.
+                 adresse : instance de Adresse sans numéro de rue.
+        Paramètres : 
+            nv_cache (int) : 1 -> cache après overpass
+                             2 -> cache après Nominatim # À FAIRE
+        Sortie : liste des nœuds de cette adresse, dans l’ordre topologique si possible.
 
 
     Méthode actuelle :
        - essai 1 :  via la méthode g.nœuds_of_rue (en local)
-       - recherche Nominatim pour trouver le nom de la rue dans osm
-       - essai 2 : dans g.nœuds avec ce nouveau nom
-       - (supprimé car lent) essai 3 : récupérer les nodes osm des way trouvées dans le .osm local, et garder ceux qui sont dans g
-       - essai 4 : récupérer les nodes de la recherche Nominatim, et garder ceux qui sont dans g
-       - essai 5 : coordonnés du premier objet renvoyé par la recherche, et nœud de g le plus proche d’icelui.
+       - essai 3 : récupérer les nodes de la recherche Nominatim, et garder ceux qui sont dans g
+       - essai 4 : coordonnés du premier objet renvoyé par la recherche, et nœud de g le plus proche d’icelui.
     """
     LOG(f"\n\n(tous_les_nœuds) Lancement de tous_les_nœuds(g, {adresse})", bavard=bavard)
 
 
     
-    ## Essai 1
+    ## Essai 1 : dans la table des rues de la base.
     essai1 = g.nœuds_of_rue(adresse, persévérant=False, bavard=bavard-1) # Ne pas se lancer dans la bb enveloppante à ce stade.
-    if essai1 is not None and len(essai1)>0:
+    if essai1:
         return essai1
     else :
-        LOG(f"(nœuds_sur_rue) Rue pas en mémoire : {adresse}.", bavard=bavard)
+        ## dans le cache
+        essai = g.dans_le_cache(adresse)
+        if essai:
+            return essai
+        
+        LOG(f"(recup_nœuds.tous_les_nœuds) Rue pas en mémoire : {adresse}.", bavard=bavard)
 
-        ## Recherche Nominatim
-        lieu = cherche_lieu(adresse, bavard=bavard-1)
-        
-        ## Essai 4, avec les nodes trouvés
-        nœuds_osm = [t.raw for t in lieu if t.raw["osm_type"]=="node"]
-        if nœuds_osm != []:
-            LOG(f"essai 4 : La recherche Nominatim a donné les nœuds {nœuds_osm}", bavard=bavard+1)
-            nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g]
-            if len(nœuds_de_g) > 0:
-                g.met_en_cache(adresse, nœuds_de_g)
-                return nœuds_de_g
-        
-        
-        ## Essai 5 : en se basant sur les coords enregistrées dans osm pour le premier élément renvoyé par Nominatim
-        ## Ce devrait être la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, bar, commerce...)
-        if len(lieu)>0:
+        lieu = adresse.rés_nominatim
+        if lieu:
+            
+        ## Recherche Nominatim         ### Inutile : déjà fait dans normalise_rue
+        #lieu = cherche_lieu(adresse, bavard=bavard-1)
+        # if len(lieu)>0:
+            
+            
+        #     nouveau_nom = normalise_rue(g, z_d, truc["display_name"].split(",")[0], adresse.ville, bavard=bavard-1)
+        #     adresse.rue_osm = nouveau_nom # Modif de l’adresse
+        #     LOG(f"(recup_nœuds.tous_les_nœuds) Nouveau nom trouvé sur Nominatim : {adresse.rue_osm}", bavard=bavard)
+            
+        #     # essai 2 : avec ce nouveau nom
+        #     essai = g.nœuds_of_rue(adresse, persévérant=False, bavard=bavard-1) # toujours pas en mode persévérant
+        #     if essai :
+        #         return essai
+            
+            ## Essai 3, avec les nodes trouvés
+            nœuds_osm = [t.raw for t in lieu if t.raw["osm_type"]=="node"]
+            if nœuds_osm:
+                LOG(f"(recup_nœuds.tous_les_nœuds) La recherche Nominatim a donné les nœuds {nœuds_osm}", bavard=bavard+1)
+                nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g ]
+                if len(nœuds_de_g) > 0:
+                    LOG("J’ai trouvé des nœuds de g dans le résultat de Nominatim", bavard=bavard+1)
+                    g.met_en_cache(adresse, z_d, nœuds_de_g)
+                    return nœuds_de_g
+            
+            
+            ## Essai 4 : en se basant sur les coords enregistrées dans osm pour le premier élément renvoyé par Nominatim
+            ## Ce devrait être la situation notamment pour toutes les recherches qui ne sont pas un nom de rue (bâtiment public, bar, commerce...)
             truc = lieu[0].raw
-            adresse.rue_osm = lieu[0].raw["display_name"].split(",")[0] # Modif de l’adresse
-            
-            essai = g.dans_le_cache(adresse)
-            if essai is not None:
-                return essai
-            
-            LOG(f"Essai 5 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
+            LOG(f"Essai 4 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
             res = nœud_sur_rue_le_plus_proche(g, coords, Adresse(g, z_d, f"{rue}, {ville}", bavard=bavard))
-            if res is not None:
-                g.met_en_cache(adresse, [res])
+            if res:
+                g.met_en_cache(adresse, z_d, [res])
                 return [res]
             #return [g.nœud_le_plus_proche( coords, recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
-
-    
+        
+        
         raise PasTrouvé(f"Pas réussi à trouver de nœud pour {adresse}.")
 
 

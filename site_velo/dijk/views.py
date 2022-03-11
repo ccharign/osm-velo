@@ -117,7 +117,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
     # Calcul des itinéraires
     print(dict(requête.session))
     try:
-        stats, chemin, d, a, noms_étapes = itinéraire(
+        stats, chemin, d, a, noms_étapes, rues_interdites = itinéraire(
             d, a, ps_détour, g, z_d, requête.session,
             rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,

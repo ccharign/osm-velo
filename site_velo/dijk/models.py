@@ -127,6 +127,8 @@ class Rue(models.Model):
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
+
+
     
 def formule_pour_correction_longueur(l, cy, p_détour):
     """
@@ -222,18 +224,6 @@ class Arête(models.Model):
     
     
 
-    
-class Cache_Adresse(models.Model):
-    """ 
-    Table d'association ville -> adresse -> chaîne de nœuds
-    Note : tout ce qui correspond à des ways dans Nominatim sera enregistré dans la table Rue, via g.nœuds_of_rue.
-    """
-    adresse = models.CharField(max_length=200, unique=True)
-    nœuds_à_découper = models.TextField()
-    def __str__(self):
-        return f"{self.ville}, {self.adresse}, {self.nœud}"
-    def nœuds(self):
-        return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
 
 class Chemin_d(models.Model):
@@ -315,3 +305,53 @@ class Chemin_d(models.Model):
             for c in cls.objects.all():
                 ligne = "|".join(map(str, (c.ar, c.p_détour, c.étapes_texte, c.interdites_texte, c.utilisateur, c.zone )))
                 sortie.write(ligne+"\n")
+
+
+    
+class Cache_Adresse(models.Model):
+    """ 
+    Table d'association ville -> adresse -> chaîne de nœuds
+    Note : tout ce qui correspond à des ways dans Nominatim sera enregistré dans la table Rue, via g.nœuds_of_rue.
+    Ceci est destiné aux lieux particuliers (bars, bâtiment administratifs, etc. )
+    """
+    adresse = models.CharField(max_length=200, unique=True)
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+    nœuds_à_découper = models.TextField()
+    def __str__(self):
+        return f"{self.ville}, {self.adresse}, {self.nœud}"
+    def nœuds(self):
+        return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
+
+
+class CacheNomRue(models.Model):
+    """
+    Associe à un nom quelconque de rue son nom osm.
+    attribut:
+      - nom (str) : nom traité par prétraitement_rue
+      - nom_osm (str)
+      - zone (Zone)
+    Une ligne est ajoutée dans cette table lorsqu’une recherche nominatim sur nom a fourni nom_osm.
+    """
+    nom = models.CharField(max_length=200)
+    nom_osm = models.CharField(max_length=200)
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(fields=["nom", "zone"], name = "Une seule entrée pour chaque (nom, zone).")
+        ]
+
+    @classmethod
+    def ajoute(cls, nom, nom_osm, z_d):
+        """
+        Effet : Crée si pas déjà présent une entrée du cache. Si une entrée est déjà présente pour (nom, z_d), nom_osm est mis à jour.
+        Sortie : l’instance créé ou trouvée.
+        """
+        essai = cls.objects.filter(nom=nom, zone=z_d).first()
+        if essai:
+            essai.nom=nom_osm
+            essai.save()
+            return essai
+        else:
+            res = cls(nom=nom, nom_osm=nom_osm, zone=z_d)
+            res.save()
+            return res

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import re
 from params import PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
-from dijk.models import Rue
+from dijk.models import Rue, CacheNomRue
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 import time
 from petites_fonctions import chrono
@@ -141,17 +141,30 @@ def arbre_rue_dune_ville(ville_d, rues):
 
 # ---> dans g.arbres_des_rues
 
+def dans_cache_nom_rue(nom, z_d):
+    """
+    Entrée :
+      nom (str), nom passé par la fonction prétraitement_rue
+      z_d (Zone)
+    Sortie (str ou None) : nom_osm associé à nom dans CacheNomRue s’il y en a un.
+    """
+    essai = CacheNomRue.objects.filter(nom=nom, zone=z_d)
+    if essai: return essai.first().nom_osm
 
-def normalise_rue(g, z_d, rue, ville, persevérant=True, tol=2, bavard=0):
+
+def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv_cache=1, tol=2, bavard=0):
     """
     Entrées : 
       - z_d (Zone)
       - ville (instance de Ville)
       - rue (str)
+      - rés_nominatim : résultat d’une éventuelle recherche nominatim précédente.
 
-    Sortie: ( nom normalisé de la rue, nom complet de la rue).
+    Sortie: ( nom normalisé de la rue, nom complet de la rue, rés de la recherche Nominatim ou None).
+
     Params:
         persevérant : si True, lance une recherche Nominatim en cas d’échec de la recherche dans g.arbres_des_rues.
+        nv_cache : (À FAIRE) si >=2, mets en cache une association nom rentré -> nom osm si le nom entré n’était pas une rue reconnue.
     
     Fonction finale de normalisation d’un nom de rue. Applique prétraitement_rue puis recherche s’il y a un nom connu à une distance d’édition inférieure à tol (càd à au plus tol fautes de frappe de rue) dans l’arbre lex g.arbres_des_rues[ville.nom_norm], auquel cas c’est ce nom qui sera renvoyé.
     """
@@ -160,40 +173,43 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, tol=2, bavard=0):
     
     res, d =  g.arbres_des_rues[ville.nom_norm].mots_les_plus_proches(étape1, d_max=tol)
     if len(res)==1:
-        if bavard>0:
-            print(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}")
+        LOG(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}", bavard=bavard)
         rue_n = list(res)[0]
-        if rue_n!=étape1:
-            #il y avait une faute de frappe
-            #Retrouvons le nom complet initial
-            r=Rue.objects.get(nom_norm=rue_n, ville__nom_norm=ville.nom_norm)
-            return rue_n, r.nom_complet
-        else:
-            return rue_n, rue
-            
-    elif len(res)>1:
-        # Devrait être très rare
-        print(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).")
-        return étape1, rue
-    
-    elif not persevérant :
-        LOG("Je laisse tomber", bavard=bavard)
-        return étape1, rue
-    
+        # Récupérons le nom complet dans la base
+        r=Rue.objects.get(nom_norm=rue_n, ville__nom_norm=ville.nom_norm)
+        return rue_n, r.nom_complet, None
+        
     else:
-        print(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je lance une recherche Nominatim.")
-        lieu = cherche_lieu(Adresse(g, z_d, f"{rue}, {ville}", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
-        LOG(f"La recherche Nominatim a donné {lieu}.", bavard=bavard)
-        way_osm = [ t.raw for t in lieu if t.raw["osm_type"]=="way"]
-        if len(way_osm)>0:            
-            tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
-            nom = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
-            print(f"Nouvel essai avec le nom suivant : {nom}")
-            return normalise_rue(g, z_d, nom, ville, persevérant=False, tol=tol, bavard=bavard)
+        essai = dans_cache_nom_rue(étape1, z_d)
+        if essai and rue!=essai:
+            print(f"J’ai trouvé {essai} dans le cache. Je relance normalise_rue avec cette nouvelle valeur.")
+            
+            return normalise_rue(g, z_d, essai, ville, persevérant=persevérant, bavard=bavard, rés_nominatim=rés_nominatim, nv_cache=0, tol=tol)
+            
+        if len(res)>1:
+            # Devrait être très rare
+            LOG(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).", bavard=bavard+1)
+            return étape1, rue, rés_nominatim
+
+        elif not persevérant :
+            LOG("Je laisse tomber", bavard=bavard)
+            return étape1, rue, rés_nominatim
+
         else:
-            LOG("Pas de way dans le résultat de la recherche Nominatim.")
-            return étape1, rue
-    
+            LOG(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je lance une recherche Nominatim.", bavard=bavard)
+            lieu = cherche_lieu(Adresse(g, z_d, f"{rue}, {ville}", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
+            LOG(f"(normalise_rue) La recherche Nominatim a donné {lieu}.", bavard=bavard)
+            way_osm = [ t.raw for t in lieu if t.raw["osm_type"]=="way"]
+            if len(way_osm)>0:            
+                tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
+                nom_osm = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
+                CacheNomRue.ajoute(étape1, nom_osm, z_d)
+                LOG(f"(normalise_rue) Nouvel essai avec le nom suivant : {nom_osm}", bavard=bavard)
+                return normalise_rue(g, z_d, nom_osm, ville, persevérant=False, rés_nominatim=lieu, tol=tol, bavard=bavard)
+            else:
+                LOG("Pas de way dans le résultat de la recherche Nominatim.")
+                return étape1, rue, lieu
+
 
 
     
@@ -207,11 +223,13 @@ class Adresse():
       - rue (str) : nom de la rue complet
       - rue_norm (str) : nom de rue après normalisation (via normalise_rue)
       - rue_osm (str) : nom de la rue trouvé dans osm (le cas échéant)
+      - rue_initiale (str) : le nom initialement fourni à __init__
       - ville (instance de Ville)
       - pays
+      - rés_nominatim : résultat de cherche_lieu s’il y a eu un appel à cette fonction.
     """
     
-    def __init__(self, g, z_d, texte, norm_rue=True, bavard=0):
+    def __init__(self, g, z_d, texte, norm_rue=True, nv_cache=1, bavard=0):
         """ 
         Entrée :
             g (graphe)
@@ -232,16 +250,18 @@ class Adresse():
         ville_t = ville_t.strip()
         
         # numéro de rue et rue
-        num, rue = re.findall("(^[0-9]*) *(.*)", num_rue)[0]
+        num, rue_initiale = re.findall("(^[0-9]*) *(.*)", num_rue)[0]
 
-        if bavard>0: print(f"analyse de l’adresse : num={num}, rue={rue}, ville={ville_t}")
+        if bavard>0: print(f"analyse de l’adresse : num={num}, rue_initiale={rue_initiale}, ville={ville_t}")
         
         # Normalisation de la ville et de la rue
         ville_n = normalise_ville(g, z_d, ville_t) # ville_t doit-elle contenir le code postal ?
+        rés_nominatim = None
         if norm_rue:
-            rue_n, rue = normalise_rue(g, z_d, rue, ville_n)
+            rue_n, rue, rés_nominatim = normalise_rue(g, z_d, rue_initiale, ville_n, nv_cache=nv_cache)
         else:
-            rue_n = rue
+            rue = rue_initiale
+            rue_n = None
         
         if bavard>0: print(f"après normalisation : num={num}, rue_n={rue_n}, rue={rue}, ville_n={ville_n}")
 
@@ -251,10 +271,12 @@ class Adresse():
         else:
             self.num=int(num)
         self.rue = rue
+        self.rue_initiale=rue_initiale
         self.rue_norm = rue_n
         self.rue_osm = None
         self.ville = ville_n
         self.pays=PAYS_DÉFAUT
+        self.rés_nominatim=rés_nominatim
 
 
     def __str__(self):

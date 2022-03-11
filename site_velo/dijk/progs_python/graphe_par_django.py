@@ -42,6 +42,7 @@ class Graphe_django():
         self.zones=[]
         self.cycla_max={}
         self.cycla_min={}
+        self.arbre_cache={}
     
         
     def charge_zone(self, zone_t, bavard=0):
@@ -53,7 +54,7 @@ class Graphe_django():
             print(f"Zone pas en mémoire : {z_d}. Voici les zones que j’ai chargées : {self.zones}")
             self.zones.append(z_d)
 
-            # Dicos des villes et des rues
+            ## Dicos des villes et des rues
             print("Chargement des arbres lex pour villes et rues...")
             for v_d in z_d.villes():
                 #if bavard>0: print(v_d.nom_norm)
@@ -61,10 +62,16 @@ class Graphe_django():
                 self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
             print("fini.")
 
+            ## Cache
+            print("Chargement du cache")
+            self.arbre_cache[zone_t] = ArbreLex.of_iterable(
+                [str(a.adresse) for a in Cache_Adresse.objects.filter(zone=z_d)]
+            )
+
             #tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
             #print(f"{len(tous_les_sommets)} sommets dans la base pour {z_d}")
 
-            #Sommets
+            ## Sommets
             tic = perf_counter()
             print("Chargement des sommets")
 
@@ -74,7 +81,7 @@ class Graphe_django():
             tic=chrono(tic, "Chargement des sommets")
 
             
-            # Arêtes
+            ## Arêtes
             print("Chargement des arêtes")
 
             arêtes = Arête.objects.filter(zone=z_d).select_related("départ", "arrivée")
@@ -294,7 +301,7 @@ class Graphe_django():
             
             # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
             tout = rd.nœuds_of_rue(adresse)
-            print(f"Liste des nœuds osm : {tout}.")
+            LOG(f"Liste des nœuds osm : {tout}.", bavard=bavard-1)
             res = [ n for n in tout if n in self ]
             if len(res)>0:
                 LOG(f"nœuds trouvés : {res}", bavard=bavard)
@@ -340,12 +347,16 @@ class Graphe_django():
             rue_d.save()
 
             
-    def met_en_cache(self, adresse, res):
-        ligne = Cache_Adresse(adresse=str(adresse), nœuds_à_découper = ",".join(map(str,res)))
+    def met_en_cache(self, adresse, z_d, res):
+        ligne = Cache_Adresse(adresse=str(adresse), zone=z_d, nœuds_à_découper = ",".join(map(str,res)))
         ligne.save()
-        LOG(f"Mis en cache : {res} pour {adresse}", bavard=1)
+        LOG(f"Mis en cache : {res} pour {adresse}, zone={z_d}", bavard=1)
 
     def dans_le_cache(self, adresse):
+        """
+        Entrée : adresse (str ou instance de Adresse)
+        Sortie : liste des nœuds si présente dans le cache, None sinon
+        """
         res = Cache_Adresse.objects.filter(adresse=str(adresse))
         if len(res)==1:
             return res[0].nœuds()

@@ -3,7 +3,7 @@ from time import perf_counter
 from petites_fonctions import chrono
 
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES, LOG
-from dijk.models import Sommet, Chemin_d
+from dijk.models import Sommet, Chemin_d, Zone
 
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_of_adresse
@@ -44,6 +44,7 @@ class Étape():
     """
     
     def __init__(self, texte, g, z_d, bavard=0):
+        #assert isinstance(z_d, Zone), f"J’ai reçu {z_d} qui n’est pas une Zone"
         self.texte = texte
         n, self.adresse = nœuds_of_étape(texte, g, z_d, bavard=bavard-1)
         self.nœuds = set(n)
@@ -157,7 +158,8 @@ class Chemin():
         #rues interdites
         if len(rues_interdites_t)>0:
             noms_rues = rues_interdites_t.split(";")
-            interdites = arêtes_interdites(g, z_d, noms_rues, bavard=bavard)
+            étapes_interdites =  (Étape(n, g , z_d) for n in noms_rues)
+            interdites = arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
         else:
             interdites = {}
         
