@@ -32,11 +32,11 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
     
     # Recherche dans le cache
     essai = g.dans_le_cache(ad)
-    if essai is not None:  
-        if bavard > 1: print(f"(nœuds_of_étape) Adresse dans le cache : {c}")
+    if essai:  
+        LOG(f"(nœuds_of_étape) Adresse dans le cache : {ad}", bavard=bavard-1)
         return essai, ad
     else:
-        if bavard > 1: print(f"(nœuds_of_étape) Pas dans le cache : {c}")
+        LOG(f"(nœuds_of_étape) Pas dans le cache : {ad}", bavard=bavard)
     
     def renvoie(res, mettre_en_cache=False):
         """
@@ -51,14 +51,14 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
         #        raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res_d}.")
         if mettre_en_cache:
             g.met_en_cache(ad, z_d, res)
-            print(f"Mis en cache : {res} pour {ad}")
+            print(f"(nœuds_of_étape) Mis en cache : {res} pour {ad}")
         return res, ad
 
     
     if ad.num is None:
         ## Pas de numéro de rue -> soit c’est une rue entière, soit c’est un batiment spécial
         ## -> liste de tous les nœuds de la rue
-        if bavard > 0 : print("Pas de numéro de rue, je vais renvoyer une liste de nœuds")
+        LOG("(nœuds_of_étape) Pas de numéro de rue, je vais renvoyer une liste de nœuds", bavard=bavard)
         if ad.rue == "":
             raise SyntaxError(f"adresse mal formée : {c}")
         else:
@@ -67,7 +67,7 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
 
     else:
         ## Numéro de rue -> renvoyer un singleton
-        if bavard > 0 : print("Numéro de rue présent : je vais renvoyer un seul nœud")
+        LOG("(nœuds_of_étape) Numéro de rue présent : je vais renvoyer un seul nœud", bavard=bavard)
         return renvoie(un_seul_nœud(g, z_d, ad, bavard=bavard-1))
 
 
@@ -104,13 +104,10 @@ def tous_les_nœuds(g, z_d, adresse, nv_cache=1, bavard=0):
         LOG(f"(recup_nœuds.tous_les_nœuds) Rue pas en mémoire : {adresse}.", bavard=bavard)
 
         lieu = adresse.rés_nominatim
+        if not lieu:
+            lieu = cherche_lieu(adresse, bavard=bavard-1)
         if lieu:
-            
-        ## Recherche Nominatim         ### Inutile : déjà fait dans normalise_rue
-        #lieu = cherche_lieu(adresse, bavard=bavard-1)
-        # if len(lieu)>0:
-            
-            
+
         #     nouveau_nom = normalise_rue(g, z_d, truc["display_name"].split(",")[0], adresse.ville, bavard=bavard-1)
         #     adresse.rue_osm = nouveau_nom # Modif de l’adresse
         #     LOG(f"(recup_nœuds.tous_les_nœuds) Nouveau nom trouvé sur Nominatim : {adresse.rue_osm}", bavard=bavard)

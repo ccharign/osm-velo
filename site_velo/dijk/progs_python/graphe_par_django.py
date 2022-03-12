@@ -293,7 +293,7 @@ class Graphe_django():
             v = Ville.objects.get(nom_norm=adresse.ville.nom_norm)
             r = Rue.objects.get(nom_norm=adresse.rue_norm, ville=v)
             res = r.nœuds()
-            if bavard>1: print(f"(g.nœuds_of_rue)Trouvé dans la base {list(res)} pour {adresse}")
+            LOG(f"(g.nœuds_of_rue) Trouvé dans la base {list(res)} pour {adresse}", bavard=bavard)
             return res
         
         except Exception as e:
@@ -301,20 +301,22 @@ class Graphe_django():
             
             # Essai 2 : via rd.nœuds_of_rue, puis intersection avec les nœuds de g
             tout = rd.nœuds_of_rue(adresse)
-            LOG(f"Liste des nœuds osm : {tout}.", bavard=bavard-1)
+            LOG(f"(g.nœuds_of_rue) Liste des nœuds osm : {tout}.", bavard=bavard-1)
             res = [ n for n in tout if n in self ]
             if len(res)>0:
-                LOG(f"nœuds trouvés : {res}", bavard=bavard)
+                LOG(f"(g.nœuds_of_rue) nœuds trouvés : {res}", bavard=bavard)
                 self.ajoute_rue(adresse, res, bavard=bavard)
                 return res
+            else:
+                LOG(f"mais aucun n’est dans le graphe :(", bavard=bavard)
             
-            elif persévérant and len(tout)>0:
+            if persévérant and len(tout)>0:
                 # essai 3 : recherche de tous les nœuds dans la bb enveloppante de tout.
                 bbe = rd.bb_enveloppante(tout, bavard=bavard-1)
                 tol=0
                 dtol=0.001
                 while len(res)==0:
-                    print(f"Recherche dans la bb enveloppante avec tol={tol}.")
+                    LOG(f"(g.nœuds_of_rue) Recherche dans la bb enveloppante avec tol={tol}.", bavard=bavard)
                     res = [ n for n in rd.nœuds_dans_bb(bbe, tol=tol) if n in self]
                     tol+=dtol
                 self.ajoute_rue(adresse, res, bavard=bavard)
@@ -348,16 +350,17 @@ class Graphe_django():
 
             
     def met_en_cache(self, adresse, z_d, res):
-        ligne = Cache_Adresse(adresse=str(adresse), zone=z_d, nœuds_à_découper = ",".join(map(str,res)))
+        ligne = Cache_Adresse(adresse=adresse.pour_cache(), zone=z_d, nœuds_à_découper = ",".join(map(str,res)))
         ligne.save()
-        LOG(f"Mis en cache : {res} pour {adresse}, zone={z_d}", bavard=1)
+        LOG(f"Mis en cache : {ligne}", bavard=1)
 
     def dans_le_cache(self, adresse):
         """
         Entrée : adresse (str ou instance de Adresse)
         Sortie : liste des nœuds si présente dans le cache, None sinon
+        À FAIRE : arbre lex
         """
-        res = Cache_Adresse.objects.filter(adresse=str(adresse))
+        res = Cache_Adresse.objects.filter(adresse=adresse.pour_cache())
         if len(res)==1:
             return res[0].nœuds()
         elif len(res)>1:

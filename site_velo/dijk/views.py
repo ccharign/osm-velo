@@ -201,7 +201,8 @@ def confirme_nv_chemin(requête):
             if id_chemin[:2]=="ps" and requête.POST[id_chemin]=="on":
                 pourcentage_détour = int(id_chemin[2:])
                 print(f"pourcentage_détour : {pourcentage_détour}")
-                c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, bavard=2)
+                # nv_cache = 2 ici.
+                c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, nv_cache=2, bavard=2)
                 chemins.append(c)
                 c_d=c.vers_django(bavard=1)
                 prop_modif=n_lectures(nb_lectures, g, [c], bavard=1)

@@ -69,13 +69,13 @@ def cherche_lieu(adresse, seulement_structurée=False, seulement_non_structurée
     Premier essai : recherche structurée avec adresse.nom_rue et adresse.ville.avec_code
     Deuxième essai, seulement si seulement_structurée==False : non structurée avec essai adresse.pour_nominatim().
     """
-    nom_rue = adresse.rue
+    nom_rue = adresse.rue()
     ville = adresse.ville
     pays = adresse.pays
     
     if not seulement_non_structurée:
         #  Essai 1 : recherche structurée. Ne marche que si l'objet à chercher est effectivement une rue
-        if bavard > 1: print(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}')
+        LOG(f'Essai 1: "street":{nom_rue}, "city":{ville.avec_code()}, "country":{pays}', bavard=bavard)
         lieu = localisateur.geocode( {"street":nom_rue, "city":ville.avec_code(), "country":pays, "dedup":0}, exactly_one=False, limit=None  ) # Autoriser plusieurs résultats car souvent une rue est découpée en plusieurs tronçons
         if lieu is not None:
             return lieu
@@ -84,9 +84,7 @@ def cherche_lieu(adresse, seulement_structurée=False, seulement_non_structurée
 
     if not seulement_structurée:
         # Essai 2: non structuré. Risque de tomber sur un résultat pas dans la bonne ville.
-
-        print("Recherche Nominatim non structurée. Attention...")
-        print(f'Essai 2 : "{adresse.pour_nominatim()}" ')
+        LOG(f'Essai 2 : "{adresse.pour_nominatim()}" ', bavard=bavard)
         lieu = localisateur.geocode(f"{adresse.pour_nominatim()}", exactly_one=False)
         if lieu is not None:
             return lieu

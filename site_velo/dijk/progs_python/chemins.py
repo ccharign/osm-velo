@@ -43,10 +43,9 @@ class Étape():
         nœuds (Sommet set) : ensemble de nœuds
     """
     
-    def __init__(self, texte, g, z_d, bavard=0):
-        #assert isinstance(z_d, Zone), f"J’ai reçu {z_d} qui n’est pas une Zone"
+    def __init__(self, texte, g, z_d, nv_cache=1, bavard=0):
         self.texte = texte
-        n, self.adresse = nœuds_of_étape(texte, g, z_d, bavard=bavard-1)
+        n, self.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
         self.nœuds = set(n)
         #for n in self.nœuds:
         #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
@@ -158,7 +157,7 @@ class Chemin():
         #rues interdites
         if len(rues_interdites_t)>0:
             noms_rues = rues_interdites_t.split(";")
-            étapes_interdites =  (Étape(n, g , z_d) for n in noms_rues)
+            étapes_interdites =  (Étape(n, g , z_d, nv_cache=2) for n in noms_rues)
             interdites = arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
         else:
             interdites = {}
@@ -169,7 +168,7 @@ class Chemin():
         étapes=[]
         for c in noms_étapes:
         #    try:                
-                étapes.append(Étape(c.strip(), g, z_d, bavard=bavard-1))
+                étapes.append(Étape(c.strip(), g, z_d, nv_cache=2, bavard=bavard-1))
         #     except Exception as e:
         #         LOG_PB(f"Échec pour l’étape {c} : {e}")
         #         n_pb+=1
@@ -195,7 +194,7 @@ class Chemin():
         c.sauv()
     
     @classmethod
-    def of_étapes(cls, z_d, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], bavard=0):
+    def of_étapes(cls, z_d, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], nv_cache=1, bavard=0):
         """
         Entrées : noms_étapes (str list).
                   pourcentage_détour (int)
@@ -203,12 +202,14 @@ class Chemin():
                   g (Graphe)
         Sortie : instance de Chemin
         """
-        étapes = [Étape(é, g, z_d) for é in noms_étapes]
+        étapes = [Étape(é, g, z_d, nv_cache=nv_cache) for é in noms_étapes]
         if bavard>0:
             print(f"List des étapes obtenues : {étapes}")
-        
+
+
+        étapes_interdites = (Étape(é, g, z_d, nv_cache=nv_cache) for é in noms_rues_interdites)
         return cls(z_d, étapes, pourcentage_détour/100, AR,
-                   interdites=arêtes_interdites(g, z_d, noms_rues_interdites),
+                   interdites=arêtes_interdites(g, z_d, étapes_interdites),
                    texte_interdites=";".join(noms_rues_interdites)
                    )
     

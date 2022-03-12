@@ -318,7 +318,7 @@ class Cache_Adresse(models.Model):
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
     nœuds_à_découper = models.TextField()
     def __str__(self):
-        return f"{self.ville}, {self.adresse}, {self.nœud}"
+        return f"{self.adresse}, {self.zone}"
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 

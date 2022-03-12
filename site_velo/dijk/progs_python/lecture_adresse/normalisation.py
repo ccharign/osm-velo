@@ -173,43 +173,62 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
     
     res, d =  g.arbres_des_rues[ville.nom_norm].mots_les_plus_proches(étape1, d_max=tol)
     if len(res)==1:
-        LOG(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}", bavard=bavard)
+        LOG(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}", bavard=bavard-1)
         rue_n = list(res)[0]
         # Récupérons le nom complet dans la base
         r=Rue.objects.get(nom_norm=rue_n, ville__nom_norm=ville.nom_norm)
         return rue_n, r.nom_complet, None
         
     else:
+        LOG(f"(normalise_rue) {étape1} pas dans l’arbre lex des rues de {ville} ({tol} fautes de frappes tolérées).", bavard=bavard)
+
+        # Autre nom dans le cache ?
         essai = dans_cache_nom_rue(étape1, z_d)
         if essai and rue!=essai:
-            print(f"J’ai trouvé {essai} dans le cache. Je relance normalise_rue avec cette nouvelle valeur.")
-            
-            return normalise_rue(g, z_d, essai, ville, persevérant=persevérant, bavard=bavard, rés_nominatim=rés_nominatim, nv_cache=0, tol=tol)
-            
+            LOG(f"J’ai trouvé {essai} dans le cache.", bavard=bavard)            
+            #return normalise_rue(g, z_d, essai, ville, persevérant=persevérant, bavard=bavard, rés_nominatim=rés_nominatim, nv_cache=0, tol=tol)
+            return prétraitement_rue(essai), essai, None
+        
+        # Résultats ambigüs dans l’arbre
         if len(res)>1:
             # Devrait être très rare
-            LOG(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).", bavard=bavard+1)
+            LOG(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).",
+                bavard=bavard+1)
             return étape1, rue, rés_nominatim
-
+        
+        # Abandon si non persévérant
         elif not persevérant :
-            LOG("Je laisse tomber", bavard=bavard)
+            LOG("Je laisse tomber", bavard=bavard+1)
             return étape1, rue, rés_nominatim
 
+        # Recherche d’un autre nom sur nominatim
         else:
-            LOG(f"(normalise_rue) Pas de rue connue à moins de {tol} fautes de frappe de {rue} dans la ville {ville}. Je lance une recherche Nominatim.", bavard=bavard)
+            LOG(f"(normalise_rue) Je lance une recherche Nominatim avec '{rue}, {ville}'.", bavard=bavard)
             lieu = cherche_lieu(Adresse(g, z_d, f"{rue}, {ville}", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
             LOG(f"(normalise_rue) La recherche Nominatim a donné {lieu}.", bavard=bavard)
+            if not lieu:
+                LOG_PB(f"Pas de lieu trouvé pour {rue}")
+                return étape1, rue, lieu
+            
+            nom_osm = None
+            # Préférence pour les ways
             way_osm = [ t.raw for t in lieu if t.raw["osm_type"]=="way"]
             if len(way_osm)>0:            
-                tronçon = way_osm[0] # Je récupère le nom à partir du premier rés, a priori le plus fiable...
-                nom_osm = tronçon["display_name"].split(",")[0]  # est-ce bien fiable ?
-                CacheNomRue.ajoute(étape1, nom_osm, z_d)
-                LOG(f"(normalise_rue) Nouvel essai avec le nom suivant : {nom_osm}", bavard=bavard)
+                nom_osm = way_osm[0]["display_name"].split(",")[0]  # est-ce bien fiable ?
+            else:
+                nom_osm = lieu[0].raw["display_name"].split(",")[0]
+
+            if prétraitement_rue(nom_osm)!=étape1:
+                LOG("Nouveau nom différent de l’ancien")
+                if nv_cache>1:
+                    LOG(f"Je mets dans CacheNomRue la valeur {nom_osm} pour le nom prétraité {étape1}")
+                    CacheNomRue.ajoute(étape1, nom_osm, z_d)
+
+                LOG(f"(normalise_rue) Nom récupéré : {nom_osm}. Je relance normalise_rue avec celui-ci.", bavard=bavard)
                 return normalise_rue(g, z_d, nom_osm, ville, persevérant=False, rés_nominatim=lieu, tol=tol, bavard=bavard)
             else:
-                LOG("Pas de way dans le résultat de la recherche Nominatim.")
-                return étape1, rue, lieu
-
+                LOG(f"Pas de différence significative entre {rue} et {nom_osm}")
+                return étape1, nom_osm, lieu
 
 
     
@@ -220,7 +239,7 @@ class Adresse():
     """
     Attributs
       - num (int)
-      - rue (str) : nom de la rue complet
+      # supprimé - rue (str) : nom de la rue complet
       - rue_norm (str) : nom de rue après normalisation (via normalise_rue)
       - rue_osm (str) : nom de la rue trouvé dans osm (le cas échéant)
       - rue_initiale (str) : le nom initialement fourni à __init__
@@ -252,57 +271,68 @@ class Adresse():
         # numéro de rue et rue
         num, rue_initiale = re.findall("(^[0-9]*) *(.*)", num_rue)[0]
 
-        if bavard>0: print(f"analyse de l’adresse : num={num}, rue_initiale={rue_initiale}, ville={ville_t}")
+        LOG(f"(Adresse.__init__) Analyse de l’adresse : num={num}, rue_initiale={rue_initiale}, ville={ville_t}", bavard=bavard)
         
         # Normalisation de la ville et de la rue
         ville_n = normalise_ville(g, z_d, ville_t) # ville_t doit-elle contenir le code postal ?
         rés_nominatim = None
+        rue_osm = None
+        rue_n = None
         if norm_rue:
-            rue_n, rue, rés_nominatim = normalise_rue(g, z_d, rue_initiale, ville_n, nv_cache=nv_cache)
-        else:
-            rue = rue_initiale
-            rue_n = None
+            rue_n, rue_osm, rés_nominatim = normalise_rue(g, z_d, rue_initiale, ville_n, nv_cache=nv_cache, bavard=bavard-1)
+        # else:
+        #     rue = rue_initiale
+        #     rue_n = None
         
-        if bavard>0: print(f"après normalisation : num={num}, rue_n={rue_n}, rue={rue}, ville_n={ville_n}")
+        LOG(f"(Adresse.__init__) Après normalisation : num={num}, rue_initiale={rue_initiale}, rue_n={rue_n}, rue_osm={rue_osm}, ville_n={ville_n}", bavard=bavard)
 
         # Initialisation des attributs
         if num=="":
             self.num=None
         else:
             self.num=int(num)
-        self.rue = rue
+        #self.rue = rue
         self.rue_initiale=rue_initiale
         self.rue_norm = rue_n
-        self.rue_osm = None
+        self.rue_osm = rue_osm
         self.ville = ville_n
         self.pays=PAYS_DÉFAUT
         self.rés_nominatim=rés_nominatim
 
+        
+    def rue(self):
+        """
+        Renvoie le nom le plus précis disponible pour la rue.
+        """
+        if self.rue_osm:
+            return self.rue_osm
+        else:
+            return self.rue_initiale
 
+    def num_ou_pas(self):
+        """
+        Sortie (str) : self.num+' ' si num présent, '' sinon.
+        """
+        if self.num:
+            return f"{self.num} "
+        else:
+            return ""
+    
     def __str__(self):
         """
         Utilisé en particulier pour l’enregistrement dans chemins.csv, pour l’affichage pour vérification à l’utilisateur, et pour la recherche de coordonnése
         """
-        if self.num is not None:
-            déb=f"{self.num} "
-        else:
-            déb=""
-        if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm}, {self.ville}"
-        else:
-            return f"{déb}{self.rue}, {self.ville}"
+        return f"{self.num_ou_pas()}{self.rue()}, {self.ville}"
         
     def pour_nominatim(self):
         """
         Renvoie une chaîne de car pour la recherche Nominatim non structurée (si échec de la recherche structurée).
         """
-        if self.num is not None:
-            déb=f"{self.num} "
-        else:
-            déb=""
-        if self.rue_osm is not None:
-            return f"{déb}{self.rue_osm}, {self.ville.avec_code()}, {self.pays}"
-        else:
-            return f"{déb}{self.rue}, {self.ville.avec_code()}, {self.pays}"
+        return f"{self.num_ou_pas()}{self.rue()}, {self.ville.avec_code()}, {self.pays}"
 
-
+    
+    def pour_cache(self):
+        """
+        Sortie (str) : chaîne utilisée dans Cache_adresse.
+        """
+        return f"{self.num_ou_pas()}{self.rue()}, {self.ville}"

@@ -1,20 +1,31 @@
 
 À FAIRE :
 
-afficher quand l’adresse a été corrigée.
+bis et ter
+
+départ et arrivée sur les coord précises
+
+Cycla défaut depuis un fichier txt
+
+arbre lex des cles du cache.
+Plus de cache. Pour tous les chemins de la base.
+Avec adresse initiale et adresse obtenue via Nominatim ?
+-> Mettre un cache au niveau de normalise_rue
+    associer adresse entrée à adresse osm
+
+Autocomplétion. https://studygyaan.com/django/implement-search-autocomplete-for-input-fields-in-django
+
 
 vue générique chemins
 
-modif du graphe:
-      - place_en_clique
 
 
 corriger géom ville
 Graphe des villes
 Recherche dans ville voisine
 
-arbre lex des cles du cache
-Plus de cache. Dès que recherche nominatim
+modif du graphe:
+      - place_en_clique
 
 
 NOTES :
