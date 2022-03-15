@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     #path("itinéraireDirect/<str:départ>/<str:arrivée>/<int:pourcentage_détour>", views.vue_itinéraire_direct),
     path("resultat", views.vue_itinéraire, name="résultat"),
+    path("retour", views.trajet_retour, name="retour"),
     
     path("contribution", views.contribution, name="contribution"),
     path("mode_demploi", views.mode_demploi, name="mode d’emploi"),

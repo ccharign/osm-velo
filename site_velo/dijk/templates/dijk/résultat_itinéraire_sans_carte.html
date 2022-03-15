@@ -134,4 +134,16 @@
   
   <input type="submit" class="btn btn-default" value="Recalculer l’itinéraire">
 </form>
+
+
+<!-- Trajet retour -->
+<form action = "{% url 'retour' %}" method="get">
+  <input type="hidden" id="départ" name="départ" value="{{départ}}">
+  <input type="hidden" id="arrivée" name="arrivée" value="{{arrivée}}">
+  <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
+  <input type="hidden" id="étapes" name="étapes" value="{{post_préc.étapes}}" >
+  <input type="hidden" id="rues_interdites" name="rues_interdites" value="{{post_préc.rues_interdites}}" >
+  <input type="hidden" id="pourcentage_détour" name="pourcentage_détour" value="{{post_préc.pourcentage_détour}}" >
+  <input type="submit" class="btn btn-default" value="Trajet retour">
+</form>
 {% endblock %}

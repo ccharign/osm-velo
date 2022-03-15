@@ -149,7 +149,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
 
 
         # Chargement du template
-        p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
+        #p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
         données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
                    "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour))
                    }
@@ -174,7 +174,19 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
         traceback.print_exc()
         return autreErreur(requête, e)
 
+    
+def trajet_retour(requête):
+    """
+    Renvoie le résultat pour le trajet retour de celui reçu dans la requête.
+    """
+    départ=requête.GET["arrivée"]
+    arrivée=requête.GET(["départ"])
+    rues_interdites = [r for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
+    texte_étapes = reversed(énumération_texte(noms_étapes))
+    z_d = g.charge_zone(requête.GET["zone_t"])
+    ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
 
+    return calcul_itinéraires(ps_détour, z_d, noms_étapes, rues_interdites)
 
 ### Ajout d’un nouvel itinéraire ###
 
