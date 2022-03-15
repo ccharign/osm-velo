@@ -161,7 +161,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        "rues_interdites": énumération_texte(rues_interdites),
                        "chemin":chemin.str_joli(),
                        "post_préc":données,
-                       "p_détour_moyen": p_détour_moyen,
+                       #"p_détour_moyen": p_détour_moyen,
                        "zone_t":z_d.nom,
                        "fouine": requête.session.get("fouine", None)
                        }
@@ -180,13 +180,14 @@ def trajet_retour(requête):
     Renvoie le résultat pour le trajet retour de celui reçu dans la requête.
     """
     départ=requête.GET["arrivée"]
-    arrivée=requête.GET(["départ"])
+    arrivée=requête.GET["départ"]
     rues_interdites = [r for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
-    texte_étapes = reversed(énumération_texte(noms_étapes))
+    
+    noms_étapes = [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0]
     z_d = g.charge_zone(requête.GET["zone_t"])
     ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
 
-    return calcul_itinéraires(ps_détour, z_d, noms_étapes, rues_interdites)
+    return calcul_itinéraires(requête, départ, arrivée, ps_détour, z_d, noms_étapes, rues_interdites)
 
 ### Ajout d’un nouvel itinéraire ###
 
