@@ -16,8 +16,8 @@
     
     <div class="col-md-9">
       <!-- La carte -->
+      	Voici l’itinéraire calculé à partir de mes connaissances actuelles. Pour me corriger, utilisez le formulaire en dessous.
       <div class="carte">
-	Voici l’itinéraire calculé à partir de mes connaissances actuelles. Pour me corriger, utilisez le formulaire en dessous.
 	{% block carte %}
 	{% endblock %}
 	<!-- <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire en plein écran dans un onglet séparé </a> -->
@@ -40,7 +40,7 @@
   <!-- Formulaire pour relancer le calcul -->
   <h4> Modifier la recherche </h4>
 
-  <p> Si le trajet proposé ne vous semble pas pertinent, corrigez-le en précisant les champs ci-dessous :
+  <p> Si le trajet proposé ne vous semble pas pertinent, corrigez-moi en précisant les champs ci-dessous :
   {% block relancer_calcul %}
   {% endblock %}
 

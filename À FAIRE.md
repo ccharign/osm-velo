@@ -3,18 +3,14 @@
 
 bis et ter
 
-départ et arrivée sur les coord précises
+départ et arrivée sur les coords précises
 
 Cycla défaut depuis un fichier txt
 
 arbre lex des cles du cache.
-Plus de cache. Pour tous les chemins de la base.
-Avec adresse initiale et adresse obtenue via Nominatim ?
--> Mettre un cache au niveau de normalise_rue
-    associer adresse entrée à adresse osm
 
 Autocomplétion. https://studygyaan.com/django/implement-search-autocomplete-for-input-fields-in-django
-
+Commencer par un champ « ajouter une rue interdite », « ajouter une étape ».
 
 vue générique chemins
 
