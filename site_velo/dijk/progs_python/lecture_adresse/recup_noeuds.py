@@ -167,7 +167,8 @@ def un_seul_nœud(g, z_d, adresse, bavard=0):
         #return [nœud_sur_rue_le_plus_proche(g, coords, adresse)]
         if bavard>0:print(f"Récupération des coordonnées de {adresse} via adresse.data.gouv.fr")
         coords = cherche_adresse_complète(adresse, bavard=bavard)
-        return [nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=bavard-1)]
+        adresse.coords = coords
+        return [nœud_sur_rue_le_plus_proche(g, adresse, bavard=bavard-1)]
     except Exception as e:
         LOG_PB(f"Échec dans cherche_adresse_complète : {e}. Je vais renvoyer tous les nœuds pour {adresse}). J’efface le numéro de l’adresse.")
         adresse.num=None
@@ -223,7 +224,7 @@ def nœuds_rue_of_nom_et_nœud(g, n, nom):
 
 
 
-def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
+def nœud_sur_rue_le_plus_proche(g, adresse, bavard=0):
     """ 
     Entrée : g (graphe)
              adresse (instance de Adresse)
@@ -231,6 +232,7 @@ def nœud_sur_rue_le_plus_proche(g, coords, adresse, bavard=0):
     Renvoie le nœud sur la rue nom_rue le plus proche de coords.
     Les nœuds de la rue seront récupérée via g.nœuds_of_rue.
     """
+    coords = adresse.coords
     nœuds = g.nœuds_of_rue(adresse, bavard=bavard)
     #nœuds = tous_les_nœuds(g, adresse, bavard=bavard-1) ## Ceci peut planter si la rue n'est pas en mémoire...
     

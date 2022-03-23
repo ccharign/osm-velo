@@ -14,7 +14,7 @@ Commencer par un champ « ajouter une rue interdite », « ajouter une étape »
 
 vue générique chemins
 
-
+Passer par un (amenity)
 
 corriger géom ville
 Graphe des villes
