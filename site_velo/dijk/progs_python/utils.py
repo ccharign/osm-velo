@@ -159,7 +159,7 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
             s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct- 1.) * 100.)
 
     tic=perf_counter()
-    dessine(à_dessiner, g, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
+    dessine(à_dessiner, g, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     chrono(tic0, f"Total pour le chemin {c}")
     return res, c, str(d), str(a), [str(é) for é in étapes], [str(é) for é in étapes_interdites]
@@ -205,7 +205,7 @@ def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0, fouine=False):
+def dessine(listes_chemins, g, ad_départ, ad_arrivée,  où_enregistrer, ouvrir=False, bavard=0, fouine=False):
     """
     Entrées :
       - listes_chemins : liste de couples (liste d'Arêtes, couleur)
@@ -224,10 +224,14 @@ def dessine(listes_chemins, g, où_enregistrer, ouvrir=False, bavard=0, fouine=F
         #sous_graphe = g.g.multidigraphe.subgraph(l)
         #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
         carte = folium_of_chemin(g, l, p, carte=carte, color=coul)
-    
-    
-    ajoute_marqueur(l[0].départ.coords(), carte, fouine=fouine)
-    ajoute_marqueur(l[-1].arrivée.coords(), carte, fouine=fouine)
+
+    # Je mets les coords de début et fin du premier itinéraire si les chhamp coords des adresses n’était pas remplis.
+    if not ad_départ.coords:
+        ad_départ.coords=l[0].départ.coords()
+    if not ad_arrivée.coords:
+        ad_arrivée.coords=l[-1].arrivée.coords()
+    ajoute_marqueur(ad_départ, carte, fouine=fouine)
+    ajoute_marqueur(ad_arrivée, carte, fouine=fouine)
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
     carte.save(où_enregistrer)

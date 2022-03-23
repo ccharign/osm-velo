@@ -378,14 +378,14 @@ def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
 
     
         
-def ajoute_marqueur(coords, carte, fouine=False, **kwargs):
+def ajoute_marqueur(ad, carte, fouine=False, **kwargs):
     """
     Entrée :
-        coords, sous la forme (lon, lat)
+        ad (Adresse)
         carte (folium.Map)
     """
-    lon,lat = coords
+    lon,lat = ad.coords
     if fouine:
-        folium.Marker(location=(lat,lon), icon= folium.Icon(icon="paw", color="black", prefix="fa"), **kwargs).add_to(carte)
+        folium.Marker(location=(lat,lon), popup=str(ad), icon= folium.Icon(icon="paw", color="black", prefix="fa"), **kwargs).add_to(carte)
     else:
-        folium.Marker(location=(lat,lon), **kwargs).add_to(carte)
+        folium.Marker(location=(lat,lon), popup=str(ad),**kwargs).add_to(carte)
