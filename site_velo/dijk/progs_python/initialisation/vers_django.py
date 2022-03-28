@@ -500,6 +500,23 @@ def charge_dico_rues_nœuds(ville_d, dico):
     Rue.objects.bulk_create(rues_à_créer)
         
 
+
+def cycla_défaut_of_csv(chemin, bavard=0):
+    """
+    Entrée : adresse d’un csv contenant des nom de rue et des valeurs de cycla défaut
+    Effet : change la cycla défaut des rues concernées.
+    """
+
+    @transaction.atomic()
+    def change_cycla(rue_d, valeur):
+        """
+        Effet : met à valeur la cycla_défaut de toutes les arêtes de la rue.
+        """
+        for a in rue_d.arêtes.all():
+            a.cycla_défaut=valeur
+            a.save()
+
+    
     
 ### Données INSEE ###
 

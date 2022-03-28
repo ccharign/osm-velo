@@ -134,7 +134,9 @@ def tous_les_nœuds(g, z_d, adresse, nv_cache=1, bavard=0):
             LOG(f"Essai 4 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
-            res = nœud_sur_rue_le_plus_proche(g, coords, Adresse(g, z_d, f"{rue}, {ville}", bavard=bavard))
+            ad =  Adresse(g, z_d, f"{rue}, {ville}")
+            ad.coords = coords
+            res = nœud_sur_rue_le_plus_proche(g, ad, bavard=bavard)
             if res:
                 g.met_en_cache(adresse, z_d, [res])
                 return [res]
@@ -238,7 +240,7 @@ def nœud_sur_rue_le_plus_proche(g, adresse, bavard=0):
     
     if nœuds is not None:
         LOG(f"Nœuds récupérés pour la rue de {adresse} : {nœuds}", bavard=bavard)
-        tab = [ (distance_euc(g.coords_of_id_osm(n),coords), n) for n in nœuds ]
+        tab = [ (distance_euc(g.coords_of_id_osm(n), coords), n) for n in nœuds ]
         LOG(f"distances aux nœuds de la rue : {tab}", bavard=bavard)
         _, res = min(tab)
         return res
