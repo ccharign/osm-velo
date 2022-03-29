@@ -1,11 +1,12 @@
 
 À FAIRE :
 
-bis et ter
-
-départ et arrivée sur les coords précises
-
 Cycla défaut depuis un fichier txt
+      -> Comment récupérer les arêtes d’une rue ?
+         Ne serait-il pas préférable de mettre une clef étrangère dans Arête vers Rue ?
+	    -> rajouter un ManyToMany.
+	       remplir au moment de transfert graphe
+
 
 arbre lex des cles du cache.
 
