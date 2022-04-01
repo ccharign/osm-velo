@@ -277,6 +277,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     Effet : transfert le graphe dans la base Django.
     La longueur des arêtes est mise à min(champ "length", d_euc de ses sommets).
     
+    Sortie : arêtes créées, arêtes mises à jour
+    
     Paramètres:
         rapide (int) : pour tout  (s,t) sommets voisins dans g,
                             0 -> efface toutes les arêtes de s vers t et remplace par celles de g
@@ -462,13 +464,13 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     LOG("Ajout de la zone à chaque arête")
     nb=0
     ## nouvelles arêtes -> rajouter zone_d mais aussi les éventuelles anciennes zones.
-    rel_àcréer=[]
+    rel_àcréer = []
     for a_d in à_créer:
         for z in union([zone_d], intersection(a_d.départ.zone.all(), a_d.arrivée.zone.all())):
             rel = Arête.zone.through(arête_id = a_d.id, zone_id = z.id)
             rel_àcréer.append(rel)
     Arête.zone.through.objects.bulk_create(rel_àcréer)
-    ## anciennes arêtes mises à jour -> rajouter zone_d
+    ## anciennes arêtes mises à jour -> rajouter zone_d et ville_d si pas présente.
     rel_àcréer=[]
     for a_d in à_màj:
         if zone_d not in a_d.zone.all() :
@@ -477,6 +479,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         nb+=1
         if nb%1000==0:print(f"    {nb} arêtes traités")
     Arête.zone.through.objects.bulk_create(rel_àcréer)
+
+    return à_créer, à_màj
 
 
 @transaction.atomic()

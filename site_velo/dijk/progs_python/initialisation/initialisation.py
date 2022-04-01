@@ -18,12 +18,12 @@ from initialisation.crée_graphe import crée_graphe_bbox
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues, extrait_nœuds_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
-from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, partie_commune, prétraitement_rue
+from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, partie_commune, prétraitement_rue, normalise_rue
 from graphe_par_networkx import Graphe_nx
-from petites_fonctions import sauv_fichier, chrono
+from petites_fonctions import sauv_fichier, chrono, union
 #from networkx import read_graphml
-from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet, Rue
-from django.db import close_old_connections
+from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet, Rue, Arête
+from django.db import close_old_connections, transaction
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
 
@@ -115,8 +115,18 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
     
     ## Transfert du graphe
     close_old_connections()
-    vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False, rapide=rapide)
+    arêtes_créées, arêtes_màj = vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False, rapide=rapide)
 
+    # Ajout de la ville aux arêtes
+    # print("Ajout de la ville aux arêtes")
+    # rel_àcréer=[]
+    # for a_d in union(arêtes_màj, arêtes_créées):
+    #     if a_d.départ.id_osm in gr_strict and a_d.arrivée.id_osm in gr_strict:
+    #         if ville_d not in a_d.ville.all():
+    #             rel_àcréer.append(Arête.ville.through(arête_id=a_d.id, ville_id=ville_d.id))
+    # print("  bulk_create")
+    # Arête.ville.through.bulk_create(rel_àcréer)
+    # print("  fini")
     
     ville_d.données_présentes = True
     ville_d.save()
@@ -221,3 +231,36 @@ def charge_multidigraph():
     nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
     g = osmnx.load_graphml(nom_fichier)
     return g
+
+
+def charge_fichier_cycla_défaut(g, chemin="/home/moi/git/osm vélo/site_velo/dijk/données/Pau/rues et cyclabilité.txt", zone="Pau_agglo"):
+    """
+    Entrées : g (graphe)
+              chemin (str)
+    Effet : remplit la cycla_défaut des rues indiquées dans le fichier.
+    
+    """
+    z_d = Zone.objects.get(nom=zone)
+    with transaction.atomic():
+        with open(chemin) as entrée:
+            for ligne in entrée:
+                if ligne[:6]=="cycla ":
+                    cycla = 1.1**int(ligne[6:].strip())
+                    print(f"\n\nRues de cyclabilité {cycla}")
+                elif ligne.strip()=="":
+                    None
+                elif ligne[:2]=="à ":
+                    v_d = Ville.objects.get(nom_norm = partie_commune(ligne[2:].strip().replace(":","")))
+                    print(f"\n  Ville {v_d}")
+                else:
+                    nom_n, nom_osm,_ = normalise_rue(g, z_d, ligne.strip(), v_d)
+                    print(f"    {nom_osm}")
+                    rue = Rue.objects.get(nom_norm=nom_n, ville=v_d)
+                    sommets = frozenset(g.dico_Sommet[s] for s in  rue.nœuds())
+                    for s in sommets:
+                        for a in Arête.objects.filter(départ=s).select_related("arrivée"):
+                            if a.arrivée in sommets:
+                                if abs(a.cycla_défaut)< abs(cycla):
+                                    print(f"À mettre à jour : ancienne cycla_défaut {a.cycla_défaut}")
+                                    a.cycla_défaut=cycla
+                                    a.save()
