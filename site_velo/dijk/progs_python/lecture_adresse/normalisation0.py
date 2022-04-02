@@ -10,10 +10,11 @@ def partie_commune(c):
     """ Appliquée à tout : nom de ville, de rue, et adresse complète
     Met en minuscules
     Supprime les tirets
-    Enlève les accents sur les e """
+    Enlève les accents sur les e et les à"""
     étape1 = c.strip().lower().replace("-", " ")
     étape2 = re.sub("é|è|ê|ë", "e", étape1)
-    return étape2
+    étape3 = re.sub("à|ä", "a", étape2)
+    return étape3
     
 
 def normalise_adresse(c):
@@ -34,8 +35,6 @@ def prétraitement_rue(rue):
     """ 
     Après l’étape "partie_commune", supprime les «de », «du », «de la ».
     Si deux espaces consécutives, supprime la deuxième.
-
-    À faire : remplacer les «avenue», «rue», «place», etc par des symboles utf8, de sorte que remplacer l’un par l’autre ne compte que pour une faute de frappe dans la distance d’édition.
     """
     
     étape1 = partie_commune(rue)

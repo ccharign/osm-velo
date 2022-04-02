@@ -343,7 +343,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     # pour profiling
     temps={"correspondance":0., "remplace_arêtes":0., "màj_arêtes":0., "récup_nom":0.}
     nb_appels={"correspondance":0, "remplace_arêtes":0, "màj_arêtes":0, "récup_nom":0}
-    
+
+    # Création du dico sommet -> liste de (voisin, arête) pour les arêtes déjà existantes dans la base.
     dico_voisins={}
     toutes_les_arêtes = Arête.objects.all().select_related("départ", "arrivée")
     for a in toutes_les_arêtes:
@@ -417,6 +418,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         Sortie (Arête list): les arêtes créées.
         """
         #arêtes_d.delete()
+        #LOG(f"arêtes à supprimer : {arêtes_d}", bavard=bavard)
         for a in arêtes_d: a.delete()
         if t in gx[s]:
             arêtes_nx = gx[s][t].values()
@@ -622,6 +624,21 @@ def charge_villes(chemin_pop=os.path.join(RACINE_PROJET, "progs_python/stats/doc
     Ville.objects.bulk_create(à_créer)
 
 
+
+@transaction.atomic()
+def renormalise_noms_villes():
+    """
+    Effet : recalcule le champ nom_norm de chaque ville au moyen de partie_commune.
+    Utile si on changé cette dernière fonction.
+    """
+    n=0
+    for v in Ville.objects.all():
+        if n%500==0: print(f"{n} communes traitées")
+        n+=1
+        v.nom_norm = partie_commune(v.nom_complet)
+        v.save()
+        
+
 def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/géom_villes.json")):
     """
     Rajoute la géométrie des villes à partir du json INSEE.
@@ -636,6 +653,9 @@ def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/d
 
 
 def ajoute_villes_voisines():
+    """
+    Remplit les relations ville-ville dans la base.
+    """
     dico_coords = {} # dico coord -> liste de villes
     à_ajouter=[]
     print("Recherche des voisinages")

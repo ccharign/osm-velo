@@ -155,7 +155,7 @@ class Graphe_django():
     def ville_la_plus_proche(self, nom, tol=2):
         """
         Entrée : nom (str), nom normalisé par partie_commune ou pas d’une ville.
-        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom)
+        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom). La distance est la distance d’édition.
         Paramètres :
             tol (int) : nb max de fautes de frappe. Si aucune ville à au plus tol fautes de frappe, lève l’exception VillePasTrouvée.
         """
