@@ -234,7 +234,7 @@ def charge_multidigraph():
     return g
 
 
-def charge_fichier_cycla_défaut(g, chemin=os.path.join(RACINE_PROJET, "données/Pau/rues et cyclabilité.txt"), zone="Pau_agglo"):
+def charge_fichier_cycla_défaut(g, chemin=os.path.join(RACINE_PROJET, "progs_python/initialisation/données/rues et cyclabilité.txt"), zone="Pau_agglo"):
     """
     Entrées : g (graphe)
               chemin (str)
