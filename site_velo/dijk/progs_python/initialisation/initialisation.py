@@ -26,6 +26,7 @@ from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet, Rue, Ar�
 from django.db import close_old_connections, transaction
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
+from params import RACINE_PROJET
 
 """
 Script pour réinitialiser ou ajouter une nouvelle zone.
@@ -233,7 +234,7 @@ def charge_multidigraph():
     return g
 
 
-def charge_fichier_cycla_défaut(g, chemin="/home/moi/git/osm vélo/site_velo/dijk/données/Pau/rues et cyclabilité.txt", zone="Pau_agglo"):
+def charge_fichier_cycla_défaut(g, chemin=os.path.join(RACINE_PROJET, "données/Pau/rues et cyclabilité.txt"), zone="Pau_agglo"):
     """
     Entrées : g (graphe)
               chemin (str)
