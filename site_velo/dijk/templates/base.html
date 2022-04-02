@@ -23,10 +23,17 @@
 
     <!-- Pour d’autres params -->
     {% block head_début %} {% endblock %}
+
+    <!-- Pour autocomplétion : jquery-ui -->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js"> </script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+
+
+    
   </head>
 
 
-  
+
   <body>
 
 <!-- Autoriser les popover -->
@@ -88,6 +95,31 @@ $(document).ready(function(){
 {% block contenu %} {% endblock %}
 </div>
   </body>
+
+  
+  <script>
+    $(document).ready(function() {
+	$(function () {
+	    $("#départ").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	    });
+	});
+    })
+  </script>
+  <script>
+    $(document).ready(function() {
+	$(function () {
+	    $("#arrivée").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	    });
+	});
+    })
+  </script>
+
+
+  
 
   {% block script %} {% endblock %}
 

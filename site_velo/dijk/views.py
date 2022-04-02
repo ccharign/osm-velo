@@ -7,7 +7,7 @@ import time
 tic0=time.perf_counter()
 
 from dijk.progs_python.params import LOG
-from petites_fonctions import chrono
+from petites_fonctions import chrono, union_liste
 from dijk.progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
@@ -36,7 +36,7 @@ g=Graphe_django()
 from datetime import datetime
 from glob import glob
 import os
-from dijk.models import Chemin_d, Zone, Rue, Ville_Zone
+from dijk.models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
 import forms
 import traceback
 import json
@@ -359,23 +359,29 @@ def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
 def pour_complétion(requête):
     """
     Renvoie la réponse nécessitée par autocomplete.
+    Découpe l’adresse en (num? bis_ter? rue(, ville)?), et cherche des complétions pour rue et ville.
     """
     if "term" in requête.GET:
         if "zone_id" not in requête.session:
             z_d = Zone.objects.get(nom = requête.session["zone"])
             requête.session["zone_id"] = z_d.pk
+        z_id = requête.session["zone_id"]
             
         à_chercher = prétraitement_rue(requête.GET["term"])
         num, bis_ter, rue, ville = découpe_adresse(à_chercher)
         début = " ".join(x for x in [num, bis_ter] if x)
         if début: début+=" "
-        villes = Ville_Zone.objects.filter(zone=requête.session["zone_id"], ville__nom_norm__icontains=ville)
-
+        
+        villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=ville)
         dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in = Subquery(villes.values("ville"))).prefetch_related("ville")
         
         dicos=[]
         for rue in dans_la_base:
             dicos.append( {"label": f"{début}{rue.nom_complet}, {rue.ville.nom_complet}"})
+        for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, zone=z_id):
+            dicos.append( {"label": f"{début}{truc.adresse}"})
+        for chose in CacheNomRue.objects.filter(nom__icontains=rue, zone=z_id):
+            dicos.append( {"label": f"{début}{chose.nom_osm}, {ville}"})
         rés = json.dumps(dicos)
     else:
         rés="fail"
