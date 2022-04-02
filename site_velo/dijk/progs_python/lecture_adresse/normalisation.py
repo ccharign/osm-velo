@@ -8,7 +8,7 @@ import time
 from petites_fonctions import chrono
 import os
 from recup_donnees import cherche_lieu
-from .normalisation0 import partie_commune, normalise_adresse, prétraitement_rue
+from .normalisation0 import partie_commune, normalise_adresse, prétraitement_rue, découpe_adresse
 
 
 class AdresseMalFormée(Exception):
@@ -234,7 +234,9 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
     
 ### Adresses ###
 
-    
+
+
+
 class Adresse():
     """
     Attributs
@@ -254,25 +256,10 @@ class Adresse():
         Entrée :
             g (graphe)
             z_d (Zone)
-            texte d’une adresse. Format : (num)? rue (code_postal? ville)
+            texte d’une adresse. Format : (num)? rue, code_postal? ville
         """
-        
-        # Découpage selon les virgules
-        trucs = texte.split(",")
-        if len(trucs)==1:
-            num_rue, ville_t = trucs[0], ""
-        elif len(trucs)==2:
-            num_rue, ville_t = trucs
-        elif len(trucs)==3:
-            num_rue, ville_t, pays = trucs
-        else:
-            raise AdresseMalFormée(f"Trop de virgules dans {texte}.")
-        ville_t = ville_t.strip()
-        
-        # numéro de rue et rue
-        num, bis_ter, rue_initiale = re.findall("(^[0-9]*) *(bis|ter)? *(.*)", num_rue)[0]
 
-        LOG(f"(Adresse.__init__) Analyse de l’adresse : num={num}, bis_ter={bis_ter}, rue_initiale={rue_initiale}, ville={ville_t}", bavard=bavard)
+        num, bis_ter, rue_initiale, ville_t = découpe_adresse(texte, bavard=bavard)
         
         # Normalisation de la ville et de la rue
         ville_n = normalise_ville(g, z_d, ville_t) # ville_t doit-elle contenir le code postal ?

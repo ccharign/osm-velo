@@ -80,8 +80,6 @@
 <!-- Formulaire pour relancer le calcul -->
 {% block relancer_calcul %}
 <form action = "{% url 'résultat' %}" method="get">
-
-
   
   <div class="from-group">
     <label for="étapes"> Étapes </label>
@@ -131,6 +129,45 @@
 </form>
 
 
+
+<!-- Relance rapide du formulaire -->
+{% block modifs_rapides %}
+
+
+    <!-- Pour autocomplétion : jquery-ui -->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js"> </script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+
+
+<form action = "{% url 'résultat' %}" method="get">
+  
+  <div class="form-group">
+    <label for="une_rue_interdite"> Rues interdites </label>
+    <div class="input-group">
+      <div class="ui-widget">
+	<input type="text" class="form-control" id="une_rue_interdite" name="rues_interdites" >
+      </div>
+      <span class="input-group-addon" data-toggle="popover" data-placement="left" title="Rues à éviter" data-trigger="hover"
+	    data-content="L’algo renverra un itinéraire qui ne suit aucune portion des rues indiquées. Il pourra toutefois en croiser une.">?</span>
+    </div>
+  </div>
+</form>
+
+
+    <script>
+      $(document).ready(function() {
+	  $(function () {
+	      $("#une_rue_interdite").autocomplete({
+		  source: "ajax/recherche_rue",
+		  minLength: 3,
+	      });
+	  });
+      })
+    </script>
+
+{% endblock %}
+
+
 <!-- Trajet retour -->
 <form action = "{% url 'retour' %}" method="get">
   <input type="hidden" id="départ" name="départ" value="{{départ}}">
@@ -142,3 +179,4 @@
   <input type="submit" class="btn btn-default" value="Trajet retour">
 </form>
 {% endblock %}
+
