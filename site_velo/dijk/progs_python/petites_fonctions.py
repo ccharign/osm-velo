@@ -96,6 +96,14 @@ def union(t1, t2):
         if x not in t1:
             yield x
 
+def union_liste(l):
+    """
+    Entrée : l, iterable d’itérables
+    Sortie : itérateur sur l’union des éléments de l
+    """
+    for x in l:
+        for y in x:
+            yield y
 
 def intersection(t1, t2):
     """ Itérateur sur t1 ∩ t2."""

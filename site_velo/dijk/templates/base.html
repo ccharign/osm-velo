@@ -5,30 +5,35 @@
   <head>
     <meta charset="utf-8">
 
-
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.js"></script>
 
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     
+
     
     <!-- Ma feuille de style -->
-    <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}" type="text/css"/>
+    <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}?version=1" type="text/css"/>
     
     <title>{% block titre %}Recherche d’itinéraire{% endblock %}</title>
 
     <!-- Pour d’autres params -->
     {% block head_début %} {% endblock %}
+
+    <!-- Pour autocomplétion : jquery-ui -->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js"> </script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+
+
+    
   </head>
 
 
-  
+
   <body>
 
 <!-- Autoriser les popover -->
@@ -90,6 +95,31 @@ $(document).ready(function(){
 {% block contenu %} {% endblock %}
 </div>
   </body>
+
+  
+  <script>
+    $(document).ready(function() {
+	$(function () {
+	    $("#départ").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	    });
+	});
+    })
+  </script>
+  <script>
+    $(document).ready(function() {
+	$(function () {
+	    $("#arrivée").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	    });
+	});
+    })
+  </script>
+
+
+  
 
   {% block script %} {% endblock %}
 
