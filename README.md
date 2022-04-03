@@ -5,6 +5,10 @@
  Ce projet permet d'utiliser les données d'openstreetmap pour calculer des itinéraires cyclables. Il se présente sous la forme d’une appli Django.
 
  Son intérêt est d'implémenter une partie apprentissage supervisé : après récupération d'une banque d'itinéraires entrés par des cyclistes, une note de cyclabilité est attribuée à chaque tronçon, et les itinéraires sont calculés en en tenant compte.
+ 
+ Plusieurs trajets sont proposés selon la quantité de détour que l’utilisateur accepte pour améliorer le confort et la sécurité.
+ 
+ La géolocalisation est implémentée.
 
  Il est testable ici : http://trajet.pauavelo.fr/
 
