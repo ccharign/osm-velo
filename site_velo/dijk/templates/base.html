@@ -36,12 +36,12 @@
 
   <body>
 
-<!-- Autoriser les popover -->
-<script>
-$(document).ready(function(){
-  $('[data-toggle="popover"]').popover();
-});
-</script>
+    <!-- Autoriser les popover -->
+    <script>
+      $(document).ready(function(){
+	  $('[data-toggle="popover"]').popover();
+      });
+    </script>
 
     <!-- <header> -->
       <nav class="navbar navbar-default">
@@ -87,16 +87,15 @@ $(document).ready(function(){
 	  </div>
 	</div>
       </nav>
-    <!-- </header> -->
-<!-- </br> -->
-<!-- <br> -->
+      <!-- </header> -->
 
-<div class="container-fluid">
-{% block contenu %} {% endblock %}
-</div>
+    <div class="container-fluid">
+      {% block contenu %} {% endblock %}
+    </div>
   </body>
 
   
+  <!-- Autocomplétion -->
   <script>
     $(document).ready(function() {
 	$(function () {
@@ -107,6 +106,7 @@ $(document).ready(function(){
 	});
     })
   </script>
+
   <script>
     $(document).ready(function() {
 	$(function () {
@@ -118,7 +118,27 @@ $(document).ready(function(){
     })
   </script>
 
+  <script>
+    $(document).ready(function() {
+	$(function () {
+	    $("#rues_interdites").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	    });
+	});
+    })
+  </script>
 
+    <script>
+    $(document).ready(function() {
+	$(function () {
+	    $("#étapes").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	    });
+	});
+    })
+  </script>
   
 
   {% block script %} {% endblock %}
