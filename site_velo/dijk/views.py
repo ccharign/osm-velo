@@ -383,7 +383,8 @@ def pour_complétion(requête):
             res = ";".join(tout[:-1]+[début+adresse])
             if ville: res+= ", "+ville
             return res
-        
+
+        # Recherche dans les rues de la base
         villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=ville)
         dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in = Subquery(villes.values("ville"))).prefetch_related("ville")
         
@@ -392,13 +393,15 @@ def pour_complétion(requête):
         for rue in dans_la_base:
             dicos.append( {"label": chaîne_à_renvoyer(rue.nom_complet, rue.ville.nom_complet)})
 
-        
+        # Recherche dans les caches
         for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, zone=z_id):
             # les adresses de Cache_Adresse ont déjà la ville
+            print(f"Trouvé dans Cache_Adresse : {truc}")
             dicos.append( {"label": chaîne_à_renvoyer(truc.adresse)})
             
-        for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue), zone=z_id):
+        for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue)):
             # en revanche dans CacheNomRue il n’y a que le nom de la rue. -> à rajouter ?
+            print(f"Trouvé dans CacheNomRue : {chose}")
             dicos.append( {"label": chaîne_à_renvoyer(chose.nom_osm, ville)})
             
         rés = json.dumps(dicos)
