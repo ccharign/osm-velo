@@ -345,7 +345,7 @@ class Graphe_django():
             LOG(f"rue déjà présente : {r}", bavard=bavard+1)
         except Exception as e:
             nœuds_à_découper = ",".join(map(str, nœuds))
-            rue_d = Rue(nom_complet=adresse.rue, nom_norm=adresse.rue_norm, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+            rue_d = Rue(nom_complet=adresse.rue(), nom_norm=adresse.rue_norm, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
             rue_d.save()
 
             
