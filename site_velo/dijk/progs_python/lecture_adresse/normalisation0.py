@@ -3,23 +3,47 @@
 ### Programmes de normalisation qui n’utilisent pas les modèles (pour éviter les dépendances circulaires) ###
 
 import re
-from petites_fonctions import multi_remplace
+from petites_fonctions import multi_remplace, LOG
 
 
 def partie_commune(c):
     """ Appliquée à tout : nom de ville, de rue, et adresse complète
     Met en minuscules
     Supprime les tirets
-    Enlève les accents sur les e """
+    Enlève les accents sur les e et les à"""
     étape1 = c.strip().lower().replace("-", " ")
     étape2 = re.sub("é|è|ê|ë", "e", étape1)
-    return étape2
+    étape3 = re.sub("à|ä", "a", étape2)
+    return étape3
     
 
 def normalise_adresse(c):
     """ Utilisé pour normaliser les adresses complètes, pour améliorer le cache.
     Actuellement c’est partie_commune(c)"""
     return partie_commune(c)
+
+def découpe_adresse(texte, bavard=0):
+    """
+    Entrée : texte (str)
+    Sortie (str*str*str*str) : num, bis_ter, rue, ville
+    """
+    # Découpage selon les virgules
+    trucs = texte.split(",")
+    if len(trucs)==1:
+        num_rue, ville_t = trucs[0], ""
+    elif len(trucs)==2:
+        num_rue, ville_t = trucs
+    elif len(trucs)==3:
+        num_rue, ville_t, pays = trucs
+    else:
+        raise AdresseMalFormée(f"Trop de virgules dans {texte}.")
+    ville_t = ville_t.strip()
+
+    # numéro de rue et rue
+    num, bis_ter, rue_initiale = re.findall("(^[0-9]*) *(bis|ter)? *(.*)", num_rue)[0]
+
+    LOG(f"(découpe_adresse) Analyse de l’adresse : num={num}, bis_ter={bis_ter}, rue_initiale={rue_initiale}, ville={ville_t}", bavard=bavard)
+    return num, bis_ter, rue_initiale, ville_t
 
 
 DICO_REMP={
@@ -34,8 +58,6 @@ def prétraitement_rue(rue):
     """ 
     Après l’étape "partie_commune", supprime les «de », «du », «de la ».
     Si deux espaces consécutives, supprime la deuxième.
-
-    À faire : remplacer les «avenue», «rue», «place», etc par des symboles utf8, de sorte que remplacer l’un par l’autre ne compte que pour une faute de frappe dans la distance d’édition.
     """
     
     étape1 = partie_commune(rue)

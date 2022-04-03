@@ -1,12 +1,13 @@
 # -*- coding:utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.db.models import  Subquery, Q
 
 import time
 tic0=time.perf_counter()
 
 from dijk.progs_python.params import LOG
-from petites_fonctions import chrono
+from petites_fonctions import chrono, union_liste
 from dijk.progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
@@ -17,6 +18,7 @@ tic=chrono(tic, "chemins", bavard=3)
 #tic=chrono(tic, "charge_graphe", bavard=3)
 
 from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
+from dijk.progs_python.lecture_adresse.normalisation0 import prétraitement_rue
 from dijk.progs_python import recup_donnees
 from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
@@ -26,17 +28,21 @@ from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
 chrono(tic, "utils", bavard=3)
 
 from graphe_par_django import Graphe_django
+from dijk.progs_python.lecture_adresse.normalisation0 import découpe_adresse
+
 g=Graphe_django()
-#g.charge_zone()
+
 
 from datetime import datetime
 from glob import glob
 import os
-from dijk.models import Chemin_d, Zone
+from dijk.models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
 import forms
 import traceback
+import json
+import re
 
-#g=charge_graphe()
+
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
@@ -52,10 +58,10 @@ def get_full_class_name(obj):
 
 
 
-# Utiliser as_view dans url.py pour remplacer les lignes ci-dessous
 def recherche(requête, zone_t):
     z_d = g.charge_zone(zone_t)
     requête.session["zone"]=zone_t
+    requête.session["zone_id"] = z_d.pk
     return render(requête, "dijk/recherche.html", {"ville":z_d.ville_défaut, "zone_t":zone_t})
 
 
@@ -153,6 +159,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
         données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
                    "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour))
                    }
+        #toutes_les_rues = Rue.objects.filter(ville__zone = z_d)
         return render(requête,
                       nom_fichier_html,
                       {"stats": stats,
@@ -163,6 +170,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        "post_préc":données,
                        #"p_détour_moyen": p_détour_moyen,
                        "zone_t":z_d.nom,
+                       #"rues":toutes_les_rues,
                        "fouine": requête.session.get("fouine", None)
                        }
                       )
@@ -188,6 +196,9 @@ def trajet_retour(requête):
     ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
 
     return calcul_itinéraires(requête, départ, arrivée, ps_détour, z_d, noms_étapes, rues_interdites)
+
+
+
 
 ### Ajout d’un nouvel itinéraire ###
 
@@ -342,3 +353,61 @@ def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
     for v in villes:
         res.append( (v,) + pourcentage_piéton_et_pistes_cyclables(v))
     return render(requête, "dijk/pourcentages.html", {"stats":res})
+
+
+
+### Auto complétion ###
+
+
+def pour_complétion(requête):
+    """
+    Renvoie la réponse nécessitée par autocomplete.
+    Laisse tel quel la partie avant le dernier ;
+    Découpe l’adresse en (num? bis_ter? rue(, ville)?), et cherche des complétions pour rue et ville.
+    """
+    if "term" in requête.GET:
+
+        # id de la zone
+        if "zone_id" not in requête.session:
+            z_d = Zone.objects.get(nom = requête.session["zone"])
+            requête.session["zone_id"] = z_d.pk
+        z_id = requête.session["zone_id"]
+
+        # découpage de la chaîne à chercher
+        tout = requête.GET["term"].split(";")
+        à_chercher = prétraitement_rue(tout[-1])
+        num, bis_ter, rue, ville = découpe_adresse(à_chercher)
+        début = " ".join(x for x in [num, bis_ter] if x)
+        if début: début+=" "
+        def chaîne_à_renvoyer(adresse, ville=None):
+            res = ";".join(tout[:-1]+[début+adresse])
+            if ville: res+= ", "+ville
+            return res
+
+        # Recherche dans les rues de la base
+        villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=ville)
+        dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in = Subquery(villes.values("ville"))).prefetch_related("ville")
+        
+        dicos=[]
+        
+        for rue in dans_la_base:
+            dicos.append( {"label": chaîne_à_renvoyer(rue.nom_complet, rue.ville.nom_complet)})
+
+        # Recherche dans les caches
+        for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, zone=z_id):
+            # les adresses de Cache_Adresse ont déjà la ville
+            print(f"Trouvé dans Cache_Adresse : {truc}")
+            dicos.append( {"label": chaîne_à_renvoyer(truc.adresse)})
+            
+        for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue)):
+            # en revanche dans CacheNomRue il n’y a que le nom de la rue. -> à rajouter ?
+            print(f"Trouvé dans CacheNomRue : {chose}")
+            dicos.append( {"label": chaîne_à_renvoyer(chose.nom_osm, ville)})
+            
+        rés = json.dumps(dicos)
+        
+    else:
+        rés="fail"
+        
+    mimeType = "application/json"
+    return HttpResponse(rés, mimeType)

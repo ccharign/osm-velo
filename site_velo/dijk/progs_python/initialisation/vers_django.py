@@ -277,6 +277,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     Effet : transfert le graphe dans la base Django.
     La longueur des arêtes est mise à min(champ "length", d_euc de ses sommets).
     
+    Sortie : arêtes créées, arêtes mises à jour
+    
     Paramètres:
         rapide (int) : pour tout  (s,t) sommets voisins dans g,
                             0 -> efface toutes les arêtes de s vers t et remplace par celles de g
@@ -341,7 +343,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     # pour profiling
     temps={"correspondance":0., "remplace_arêtes":0., "màj_arêtes":0., "récup_nom":0.}
     nb_appels={"correspondance":0, "remplace_arêtes":0, "màj_arêtes":0, "récup_nom":0}
-    
+
+    # Création du dico sommet -> liste de (voisin, arête) pour les arêtes déjà existantes dans la base.
     dico_voisins={}
     toutes_les_arêtes = Arête.objects.all().select_related("départ", "arrivée")
     for a in toutes_les_arêtes:
@@ -415,6 +418,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         Sortie (Arête list): les arêtes créées.
         """
         #arêtes_d.delete()
+        #LOG(f"arêtes à supprimer : {arêtes_d}", bavard=bavard)
         for a in arêtes_d: a.delete()
         if t in gx[s]:
             arêtes_nx = gx[s][t].values()
@@ -462,13 +466,13 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     LOG("Ajout de la zone à chaque arête")
     nb=0
     ## nouvelles arêtes -> rajouter zone_d mais aussi les éventuelles anciennes zones.
-    rel_àcréer=[]
+    rel_àcréer = []
     for a_d in à_créer:
         for z in union([zone_d], intersection(a_d.départ.zone.all(), a_d.arrivée.zone.all())):
             rel = Arête.zone.through(arête_id = a_d.id, zone_id = z.id)
             rel_àcréer.append(rel)
     Arête.zone.through.objects.bulk_create(rel_àcréer)
-    ## anciennes arêtes mises à jour -> rajouter zone_d
+    ## anciennes arêtes mises à jour -> rajouter zone_d et ville_d si pas présente.
     rel_àcréer=[]
     for a_d in à_màj:
         if zone_d not in a_d.zone.all() :
@@ -477,6 +481,8 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         nb+=1
         if nb%1000==0:print(f"    {nb} arêtes traités")
     Arête.zone.through.objects.bulk_create(rel_àcréer)
+
+    return à_créer, à_màj
 
 
 @transaction.atomic()
@@ -618,6 +624,21 @@ def charge_villes(chemin_pop=os.path.join(RACINE_PROJET, "progs_python/stats/doc
     Ville.objects.bulk_create(à_créer)
 
 
+
+@transaction.atomic()
+def renormalise_noms_villes():
+    """
+    Effet : recalcule le champ nom_norm de chaque ville au moyen de partie_commune.
+    Utile si on changé cette dernière fonction.
+    """
+    n=0
+    for v in Ville.objects.all():
+        if n%500==0: print(f"{n} communes traitées")
+        n+=1
+        v.nom_norm = partie_commune(v.nom_complet)
+        v.save()
+        
+
 def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/docs/géom_villes.json")):
     """
     Rajoute la géométrie des villes à partir du json INSEE.
@@ -632,6 +653,9 @@ def charge_géom_villes(chemin=os.path.join(RACINE_PROJET, "progs_python/stats/d
 
 
 def ajoute_villes_voisines():
+    """
+    Remplit les relations ville-ville dans la base.
+    """
     dico_coords = {} # dico coord -> liste de villes
     à_ajouter=[]
     print("Recherche des voisinages")

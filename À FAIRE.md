@@ -1,16 +1,15 @@
 
 À FAIRE :
 
-bis et ter
-
-départ et arrivée sur les coords précises
-
-Cycla défaut depuis un fichier txt
 
 arbre lex des cles du cache.
 
-Autocomplétion. https://studygyaan.com/django/implement-search-autocomplete-for-input-fields-in-django
-Commencer par un champ « ajouter une rue interdite », « ajouter une étape ».
+Formulaire de correction rapide.
+  -> juste rajouter un nom de rue interdite ou une étape.
+
+Tester les forms de Django avec bs3form
+
+Ajouter la ville dans le cache CacheNomRue
 
 vue générique chemins
 

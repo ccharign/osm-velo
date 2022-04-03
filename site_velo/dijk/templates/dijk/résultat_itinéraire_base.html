@@ -11,34 +11,41 @@
 {% endblock %}
 {% endif %}
 
+<!-- Formulaire de relance simplifié -->
+{% block modifs_rapides %}
+{% endblock %}
 
-  <div class="row">
+
+<!-- Carte et stats -->
+<div class="row">
     
-    <div class="col-md-9">
-      <!-- La carte -->
+  <div class="col-md-9">
+    <!-- La carte -->
       	Voici l’itinéraire calculé à partir de mes connaissances actuelles. Pour me corriger, utilisez le formulaire en dessous.</br>
-      <div class="carte">
-	{% block carte %}
-	{% endblock %}
+    <div class="carte">
+      {% block carte %}
+      {% endblock %}
 	<!-- <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire en plein écran dans un onglet séparé </a> -->
-      </div>
     </div>
-
-    <div class="col-sm-3">
+  </div>
+  
+  <div class="col-sm-3">
       <!-- Statistiques -->
       <h4> Longueurs et traces gps </h4>
       {% block stats %}
       {% endblock %}
-
+      
       {% if fouine %}
       <img src="{% static 'dijk/fouine.jpeg' %}">
       {% endif %}
-    </div>
   </div>
+</div>
 
 <br><br>
-  <!-- Formulaire pour relancer le calcul -->
-  <h4> Modifier la recherche </h4>
+
+
+<!-- Formulaire pour relancer le calcul -->
+<h4> Modifier la recherche </h4>
 
   <p> Si le trajet proposé ne vous semble pas pertinent, corrigez-moi en précisant les champs ci-dessous :
   {% block relancer_calcul %}

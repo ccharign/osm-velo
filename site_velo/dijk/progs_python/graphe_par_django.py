@@ -155,7 +155,7 @@ class Graphe_django():
     def ville_la_plus_proche(self, nom, tol=2):
         """
         Entrée : nom (str), nom normalisé par partie_commune ou pas d’une ville.
-        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom)
+        Sortie (Ville) : instance de models.Ville dont le nom normalisé est le plus proche de partie_commune(nom). La distance est la distance d’édition.
         Paramètres :
             tol (int) : nb max de fautes de frappe. Si aucune ville à au plus tol fautes de frappe, lève l’exception VillePasTrouvée.
         """
@@ -345,7 +345,7 @@ class Graphe_django():
             LOG(f"rue déjà présente : {r}", bavard=bavard+1)
         except Exception as e:
             nœuds_à_découper = ",".join(map(str, nœuds))
-            rue_d = Rue(nom_complet=adresse.rue, nom_norm=adresse.rue_norm, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
+            rue_d = Rue(nom_complet=adresse.rue(), nom_norm=adresse.rue_norm, ville=ville_d, nœuds_à_découper=nœuds_à_découper)
             rue_d.save()
 
             
