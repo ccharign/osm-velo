@@ -359,12 +359,14 @@ def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
 ### Auto complétion ###
 
 
-def pour_complétion(requête):
+def pour_complétion(requête, nbMax = 10):
     """
     Renvoie la réponse nécessitée par autocomplete.
     Laisse tel quel la partie avant le dernier ;
     Découpe l’adresse en (num? bis_ter? rue(, ville)?), et cherche des complétions pour rue et ville.
+    nbMax : nb max de résultat. S’il y en a plus, aucun n’est renvoyé.
     """
+    mimeType = "application/json"
     if "term" in requête.GET:
 
         # id de la zone
@@ -393,6 +395,8 @@ def pour_complétion(requête):
         for rue in dans_la_base:
             dicos.append( {"label": chaîne_à_renvoyer(rue.nom_complet, rue.ville.nom_complet)})
 
+        if len(dicos)>nbMax:
+            return HttpResponse("fail", mimeType)
         # Recherche dans les caches
         for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, zone=z_id):
             # les adresses de Cache_Adresse ont déjà la ville
@@ -409,5 +413,5 @@ def pour_complétion(requête):
     else:
         rés="fail"
         
-    mimeType = "application/json"
+
     return HttpResponse(rés, mimeType)
