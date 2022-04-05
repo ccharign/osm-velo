@@ -10,3 +10,8 @@ class FormCycla(forms.Form):
     zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label='Zone')
     force_calcul = forms.BooleanField(label="Forcer le calcul", required=False)
     
+class ChoixZone(forms.Form):
+    """
+    Choix de zone. A priori pour la page d'index.
+    """
+    zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label='Zone')

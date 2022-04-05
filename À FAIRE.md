@@ -1,6 +1,8 @@
 
 À FAIRE :
 
+Rajouter la ville dans les deux caches.
+L'utiliser dans la complétion auto.
 
 arbre lex des cles du cache.
 
@@ -11,7 +13,7 @@ Tester les forms de Django avec bs3form
 
 Ajouter la ville dans le cache CacheNomRue
 
-vue générique chemins
+Tester vue générique pour chemins
 
 Passer par un (amenity)
 

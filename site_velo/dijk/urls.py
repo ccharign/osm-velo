@@ -19,7 +19,7 @@ urlpatterns = [
     path("pourcentages_res/", views.vue_pourcentages_piétons_pistes_cyclables, name = "stats"),
     
     path("cycla/<str:zone_t>", views.carte_cycla, name="carte cycla"),
-    path("cycla/", views.cycla_choix, name = "cycla"),    
+    path("cycla/", views.choix_cycla, name = "cycla"),    
 
     path("telechargement/", views.téléchargement, name = "téléchargement"),
 

@@ -270,15 +270,27 @@ def téléchargement(requête):
 
 
 # Version formulaire de Django
-def cycla_choix(requête):
+def choix_cycla(requête):
     if requête.method == "POST":
         # On est arrivé ici après remplissage du formulaire
         form = forms.FormCycla(requête.POST)
         if form.is_valid():
             return carte_cycla(requête)
     else:
+        # Formulaire pas encore rempli (premier appel)
         form = forms.FormCycla()
     return render(requête, "dijk/cycla_choix.html", {"form":form})
+
+
+def choix_zone(requête):
+    if requête.method == "POST":
+        form = forms.ChoixZone(requête.POST)
+        if form.is_valid():
+            return carte_cycla(requête)
+    else:
+        form = forms.ChoixZone()
+    return render(requête, "dijk/index.html", {"form":form})
+
 
 
 def carte_cycla(requête):
