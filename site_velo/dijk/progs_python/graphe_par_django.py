@@ -349,8 +349,12 @@ class Graphe_django():
             rue_d.save()
 
             
-    def met_en_cache(self, adresse, z_d, res):
-        ligne = Cache_Adresse(adresse=adresse.pour_cache(), zone=z_d, nœuds_à_découper = ",".join(map(str,res)))
+    def met_en_cache(self, adresse, res):
+        ligne = Cache_Adresse(
+            adresse=adresse.pour_cache(),
+            vile=Ville.objects.get(adresse.ville.nom_complet),
+            nœuds_à_découper = ",".join(map(str,res))
+        )
         ligne.save()
         LOG(f"Mis en cache : {ligne}", bavard=1)
 
@@ -360,7 +364,7 @@ class Graphe_django():
         Sortie : liste des nœuds si présente dans le cache, None sinon
         À FAIRE : arbre lex
         """
-        res = Cache_Adresse.objects.filter(adresse=adresse.pour_cache())
+        res = Cache_Adresse.objects.filter(adresse=adresse.pour_cache(), ville__nom_complet=adresse.ville.nom_complet)
         if len(res)==1:
             return res[0].nœuds()
         elif len(res)>1:

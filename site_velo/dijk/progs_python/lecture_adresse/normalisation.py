@@ -141,14 +141,17 @@ def arbre_rue_dune_ville(ville_d, rues):
 
 # ---> dans g.arbres_des_rues
 
-def dans_cache_nom_rue(nom, z_d):
+def dans_cache_nom_rue(nom, ville):
     """
     Entrée :
       nom (str), nom passé par la fonction prétraitement_rue
-      z_d (Zone)
+      ville (normalisation.Ville)
     Sortie (str ou None) : nom_osm associé à nom dans CacheNomRue s’il y en a un.
     """
-    essai = CacheNomRue.objects.filter(nom=nom, zone=z_d)
+    essai = CacheNomRue.objects.filter(
+        nom=nom,
+        ville__nom_complet=ville.nom_complet
+    )
     if essai: return essai.first().nom_osm
 
 
@@ -183,7 +186,7 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
         LOG(f"(normalise_rue) {étape1} pas dans l’arbre lex des rues de {ville} ({tol} fautes de frappes tolérées).", bavard=bavard)
 
         # Autre nom dans le cache ?
-        essai = dans_cache_nom_rue(étape1, z_d)
+        essai = dans_cache_nom_rue(étape1, ville)
         if essai and rue!=essai:
             LOG(f"J’ai trouvé {essai} dans le cache.", bavard=bavard)            
             #return normalise_rue(g, z_d, essai, ville, persevérant=persevérant, bavard=bavard, rés_nominatim=rés_nominatim, nv_cache=0, tol=tol)
@@ -222,7 +225,7 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
                 LOG("Nouveau nom différent de l’ancien")
                 if nv_cache>1:
                     LOG(f"Je mets dans CacheNomRue la valeur {nom_osm} pour le nom prétraité {étape1}")
-                    CacheNomRue.ajoute(étape1, nom_osm, z_d)
+                    CacheNomRue.ajoute(étape1, nom_osm, ville)
 
                 LOG(f"(normalise_rue) Nom récupéré : {nom_osm}. Je relance normalise_rue avec celui-ci.", bavard=bavard)
                 return normalise_rue(g, z_d, nom_osm, ville, persevérant=False, rés_nominatim=lieu, tol=tol, bavard=bavard)
@@ -326,4 +329,4 @@ class Adresse():
         """
         Sortie (str) : chaîne utilisée dans Cache_adresse.
         """
-        return f"{self.num_ou_pas()}{self.rue()}, {self.ville}"
+        return f"{self.num_ou_pas()}{self.rue()}"

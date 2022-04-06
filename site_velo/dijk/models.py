@@ -315,10 +315,10 @@ class Cache_Adresse(models.Model):
     Ceci est destiné aux lieux particuliers (bars, bâtiment administratifs, etc. )
     """
     adresse = models.CharField(max_length=200, unique=True)
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
     nœuds_à_découper = models.TextField()
     def __str__(self):
-        return f"{self.adresse}, {self.zone}"
+        return f"{self.adresse}, {self.ville}"
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
@@ -329,29 +329,29 @@ class CacheNomRue(models.Model):
     attribut:
       - nom (str) : nom traité par prétraitement_rue
       - nom_osm (str)
-      - zone (Zone)
+      - ville (Ville)
     Une ligne est ajoutée dans cette table lorsqu’une recherche nominatim sur nom a fourni nom_osm.
     """
     nom = models.CharField(max_length=200)
     nom_osm = models.CharField(max_length=200)
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
     class Meta:
         constraints=[
-            models.UniqueConstraint(fields=["nom", "zone"], name = "Une seule entrée pour chaque (nom, zone).")
+            models.UniqueConstraint(fields=["nom", "ville"], name = "Une seule entrée pour chaque (nom, ville).")
         ]
 
     @classmethod
-    def ajoute(cls, nom, nom_osm, z_d):
+    def ajoute(cls, nom, nom_osm, ville):
         """
         Effet : Crée si pas déjà présent une entrée du cache. Si une entrée est déjà présente pour (nom, z_d), nom_osm est mis à jour.
         Sortie : l’instance créé ou trouvée.
         """
-        essai = cls.objects.filter(nom=nom, zone=z_d).first()
+        essai = cls.objects.filter(nom=nom, ville__nom_complet=ville.nom_complet).first()
         if essai:
             essai.nom=nom_osm
             essai.save()
             return essai
         else:
-            res = cls(nom=nom, nom_osm=nom_osm, zone=z_d)
+            res = cls(nom=nom, nom_osm=nom_osm, ville__nom_complet=ville.nom_complet)
             res.save()
             return res

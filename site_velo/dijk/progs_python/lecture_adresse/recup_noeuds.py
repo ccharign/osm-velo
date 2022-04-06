@@ -50,7 +50,7 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
         #     if s not in g :
         #        raise ValueError("Le nœud {s} obtenu pour {c} n’est pas dans le graphe. Liste des nœuds obtenus : {res_d}.")
         if mettre_en_cache:
-            g.met_en_cache(ad, z_d, res)
+            g.met_en_cache(ad, res)
             print(f"(nœuds_of_étape) Mis en cache : {res} pour {ad}")
         return res, ad
 
@@ -124,7 +124,7 @@ def tous_les_nœuds(g, z_d, adresse, nv_cache=1, bavard=0):
                 nœuds_de_g = [ n["osm_id"] for n in nœuds_osm if n["osm_id"] in g ]
                 if len(nœuds_de_g) > 0:
                     LOG("J’ai trouvé des nœuds de g dans le résultat de Nominatim", bavard=bavard+1)
-                    g.met_en_cache(adresse, z_d, nœuds_de_g)
+                    g.met_en_cache(adresse,  nœuds_de_g)
                     return nœuds_de_g
             
             
@@ -138,7 +138,7 @@ def tous_les_nœuds(g, z_d, adresse, nv_cache=1, bavard=0):
             ad.coords = coords
             res = nœud_sur_rue_le_plus_proche(g, ad, bavard=bavard)
             if res:
-                g.met_en_cache(adresse, z_d, [res])
+                g.met_en_cache(adresse, [res])
                 return [res]
             #return [g.nœud_le_plus_proche( coords, recherche=f"Depuis tous_les_nœuds pour {adresse}." )]
         
