@@ -1,8 +1,12 @@
 
 À FAIRE :
 
-Rajouter la ville dans les deux caches.
-L'utiliser dans la complétion auto.
+
+Mettre une case à cocher pour enregistrer dans le cache ?
+   -> utils.itinéraire renvoie les corrections qui ont été faites
+   -> voir le template rés_itinéraire_base
+
+Recherche dans l’arbre lex dans la complétion automatique, avec tolérance à faute de frappe.
 
 arbre lex des cles du cache.
 
@@ -11,7 +15,6 @@ Formulaire de correction rapide.
 
 Tester les forms de Django avec bs3form
 
-Ajouter la ville dans le cache CacheNomRue
 
 Tester vue générique pour chemins
 
