@@ -285,7 +285,7 @@ def choix_zone(requête):
     if requête.method == "POST":
         form = forms.ChoixZone(requête.POST)
         if form.is_valid():
-            return carte_cycla(requête)
+            return recherche(requête, requête.POST["zone_t"])
     else:
         form = forms.ChoixZone()
     return render(requête, "dijk/index.html", {"form":form})

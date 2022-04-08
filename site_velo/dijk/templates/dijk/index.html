@@ -4,11 +4,18 @@
 
 Choisissez votre zone (plus la zone est petite et plus le chargement est rapide (ou moins lent)) :
 
-<ul>
-  {% for z in zones %}
-  <li> <a href="{% url 'index'%}{{z}}"> {{z}} </a> </li>
-  {% endfor %}
-</ul>
+<!-- <ul> -->
+<!--   {% for z in zones %} -->
+<!--   <li> <a href="{% url 'index'%}{{z}}"> {{z}} </a> </li> -->
+<!--   {% endfor %} -->
+<!-- </ul> -->
+
+<form action="" method="post">
+    {% csrf_token %}
+    <!--  bootstrap_form form  -->
+    {{form}}
+    <input type="submit" value="C’est parti">
+</form>
 
 
 {% endblock %}

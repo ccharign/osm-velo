@@ -5,6 +5,7 @@
 Mettre une case à cocher pour enregistrer dans le cache ?
    -> utils.itinéraire renvoie les corrections qui ont été faites
    -> voir le template rés_itinéraire_base
+Voire récup dans osm tous les noms de lieux ?
 
 Recherche dans l’arbre lex dans la complétion automatique, avec tolérance à faute de frappe.
 
