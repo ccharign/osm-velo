@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block contenu %}
 
 
@@ -8,13 +9,20 @@ Choisissez votre zone (plus la zone est petite et plus le chargement est rapide 
 <!--   {% for z in zones %} -->
 <!--   <li> <a href="{% url 'index'%}{{z}}"> {{z}} </a> </li> -->
 <!--   {% endfor %} -->
-<!-- </ul> -->
+  <!-- </ul> -->
+
+{% load bootstrap3 %}
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
 
 <form action="" method="post">
-    {% csrf_token %}
-    <!--  bootstrap_form form  -->
-    {{form}}
-    <input type="submit" value="C’est parti">
+  {% csrf_token %}
+  
+  {% bootstrap_form form %}
+  
+  {% buttons %}
+  <button type="submit" class="btn btn-primary">C’est parti</button>
+  {% endbuttons %}
 </form>
 
 

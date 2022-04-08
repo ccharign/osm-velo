@@ -14,4 +14,4 @@ class ChoixZone(forms.Form):
     """
     Choix de zone. A priori pour la page d'index.
     """
-    zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label='Zone')
+    zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label="")

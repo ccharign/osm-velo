@@ -285,9 +285,11 @@ def choix_zone(requête):
     if requête.method == "POST":
         form = forms.ChoixZone(requête.POST)
         if form.is_valid():
-            return recherche(requête, requête.POST["zone_t"])
+            z_d = Zone.objects.get(pk=requête.POST["zone"])
+            return recherche(requête, z_d.nom)
     else:
         form = forms.ChoixZone()
+        print(f"Requête pas POST, formulaire créé : {form}")
     return render(requête, "dijk/index.html", {"form":form})
 
 

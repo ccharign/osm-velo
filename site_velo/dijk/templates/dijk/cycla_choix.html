@@ -15,8 +15,9 @@ Choisissez la zone de laquelle afficher la carte de la cyclabilité :
     {% csrf_token %}
     {% bootstrap_form form %}
 
-    <input type="submit" value="C’est parti">
-
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">C’est parti</button>
+    {% endbuttons %}
 </form>
 
 L’option « force_calcul » force le calcul de la carte, même si elle est déjà présente en mémoire (pour le cas où les données auraient changé depuis le dernier calcul).
