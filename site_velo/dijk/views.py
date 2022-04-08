@@ -32,7 +32,6 @@ from dijk.progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
 g=Graphe_django()
 
-
 from datetime import datetime
 from glob import glob
 import os
@@ -391,34 +390,38 @@ def pour_complétion(requête, nbMax = 10):
         tout = requête.GET["term"].split(";")
         à_chercher = prétraitement_rue(tout[-1])
         num, bis_ter, rue, ville = découpe_adresse(à_chercher)
+        print(f"Recherche de {rue}")
         début = " ".join(x for x in [num, bis_ter] if x)
         if début: début+=" "
+        
         def chaîne_à_renvoyer(adresse, ville=None):
             res = ";".join(tout[:-1]+[début+adresse])
             if ville: res+= ", "+ville
             return res
 
-        # Recherche dans les rues de la base
+        # Villes de la zone z_id
         villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=ville)
-        dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in = Subquery(villes.values("ville"))).prefetch_related("ville")
-        
+        req_villes = Subquery(villes.values("ville"))
+
         dicos=[]
         
-        for rue in dans_la_base:
-            dicos.append( {"label": chaîne_à_renvoyer(rue.nom_complet, rue.ville.nom_complet)})
+        # Recherche dans les rues de la base
+        dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in =req_villes ).prefetch_related("ville")
+        for rue_trouvée in dans_la_base:
+            dicos.append( {"label": chaîne_à_renvoyer(rue_trouvée.nom_complet, rue_trouvée.ville.nom_complet)})
 
         if len(dicos)>nbMax:
+            print(f"Nombre de résultats : {len(dicos)}. C’est trop.")
             return HttpResponse("fail", mimeType)
+        
         # Recherche dans les caches
-        for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, zone=z_id):
-            # les adresses de Cache_Adresse ont déjà la ville
+        for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, ville__in =req_villes).prefetch_related("ville"):
             print(f"Trouvé dans Cache_Adresse : {truc}")
-            dicos.append( {"label": chaîne_à_renvoyer(truc.adresse)})
+            dicos.append( {"label": chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)})
             
-        for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue)):
-            # en revanche dans CacheNomRue il n’y a que le nom de la rue. -> à rajouter ?
+        for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue), ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans CacheNomRue : {chose}")
-            dicos.append( {"label": chaîne_à_renvoyer(chose.nom_osm, ville)})
+            dicos.append( {"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
             
         rés = json.dumps(dicos)
         

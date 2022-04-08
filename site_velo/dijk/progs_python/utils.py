@@ -330,7 +330,7 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
     
 ### Apprentissage ###
 
-def lecture_tous_les_chemins(g, z_t=None, bavard=0):
+def lecture_tous_les_chemins(g, z_t=None, bavard=2):
     """
     Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
     """

@@ -352,6 +352,6 @@ class CacheNomRue(models.Model):
             essai.save()
             return essai
         else:
-            res = cls(nom=nom, nom_osm=nom_osm, ville__nom_complet=ville.nom_complet)
+            res = cls(nom=nom, nom_osm=nom_osm, ville= Ville.objects.get(nom_complet= ville.nom_complet))
             res.save()
             return res

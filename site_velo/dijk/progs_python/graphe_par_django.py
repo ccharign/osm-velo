@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 
-from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse, Zone
+from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse, Zone, Ville_Zone
 import recup_donnees as rd
 from params import LOG, STR_VILLE_DÉFAUT, DONNÉES
 from petites_fonctions import deuxConséc, chrono, distance_euc
 from time import perf_counter
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Subquery
 import dijkstra
 from lecture_adresse.arbresLex import ArbreLex
 import os
@@ -64,8 +64,9 @@ class Graphe_django():
 
             ## Cache
             print("Chargement du cache")
+            villes = Ville_Zone.objects.filter(zone=z_d)
             self.arbre_cache[zone_t] = ArbreLex.of_iterable(
-                [str(a.adresse) for a in Cache_Adresse.objects.filter(zone=z_d)]
+                [str(a.adresse) for a in Cache_Adresse.objects.filter(ville__in = Subquery(villes.values("ville")))]
             )
 
             #tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
@@ -352,7 +353,7 @@ class Graphe_django():
     def met_en_cache(self, adresse, res):
         ligne = Cache_Adresse(
             adresse=adresse.pour_cache(),
-            vile=Ville.objects.get(adresse.ville.nom_complet),
+            ville=Ville.objects.get(nom_complet = adresse.ville.nom_complet),
             nœuds_à_découper = ",".join(map(str,res))
         )
         ligne.save()
