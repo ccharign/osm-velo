@@ -66,7 +66,7 @@ def recherche(requête, zone_t):
 
 def fouine(requête):
     requête.session["fouine"] = True
-    return index(requête) 
+    return choix_zone(requête) 
 
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
