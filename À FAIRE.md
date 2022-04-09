@@ -1,6 +1,11 @@
 
 À FAIRE :
 
+Amenities : les charger dans la base, et les mettre dans la complétion auto.
+Chercher dedans dans chemins.Étape
+Traduire en français
+
+Faire un passer par un(e) ...
 
 Mettre une case à cocher pour enregistrer dans le cache ?
    -> utils.itinéraire renvoie les corrections qui ont été faites
@@ -13,9 +18,6 @@ arbre lex des cles du cache.
 
 Formulaire de correction rapide.
   -> juste rajouter un nom de rue interdite ou une étape.
-
-Tester les forms de Django avec bs3form
-
 
 Tester vue générique pour chemins
 

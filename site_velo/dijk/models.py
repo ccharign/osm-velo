@@ -355,3 +355,8 @@ class CacheNomRue(models.Model):
             res = cls(nom=nom, nom_osm=nom_osm, ville= Ville.objects.get(nom_complet= ville.nom_complet))
             res.save()
             return res
+
+
+class Amenity(models.Model):
+    nom = models.TextField()
+    

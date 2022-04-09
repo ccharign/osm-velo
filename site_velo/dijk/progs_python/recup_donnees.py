@@ -237,7 +237,26 @@ def coord_nœud(id_nœud):
 
 
 
-
+def récup_amenities(ville, bavard=0):
+    """
+    Entrée : ville (instance de normalisation.Ville)
+    Sortie : liste de dico des amenities avec un nom de la ville.
+    """
+    api = overpy.Overpass()
+    requête = f"""
+    area[name="{ville.nom_complet}"]->.searchArea;
+    (
+    node["amenity"]["name"](area.searchArea);
+    );
+    out;"""
+    if bavard>0:print(requête)
+    res_req = api.query(requête)
+    res=[]
+    for n in res_req.nodes:
+        d = {"id_osm":n.id, "lon":float(n.lon), "float":float(n.lat)}
+        d.update(n.tags)
+        res.append(d)
+    return res
 
 
 
