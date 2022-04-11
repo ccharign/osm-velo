@@ -25,5 +25,6 @@ site_velo/dijk/données/Pau/sauv**
 **.db
 **.sqlite3
 **/données**
+!**/données_à_charger**
 passenger.log
 site_velo/db.sqlite*

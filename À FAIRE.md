@@ -1,6 +1,8 @@
 
 À FAIRE :
 
+Rajouter allées du parc en vert
+
 Amenities : les charger dans la base, et les mettre dans la complétion auto.
 Chercher dedans dans chemins.Étape
 Traduire en français

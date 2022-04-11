@@ -1,0 +1,335 @@
+cycla 2
+
+à Pau:
+grande allée centrale
+allée de la laïcité
+rue suzanne bacarisse
+boulevard hauterive
+la coulée verte
+rue andré mitton
+avenue louis sallenave
+piste cyclable uppa est
+avenue louis sallenave
+boulevard de l’aviation
+rue renée char
+chemin de bernadou
+avenue de saragosse
+cours lyautey
+avenue dufau
+avenue robert schuman
+avenue d’attigny
+avenue fouchet
+rue ronsard
+boulevard du recteur jean sarrailh
+rue théo lanne
+avenue des sayettes
+rue alfred de vigny
+avenue jeliotte
+avenue des lauriers
+rue lavignotte
+avenue des acacias
+rue de l’abbé ludovic gaurier
+allée pierre laroque
+boulevard des pyrénées
+rue adoue
+allée de l’émir abd el-kader
+rue des bains
+rue du hédas
+avenue du stade d’eaux vives
+V81
+
+
+à Lons:
+chemin salié
+voie paris-madrid
+V81
+pont bleu
+
+
+à Billère:
+piste cyclable du balaïtous
+rue laffitte
+rue rené vitel
+rue de galas
+passage bellevue
+rue du lacaou
+rue des marnières
+rue vignau
+rue du golf
+rue virgilio peña córdoba
+V81
+
+
+
+à Lescar:
+chemin de la teulère
+
+
+à Gelos:
+rue pierre mounaud
+rue magendie
+V81
+
+
+
+à Mazère-Lezons:
+rue louis barthou
+avenue de la république
+rue pasteur
+V81
+
+
+à Jurançon:
+voie verte de la vallée d’ossau
+chemin soubacq
+chemin de gaspé
+
+
+
+
+cycla 1
+
+à Pau:
+chemin de bastard
+allèe de bastard
+chemin de la forêt de bastard
+avenue de montardon
+chemin vert
+boulevard de l’oussère (entre le chemin vert et l’avenue philippon)
+avenue philippon (uniquement au sud du boulevard de l’oussère)
+allée de la laïcité (uniquement entre la rue suzanne bacarisse et le boulevard olof palme)
+rue monseigneur campo
+avenue de buros (uniquement entre le boulevard tourasse et la rue monseigneur campo)
+sentier sans nom entre l’avenue de buros et l’avenue des lilas au nord de la rue de condom
+rue cassiopée (piste cyclable)
+chemin guilhem
+rue blanqui
+avenue léon blum
+rue paul bert
+rue louis chuchague
+rue georges mandel
+rue marx dormoy
+chemin labriart
+avenue de buros (uniquement entre le boulevard tourasse et le boulevard de la paix)
+chemin des écoliers
+avenue pierre massé
+rue jean genèze
+rue audrey benghozi
+boulevard lucien favre
+avenue du doyen robert poplawski
+rue saint john perse
+cours léon bérard (uniquement à l’est du rond-point des droits de l’homme)
+avenue de l’université
+rue paul et jean-claude camors
+boulevard du recteur jean sarrailh (uniquement à l’est de la rue paul et jean-claude camors)
+avenue rhin et danube
+avenue du président kennedy
+rue du sergent bernès-cambot
+rue victor ladeveze
+rue du père pardies
+rue viard
+rue carnot
+rue golda meir
+rue paul et henri courteault
+rue mozart
+impasse du pic d’aneto
+rue jacques prévert
+rue sambre et meuse
+rue louis blériot
+rue paul mirat
+rue frédéric mistral
+rue simin palay
+avenue norman prince
+allée de morlaàs
+rue du comte de saint-cricq
+boulevard du corps franc pommiès et du 49e régiment d’infanterie
+rue du pasteur alphonse cadier
+rue du chanoine laborde
+rue bonado
+rue lespy
+rue carrérot
+cours bosquet
+avenue trespoey
+avenue henry russel
+avenue du stade nautique
+avenue nitot
+avenue de montebello
+rue de livron
+allèe lamartine
+sentiers du roy
+place mulot
+pont d’espagne
+avenue des vallées
+rue amédée roussille
+rue du soust
+rue de lajus
+avenue de la concorde
+
+
+
+à Billère:
+rue du lacaou
+avenue de la résistance
+avenue montilleul
+rue clair-soleil
+avenue lalanne
+rue claverie (piste cyclable)
+rue jeanne lassansaa
+rue du mohédan
+impasse lacassagne
+allée montesquieu
+pont d’espagne
+chemin latéral
+rue de la saligue
+rue de l’aubisque
+rue de la gravière
+passerelle billère
+
+
+
+à Lons:
+boulevard blériot
+boulevard des frères farman
+chemin sans nom le long de l’ousse des bois
+avenue du moulin
+rue du château
+vois verte romain gary
+chemin latéral
+avenue de pau
+rue du souvenir
+rue georges lassalle
+chemin des vignes
+rue des écoles
+rue de la mairie
+rue de l’église
+rue d’ariste
+rue monhauba
+
+
+à Laroin:
+passerelle de laroin
+
+
+à Lescar:
+chemin salié
+chemin lasbordettes
+chemin de las pachères
+chemin sans nom le long du lescourre
+chemin de lons
+chemin de la plaine
+avenue roger cadet
+rue sainte-catherine
+chemin de beneharnum
+côte du vigné
+
+
+à Montardon:
+chemin de sers
+chemin de pau (piste cyclable)
+chemin du luy
+chemin sans nom le long du luy
+
+
+à Bizanos:
+avenue beau soleil
+rue des frères cousté
+rue pasteur
+rue gallieni
+avenue de l’yser
+rue de verdun
+
+
+à Idron:
+avenue des arrouturous
+avenue du béarn
+rue du lannot
+chemin henri iv
+
+
+à Mazère-Lezons:
+rue du gave
+rue du château
+rue pasteur
+lotissement le clos corisande
+V81
+véloroute*
+
+
+à Uzos:
+rue de lassallette
+rue de l’église
+
+
+à Meillon:
+rue d’ossau
+rue du gabizos
+rue du stade
+rue des pyrénées
+
+
+à Assat:
+rue de bayne
+rue des platanes
+chemin de vignau
+
+
+à Siros:
+chemin la carrerrasse
+cami de catsus
+chemin du moulin
+chemin du tucoo
+
+
+à Artiguelouve:
+chemin du stade
+d804
+avenue du château
+V81
+véloroute*
+
+
+à Arbus:
+d804
+route d’artiguelouve
+rue des écoles
+chemin du gave
+V81
+véloroute*
+
+
+à Jurançon:
+pont d’espagne
+avenue des vallées
+rue massenet
+avenue ernest cazenave
+avenue gaston cambot
+rue charles de gaulle
+rue ollé laprune
+rue gaston phoebus
+avenue lamartine
+avenue du béarn
+avenue bagnell
+impasse d’oly
+rue de guindalos
+rue cyprien loustau
+avenue henri iv
+chemin du vert galant
+V81
+véloroute*
+
+
+cycla -2
+
+à Pau:
+avenue de l’europe
+boulevard olof palme
+
+
+à Lons:
+avenue de l’hippodrome
+
+
+à Lescar:
+chemin salié
+avenue du vert galant
+
