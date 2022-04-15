@@ -4,6 +4,7 @@
 
 from params import CHEMIN_NŒUDS_RUES
 from lecture_adresse.normalisation import normalise_rue, normalise_ville, prétraitement_rue
+from petites_fonctions import LOG
 D_MAX_SUITE_RUE = 10  # Nombre max d’arêtes où on va chercher pour trouver la suite d’une rue.
 
 
@@ -46,13 +47,17 @@ def prochaine_sphère(g, sph, rue, rue_n, ville, déjàVu, boule, dmax):
 
 def extrait_nœuds_des_rues(g, bavard = 0):
     """
-    Sortie : dictionnaire ville -> rue_n -> (rue, liste nœuds)
+    Sortie : (dictionnaire ville -> rue_n -> (rue, liste nœuds),
+              la même pour les places piétonnes)
     La recherche est faite par des parcours de graphe pour avoir les sommets autant que possible dans l’ordre topologique.
     Grosse complication presque gratuite oui, c’était pour le sport.
+    La liste des place piétonne est vue de la transformation d’icelles en cliques.
     """
     
     déjàVu = {} # dico (ville -> nom de rue -> set de nœuds). Ne sert que pour le cas d’une rue qui boucle.
     res = {} # dico (ville -> nom de rue -> liste des nœuds dans un ordre topologique )
+    places_piétonnes = {}
+
     
     def suivre_rue(s, ville, rue, rue_n):
         """
@@ -80,29 +85,62 @@ def extrait_nœuds_des_rues(g, bavard = 0):
         res[ville][rue_n][1].reverse()
         suivre_rue(t, ville, rue, rue_n)
 
-    
-    for s in g.digraphe.nodes:
+    # def est_place_piétonne(s,t,nom):
+    #     if "place" in nom.lower():
+    #         for a in g.multidigraphe[s][t].values():
+    #             if a.get("name")==nom and a.get("highway")=="pedestrian":
+    #                 print(f"place piétonne : {nom}")
+    #                 return True
+    #     return False
+                
+
+    gx = g.multidigraphe
+
+    for s in gx:
         villes = g.villes_dun_sommet(s, bavard=bavard-1)
         for ville in villes :
             if ville not in déjàVu:
                 print(f"Nouvelle ville rencontrée : {ville}")
                 déjàVu[ville] = {}
                 res[ville] = {}
-            for t in g.voisins_nus(s):
-                rues = g.rue_dune_arête(s, t)
-                for rue in rues:
-                    rue_n = prétraitement_rue(rue)
-                    if rue_n not in res[ville]:
-                        #print(f"Nouvelle rue : {rue}, normalisée en {rue_n}")
-                        res[ville][rue_n] = (rue, [t, s])
-                        déjàVu[ville][rue_n] = set((s, t))
-                        partir_dune_arête(s, t, ville, rue, rue_n)
-                    elif s not in déjàVu[ville][rue_n] or t not in déjàVu[ville][rue_n]:  # Cas d’un nouveau tronçon d’une ancienne rue
-                        res[ville][rue_n][1].extend((t, s))
-                        déjàVu[ville][rue_n].update((s, t))
-                        partir_dune_arête(s,t,ville,rue, rue_n)
-                        if bavard>1: print(f"Nouveau tronçon de {rue} à {ville}. Nœuds trouvés : {res[ville][rue_n]}")
-    return res
+                places_piétonnes[ville]={}
+            for t, arêtes in gx[s].items():
+                if t == 3145210257:
+                    print(f"Trouvé le nœud 3145210257. arêtes = {arêtes} s = {s} ")
+                    input("presser une touche")
+                    
+                for a in arêtes.values():
+                    rues = a.get("name", [])
+                    if not isinstance(rues, list):
+                        rues=[rues]
+                    for rue in rues:
+                        rue_n = prétraitement_rue(rue)
+                        if "place" in rue_n and a.get("highway")=="pedestrian":
+                            p_piétonne=True
+                        else:
+                            p_piétonne=False
+
+                        #rues = g.rue_dune_arête(s, t)
+                        #for rue, p_piétonne in rues:
+
+                        if rue_n=="place georges clemenceau":
+                            print(f"Place Clemenceau : {s, t}, p_piétonne={p_piétonne}")
+                        if p_piétonne:
+                            if rue_n not in places_piétonnes[ville]:
+                                places_piétonnes[ville][rue_n]=set()
+                            places_piétonnes[ville][rue_n].update([s,t])
+
+                        if rue_n not in res[ville]:
+                            #print(f"Nouvelle rue : {rue}, normalisée en {rue_n}")
+                            res[ville][rue_n] = (rue, [t, s])
+                            déjàVu[ville][rue_n] = set((s, t))
+                            partir_dune_arête(s, t, ville, rue, rue_n)
+                        elif s not in déjàVu[ville][rue_n] or t not in déjàVu[ville][rue_n]:  # Cas d’un nouveau tronçon d’une ancienne rue
+                            res[ville][rue_n][1].extend((t, s))
+                            déjàVu[ville][rue_n].update((s, t))
+                            partir_dune_arête(s,t,ville,rue, rue_n)
+                            LOG(f"Nouveau tronçon de {rue} à {ville}. Nœuds trouvés : {res[ville][rue_n]}", bavard=bavard-1)
+    return res, places_piétonnes
 
 
 def sortie_csv(g, bavard=0):

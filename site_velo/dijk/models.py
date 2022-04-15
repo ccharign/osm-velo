@@ -150,7 +150,8 @@ class Arête(models.Model):
         rue (Rue). Ce champ est-il utile ?
         geom (string). Couples lon,lat séparés par des ;
         nom (str)
-        zone (Zone)
+        zone (Zone ManyToMany)
+        sensInterdit (BooleanField)
     """
     départ = models.ForeignKey(Sommet, related_name="sommet_départ", on_delete=models.CASCADE, db_index=True)
     arrivée = models.ForeignKey(Sommet, related_name="sommet_arrivée", on_delete=models.CASCADE)

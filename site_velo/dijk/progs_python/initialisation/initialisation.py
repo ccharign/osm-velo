@@ -40,7 +40,7 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
 
 def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, rapide = 0):
     """
-    Entrées : nom (str)
+    Entrées : nom (str), nom de la ville à charger.
               code (int)
               zone (str)
     Effet : 
@@ -50,6 +50,9 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
            - Rues
         Le tout associé à la zone indiquée, qui est créée si besoin.
         Le code postal est rajouté à la base s’il n’y était pas.
+
+    NB : actuellement, les places piétonnes sont récupérées via la fonction noeuds_des_rues, et la procédure place_en_clique est programmée, mais elle n’est pas lancée, car sur Pau en tout cas, cela ne semble pas pertinent (cf la place Clemenceau).
+
     Paramètres:
         - rapide (int) : indique la stratégie en cas de données déjà présentes.
              pour tout  (s,t) sommets voisins dans g,
@@ -76,32 +79,35 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
 
     
     ## Récup des graphe via osmnx
-    print(f"Récupération du graphe pour « {ville_d.code} {ville_d.nom_complet}, {pays} » avec une marge")
+    print(f"\nRécupération du graphe pour « {ville_d.code} {ville_d.nom_complet}, {pays} » avec une marge :\n")
     gr_avec_marge = osmnx.graph_from_place(
         {"city":f"{ville_d.nom_complet}", "postcode":ville_d.code, "country":pays},
         network_type="all", # Tout sauf private
         retain_all="False", # Sinon il peut y avoir des enclaves déconnectées car accessibles seulement par chemin privé (ex: CSTJF)
         buffer_dist=500  # Marge de 500m
     )
-    print("\nRécupération du graphe exact")
+    print("\n\nRécupération du graphe exact:\n")
     gr_strict = osmnx.graph_from_place({"city":f"{nom}", "postcode":code, "country":pays}, network_type="all", retain_all="True")
 
     g = Graphe_nx(gr_avec_marge)
 
     
-    ## Noms des villes
-    print("\nAjout du nom de ville.")
-    for n in gr_strict.nodes:
+    ## Noms des villes ajouté dans g (Graphe_nx)
+    print("\n\nAjout du nom de ville.")
+    for n in gr_strict:
         #if n not in g.villes_of_nœud: g.villes_of_nœud=[]
         g.villes_of_nœud[n] = [nom]
 
         
     ## Nœuds des rues
-    print("\nCalcul des nœuds de chaque rue")
-    dico_rues = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue_n -> (rue, liste nœuds) # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
+    print("\n\nCalcul des nœuds de chaque rue")
+    dico_rues, places_piétonnes = extrait_nœuds_des_rues(g, bavard=bavard-1) # dico ville -> rue_n -> (rue, liste nœuds) # Seules les rues avec nom de ville, donc dans g_strict seront calculées.
     print("Écriture des nœuds des rues dans la base.")
     close_old_connections()
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
+    print(f"\nPlaces piétonnes trouvées : {places_piétonnes}\n")
+    input("presser une touche")
+    
     
     print("Création de l'arbre lexicographique")
     arbre_rue_dune_ville(
@@ -177,7 +183,7 @@ ZONE_VOIRON={
 }.items()
 
 
-def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=0):
+def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=0):
     """
     Entrée : liste_villes, itérable de (nom de ville, code postal)
              zone (str), nom de la zone
@@ -188,6 +194,7 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
 
     Paramètres: 
        Si réinit, tous les éléments associés à la zone (villes, rues, sommets, arêtes) ainsi que le cache sont au préalable supprimés.
+       Si effacer_cache, tous les fichiers .json du dossier cache du répertoire courant seront effacés.
     """
 
     ## Récupération ou création de la zone :
@@ -207,6 +214,8 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, zone="Pau_agglo", v
         Sommet.objects.filter(zone=z_d).delete()
         Cache_Adresse.objects.all().delete()
 
+    # Vidage du cache d’osmnx
+    
     ## Chargement des villes :
     for nom, code in liste_villes:
         charge_ville(nom, code, zone, bavard=bavard, rapide=rapide)

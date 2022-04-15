@@ -6,7 +6,7 @@ tic=perf_counter()
 import networkx as nx
 chrono(tic, "networkx", bavard=2)
 
-from petites_fonctions import distance_euc
+from petites_fonctions import distance_euc, LOG
 #from time import perf_counter
 from params import LOG_PB, D_MAX_POUR_NŒUD_LE_PLUS_PROCHE, CHEMIN_CACHE, CHEMIN_CYCLA
 
@@ -100,17 +100,18 @@ class Graphe_nx():
 
     
     def rue_dune_arête(self, s, t, bavard=0):
-        """ Liste des noms des rues contenant l’arête (s,t). Le plus souvent un singleton.
+        """ Liste des couple (nom, est_une_place_piétonne) des rues contenant l’arête (s,t). Le plus souvent un singleton.
             Renvoie None si celui-ci n’est pas présent (pas de champ "name" dans les données de l’arête)."""
         res = []
         for a in self.multidigraphe[s][t].values():
             if "name" in a:
+                piétonne = a.get("highway")=="pedestrian"
                 if isinstance(a["name"], str):
-                    res.append(a["name"])
+                    res.append((a["name"], piétonne and "place" in a["name"].lower()))
                 else:
-                    res.extend(a["name"])
-        if len(res)==0 and bavard>0:
-            print(f"L’arête {(s, t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}")
+                    res.extend( (r, piétonne and "place" in r.lower()) for r in a["name"])
+        if len(res)==0:
+            LOG(f"L’arête {(s, t)} n’a pas de nom. Voici ses données\n {self.digraphe[s][t]}", bavard=bavard)
         return res
 
     ### Remplacé par villes_dun_sommet

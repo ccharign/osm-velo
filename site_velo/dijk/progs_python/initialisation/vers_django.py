@@ -16,6 +16,7 @@ from params import CHEMIN_CHEMINS, LOG
 from petites_fonctions import union, mesure_temps, intersection, distance_euc
 from time import perf_counter, sleep
 from django.db import transaction, close_old_connections
+from django.db.models import Q
 from lecture_adresse.arbresLex import ArbreLex
 import re
 import os
@@ -414,16 +415,22 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
     #@mesure_temps("remplace_arêtes", temps, nb_appels)
     def remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx):
         """
-        Supprime les arêtes de arêtes_d, et crée à la place celles venant de arêtes_nx.
+        Supprime les arêtes de arêtes_d, et crée à la place celles venant de gx[s][t].
         Sortie (Arête list): les arêtes créées.
         """
         #arêtes_d.delete()
-        #LOG(f"arêtes à supprimer : {arêtes_d}", bavard=bavard)
-        for a in arêtes_d: a.delete()
+
+        
         if t in gx[s]:
             arêtes_nx = gx[s][t].values()
         else:
             arêtes_nx=[]
+        
+        
+        for a in arêtes_d:
+            LOG(f"arête à supprimer : {a} -> {a.départ, a.arrivée, a.nom}\n à remplacer par {arêtes_nx} -> {list(arêtes_nx)[0].get('name')}.", bavard=bavard)
+            a.delete()
+        
         res=[]
         for a_nx in arêtes_nx:
             a_d = Arête(départ = s_d,
@@ -449,7 +456,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                     if nb%500==0:print(f"    {nb} arêtes traitées\n ") #{temps}\n{nb_appels}\n")
                     t_d = tous_les_sommets.get(id_osm=t)
                     correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
-                    if not (rapide==2 and len(arêtes_d)>0):
+                    if rapide<2 and arêtes_d:
                         if rapide==0 or not correspondent:
                             arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
                         else:
@@ -676,6 +683,53 @@ def ajoute_villes_voisines():
     print("Enregistrement")
     Ville_Ville.objects.bulk_create(à_ajouter_vraiment)
 
+
+@transaction.atomic()
+def met_en_clique(g, nœuds, nom, cycla_défaut=1.1, bavard=0):
+    """
+    Entrée : g (graphe)
+             nœuds (liste d’id osm)
+             nom (str)
+    Effet : rajoute toutes les arêtes nécessaires pour que l’ensemble des sommets dans nœuds devienne une clique. Les longueurs sont prises comme la distance euclidienne entre les deux sommets. Le nom qui sera rentré est celui passé en arg.
+    Paramètres:
+        cycla_défaut (float) : cycla défaut à mettre aux arêtes créées.
+    """
+    cpt = 0
+    for s in nœuds:
+        s_d = Sommet.objects.get(id_osm=s)
+        for t in nœuds:
+            t_d = Sommet.objects.get(id_osm=t)
+            if t!=s:
+                if not Arête.objects.filter(départ__id_osm=s, arrivée__id_osm=t).exists():
+                    a = Arête(
+                        départ = s_d,
+                        arrivée = t_d,
+                        longueur = g.d_euc(s,t),
+                        geom = f"{s_d.lon},{s_d.lat};{t_d.lon},{t_d.lat}",
+                        cycla_défaut= cycla_défaut
+                    )
+                    a.save()
+                    cpt+=1
+    print(f"{cpt} nouvelles arêtes créées.")
+    
+    
+def place_en_clique(g, v_d):
+    """
+    Effet : Transforme en clique toutes les places.
+    """
+    for r in Rue.objects.filter( Q(nom_complet__icontains="place") | Q(nom_complet__icontains="square"), ville=v_d):
+        print(f"Mise en clique : {r}")
+        met_en_clique(g, r.nœuds(), r.nom_complet)
+    
+
+
+
+
+
+
+
+
+    
 
 ### vieux trucs ###
 
