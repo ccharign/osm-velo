@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 """
-Arbres quaternaires
+Arbres quaternaires. Le type correspond plutôt aux R-arbres, mais la fonction of_list crée a priori quatre fils par nœud.
 
 But : enregistrer l’id osm et les coords de chaque sommet
 """
-from petites_fonctions import distance_euc
+from petites_fonctions import distance_euc, R_TERRE
+from math import cos, pi
 
 def union_bb(lbb):
     """
@@ -92,9 +93,9 @@ class Quadrarbre():
         # Il existe au moins un élément sur chaque bord de la bounding box
         dno = distance_euc(coords, (self.ouest, self.nord))
         dso = distance_euc(coords, (self.ouest, self.sud))
-        dne =  distance_euc(coords, (self.est, self.nord))
-        dse =  distance_euc(coords, (self.est, self.sud))
-
+        dne = distance_euc(coords, (self.est, self.nord))
+        dse = distance_euc(coords, (self.est, self.sud))
+        
         # Il existe un élément sur le bord ouest
         d1 = max(dno, dso)
         # bord est
@@ -106,13 +107,44 @@ class Quadrarbre():
         
         return min(d1, d2, d3, d4)
     
+    
+    def minorant_de_d_min(self, coords:(float,float)):
+        """
+        Sortie : en O(1), un minorant de la distance min entre coords et un nœud de l’arbre.
+        C’est la distance entre coords et la bounding box de self.
+        """
+        s,o,n,e = self.bb
+        lon, lat = coords #lon : ouest-est
+        res_carré=0
+        le_cos = cos(lat*pi/180)
         
-
-    def nœud_le_plus_proche(self, coords:(float,float), majorant=float("inf")):
+        if lon < o:
+            res_carré+=(o-lon)**2 * le_cos
+        elif lon >e :
+            res_carré+=(lon-e)**2 * le_cos
+        if lat<s:
+            res_carré+=(s-lat)**2
+        elif lat >n:
+            res_carré+=(lat-n)**2
+        
+        return res_carré**.5  * R_TERRE * pi/180
+        
+        
+    def nœud_le_plus_proche(self, coords:(float,float)):
         """
-        Sortie ((float×float)×int) : (coords, id_osm) du nœud le plus proche de coords.
-
-        Paramètre : 
-            majorant (float), ne renvoyer un résultat que s’il est inférieur à ce majorant
+        Sortie ((float×float)×int×float) : (coords, id_osm, distance) du nœud le plus proche de coords.
         """
-        pass
+        
+        if not self.fils:
+            return self.bb[1:3], self.id_osm, distance_euc(coords, self.bb[1:3]) # o, n ce qui fait lon, lat
+        
+        else:
+            d_min = float("inf")
+            res = None
+            for m, fils in sorted( ((f.minorant_de_d_min(coords), f) for f in self.fils) ): # Om commence par le fils qui a le plus probablement le nœud le plus proche.
+                if m < d_min:
+                    c, id_osm, dist = fils.nœud_le_plus_proche(coords)
+                    if dist<d_min:
+                        d_min, res = dist, (c, id_osm)
+            return res+(d_min,)
+                    
