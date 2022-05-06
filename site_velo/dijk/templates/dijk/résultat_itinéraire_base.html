@@ -21,12 +21,15 @@
     
   <div class="col-md-9">
     <!-- La carte -->
-      	Voici l’itinéraire calculé à partir de mes connaissances actuelles. Pour me corriger, utilisez le formulaire en dessous.</br>
+    Voici l’itinéraire calculé à partir de mes connaissances actuelles. Pour me corriger, utilisez le formulaire en dessous.</br>
+    <div class="marker-position">click on the map, move the marker, click on the marker</div>
     <div class="carte">
       {% block carte %}
       {% endblock %}
+    
 	<!-- <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire en plein écran dans un onglet séparé </a> -->
     </div>
+    
   </div>
   
   <div class="col-sm-3">

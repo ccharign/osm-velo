@@ -122,7 +122,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
     # Calcul des itinéraires
     print(dict(requête.session))
     try:
-        stats, chemin, d, a, noms_étapes, rues_interdites = itinéraire(
+        stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire(
             d, a, ps_détour, g, z_d, requête.session,
             rajouter_iti_direct=len(noms_étapes)>0,
             noms_étapes=noms_étapes,
@@ -170,7 +170,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        #"p_détour_moyen": p_détour_moyen,
                        "zone_t":z_d.nom,
                        #"rues":toutes_les_rues,
-                       "fouine": requête.session.get("fouine", None)
+                       "fouine": requête.session.get("fouine", None),
+                       "la_carte": carte.get_name()
                        }
                       )
 

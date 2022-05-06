@@ -27,6 +27,7 @@ from django.db import close_old_connections, transaction
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
 from params import RACINE_PROJET
+from quadrarbres import Quadrarbre
 
 """
 Script pour réinitialiser ou ajouter une nouvelle zone.
@@ -35,6 +36,24 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
    -> À voir, peut être le cache ?
    -> Ou carrément recréer le cache...
 """
+
+
+
+
+def quadArbreDeGraphe(gx, bavard=0):
+    """
+    Entrée : gx (graphe nx)
+    Sortie (Quadrarbre) : l’arbre quaternaire des nœuds de gx
+    """
+    tic = perf_counter()
+    res= Quadrarbre.of_list(
+        [((gx.nodes[n]["x"], gx.nodes[n]["y"]), n) for n in gx]
+    )
+    chrono(tic, "arbre quad du graphe", bavard=bavard)
+    return res
+    
+    
+
 
 
 

@@ -78,7 +78,17 @@
 
 <!-- Formulaire pour relancer le calcul -->
 {% block relancer_calcul %}
-<form action = "{% url 'résultat' %}" method="get">
+
+<script>
+  var laCarte;
+    $(document).ready(function() {
+	laCarte = {{la_carte}};
+	gèreLesClics();
+    });
+  
+</script>
+
+<form action = "{% url 'résultat' %}" method="get" id="relancer_recherche">
   
   <div class="from-group">
     <label for="étapes"> Étapes </label>

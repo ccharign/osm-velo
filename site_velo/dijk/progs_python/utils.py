@@ -159,10 +159,10 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
             s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct- 1.) * 100.)
 
     tic=perf_counter()
-    dessine(à_dessiner, g, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
+    carte = dessine(à_dessiner, g, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     chrono(tic0, f"Total pour le chemin {c}")
-    return res, c, str(d), str(a), [str(é) for é in étapes], [str(é) for é in étapes_interdites]
+    return res, c, str(d), str(a), [str(é) for é in étapes], [str(é) for é in étapes_interdites], carte
 
 
 ### création du gpx ###
@@ -235,7 +235,9 @@ def dessine(listes_chemins, g, ad_départ, ad_arrivée,  où_enregistrer, ouvrir
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
     carte.save(où_enregistrer)
+
     if ouvrir : ouvre_html(où_enregistrer)
+    return carte
 
 
 list_colors = [# Du vert au rouge
