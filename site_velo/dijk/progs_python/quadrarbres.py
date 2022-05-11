@@ -4,8 +4,10 @@ Arbres quaternaires. Le type correspond plutôt aux R-arbres, mais la fonction o
 
 But : enregistrer l’id osm et les coords de chaque sommet
 """
-from petites_fonctions import distance_euc, R_TERRE
+from petites_fonctions import distance_euc, R_TERRE, chrono
+from time import perf_counter
 from math import cos, pi
+from dijk.models import Arête
 
 def produit_scalaire(u, v):
     return sum(ui*vi for (ui,vi) in zip(u,v))
@@ -162,6 +164,56 @@ class Quadrarbre():
             return res, d_min
 
 
+    def sauv(self, chemin):
+        """
+        Sauvegarde l’arbre dans le fichier situé à chemin, via un parcours en profondeur.
+        On suppose que les étiquettes ont un attribut pk, c’est ce qui sera inscrit dans le fichier.
+        """
+
+        with open(chemin, "w") as sortie:
+            def aux(a):
+                if a.fils:
+                    # Nœud interne
+                    sortie.write( f"N{','.join(map(str, a.bb))},{len(a.fils)}\n" )
+                    for f in a.fils:
+                        aux(f)
+                else:
+                    # Feuille
+                    sortie.write( f"F{','.join(map(str, a.bb))},{a.étiquette.pk}\n"  )
+            aux(self)
+
+    @classmethod
+    def of_fichier(cls, chemin:str, récup_objet, feuille):
+        """
+        Entrées :
+             chemin, adresse du fichier
+             récup_objet, fonction qui à son pk associe l’objet à mettre dans les étiquettes des feuilles
+             feuille, fonction qui à l’objet associe la feuille.
+        """
+        with open(chemin) as entrée:
+            def aux():
+                
+                ligne=entrée.readline().strip()
+                
+                if ligne[0]=="F":
+                    s,o,n,e,pk = ligne[1:].split(',')
+                    étiquette = récup_objet(int(pk))
+                    return feuille(étiquette)
+                
+                elif ligne[0]=="N":
+                    s,o,n,e, nb_fils = ligne[1:].split(',')
+                    res = cls()
+                    res.bb = tuple(map(float, (s,o,n,e)))
+                    res.fils = [aux() for _ in range(int(nb_fils))]
+                    return res
+
+                else:
+                    raise RuntimeError(f"Ligne ne commençant ni par F ni par N : {ligne}")
+                
+            return aux()
+
+
+
 
 
 class QuadrArbreSommet(Quadrarbre):
@@ -250,3 +302,19 @@ class QuadrArbreArête(Quadrarbre):
     @classmethod
     def of_list(cls, l):
         return super().of_list(l, lambda x:x.départ.coords()[0], lambda x:x.départ.coords()[1], cls.feuille)
+
+
+    @classmethod
+    def of_fichier(cls, chemin, d_arête_of_pk, bavard=0):
+        """
+        Entrée: 
+           d_arête_of_pk : dico qui à sa pk associe l’arête
+        """
+        tic = perf_counter()
+        res = super().of_fichier(
+            chemin,
+            lambda k: d_arête_of_pk[k],
+            cls.feuille
+        )
+        chrono(tic, f"Chargement de l’arbre des arêtes depuis {chemin}", bavard=bavard)
+        return res

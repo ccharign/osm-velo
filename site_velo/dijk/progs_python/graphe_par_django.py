@@ -11,6 +11,8 @@ from lecture_adresse.arbresLex import ArbreLex
 import os
 import lecture_adresse.normalisation as no
 from django.db import transaction
+from quadrarbres import QuadrArbreArête
+import initialisation.initialisation as ini
 
 
 class VillePasTrouvée(Exception):
@@ -29,6 +31,7 @@ class Graphe_django():
         zones (liste de Zone)
         ville_défaut (instance de models.Ville)
         arbres_des_rues : dico (ville_norm -> ArbreLex)
+        arbre_arêtes : dico (nom de zone -> arbreQuad des arêtes).
     """
     
     def __init__(self):
@@ -43,6 +46,7 @@ class Graphe_django():
         self.cycla_max={}
         self.cycla_min={}
         self.arbre_cache={}
+        self.arbre_arêtes={}
     
         
     def charge_zone(self, zone_t, bavard=0):
@@ -54,6 +58,9 @@ class Graphe_django():
             print(f"Zone pas en mémoire : {z_d}. Voici les zones que j’ai chargées : {self.zones}")
             self.zones.append(z_d)
 
+            dossier_données = os.path.join(DONNÉES, str(z_d))
+            os.makedirs(dossier_données, exist_ok=True)
+            
             ## Dicos des villes et des rues
             print("Chargement des arbres lex pour villes et rues...")
             for v_d in z_d.villes():
@@ -62,6 +69,7 @@ class Graphe_django():
                 self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
             print("fini.")
 
+            
             ## Cache
             print("Chargement du cache")
             villes = Ville_Zone.objects.filter(zone=z_d)
@@ -86,10 +94,12 @@ class Graphe_django():
             print("Chargement des arêtes")
 
             arêtes = Arête.objects.filter(zone=z_d).select_related("départ", "arrivée")
+            d_arête_of_pk = {} # Pour le chargement de l’arbre quad.
             print(f"{len(arêtes)} arêtes dans la base pour la zone {z_d}")
             for a in arêtes:
                 s = a.départ.id_osm
                 t = a.arrivée.id_osm
+                d_arête_of_pk[a.pk] = a
                 #assert s in tous_les_sommets and t in tous_les_sommets, f"l’arête {a} de la zone {z_d} n’a pas ses deux sommets dans la zone"
                 #if z_d not in a.départ.zone.all() or z_d not in a.arrivée.zone.all():
                 #    raise RuntimeError(f"Un sommet de l’arête {a} n’était pas dans la même zone que celle-ci ({z_d}).")
@@ -97,7 +107,21 @@ class Graphe_django():
                     self.dico_voisins[s].append((t, a))
             tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
-
+            
+            ## arbre quad des arêtes:
+            chemin = os.path.join(dossier_données, f"arbre_arêtes_{z_d}")
+            if os.path.exists(chemin):
+                tic=perf_counter()
+                print(f"Chargement de l’arbre quad des arêtes depuis {chemin}")
+                self.arbre_arêtes[z_d.nom] = QuadrArbreArête.of_fichier(chemin, d_arête_of_pk)
+                chrono(tic, "Chargement de l’arbre quad des arêtes")
+            else:
+                tic=perf_counter()
+                self.arbre_arêtes[z_d.nom] = ini.quadArbreArêtesDeZone(z_d)
+                self.arbre_arêtes[z_d.nom].sauv(chemin)
+                chrono(tic, f"Création puis sauvegarde (dans {chemin}) de l’arbre des arêtes")
+                
+                
             #cycla min et max
             self.calcule_cycla_min_max(z_d)
         else:

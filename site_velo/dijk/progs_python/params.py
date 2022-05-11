@@ -32,7 +32,7 @@ TOUTES_LES_VILLES={
 
 RACINE_PROJET="dijk/"
 
-DONNÉES = os.path.join(RACINE_PROJET,"données/Pau")
+DONNÉES = os.path.join(RACINE_PROJET,"données/")
 TMP = os.path.join(RACINE_PROJET, "tmp/")
 os.makedirs(TMP, exist_ok=True)
 os.makedirs(DONNÉES, exist_ok=True)
