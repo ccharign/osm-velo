@@ -7,6 +7,10 @@ But : enregistrer l’id osm et les coords de chaque sommet
 from petites_fonctions import distance_euc, R_TERRE
 from math import cos, pi
 
+def produit_scalaire(u, v):
+    return sum(ui*vi for (ui,vi) in zip(u,v))
+
+
 def union_bb(lbb):
     """
     Entrée : une liste de bounding box
@@ -20,13 +24,15 @@ def union_bb(lbb):
         max(bb[3] for bb in lbb)
     )
 
+
 class Quadrarbre():
     """
     Attributs :
         fils (liste de Quadarbres)
         bb (float, float, float, float) : bounding box minimale contenant les nœuds de l’arbre. (s,o,n,e)
              Pour une feuille, ouest==est et nord==sud.
-        id_osm (int) : id d’un nœud osm. Seulement pour les feuilles.
+        étiquette : doit être munie d’une méthode « coords » qui renvoie (lon, lat).
+        distance (pour les feuilles) : fonction qui a une coords associe la distance à la feuille.
     """
 
 
@@ -34,42 +40,45 @@ class Quadrarbre():
         """
         Renvoie un arbre vide
         """
-        self.fils=None
+        self.fils = None
         self.bb = None
-        self.id_osm=None
-    
-    
-    @classmethod
-    def feuille(cls, coords, id_osm:int):
-        lon, lat = coords
-        res = cls()
-        res.bb = lat, lon, lat, lon
-        res.id_osm = id_osm
-        return res
+        self.étiquette = None
+        self.distance = None
+
+    def __lt__(self, autre):
+        """
+        Sert dans la recherche de l’étiquette la plus proche, quand on trie selon la distance à la bbox.
+        """
+        return True
         
-    
     @classmethod
-    def of_list(cls, l):
+    def of_list(cls, l, f_lon, f_lat, feuille):
+        
         """
-        Entrée : l (((float×float)×int) list), list de (coords, id_osm)
-        Sortie (Quadrarbre) : arbre quad contenant les nœuds osm de l
+        Entrée : 
+            l, liste d’objets à mettre dans l’abre.
+            f_lon, fonction qui a un objet associe la longitude selon laquelle trier.
+            f_lat, fonction qui a un objet associe la latitude selon laquelle trier.
+            feuille, fonction qui a un objet associe la feuille correspondante.
+        Sortie (Quadrarbre) : arbre quad contenant les éléments l.
         """
+        
         assert isinstance(l, list), f"Pas une liste : {l}"
         assert l, "Reçu une liste vide"
 
         if len(l)==1:
-            return cls.feuille(*l[0])
+            return feuille(l[0])
         
         else:
-            l.sort(key=lambda x:x[0][0]) # tri selon la longitude.
+            l.sort(key=f_lon) # tri selon la longitude.
             ouest = l[:len(l)//2]
             est = l[len(l)//2:]
 
-            ouest.sort(key=lambda x :x[0][1]) # tri selon la latitude
+            ouest.sort(key=f_lat) # tri selon la latitude
             so = ouest[:len(ouest)//2]
             no = ouest[len(ouest)//2:]
 
-            est.sort(key=lambda x :x[0][1]) # tri selon la latitude
+            est.sort(key=f_lat) # tri selon la latitude
             se = est[:len(est)//2]
             ne = est[len(est)//2:]
 
@@ -78,8 +87,9 @@ class Quadrarbre():
             res.bb = union_bb([f.bb for f in res.fils])
             return res
 
-        
+    
     def __len__(self):
+        """ Renvoie le nb de feuilles."""
         if self.fils is None:
             return 1
         else:
@@ -89,6 +99,7 @@ class Quadrarbre():
     def majorant_de_d_min(self, coords:(float,float)):
         """
         Sortie : en O(1) un majorant de la plus petite distance entre coords et un élément de l’arbre. (Pour le branch and bound de la recherche de nœud le plus proche.)
+        Basé sur le fait qu’il existe au moins un objet sur chaque bord de la bbox.
         """
         # Il existe au moins un élément sur chaque bord de la bounding box
         dno = distance_euc(coords, (self.ouest, self.nord))
@@ -128,23 +139,114 @@ class Quadrarbre():
             res_carré+=(lat-n)**2
         
         return res_carré**.5  * R_TERRE * pi/180
-        
-        
-    def nœud_le_plus_proche(self, coords:(float,float)):
+
+    
+    # exemple : Barthou/SaintLouis (-0.37054131408589847, 43.295030439425645)
+    # (-0.371292129834015, 43.29535229996814)
+    def étiquette_la_plus_proche(self, coords:(float,float)):
         """
-        Sortie ((float×float)×int×float) : (coords, id_osm, distance) du nœud le plus proche de coords.
+        Sortie (étiquette×float) : (étiquette, distance) de la feuille plus la proche de coords.
         """
         
         if not self.fils:
-            return self.bb[1:3], self.id_osm, distance_euc(coords, self.bb[1:3]) # o, n ce qui fait lon, lat
+            return self.étiquette, self.distance(coords)
         
         else:
             d_min = float("inf")
             res = None
-            for m, fils in sorted( ((f.minorant_de_d_min(coords), f) for f in self.fils) ): # Om commence par le fils qui a le plus probablement le nœud le plus proche.
+            for m, fils in sorted( ((f.minorant_de_d_min(coords), f) for f in self.fils) ): # On commence par le fils qui a le plus probablement le nœud le plus proche.
                 if m < d_min:
-                    c, id_osm, dist = fils.nœud_le_plus_proche(coords)
+                    s, dist = fils.étiquette_la_plus_proche(coords)
                     if dist<d_min:
-                        d_min, res = dist, (c, id_osm)
-            return res+(d_min,)
-                    
+                        d_min, res = dist, s
+            return res, d_min
+
+
+
+
+class QuadrArbreSommet(Quadrarbre):
+    """
+    Conçu pour des objets ponctuels (une seule coord).
+    """
+    
+    def __init__(self):
+        super().__init__()
+                
+
+    @classmethod
+    def feuille(cls, s):
+        """ feuille contenant le sommet s."""
+        lon, lat = s.coords()
+        res = cls()
+        res.bb = lat, lon, lat, lon # bbox réduite à un point.
+        res.étiquette = s
+        res.distance = lambda c:distance_euc(s.coords(), c)
+        return res
+
+    
+    @classmethod
+    def of_list(cls, l):
+        return super().of_list(l, lambda x:x.coords()[0], lambda x:x.coords()[1], cls.feuille)
+
+    
+
+
+
+
+
+class QuadrArbreArête(Quadrarbre):
+    """
+    Prévu pour contenir des arêtes.
+    En pratique, les étiquettes doivent avoir un attribut « départ » et une méthode « arrivée », qui renvoient des objets ayant une méthode « coords ».
+    Les arêtes sont supposées être des segments : découper au préalable en cas de géométrie plus complexe.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+
+    @classmethod
+    def feuille(cls, a):
+        
+        lon_d, lat_d = a.départ.coords()
+        lon_a, lat_a = a.arrivée.coords()
+        assert (lon_a, lat_a) != (lon_d, lat_d)
+        o, e = sorted((lon_d, lon_a))
+        s, n = sorted((lat_d, lat_a))
+        res = cls()
+        res.bb=(s,o,n,e)
+        
+        res.étiquette = a
+
+        le_cos = cos(lat_a*pi/180) # Je considère que c’est le même que pour lat_d.
+        
+        def distance(coords):
+            """ Distance entre coords et l’arête a (càd le point de a le plus proche de coords)."""
+            vec_ad = ((lon_d-lon_a)*le_cos, lat_d-lat_a)
+            x, y = coords
+            vec_ac = ((x-lon_a)*le_cos, y-lat_a)
+
+
+            if produit_scalaire(vec_ad, vec_ac) <= 0:
+                # Le point de a le plus proche est son arrivée
+                return distance_euc(coords, (lon_a, lat_a))
+
+            elif produit_scalaire(vec_ad, ((x-lon_d)*le_cos, y-lat_d)) >= 0:
+                # Le point le plus proche est le départ de a.
+                return distance_euc(coords, (lon_d, lat_d))
+
+            else:
+                # Le point le plus proche est dans le segment a.
+                # La distance au carré est AC**2 - <AB|AC>/AD**2
+                return (
+                    produit_scalaire(vec_ac, vec_ac)
+                    - produit_scalaire(vec_ad, vec_ac)**2 / produit_scalaire(vec_ad, vec_ad)
+                ) ** .5 * pi/180 * R_TERRE
+
+        res.distance = distance
+        return res
+
+
+    @classmethod
+    def of_list(cls, l):
+        return super().of_list(l, lambda x:x.départ.coords()[0], lambda x:x.départ.coords()[1], cls.feuille)

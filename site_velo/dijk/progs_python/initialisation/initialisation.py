@@ -27,7 +27,7 @@ from django.db import close_old_connections, transaction
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
 from params import RACINE_PROJET
-from quadrarbres import Quadrarbre
+from quadrarbres import QuadrArbreSommet, QuadrArbreArête
 
 """
 Script pour réinitialiser ou ajouter une nouvelle zone.
@@ -38,23 +38,22 @@ Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
 """
 
 
-
-
-def quadArbreDeGraphe(gx, bavard=0):
-    """
-    Entrée : gx (graphe nx)
-    Sortie (Quadrarbre) : l’arbre quaternaire des nœuds de gx
-    """
+    
+def quadArbreDeZone(z_d, bavard=0):
+    l = list(Sommet.objects.filter(zone=z_d))
     tic = perf_counter()
-    res= Quadrarbre.of_list(
-        [((gx.nodes[n]["x"], gx.nodes[n]["y"]), n) for n in gx]
-    )
-    chrono(tic, "arbre quad du graphe", bavard=bavard)
+    res = QuadrArbreSommet.of_list(l)
+    chrono(tic, f"arbre quad de la zone {z_d}", bavard=bavard)
     return res
-    
-    
 
 
+
+def quadArbreArêtesDeZone(z_d, bavard=0):
+    l = list(Arête.objects.filter(zone=z_d).prefetch_related("départ", "arrivée"))
+    tic = perf_counter()
+    res = QuadrArbreArête.of_list(l)
+    chrono(tic, f"arbre quad de la zone {z_d}", bavard=bavard)
+    return res
 
 
 def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, rapide = 0):
