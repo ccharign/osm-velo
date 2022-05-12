@@ -30,11 +30,7 @@ from params import RACINE_PROJET
 from quadrarbres import QuadrArbreSommet, QuadrArbreArête
 
 """
-Script pour réinitialiser ou ajouter une nouvelle zone.
-
-Ce scrit ne réinitialise *pas* le cache ni la cyclabilité.
-   -> À voir, peut être le cache ?
-   -> Ou carrément recréer le cache...
+Fonctions pour (ré)initialiser ou ajouter une nouvelle ville ou zone.
 """
 
 
@@ -48,15 +44,23 @@ def quadArbreDeZone(z_d, bavard=0):
 
 
 
-def quadArbreArêtesDeZone(z_d, bavard=0):
+def quadArbreArêtesDeZone(z_d, sauv=True, bavard=0):
+    """
+    Entrée : z_d (mo.Zone)
+    Sortie : arbre des arêtes de cette zone
+    Effet : si sauv, enregistre l’arbre à l’adresse "{DONNÉES}/{z_d.nom}/arbre_arêtes_{z_d}"
+    """
     l = list(Arête.objects.filter(zone=z_d).prefetch_related("départ", "arrivée"))
     tic = perf_counter()
-    res = QuadrArbreArête.of_list(l)
-    chrono(tic, f"arbre quad de la zone {z_d}", bavard=bavard)
+    res = QuadrArbreArête.of_list_darêtes_d(l)
+    if sauv:
+        rép = os.path.join(DONNÉES, z_d.nom)
+        res.sauv(os.path.join(rép, f"arbre_arêtes_{z_d}"))
+    chrono(tic, f"création et sauvegarde de l’arbre quad de la zone {z_d}", bavard=bavard)
     return res
 
 
-def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, rapide = 0):
+def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, ville_defaut=None, pays="France", bavard=2, rapide = 0):
     """
     Entrées : nom (str), nom de la ville à charger.
               code (int)
@@ -78,6 +82,7 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
                 1 -> regarde si les arête entre s et t dans g correspondent à celles dans la base, et dans ce cas ne rien faire.
                         « correspondent » signifie : même nombre et mêmes noms.
                 2 -> si il y a quelque chose dans la base pour (s,t), ne rien faire.
+        - recalculer_arbre_arêtes_de_la_zone (bool) : si vrai le fichier contenant l’arbre quad des arêtes de la zone est recalculé (~4s pour Pau_agglo)
     """
 
 
@@ -142,16 +147,11 @@ def charge_ville(nom, code, zone, ville_defaut=None, pays="France", bavard=2, ra
     close_old_connections()
     arêtes_créées, arêtes_màj = vd.transfert_graphe(g, zone_d, bavard=bavard-1, juste_arêtes=False, rapide=rapide)
 
-    # Ajout de la ville aux arêtes
-    # print("Ajout de la ville aux arêtes")
-    # rel_àcréer=[]
-    # for a_d in union(arêtes_màj, arêtes_créées):
-    #     if a_d.départ.id_osm in gr_strict and a_d.arrivée.id_osm in gr_strict:
-    #         if ville_d not in a_d.ville.all():
-    #             rel_àcréer.append(Arête.ville.through(arête_id=a_d.id, ville_id=ville_d.id))
-    # print("  bulk_create")
-    # Arête.ville.through.bulk_create(rel_àcréer)
-    # print("  fini")
+
+    ## Arbre q des arêtes
+    if recalculer_arbre_arêtes_de_la_zone:
+        quadArbreArêtesDeZone(zone_d, sauv=True)
+        
     
     ville_d.données_présentes = True
     ville_d.save()
@@ -236,7 +236,10 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
     
     ## Chargement des villes :
     for nom, code in liste_villes:
-        charge_ville(nom, code, zone, bavard=bavard, rapide=rapide)
+        charge_ville(nom, code, zone, bavard=bavard, rapide=rapide, recalculer_arbre_arêtes_de_la_zone=False)
+
+    ## Arbre quad des arêtes
+    quadArbreArêtesDeZone(z_d, sauv=True)
 
 
 

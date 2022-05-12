@@ -1,10 +1,8 @@
 # -*- coding:utf-8 -*-
 """
 Arbres quaternaires. Le type correspond plutôt aux R-arbres, mais la fonction of_list crée a priori quatre fils par nœud.
-
-But : enregistrer l’id osm et les coords de chaque sommet
 """
-from petites_fonctions import distance_euc, R_TERRE, chrono
+from petites_fonctions import distance_euc, R_TERRE, chrono, deuxConséc
 from time import perf_counter
 from math import cos, pi
 from dijk.models import Arête
@@ -44,7 +42,7 @@ class Quadrarbre():
         """
         self.fils = None
         self.bb = None
-        self.étiquette = None
+        #self.étiquette = None
         self.distance = None
 
     def __lt__(self, autre):
@@ -133,11 +131,11 @@ class Quadrarbre():
         
         if lon < o:
             res_carré+=(o-lon)**2 * le_cos
-        elif lon >e :
+        elif lon > e :
             res_carré+=(lon-e)**2 * le_cos
-        if lat<s:
+        if lat < s:
             res_carré+=(s-lat)**2
-        elif lat >n:
+        elif lat > n:
             res_carré+=(lat-n)**2
         
         return res_carré**.5  * R_TERRE * pi/180
@@ -179,15 +177,16 @@ class Quadrarbre():
                         aux(f)
                 else:
                     # Feuille
-                    sortie.write( f"F{','.join(map(str, a.bb))},{a.étiquette.pk}\n"  )
+                    sortie.write( f"F{','.join(map(str, a.bb))},{a.étiquette}\n"  )
             aux(self)
-
+    
+    
     @classmethod
     def of_fichier(cls, chemin:str, récup_objet, feuille):
         """
         Entrées :
              chemin, adresse du fichier
-             récup_objet, fonction qui à son pk associe l’objet à mettre dans les étiquettes des feuilles
+             récup_objet, fonction qui à la chaîne écrite dans le fichier associe l’objet à mettre dans les étiquettes des feuilles. (Fonction réciproque du __str__ de l’étiquette.)
              feuille, fonction qui à l’objet associe la feuille.
         """
         with open(chemin) as entrée:
@@ -196,8 +195,8 @@ class Quadrarbre():
                 ligne=entrée.readline().strip()
                 
                 if ligne[0]=="F":
-                    s,o,n,e,pk = ligne[1:].split(',')
-                    étiquette = récup_objet(int(pk))
+                    s,o,n,e, c = ligne[1:].split(',')
+                    étiquette = récup_objet(c)
                     return feuille(étiquette)
                 
                 elif ligne[0]=="N":
@@ -243,7 +242,24 @@ class QuadrArbreSommet(Quadrarbre):
     
 
 
+class ArêteSimplifiée():
+    """
+    Classe pour représenter des segments faisant partie d’arêtes de la base Django.
 
+    Attributs:
+        départ (float×float) : coordonnées d’une extrémité
+        arrivée (float×float)  : coordonnées de l’autre extrémité
+        pk (int) : pk de l’arête django contenant celle-ci.
+    """
+    def __init__(self, départ, arrivée, pk):
+        self.départ=départ
+        self.arrivée=arrivée
+        self.pk=pk
+
+    def __str__(self):
+        lon_d, lat_d = self.départ
+        lon_a, lat_a = self.arrivée
+        return f"{lon_d};{lat_d};{lon_a};{lat_a};{self.pk}"
 
 
 class QuadrArbreArête(Quadrarbre):
@@ -260,8 +276,8 @@ class QuadrArbreArête(Quadrarbre):
     @classmethod
     def feuille(cls, a):
         
-        lon_d, lat_d = a.départ.coords()
-        lon_a, lat_a = a.arrivée.coords()
+        lon_d, lat_d = a.départ
+        lon_a, lat_a = a.arrivée
         assert (lon_a, lat_a) != (lon_d, lat_d)
         o, e = sorted((lon_d, lon_a))
         s, n = sorted((lat_d, lat_a))
@@ -298,23 +314,50 @@ class QuadrArbreArête(Quadrarbre):
         res.distance = distance
         return res
 
-
+    
     @classmethod
     def of_list(cls, l):
-        return super().of_list(l, lambda x:x.départ.coords()[0], lambda x:x.départ.coords()[1], cls.feuille)
+        return super().of_list(l, lambda x:x.départ[0], lambda x:x.départ[1], cls.feuille)
 
+    
+    @classmethod
+    def of_list_darêtes_d(cls, l):
+        """
+        Entrée : l, liste de mo.Arête. En pratique les objets de l doivent avoir une méthode « géométrie » qui renvoie une liste de coords, et un attribut pk (clef primaire).
+        Sortie : arbre quad contenant les ArêteSimplifiée obtenues en découpant les Arêtes selon leur géom.
+        """
+        lf = []
+        for a_d in l:
+            for (d, a) in deuxConséc(a_d.géométrie()):
+                lf.append(ArêteSimplifiée(d, a, a_d.pk))
+        return cls.of_list(lf)
+    
 
     @classmethod
-    def of_fichier(cls, chemin, d_arête_of_pk, bavard=0):
+    def of_fichier(cls, chemin, bavard=0):
         """
         Entrée: 
            d_arête_of_pk : dico qui à sa pk associe l’arête
         """
         tic = perf_counter()
+        def arête_of_str(c):
+            lon_d, lat_d, lon_a,lat_a,pk = c.split(";")
+            dép = tuple(map(float, (lon_d, lat_d)))
+            arr = tuple(map(float, (lon_a, lat_a)))
+            return ArêteSimplifiée(dép, arr, int(pk))
         res = super().of_fichier(
             chemin,
-            lambda k: d_arête_of_pk[k],
+            arête_of_str,
             cls.feuille
         )
         chrono(tic, f"Chargement de l’arbre des arêtes depuis {chemin}", bavard=bavard)
         return res
+
+    
+    def arête_la_plus_proche(self, coords):
+        """
+        Sortie : (arête django la plus proche de coords, distance)
+        """
+        a, d = self.étiquette_la_plus_proche(coords)
+        a_d = Arête.objects.get(pk=a.pk)
+        return a_d, d

@@ -56,7 +56,6 @@ class Graphe_django():
         z_d = Zone.objects.get(nom=zone_t)
         if z_d not in self.zones:
             print(f"Zone pas en mémoire : {z_d}. Voici les zones que j’ai chargées : {self.zones}")
-            self.zones.append(z_d)
 
             dossier_données = os.path.join(DONNÉES, str(z_d))
             os.makedirs(dossier_données, exist_ok=True)
@@ -110,20 +109,17 @@ class Graphe_django():
             
             ## arbre quad des arêtes:
             chemin = os.path.join(dossier_données, f"arbre_arêtes_{z_d}")
-            if os.path.exists(chemin):
-                tic=perf_counter()
-                print(f"Chargement de l’arbre quad des arêtes depuis {chemin}")
-                self.arbre_arêtes[z_d.nom] = QuadrArbreArête.of_fichier(chemin, d_arête_of_pk)
-                chrono(tic, "Chargement de l’arbre quad des arêtes")
-            else:
-                tic=perf_counter()
-                self.arbre_arêtes[z_d.nom] = ini.quadArbreArêtesDeZone(z_d)
-                self.arbre_arêtes[z_d.nom].sauv(chemin)
-                chrono(tic, f"Création puis sauvegarde (dans {chemin}) de l’arbre des arêtes")
+            tic=perf_counter()
+            LOG(f"Chargement de l’arbre quad des arêtes depuis {chemin}", bavard=bavard)
+            self.arbre_arêtes[z_d.nom] = QuadrArbreArête.of_fichier(chemin)
+            chrono(tic, "Chargement de l’arbre quad des arêtes", bavard=bavard, force=True)
                 
                 
             #cycla min et max
             self.calcule_cycla_min_max(z_d)
+
+            self.zones.append(z_d)
+            
         else:
             print(f"Zone déjà en mémoire : {z_d}.")
         return z_d
