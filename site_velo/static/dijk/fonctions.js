@@ -35,7 +35,7 @@ function addMarker(e) {
     marker.on("dragend", dragedMarker);
 
     form = document.getElementById("relance_rapide");
-    addHidden(form, "étape_coord"+compteur, e.latlng.lat +";"+ e.latlng.lng)
+    addHidden(form, "étape_coord"+compteur, e.latlng.lng +";"+ e.latlng.lat)
     
 }
 

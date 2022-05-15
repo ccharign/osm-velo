@@ -103,17 +103,17 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     ## Calcul des étapes
     tic0 = perf_counter()
 
-    d = chemins.Étape(départ, g, z_d, bavard=bavard-1)
+    d = chemins.Étape.of_texte(départ, g, z_d, bavard=bavard-1)
     if bavard>0: print(f"Départ trouvé : {d}, {d.nœuds}")
 
-    a = chemins.Étape(arrivée, g, z_d, bavard=bavard-1)
+    a = chemins.Étape.of_texte(arrivée, g, z_d, bavard=bavard-1)
     if bavard>0: print(f"Arrivée trouvé : {a}")
     
-    étapes = [d] + [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in noms_étapes] + [a]
+    étapes = [d] + [chemins.Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes] + [a]
 
 
     ## Arêtes interdites
-    étapes_interdites = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
+    étapes_interdites = [chemins.Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
     interdites = chemins.arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
     
     tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")

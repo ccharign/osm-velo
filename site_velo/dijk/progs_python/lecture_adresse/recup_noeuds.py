@@ -21,7 +21,7 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
         g : graphe.
         z_d (Zone) : pour la ville par défaut
         nv_cache (int), niveau de mise en cache
-        Sortie : (liste de nœuds (instance de Sommet) de g associé à cette adresse, l’adresse de type Adresse)
+        Sortie : (liste de nœuds (id osm) de g associé à cette adresse, l’adresse de type Adresse)
            Si un numéro est indiqué, la liste de nœuds est le singleton du nœud de la rue le plus proche.
            Sinon c’est la liste de tous les nœuds connus de la rue.
     """

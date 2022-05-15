@@ -25,5 +25,5 @@ class RelanceRapide(forms.Form):
     départ = forms.CharField(widget=forms.HiddenInput())
     arrivée = forms.CharField(widget=forms.HiddenInput())
     pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
-    
+    zone_t = forms.CharField(widget=forms.HiddenInput())
     

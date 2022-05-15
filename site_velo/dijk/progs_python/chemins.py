@@ -11,7 +11,7 @@ chrono(tic, "recup_donnees")
 #import module_graphe
 import os
 tic=perf_counter()
-from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville
+from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville, Adresse
 chrono(tic, "lecture_adresse.normalisation")
 import re
 import dijkstra
@@ -38,17 +38,37 @@ class ÉchecChemin(Exception):
 class Étape():
     """
     Attributs : 
-        texte (str), adresse de l'étape. 
+        #texte (str), adresse de l'étape. 
         adresse (instance de Adresse)
         nœuds (Sommet set) : ensemble de nœuds
     """
     
-    def __init__(self, texte, g, z_d, nv_cache=1, bavard=0):
-        self.texte = texte
-        n, self.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
-        self.nœuds = set(n)
+    def __init__(self):
+        self.adresse=None
+        self.nœuds = set()
+
+        
+    @classmethod
+    def of_texte(cls, texte, g, z_d, nv_cache=1, bavard=0):
+        res=cls()
+        #res.texte = texte
+        n, res.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
+        res.nœuds = set(n)
+        return res
         #for n in self.nœuds:
         #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
+
+        
+    @classmethod
+    def of_arête(cls, a):
+        res=cls()
+        res.nœuds = set((a.départ.id_osm, a.arrivée.id_osm))
+        # if a.nom:
+        #     res.adresse = Adresse(g, z_d, f"{a.nom}"
+        #                          )
+        res.adresse=f"Arête numéro {a.pk} ({a.nom})"
+        return res
+
         
     def __str__(self):
         return str(self.adresse)

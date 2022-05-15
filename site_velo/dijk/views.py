@@ -2,8 +2,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import  Subquery, Q
-
 import time
+
 tic0=time.perf_counter()
 
 from dijk.progs_python.params import LOG
@@ -11,7 +11,7 @@ from petites_fonctions import chrono, union_liste
 from dijk.progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
-from dijk.progs_python.chemins import Chemin, chemins_of_csv
+from dijk.progs_python.chemins import Chemin, chemins_of_csv, Étape
 tic=chrono(tic, "chemins", bavard=3)
 
 #from dijk.progs_python.init_graphe import charge_graphe
@@ -113,15 +113,16 @@ def vue_itinéraire(requête):
 
 def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, interdites={}, bavard=0):
     """
-    Entrées : ps_détour (float list)
+    Entrées : ps_détour (float list ou str)
               z_d (models.Zone)
               noms_étapes (str list)
               rues_interdites (str list), noms des rues interdites.
               étapes (chemin.Étape list or None), si présent sera utilisé au lieu de noms_étapes. Doit contenir aussi départ et arrivée. Et dans ce cas, interdites sera utilisé au lieu de nues_interdites.
     """
     
-    # Calcul des itinéraires
-    #print(dict(requête.session))
+    if isinstance(ps_détour, str):
+        ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
+        
     try:
         if étapes:
             # On saute le calcul des étapes
@@ -167,27 +168,26 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
 
         # Chargement du template
         #p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
+        # Ce dico sera envoyé au gabarit sous le nom de 'post_préc'
         données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
                    "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour)),
                    "départ":d,
-                   "arrivée":a
+                   "arrivée":a,
+                   "zone_t":z_d.nom,
                    }
         #toutes_les_rues = Rue.objects.filter(ville__zone = z_d)
         return render(requête,
                       nom_fichier_html,
-                      {"stats": stats,
-                       "départ":d, "arrivée":a,
-                       "étapes": texte_étapes,
-                       "rues_interdites": énumération_texte(rues_interdites),
-                       "chemin":chemin.str_joli(),
-                       "post_préc":données,
-                       "relance_rapide":forms.RelanceRapide(initial=données),
-                       #"p_détour_moyen": p_détour_moyen,
-                       "zone_t":z_d.nom,
-                       #"rues":toutes_les_rues,
-                       "fouine": requête.session.get("fouine", None),
-                       "la_carte": carte.get_name()
-                       }
+                      {**données,
+                       **{"stats": stats,
+                           "étapes": texte_étapes,
+                           "rues_interdites": énumération_texte(rues_interdites),
+                           "chemin":chemin.str_joli(),
+                           "post_préc":données,
+                           "relance_rapide":forms.RelanceRapide(initial=données),
+                           "fouine": requête.session.get("fouine", None),
+                           "la_carte": carte.get_name()
+                       }}
                       )
 
     # Renvoi sur la page d’erreur
@@ -201,8 +201,25 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
 def relance_rapide(requête):
     """
     Relance un calcul à partir du résultat du formulaire de relance rapide.
+    Les étapes sont dans des champs contenant  'étape_coord', sous la forme 'lon;lat'
     """
     print(requête.GET)
+    z_d = g.charge_zone(requête.GET["zone_t"])
+    départ = Étape.of_texte(requête.GET["départ"], g, z_d)
+    arrivée = Étape.of_texte(requête.GET["arrivée"],g, z_d)
+
+
+    inter = []
+    for c, v in requête.GET.items():
+        if "étape_coord" in c:
+            print(v)
+            coords = tuple(map(float, v.split(";")))
+            a, _ = g.arête_la_plus_proche(coords, z_d)
+            inter.append((c[11:], Étape.of_arête(a)))
+    inter.sort()
+    étapes = [départ] + [é for _, é in inter] + [arrivée]
+    return calcul_itinéraires(requête, départ, arrivée, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, bavard=10)
+    
     
     
 def trajet_retour(requête):
