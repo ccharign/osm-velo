@@ -70,7 +70,7 @@ def arêtes_interdites(g, z_d, étapes_interdites, bavard=0):
     Entrée : g (graphe)
              z_d (Zone)
              étapes_interdites (Étapes iterable), liste de noms de rues à éviter
-    Sortie : dico des arêtes correspondant
+    Sortie : dico des arêtes correspondant (s->voisins de s interdits)
     """
     interdites = {}
     for é in étapes_interdites:

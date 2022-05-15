@@ -2,18 +2,19 @@
 
 
 {% block contenu %}
-  {% load static %}
+{% load static %}
 
  
 <!-- Formulaire pour enregistrer la contribution -->
 {% if étapes or post_préc.rues_interdites %}
-{% block enregistrer_contrib %}
-{% endblock %}
+  {% block enregistrer_contrib %}
+  {% endblock %}
 {% endif %}
 
 <!-- Formulaire de relance simplifié -->
-<!-- {% block modifs_rapides %} -->
-<!-- {% endblock %} -->
+{% block modifs_rapides %}
+
+{% endblock %}
 
 
 <!-- Carte et stats -->
@@ -21,8 +22,8 @@
     
   <div class="col-md-9">
     <!-- La carte -->
-    Voici l’itinéraire calculé à partir de mes connaissances actuelles. Pour me corriger, utilisez le formulaire en dessous.</br>
-    <div class="marker-position">click on the map, move the marker, click on the marker</div>
+    
+    <!-- <div class="marker-position">click on the map, move the marker, click on the marker</div> -->
     <div class="carte">
       {% block carte %}
       {% endblock %}

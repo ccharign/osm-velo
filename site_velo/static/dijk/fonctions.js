@@ -2,9 +2,7 @@
 var compteur = 0;
 
 function gèreLesClics(){
-    
     laCarte.on("click", addMarker);
-
 }
 
 
@@ -22,6 +20,7 @@ function addMarker(e) {
 	  .bindTooltip(""+compteur, {permanent: true, direction:"bottom"})
 	  .addTo(laCarte)
 	  .bindPopup(buttonRemove);
+    
     marker.numéro = compteur;
 
     // var marker = L.marker(props.coords,
@@ -35,13 +34,13 @@ function addMarker(e) {
     // event draged marker
     marker.on("dragend", dragedMarker);
 
-    form = document.getElementById("relancer_recherche");
+    form = document.getElementById("relance_rapide");
     addHidden(form, "étape_coord"+compteur, e.latlng.lat +";"+ e.latlng.lng)
     
 }
 
 const buttonRemove =
-  '<button type="button" class="remove">delete marker 💔</button>';
+  '<button type="button" class="remove">Supprimer</button>';
 
 // remove marker
 function removeMarker() {

@@ -403,3 +403,10 @@ class Graphe_django():
                     #raise RuntimeError(f"La longeur de {a} est < à la distance euc entre ses sommets {s} et {t} ({self.d_euc(s, t)}))")
                     rapport_max = max(rapport_max,self.d_euc(s,t)/a.longueur )
         return rapport_max
+
+
+    def arête_la_plus_proche(self, coords, z_d):
+        """
+        Renvoie l’arête de l’arbre des arêtes de z_d la plus proche de coords.
+        """
+        return self.arbre_arêtes[z_d.nom].arête_la_plus_proche(coords)

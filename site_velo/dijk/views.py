@@ -24,7 +24,7 @@ from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfect
 from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
-from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla
+from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla, itinéraire_of_étapes
 chrono(tic, "utils", bavard=3)
 
 from graphe_par_django import Graphe_django
@@ -111,25 +111,37 @@ def vue_itinéraire(requête):
     #    return autreErreur(requête, e)
 
 
-def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, bavard=0):
+def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, interdites={}, bavard=0):
     """
     Entrées : ps_détour (float list)
               z_d (models.Zone)
               noms_étapes (str list)
-              rues_interdites (str list)
+              rues_interdites (str list), noms des rues interdites.
+              étapes (chemin.Étape list or None), si présent sera utilisé au lieu de noms_étapes. Doit contenir aussi départ et arrivée. Et dans ce cas, interdites sera utilisé au lieu de nues_interdites.
     """
     
     # Calcul des itinéraires
-    print(dict(requête.session))
+    #print(dict(requête.session))
     try:
-        stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire(
-            d, a, ps_détour, g, z_d, requête.session,
-            rajouter_iti_direct=len(noms_étapes)>0,
-            noms_étapes=noms_étapes,
-            rues_interdites=rues_interdites,
+        if étapes:
+            # On saute le calcul des étapes
+            stats, chemin, d, a, noms_étapes, carte = itinéraire_of_étapes(
+            étapes, ps_détour, g, z_d, requête.session,
+            rajouter_iti_direct=len(étapes)>2,
+            interdites=interdites,
             bavard=10,
             où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
+            rues_interdites=[]
+        else:
+            stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire(
+                d, a, ps_détour, g, z_d, requête.session,
+                rajouter_iti_direct=len(noms_étapes)>0,
+                noms_étapes=noms_étapes,
+                rues_interdites=rues_interdites,
+                bavard=10,
+                où_enregistrer="dijk/templates/dijk/iti_folium.html"
+            )
     
         # Création du template
         texte_étapes = énumération_texte(noms_étapes)
@@ -156,7 +168,9 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
         # Chargement du template
         #p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
         données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
-                   "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour))
+                   "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour)),
+                   "départ":d,
+                   "arrivée":a
                    }
         #toutes_les_rues = Rue.objects.filter(ville__zone = z_d)
         return render(requête,
@@ -167,6 +181,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                        "rues_interdites": énumération_texte(rues_interdites),
                        "chemin":chemin.str_joli(),
                        "post_préc":données,
+                       "relance_rapide":forms.RelanceRapide(initial=données),
                        #"p_détour_moyen": p_détour_moyen,
                        "zone_t":z_d.nom,
                        #"rues":toutes_les_rues,
@@ -182,6 +197,13 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
         traceback.print_exc()
         return autreErreur(requête, e)
 
+    
+def relance_rapide(requête):
+    """
+    Relance un calcul à partir du résultat du formulaire de relance rapide.
+    """
+    print(requête.GET)
+    
     
 def trajet_retour(requête):
     """

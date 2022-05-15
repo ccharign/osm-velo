@@ -1,7 +1,9 @@
 {% extends "dijk/résultat_itinéraire_base.html" %}
 
 
-
+{% load bootstrap3 %}
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
 
 
 
@@ -53,11 +55,11 @@
   </form>
 </p>
 {% endblock %}
+<!-- fin enregistrer contrib -->
 
 
 
-
-<!-- Statistiques -->
+<!-- Statistiques et trace gpx -->
 {% block stats %}
 <ul>
   {% for x in stats %}
@@ -73,6 +75,8 @@
   {% endfor %}
 </ul>
 {% endblock %}
+<!-- fin stats -->
+
 
 
 
@@ -85,7 +89,6 @@
 	laCarte = {{la_carte}};
 	gèreLesClics();
     });
-  
 </script>
 
 <form action = "{% url 'résultat' %}" method="get" id="relancer_recherche">
@@ -137,33 +140,23 @@
   </div>
 </form>
 {% endblock %}
-
+<!-- fin relance complet -->
 
 
 
 <!-- Relance rapide du formulaire -->
 {% block modifs_rapides %}
 
+<form action = "{% url 'relance_rapide' %}" method="get" id="relance_rapide">
+  Voici l’itinéraire obtenu à l’aide de mes connaissaces actuelles. Pour me corriger : clic pour ajouter une étape.
+  {% bootstrap_form relance_rapide %}
 
-<form action = "{% url 'résultat' %}" method="get">
-  
- 
+  {% buttons %}
+  <button type="submit" class="btn btn-primary">Recalculer</button>
+  {% endbuttons %}
 </form>
-
-
-<script>
-  $(document).ready(function() {
-      $(function () {
-	      $("#une_rue_interdite").autocomplete({
-		  source: "ajax/recherche_rue",
-		  minLength: 3,
-	      });
-	  });
-  })
-</script>
-
 {% endblock %}
-
+<!-- fin relance rapide -->
 
     
 

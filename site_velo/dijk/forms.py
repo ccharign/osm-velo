@@ -20,8 +20,10 @@ class ChoixZone(forms.Form):
 
 class RelanceRapide(forms.Form):
     """
-    Pour relancer rapidement une recherche. Permet l’ajout d’une rue interdite et d’une étape.
+    Pour relancer rapidement une recherche.
     """
-    rue_interdite = forms.TextInput()
-    étape = forms.TextInput()
+    départ = forms.CharField(widget=forms.HiddenInput())
+    arrivée = forms.CharField(widget=forms.HiddenInput())
+    pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
+    
     

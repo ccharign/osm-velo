@@ -109,18 +109,50 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     a = chemins.Étape(arrivée, g, z_d, bavard=bavard-1)
     if bavard>0: print(f"Arrivée trouvé : {a}")
     
-    étapes = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
+    étapes = [d] + [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in noms_étapes] + [a]
 
 
     ## Arêtes interdites
     étapes_interdites = [chemins.Étape(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
     interdites = chemins.arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
-    tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
     
+    tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
+
+    stats, c, dép, arr, nom_étapes, carte = itinéraire_of_étapes(étapes, ps_détour, g, z_d, session, rajouter_iti_direct, interdites, où_enregistrer, bavard, ouvrir)
+
+    return stats, c, dép, arr, nom_étapes, [str(é) for é in étapes_interdites], carte
+ 
+
+def itinéraire_of_étapes(étapes,
+                         ps_détour,
+                         g,
+                         z_d,
+                         session,
+                         rajouter_iti_direct=True,
+                         interdites={},
+                         où_enregistrer=os.path.join(TMP, "itinéraire.html"),
+                         bavard=0,
+                         ouvrir=False):
+    """
+    Entrées:
+        ps_détour (float list)
+        étapes (listes d’étapes), départ et arrivée inclus.
+        interdites (s -> set des voisins interdits) le dico des arêtes interdites 
+
+    Sortie : 
+    (stats : liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
+     c : chemin avec le plus grand p_détour,
+     dép : nom du départ après éventuelle correction,
+     arr : idem pour l’arrivée,
+     nom_étapes,
+     carte
+    )
+    """
     np = len(ps_détour)
     à_dessiner = []
     res = []
-
+    
+    
     def traite_un_chemin(c, coul, légende, aide):
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
         à_dessiner.append( (iti_d, coul, p))
@@ -136,16 +168,17 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
                     "gpx": gpx_of_iti(iti_d, session, bavard=bavard-1)}
                    )
 
-
+    tic = perf_counter()
     for i, p in enumerate(ps_détour):
-        c = chemins.Chemin(z_d, [d]+étapes+[a], p, False, interdites=interdites)
+        c = chemins.Chemin(z_d, étapes, p, False, interdites=interdites)
         coul = color_dict[ (i*n_coul)//np ]
         traite_un_chemin(c, coul, *légende_et_aide(p))
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if ps_détour[0]==0.:
-        longueur_ch_direct = res[0]["longueur"]    
-    
+        longueur_ch_direct = res[0]["longueur"]
+        
+    d, a = étapes[0], étapes[-1]
     if rajouter_iti_direct:
         cd = chemins.Chemin(z_d, [d,a], 0, False)
         coul = "#000000"
@@ -161,8 +194,8 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
     tic=perf_counter()
     carte = dessine(à_dessiner, g, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
-    chrono(tic0, f"Total pour le chemin {c}")
-    return res, c, str(d), str(a), [str(é) for é in étapes], [str(é) for é in étapes_interdites], carte
+    #chrono(tic0, f"Total pour le chemin {c}")
+    return res, c, str(d), str(a), [str(é) for é in étapes[1:-1]], carte
 
 
 ### création du gpx ###
