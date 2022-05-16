@@ -64,7 +64,7 @@ function dragedMarker() {
   //  this.getLatLng().lng
     //}`;
     const marker=this;
-    document.getElementById("étape_coord"+marker.numéro).value = marker.getLatLng().lat+";"+ marker.getLatLng().lng;
+    document.getElementById("étape_coord"+marker.numéro).value = marker.getLatLng().lng+";"+ marker.getLatLng().lat;
 }
 
 function addHidden(theForm, key, value) {

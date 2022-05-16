@@ -1,26 +1,26 @@
 # -*- coding:utf-8 -*-
 from time import perf_counter
-from petites_fonctions import chrono
+import os
+import re
+
+
+from petites_fonctions import chrono, milieu
 
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES, LOG
-from dijk.models import Sommet, Chemin_d, Zone
+from dijk.models import Sommet, Chemin_d, Zone, Arête
 
 tic=perf_counter()
 from recup_donnees import cherche_lieu, coords_of_adresse
 chrono(tic, "recup_donnees")
-#import module_graphe
-import os
+
 tic=perf_counter()
 from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville, Adresse
 chrono(tic, "lecture_adresse.normalisation")
-import re
+
 import dijkstra
 tic=perf_counter()
 from lecture_adresse.recup_noeuds import nœuds_of_étape
 chrono(tic, "lecture_adresse.recup_noeuds")
-#Pour test
-#import init_graphe
-#g = init_graphe.charge_graphe(bavard=1)
 
 
 def sans_guillemets(c):
@@ -50,28 +50,95 @@ class Étape():
         
     @classmethod
     def of_texte(cls, texte, g, z_d, nv_cache=1, bavard=0):
+        """
+        Si de la forme 'Arêtelon;lat', renvoie l’objet de type ÉtapeArête correspondant à ces coords.
+        Sinon lit l’adresse et renvoie l’objet de type Étape classique.
+        """
         res=cls()
         #res.texte = texte
-        n, res.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
-        res.nœuds = set(n)
-        return res
+
+        # Voyons si le texte venait d’un ÉtapeArête.__str__
+        essai = re.match("^Arête(.*),(.*)", texte)
+        if essai:
+            lon, lat = map(float, essai.groups())
+            return ÉtapeArête.of_coords((lon,lat), g, z_d)
+        else:
+
+            # voyons s’il venait d’un ÉtapeArête.joli_texte
+            essai2 = re.match("^Arête numéro ([0-9]*).*", texte)
+            if essai2:
+                pk=map(int, essai.groups())
+                return ÉtapeArête.of_pk(pk)
+
+            # Cas général : le texte est une adresse.
+            else:
+                n, res.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
+                res.nœuds = set(n)
+                return res
         #for n in self.nœuds:
         #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
 
         
-    @classmethod
-    def of_arête(cls, a):
-        res=cls()
-        res.nœuds = set((a.départ.id_osm, a.arrivée.id_osm))
-        # if a.nom:
-        #     res.adresse = Adresse(g, z_d, f"{a.nom}"
-        #                          )
-        res.adresse=f"Arête numéro {a.pk} ({a.nom})"
-        return res
-
-        
     def __str__(self):
         return str(self.adresse)
+
+    
+class ÉtapeArête():
+    """
+    Pour représenter une étape qui est une arête. Dispose de l’attribut nœud et de la méthode __str__ afin d’être utilisée dans un chemin comme la classe Étape.
+
+    Attributs:
+        nœuds (int set), set d’id_osm de sommets
+        coords_ini (float×float), coords du point dont cette arête était la plus proche. Servira de str pour l’enregistrement dans la base.
+        pk (int), clef primaire de l’arête dans la base models.Arête.
+        nom (str), nom de la rue contenant cette arête.
+    """
+    
+    def __init__(self):
+        self.nœuds=set()
+        self.coords_ini = None
+        self.pk = None
+    
+    
+    @classmethod
+    def of_arête(cls, a, coords):
+        res=cls()
+        res.coords_ini = coords
+        res.nœuds = set((a.départ.id_osm, a.arrivée.id_osm))
+        res.nom = a.nom
+        res.pk = a.pk
+        return res
+
+    
+    @classmethod
+    def of_pk(cls, pk):
+        """
+        Je prend ici le milieu du premier segment de l’arête pour le champ coords.
+        """
+        a = Arête.objects.get(pk=pk)
+        premier_segment = a.géométrie()[:2]
+        coords= milieu(*premier_segment)
+        return cls.of_arête(a, coords)
+        
+    
+    @classmethod
+    def of_coords(cls, coords, g, z_d):
+        a, _ = g.arête_la_plus_proche(coords, z_d)
+        return cls.of_arête(a, coords)
+    
+    
+    def __str__(self):
+        """
+        Sera utilisé pour enregistrement dans la base.
+        """
+        return f"Arête{self.coords_ini[0]},{self.coords_ini[1]}"
+    
+    
+    def joli_texte(self):
+        """
+        Pour affichage utilisateur.
+        """
+        return f"Arête numéro {self.pk} ({self.nom})"
 
 
 def dico_arête_of_nœuds(g, nœuds):
@@ -177,7 +244,7 @@ class Chemin():
         #rues interdites
         if len(rues_interdites_t)>0:
             noms_rues = rues_interdites_t.split(";")
-            étapes_interdites =  (Étape(n, g , z_d, nv_cache=2) for n in noms_rues)
+            étapes_interdites =  (Étape.of_texte(n, g , z_d, nv_cache=2) for n in noms_rues)
             interdites = arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
         else:
             interdites = {}
@@ -188,7 +255,7 @@ class Chemin():
         étapes=[]
         for c in noms_étapes:
         #    try:                
-                étapes.append(Étape(c.strip(), g, z_d, nv_cache=2, bavard=bavard-1))
+                étapes.append(Étape.of_texte(c.strip(), g, z_d, nv_cache=2, bavard=bavard-1))
         #     except Exception as e:
         #         LOG_PB(f"Échec pour l’étape {c} : {e}")
         #         n_pb+=1
@@ -222,12 +289,12 @@ class Chemin():
                   g (Graphe)
         Sortie : instance de Chemin
         """
-        étapes = [Étape(é, g, z_d, nv_cache=nv_cache) for é in noms_étapes]
+        étapes = [Étape.of_texte(é, g, z_d, nv_cache=nv_cache) for é in noms_étapes]
         if bavard>0:
             print(f"List des étapes obtenues : {étapes}")
 
 
-        étapes_interdites = (Étape(é, g, z_d, nv_cache=nv_cache) for é in noms_rues_interdites)
+        étapes_interdites = (Étape.of_texte(é, g, z_d, nv_cache=nv_cache) for é in noms_rues_interdites)
         return cls(z_d, étapes, pourcentage_détour/100, AR,
                    interdites=arêtes_interdites(g, z_d, étapes_interdites),
                    texte_interdites=";".join(noms_rues_interdites)

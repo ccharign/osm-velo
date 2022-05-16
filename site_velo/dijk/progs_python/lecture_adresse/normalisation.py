@@ -1,12 +1,12 @@
-
 # -*- coding:utf-8 -*-
 import re
+import time
+import os
+
 from params import PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
 from dijk.models import Rue, CacheNomRue
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
-import time
 from petites_fonctions import chrono
-import os
 from recup_donnees import cherche_lieu
 from .normalisation0 import partie_commune, normalise_adresse, prétraitement_rue, découpe_adresse
 

@@ -3,6 +3,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import  Subquery, Q
 import time
+from datetime import datetime
+from glob import glob
+import os
+import forms
+import traceback
+import json
+import re
+
 
 tic0=time.perf_counter()
 
@@ -11,7 +19,7 @@ from petites_fonctions import chrono, union_liste
 from dijk.progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
-from dijk.progs_python.chemins import Chemin, chemins_of_csv, Étape
+from dijk.progs_python.chemins import Chemin, chemins_of_csv, Étape, ÉtapeArête
 tic=chrono(tic, "chemins", bavard=3)
 
 #from dijk.progs_python.init_graphe import charge_graphe
@@ -32,14 +40,9 @@ from dijk.progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
 g=Graphe_django()
 
-from datetime import datetime
-from glob import glob
-import os
+
 from dijk.models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
-import forms
-import traceback
-import json
-import re
+
 
 
 
@@ -201,7 +204,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
 def relance_rapide(requête):
     """
     Relance un calcul à partir du résultat du formulaire de relance rapide.
-    Les étapes sont dans des champs contenant  'étape_coord', sous la forme 'lon;lat'
+    Les étapes sont dans des champs dont le nom contient 'étape_coord', sous la forme 'lon;lat'
     """
     print(requête.GET)
     z_d = g.charge_zone(requête.GET["zone_t"])
@@ -215,7 +218,7 @@ def relance_rapide(requête):
             print(v)
             coords = tuple(map(float, v.split(";")))
             a, _ = g.arête_la_plus_proche(coords, z_d)
-            inter.append((c[11:], Étape.of_arête(a)))
+            inter.append((c[11:], ÉtapeArête.of_arête(a, coords)))
     inter.sort()
     étapes = [départ] + [é for _, é in inter] + [arrivée]
     return calcul_itinéraires(requête, départ, arrivée, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, bavard=10)

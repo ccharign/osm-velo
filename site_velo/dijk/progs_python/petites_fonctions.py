@@ -18,25 +18,10 @@ import re
 import geopy.distance
 
 
-def sauv_fichier(chemin):
-    """
-    Crée une copie du fichier dans le sous-répertoire « sauv » du répertoire contenant le fichier. Le sous-répertoire « sauv » doit exister au préalable.
-    """
-    dossier, nom = os.path.split(chemin)
-    dossier_sauv = os.path.join(dossier,"sauv")
-    os.makedirs(dossier_sauv, exist_ok=True)
-    nom_sauv = nom+str(datetime.datetime.now())
-    shutil.copyfile(
-        chemin,
-        os.path.join(dossier_sauv, nom_sauv)
-    )
 
-# geopy.geocoders.options.default_user_agent = "pau à vélo"
-# localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
-# def recherche_inversée(coords, bavard=0):
-#     if bavard>0:print("Pause de 1s avant la recherche inversée")
-#     time.sleep(1)
-#     return(localisateur.reverse(coords))
+#################
+### Géométrie ###
+#################
 
 
 R_TERRE = 6360000  # en mètres
@@ -77,6 +62,17 @@ def distance_si_pas_trop(c1, c2):
     else:
         return d
 
+def milieu(c1, c2):
+    lon1, lat1 = c1
+    lon2, lat2 = c2
+    return (lon1+lon2)/2, (lat1+lat2)/2
+
+
+
+##################
+### Itérateurs ###
+##################
+
     
 def deuxConséc(t):
     """ Renvoie un itérateur sur les couples d'éléments consécutifs de t."""
@@ -112,26 +108,15 @@ def intersection(t1, t2):
             yield x
 
 
-def multi_remplace(d, texte):
-    """
-    Entrées : d (str -> str dict)
-              texte (str)
-    Sortie : texte où chaque itération d’une clef de d a été remplacée par la valeur correspondante.
-    """
-    #https://stackoverflow.com/questions/6116978/how-to-replace-multiple-substrings-of-a-string
-    remp = { re.escape(c):v for c,v in d.items()}
-    regexp = re.compile("|".join(remp.keys()))
-    return regexp.sub(lambda m:remp[re.escape(m.group(0))], texte)
 
 
-def ajouteDico(d, clef, val):
-    """d est un dico de listes.
-       Ajoute val à la liste de clef donnée si pas encore présente."""
-    if clef in d:
-        if val not in d[clef]:
-            d[clef].append(val)
-    else:
-            d[clef]=[val]
+
+
+            
+###################
+### Benchmarking###
+###################
+
 
 def chrono(tic, tâche, bavard=1, force=False):
     """
@@ -164,3 +149,66 @@ def mesure_temps(nom, temps, nb_appels):
         return nv_f
     return décorateur
         
+
+
+
+
+##############
+### Divers ###
+##############
+
+
+def sauv_fichier(chemin):
+    """
+    Crée une copie du fichier dans le sous-répertoire « sauv » du répertoire contenant le fichier. Le sous-répertoire « sauv » doit exister au préalable.
+    """
+    dossier, nom = os.path.split(chemin)
+    dossier_sauv = os.path.join(dossier,"sauv")
+    os.makedirs(dossier_sauv, exist_ok=True)
+    nom_sauv = nom+str(datetime.datetime.now())
+    shutil.copyfile(
+        chemin,
+        os.path.join(dossier_sauv, nom_sauv)
+    )
+
+def sauv_fichier(chemin):
+    """
+    Crée une copie du fichier dans le sous-répertoire « sauv » du répertoire contenant le fichier. Le sous-répertoire « sauv » doit exister au préalable.
+    """
+    dossier, nom = os.path.split(chemin)
+    dossier_sauv = os.path.join(dossier,"sauv")
+    os.makedirs(dossier_sauv, exist_ok=True)
+    nom_sauv = nom+str(datetime.datetime.now())
+    shutil.copyfile(
+        chemin,
+        os.path.join(dossier_sauv, nom_sauv)
+    )
+
+
+def multi_remplace(d, texte):
+    """
+    Entrées : d (str -> str dict)
+              texte (str)
+    Sortie : texte où chaque itération d’une clef de d a été remplacée par la valeur correspondante.
+    """
+    #https://stackoverflow.com/questions/6116978/how-to-replace-multiple-substrings-of-a-string
+    remp = { re.escape(c):v for c,v in d.items()}
+    regexp = re.compile("|".join(remp.keys()))
+    return regexp.sub(lambda m:remp[re.escape(m.group(0))], texte)
+
+
+def ajouteDico(d, clef, val):
+    """d est un dico de listes.
+       Ajoute val à la liste de clef donnée si pas encore présente."""
+    if clef in d:
+        if val not in d[clef]:
+            d[clef].append(val)
+    else:
+            d[clef]=[val]
+
+# geopy.geocoders.options.default_user_agent = "pau à vélo"
+# localisateur = geopy.geocoders.Nominatim(user_agent="pau à vélo")
+# def recherche_inversée(coords, bavard=0):
+#     if bavard>0:print("Pause de 1s avant la recherche inversée")
+#     time.sleep(1)
+#     return(localisateur.reverse(coords))

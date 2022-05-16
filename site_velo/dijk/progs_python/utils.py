@@ -3,24 +3,28 @@
 ### Fonctions diverses pour utiliser le logiciel
 
 from time import perf_counter
-from petites_fonctions import chrono, deuxConséc
-import dijk.models as mo
-from params import TMP
-#from importlib import reload  # recharger un module après modif
 import subprocess
-#import networkx as nx  # graphe
-from dijk.models import Zone
-#from osmnx import plot_graph_folium
+import os
+from django.db import transaction
+import gpxpy
+
+from petites_fonctions import chrono, deuxConséc
+tic=perf_counter()
+import folium
+chrono(tic, "folium", bavard=2)
 from folium.plugins import Fullscreen, LocateControl
 
+
+
+import dijk.models as mo
+from dijk.models import Zone, Chemin_d, Arête
+
+from params import TMP
+
 tic=perf_counter()
-from mon_folium import  folium_of_chemin, ajoute_marqueur, folium_of_arêtes
+from mon_folium import folium_of_chemin, ajoute_marqueur, folium_of_arêtes
 chrono(tic, "mon_folium", bavard=2)
 
-#ox.config(use_cache=True, log_console=True)
-#from module_graphe import graphe  #ma classe de graphe
-#import récup_données as rd
-#import apprentissage
 import dijkstra
 
 tic=perf_counter()
@@ -28,18 +32,10 @@ import chemins  # classe chemin et lecture du csv
 chrono(tic, "chemins", bavard=2)
 
 from lecture_adresse.normalisation import normalise_rue, normalise_ville
-import os
 
-
-tic=perf_counter()
-import folium
-chrono(tic, "folium", bavard=2)
-
-from dijk.models import Chemin_d, Arête
 import apprentissage as ap
-from django.db import transaction
 
-import gpxpy
+
 
 def liste_Arête_of_iti(g, iti, p_détour):
     """
