@@ -8,7 +8,7 @@ import os
 from django.db import transaction
 import gpxpy
 
-from petites_fonctions import chrono, deuxConséc
+from petites_fonctions import chrono, deuxConséc, LOG
 tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
