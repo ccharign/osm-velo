@@ -129,7 +129,7 @@ def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, vill
     close_old_connections()
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
     print(f"\nPlaces piétonnes trouvées : {places_piétonnes}\n")
-    input("presser une touche")
+    #input("presser une touche")
     
     
     print("Création de l'arbre lexicographique")

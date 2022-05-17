@@ -361,7 +361,7 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
     
 ### Apprentissage ###
 
-def lecture_tous_les_chemins(g, z_t=None, bavard=2):
+def lecture_tous_les_chemins(g, z_t=None, n_lectures_max=20, bavard=2):
     """
     Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
     """
@@ -370,15 +370,36 @@ def lecture_tous_les_chemins(g, z_t=None, bavard=2):
     else:
         z=g.charge_zone(z_t)
         à_parcourir = [z]
+
+    # Liste des chemins à lire
+    à_lire=[]
     for z in à_parcourir:
         for c_d in Chemin_d.objects.filter(zone=z):
             c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
-            n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
-            c_d.dernier_p_modif = n_modif/l
-            c_d.save()
-            print(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n")
+            c.c_d = c_d
+            à_lire.append(c)
 
-            
+    # lecture des chemins
+    for _ in range(n_lectures_max):
+        LOG(f"\n{len(à_lire)} chemins restant à lire.")
+        à_lire_après = []
+        for c in à_lire:
+            n_modif,l = ap.lecture_meilleur_chemin(g, c, bavard=bavard)
+            c.c_d.dernier_p_modif = n_modif / l
+            LOG(f"\nLecture de {c}. {n_modif} arêtes modifiées, distance = {l}.\n\n\n", bavard=bavard)
+            if n_modif>0:
+                à_lire_après.append(c)
+            else:
+                c.c_d.save()
+        à_lire = à_lire_après
+
+    # sauvegarde des dernier_p_modif pour les chemins où ce n’est pas arrivé à 0.
+    for c in à_lire:
+        LOG(f"Apprentissage pas fini pour {c}, p_modif = {c.c_d.dernier_p_modif}")
+        c.c_d.save()
+        
+
+
 def réinit_cycla(g, z_t=None, nb_lectures=6, bavard=0):
     """
     Vide la la cyclabilité des arêtes puis lance nb_lectures lectures des chemins.

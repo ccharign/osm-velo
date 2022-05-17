@@ -1,7 +1,10 @@
 
 À FAIRE :
 
-Rajouter allées du parc en vert
+Rechargement et entraînement pratique...
+   - apprentissage auto. Tous les chemin qui ont un score de dernière modif>0
+   - réinit base ?
+
 
 Amenities : les charger dans la base, et les mettre dans la complétion auto.
 Chercher dedans dans chemins.Étape
@@ -9,21 +12,20 @@ Traduire en français
 
 Faire un passer par un(e) ...
 
+BUG de la place Clémenceau. Il semble qu’il y mangue des arêtes.
+
+Recherche dans l’arbre lex dans la complétion automatique, avec tolérance à faute de frappe.
+
+
 Mettre une case à cocher pour enregistrer dans le cache ?
    -> utils.itinéraire renvoie les corrections qui ont été faites
    -> voir le template rés_itinéraire_base
 Voire récup dans osm tous les noms de lieux ?
 
-Recherche dans l’arbre lex dans la complétion automatique, avec tolérance à faute de frappe.
 
-arbre lex des cles du cache.
-
-Formulaire de correction rapide.
-  -> juste rajouter un nom de rue interdite ou une étape.
 
 Tester vue générique pour chemins
 
-Passer par un (amenity)
 
 corriger géom ville
 Graphe des villes

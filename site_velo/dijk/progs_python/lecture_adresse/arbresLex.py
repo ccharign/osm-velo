@@ -100,7 +100,7 @@ class ArbreLex():
             
     def mots_les_plus_proches(self, mot, d_actuelle=0, d_max = float("inf")):
         """ Renvoie le couple (set des mots à distance minimale de mot, la distance minimale elle-même).
-        Renvoie set([]) si aucun mot à distance <= dmax.
+        Renvoie set() si aucun mot à distance <= dmax.
         """
 
         def rassemble_possibs(p1, p2):
@@ -165,8 +165,16 @@ class ArbreLex():
                         )
                                             
                 return res
+    
+    
+    def complétion(self, mot:str, tol:int, n_max_rés=float("inf")):
+        """
+        Sortie (str set) : tous les mots de l’arbre commençant par mot.
+        Paramètres:
+            - n_max_rés, nb max de résultats à renvoyer. Si le nb de rés dépasse ce paramètre, on renvoie uniquement les résultats avec tol=0, Si même ainsi le nb de rés dépasse n_max_rés, la fonction renvoie [].
+        """
 
-
+    
     def sauv(self, chemin):
         """
         Enregistre l’arbre dans le fichier spécifié.

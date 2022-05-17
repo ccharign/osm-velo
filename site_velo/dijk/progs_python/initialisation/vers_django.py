@@ -326,12 +326,12 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         # Pas possible avant car il faut avoir sauvé l’objet pour rajouter une relation ManyToMany.
         # Il faudrait un bulk_manyToMany ... -> utiliser la table d’association automatiquement créée par Django : through
         #https://docs.djangoproject.com/en/4.0/ref/models/fields/#django.db.models.ManyToManyField
-        print("Sommets créés")
+        LOG("Sommets créés", bavard)
         rel_àcréer=[]
         for s_d in à_créer:
             rel = Sommet.zone.through(sommet_id = s_d.id, zone_id = zone_d.id)
             rel_àcréer.append(rel)
-        print("Sommets mis à jour")
+        LOG("Sommets mis à jour", sommet)
         for s_d in à_màj:
             if zone_d not in s_d.zone.all() :
                 rel = Sommet.zone.through(sommet_id = s_d.id, zone_id = zone_d.id)
@@ -413,7 +413,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
 
 
     #@mesure_temps("remplace_arêtes", temps, nb_appels)
-    def remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx):
+    def remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx, bavard=0):
         """
         Supprime les arêtes de arêtes_d, et crée à la place celles venant de gx[s][t].
         Sortie (Arête list): les arêtes créées.
@@ -428,7 +428,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         
         
         for a in arêtes_d:
-            LOG(f"arête à supprimer : {a} -> {a.départ, a.arrivée, a.nom}\n à remplacer par {arêtes_nx} -> {list(arêtes_nx)[0].get('name')}.", bavard=bavard)
+            LOG(f"arête à supprimer : {a} -> {a.départ, a.arrivée, a.nom}\n à remplacer par {arêtes_nx} -> {list(arêtes_nx)[0].get('name')}.", bavard=bavard-1)
             a.delete()
         
         res=[]
@@ -444,7 +444,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         à_créer.extend(res)
         return res
 
-    LOG("Chargement des arêtes depuis le graphe osmnx")
+    LOG("Chargement des arêtes depuis le graphe osmnx", bavard)
     nb=0
 
     with transaction.atomic():
@@ -458,11 +458,11 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                     correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
                     if rapide<2 and arêtes_d:
                         if rapide==0 or not correspondent:
-                            arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx)
+                            arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx, bavard=bavard-1)
                         else:
                             màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x)
     
-    LOG("Ajout des nouvelles arêtes dans la base")
+    LOG("Ajout des nouvelles arêtes dans la base", bavard)
     #créées=Arête.objects.bulk_create(à_créer)
     sauv_données(à_créer)
     LOG("Mise à jour des anciennes arêtes")
