@@ -185,7 +185,7 @@ class ArbreLex():
         """
         
         if len(mot)==0:
-            
+            pass
 
 
         
