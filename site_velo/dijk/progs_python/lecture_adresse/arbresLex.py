@@ -14,7 +14,8 @@ class ArbreLex():
         """ Renvoie un arbre vide"""
         self.fils = {}
         self.term = False
-
+    
+    
     def tous_les_mots(self):
         """
         Renvoie la liste des mots de l’arbre
@@ -32,7 +33,16 @@ class ArbreLex():
                     list(map(lambda m:x+m, a.tous_les_mots()))
                 )
             return res
-        
+    
+    
+    def __len__(self):
+        if self.term:
+            res=1
+        else:
+            res=0
+        return sum(len(a) for a in self.fils.values())
+
+    
     def insère(self, mot):
         """
         Entrée : mot (str)
@@ -171,9 +181,14 @@ class ArbreLex():
         """
         Sortie (str set) : tous les mots de l’arbre commençant par mot.
         Paramètres:
-            - n_max_rés, nb max de résultats à renvoyer. Si le nb de rés dépasse ce paramètre, on renvoie uniquement les résultats avec tol=0, Si même ainsi le nb de rés dépasse n_max_rés, la fonction renvoie [].
+            - n_max_rés, nb max de résultats à renvoyer. Si le nb de rés dépasse ce paramètre, on renvoie uniquement les résultats avec tol=0, Si même ainsi le nb de rés dépasse n_max_rés, la fonction renvoie set().
         """
+        
+        if len(mot)==0:
+            
 
+
+        
     
     def sauv(self, chemin):
         """

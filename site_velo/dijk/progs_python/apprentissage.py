@@ -24,6 +24,7 @@ def dico_arêtes(iti):
         res.add(a)
     return res
 
+
 @atomic
 def lecture_meilleur_chemin(g, chemin, bavard=0):
     """ 
@@ -109,3 +110,5 @@ def lecture_jusqu_à_perfection(g, chemins, n_max=50, bavard=0):
     if n_étapes==n_max:
         LOG_PB(f"Nombre max d’itérations ({n_max}) atteint lors de l’apprentissage pour les chemins {chemins}.")
     return prop_modif[-1]
+
+

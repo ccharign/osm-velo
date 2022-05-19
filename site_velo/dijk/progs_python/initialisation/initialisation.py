@@ -44,7 +44,7 @@ def quadArbreDeZone(z_d, bavard=0):
 
 
 
-def quadArbreArêtesDeZone(z_d, sauv=True, bavard=0):
+def quadArbreAretesDeZone(z_d, sauv=True, bavard=0):
     """
     Entrée : z_d (mo.Zone)
     Sortie : arbre des arêtes de cette zone

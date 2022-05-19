@@ -184,9 +184,9 @@ class Chemin():
         self.p_détour = p_détour
         self.AR = AR
         self.texte = None
-        self.interdites=interdites
-        self.noms_rues_interdites=texte_interdites
-        self.zone=z_d
+        self.interdites = interdites
+        self.noms_rues_interdites = texte_interdites
+        self.zone = z_d
     
 
     @classmethod

@@ -271,7 +271,7 @@ def confirme_nv_chemin(requête):
                 c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, nv_cache=2, bavard=2)
                 chemins.append(c)
                 c_d=c.vers_django(bavard=1)
-                prop_modif=n_lectures(nb_lectures, g, [c], bavard=1)
+                prop_modif = n_lectures(nb_lectures, g, [c], bavard=1)
                 print(prop_modif)
                 c_d.dernier_p_modif=prop_modif
                 c_d.save()
