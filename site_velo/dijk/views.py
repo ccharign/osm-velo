@@ -38,17 +38,14 @@ chrono(tic, "utils", bavard=3)
 from graphe_par_django import Graphe_django
 from dijk.progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
-g=Graphe_django()
-
-
 from dijk.models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
-
-
-
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
-# Create your views here.
+
+g=Graphe_django()
+
+
 
 
 #https://stackoverflow.com/questions/18176602/how-to-get-the-name-of-an-exception-that-was-caught-in-python
@@ -114,13 +111,14 @@ def vue_itinéraire(requête):
     #    return autreErreur(requête, e)
 
 
-def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, interdites={}, bavard=0):
+def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, étapes_interdites=[], bavard=0):
     """
     Entrées : ps_détour (float list ou str)
               z_d (models.Zone)
               noms_étapes (str list)
               rues_interdites (str list), noms des rues interdites.
               étapes (chemin.Étape list or None), si présent sera utilisé au lieu de noms_étapes. Doit contenir aussi départ et arrivée. Et dans ce cas, interdites sera utilisé au lieu de nues_interdites.
+              interdites (chemin.Étape list or None), ne passer par aucune arête inclue dans une de ces étapes.
     """
     
     if isinstance(ps_détour, str):
@@ -129,14 +127,13 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
     try:
         if étapes:
             # On saute le calcul des étapes
-            stats, chemin, d, a, noms_étapes, carte = itinéraire_of_étapes(
+            stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire_of_étapes(
             étapes, ps_détour, g, z_d, requête.session,
             rajouter_iti_direct=len(étapes)>2,
-            interdites=interdites,
+            étapes_interdites=étapes_interdites,
             bavard=10,
             où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
-            rues_interdites=[]
         else:
             stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire(
                 d, a, ps_détour, g, z_d, requête.session,
@@ -205,6 +202,7 @@ def relance_rapide(requête):
     """
     Relance un calcul à partir du résultat du formulaire de relance rapide.
     Les étapes sont dans des champs dont le nom contient 'étape_coord', sous la forme 'lon;lat'
+    Les arêtes interdutes sont dans des champs dont le nom contient 'interdite_coord', sous la même forme.
     """
     print(requête.GET)
     z_d = g.charge_zone(requête.GET["zone_t"])
@@ -212,16 +210,29 @@ def relance_rapide(requête):
     arrivée = Étape.of_texte(requête.GET["arrivée"],g, z_d)
 
 
-    inter = []
+    é_inter = []
+    é_interdites = []
+    def ajoute_arête(s, t):
+        if s in arêtes_interdites:
+            arêtes_interdites[s].add(t)
+        else:
+            arêtes_interdites[s] = set(t)
+            
     for c, v in requête.GET.items():
         if "étape_coord" in c:
-            print(v)
             coords = tuple(map(float, v.split(";")))
             a, _ = g.arête_la_plus_proche(coords, z_d)
-            inter.append((c[11:], ÉtapeArête.of_arête(a, coords)))
-    inter.sort()
-    étapes = [départ] + [é for _, é in inter] + [arrivée]
-    return calcul_itinéraires(requête, départ, arrivée, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, bavard=10)
+            é_inter.append((c[11:], ÉtapeArête.of_arête(a, coords)))
+            
+        elif "interdite_coord" in c:
+            coords = tuple(map(float, v.split(";")))
+            a, _ = g.arête_la_plus_proche(coords, z_d)
+            é_interdites.append(ÉtapeArête.of_arête(a, coords))
+            
+            
+    é_inter.sort()
+    étapes = [départ] + [é for _, é in é_inter] + [arrivée]
+    return calcul_itinéraires(requête, départ, arrivée, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, étapes_interdites=é_interdites, bavard=10)
     
     
     

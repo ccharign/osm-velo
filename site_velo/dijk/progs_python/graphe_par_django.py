@@ -1,18 +1,21 @@
 # -*- coding:utf-8 -*-
 
+from time import perf_counter
+import os
+from django.db.models import Max, Min, Subquery
+from django.db import transaction
+
 from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse, Zone, Ville_Zone
+
 import recup_donnees as rd
 from params import LOG, STR_VILLE_DÉFAUT, DONNÉES
 from petites_fonctions import deuxConséc, chrono, distance_euc
-from time import perf_counter
-from django.db.models import Max, Min, Subquery
 import dijkstra
 from lecture_adresse.arbresLex import ArbreLex
-import os
 import lecture_adresse.normalisation as no
-from django.db import transaction
 from quadrarbres import QuadrArbreArête
-import initialisation.initialisation as ini
+
+#import initialisation.initialisation as ini
 
 
 class VillePasTrouvée(Exception):
