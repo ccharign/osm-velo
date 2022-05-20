@@ -148,7 +148,12 @@
 {% block modifs_rapides %}
 
 <form action = "{% url 'relance_rapide' %}" method="get" id="relance_rapide">
-  Voici l’itinéraire obtenu à l’aide de mes connaissaces actuelles. Pour me corriger, précisez des étapes en cliquant sur la carte. Ou formulaire complet en bas de page.
+  Voici l’itinéraire obtenu à l’aide de mes connaissaces actuelles. Pour me corriger:
+  <ul>
+    <li> indiquez des tronçons de rue à emprunter en cliquant sur la carte;</li>
+    <li> indiquez des tronçons à éviter en controle-cliquant.
+  </ul>
+(Ou formulaire complet en bas de page.)
   {% bootstrap_form relance_rapide %}
 
   {% buttons %}

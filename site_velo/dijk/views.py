@@ -58,6 +58,7 @@ def get_full_class_name(obj):
 
 
 def recherche(requête, zone_t):
+    print(f"Lancement de la vue « recherche », zone_t={zone_t}.")
     z_d = g.charge_zone(zone_t)
     requête.session["zone"]=zone_t
     requête.session["zone_id"] = z_d.pk
@@ -220,9 +221,11 @@ def relance_rapide(requête):
             
     for c, v in requête.GET.items():
         if "étape_coord" in c:
+            num= int(re.match("étape_coord([0-9]*)", c).groups()[0])
+            print(num)
             coords = tuple(map(float, v.split(";")))
             a, _ = g.arête_la_plus_proche(coords, z_d)
-            é_inter.append((c[11:], ÉtapeArête.of_arête(a, coords)))
+            é_inter.append((num, ÉtapeArête.of_arête(a, coords)))
             
         elif "interdite_coord" in c:
             coords = tuple(map(float, v.split(";")))
