@@ -26,4 +26,16 @@ class RelanceRapide(forms.Form):
     arrivée = forms.CharField(widget=forms.HiddenInput())
     pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
     zone_t = forms.CharField(widget=forms.HiddenInput())
+
+    
+class EnregistrerContrib(forms.Form):
+    """
+    Pour enregistrer une contribution.
+    """
+    départ = forms.CharField(widget=forms.HiddenInput())
+    arrivée = forms.CharField(widget=forms.HiddenInput())
+    zone_t = forms.CharField(widget=forms.HiddenInput())
+    étapes = forms.CharField(widget=forms.HiddenInput())
+    rues_interdites = forms.CharField(widget=forms.HiddenInput())
+    AR = forms.BooleanField(label="Valable aussi pour le retour ?", required=False)
     

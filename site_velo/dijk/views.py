@@ -186,6 +186,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
                            "chemin":chemin.str_joli(),
                            "post_préc":données,
                            "relance_rapide":forms.RelanceRapide(initial=données),
+                           "enregistrer_contrib":forms.EnregistrerContrib(initial=données),
                            "fouine": requête.session.get("fouine", None),
                            "la_carte": carte.get_name()
                        }}
