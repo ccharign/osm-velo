@@ -68,7 +68,7 @@ def légende_et_aide(p_détour):
         return f"Profil détour {pourcent}%", ""
 
 
-def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
+def itinéraire( ps_détour, g, z_d, session,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
                où_enregistrer=os.path.join(TMP, "itinéraire.html"),
                bavard=0, ouvrir=False):
@@ -79,33 +79,29 @@ def itinéraire(départ, arrivée, ps_détour, g, z_d, session,
       - z_d (Zone), sert pour récupérer la ville défaut.
       - session (dic), le dico de la session Django
       - départ, arrivée (str) Seront lues par chemins.Étape.
-      - noms_étapes (str list), liste de noms d’étapes intermédiaires. Seront également lues par chemin.Étape.
+      - noms_étapes (str list), liste de noms d’étapes (départ et arrivée inclues). Seront également lues par chemin.Étape.
       - rues_interdites (str list) : liste des noms du rues à éviter.
 
     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
 
-    Sortie : (liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
-              objet Chemin correspondant au dernier p_détour,
-              d, a, noms_étapes, # À FAIRE : rues_interdites
-             )
-             id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
-             aide sera affichée en infobulle dans les pages de résultat.
-             départ, arrivée, noms_étapes et rues_interdites sont les valeurs après correction d’éventuelles fautes de frappe,
+    Sortie : ( liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
+                     # id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
+                     # aide sera affichée en infobulle dans les pages de résultat.
+               objet Chemin correspondant au dernier p_détour,
+
+               noms_étapes,
+               rues_interdites sont les valeurs après correction d’éventuelles fautes de frappe,
+               carte 
+              )
              
     """
-
+    assert len(noms_étapes)>1
     ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
     
     ## Calcul des étapes
     tic0 = perf_counter()
 
-    d = chemins.Étape.of_texte(départ, g, z_d, bavard=bavard-1)
-    if bavard>0: print(f"Départ trouvé : {d}, {d.nœuds}")
-
-    a = chemins.Étape.of_texte(arrivée, g, z_d, bavard=bavard-1)
-    if bavard>0: print(f"Arrivée trouvé : {a}")
-    
-    étapes = [d] + [chemins.Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes] + [a]
+    étapes = [chemins.Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
 
 
     ## Arêtes interdites
@@ -145,7 +141,7 @@ def itinéraire_of_étapes(étapes,
     """
     np = len(ps_détour)
     à_dessiner = []
-    res = []
+    stats = []
     
     interdites = chemins.arêtes_interdites(g, z_d, étapes_interdites, bavard=bavard)
     
@@ -154,7 +150,7 @@ def itinéraire_of_étapes(étapes,
         à_dessiner.append( (iti_d, coul, p))
         #nom_gpx = hash(c)
         
-        res.append({"légende": légende,
+        stats.append({"légende": légende,
                     "aide":aide,
                     "id": f"ps{int(100*c.p_détour)}",
                     "longueur":g.longueur_itinéraire(iti_d),
@@ -172,7 +168,7 @@ def itinéraire_of_étapes(étapes,
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
     if ps_détour[0]==0.:
-        longueur_ch_direct = res[0]["longueur"]
+        longueur_ch_direct = stats[0]["longueur"]
         
     d, a = étapes[0], étapes[-1]
     if rajouter_iti_direct:
@@ -180,18 +176,18 @@ def itinéraire_of_étapes(étapes,
         coul = "#000000"
         traite_un_chemin(cd, coul, "Trajet direct", "Le trajet le plus court, sans prendre en compte les étapes imposées.")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
-        longueur_ch_direct = res[-1]["longueur"]
+        longueur_ch_direct = stats[-1]["longueur"]
 
     # Calculer les pourcentages de détour effectifs
     if rajouter_iti_direct or ps_détour[0]==0.:
-        for s in res:
+        for s in stats:
             s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct- 1.) * 100.)
 
     tic=perf_counter()
     carte = dessine(à_dessiner, g, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     #chrono(tic0, f"Total pour le chemin {c}")
-    return res, c, str(d), str(a), [str(é) for é in étapes[1:-1]], [str(é) for é in étapes_interdites ], carte
+    return stats, c, [str(é) for é in étapes], [str(é) for é in étapes_interdites ], carte
 
 
 ### création du gpx ###

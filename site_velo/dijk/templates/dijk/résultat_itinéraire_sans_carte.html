@@ -16,7 +16,7 @@
 <p>
   Sélectionnez les profils cyclistes pour lesquels il vous semble pertinent, pour aller de « {{départ}} » à « {{arrivée}} »,
   {% if étapes %}
-  de passer par « {{étapes}} »
+  de passer par « {{texte_étapes_inter}} »
   {% endif %}
   {% if étapes and post_préc.rues_interdites %}
   et
@@ -148,7 +148,7 @@
 {% block modifs_rapides %}
 
 <form action = "{% url 'relance_rapide' %}" method="get" id="relance_rapide">
-  Voici l’itinéraire obtenu à l’aide de mes connaissaces actuelles. Pour me corriger:
+  Voici l’itinéraire obtenu à l’aide de mes connaissances actuelles. Pour me corriger:
   <ul>
     <li> indiquez des tronçons de rue à emprunter en cliquant sur la carte;</li>
     <li> indiquez des tronçons à éviter en controle-cliquant.

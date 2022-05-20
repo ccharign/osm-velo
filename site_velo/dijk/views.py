@@ -99,26 +99,26 @@ def vue_itinéraire(requête):
         z_d = g.charge_zone(requête.GET["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
         #z_d = Zone.objects.get(nom=requête.GET["zone_t"])
 
-        noms_étapes = [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0]
+        noms_étapes = [d] + [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0] + [a]
 
         ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
 
         rues_interdites = [r for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
-        print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes} et rues interdites = {rues_interdites}.")
+        print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes[1:-1]} et rues interdites = {rues_interdites}.")
 
-        return calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites)
+        return calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites)
     
     #except Exception as e:
     #    return autreErreur(requête, e)
 
 
-def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, étapes_interdites=[], bavard=0):
+def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, étapes_interdites=[], bavard=0):
     """
     Entrées : ps_détour (float list ou str)
               z_d (models.Zone)
               noms_étapes (str list)
               rues_interdites (str list), noms des rues interdites.
-              étapes (chemin.Étape list or None), si présent sera utilisé au lieu de noms_étapes. Doit contenir aussi départ et arrivée. Et dans ce cas, interdites sera utilisé au lieu de nues_interdites.
+              étapes (chemin.Étape list or None), si présent sera utilisé au lieu de noms_étapes. Doit contenir aussi départ et arrivée. Et dans ce cas, interdites sera utilisé au lieu de rues_interdites.
               interdites (chemin.Étape list or None), ne passer par aucune arête inclue dans une de ces étapes.
     """
     
@@ -128,7 +128,7 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
     try:
         if étapes:
             # On saute le calcul des étapes
-            stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire_of_étapes(
+            stats, chemin, noms_étapes, rues_interdites, carte = itinéraire_of_étapes(
             étapes, ps_détour, g, z_d, requête.session,
             rajouter_iti_direct=len(étapes)>2,
             étapes_interdites=étapes_interdites,
@@ -136,8 +136,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
             où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
         else:
-            stats, chemin, d, a, noms_étapes, rues_interdites, carte = itinéraire(
-                d, a, ps_détour, g, z_d, requête.session,
+            stats, chemin, noms_étapes, rues_interdites, carte = itinéraire(
+                ps_détour, g, z_d, requête.session,
                 rajouter_iti_direct=len(noms_étapes)>0,
                 noms_étapes=noms_étapes,
                 rues_interdites=rues_interdites,
@@ -146,8 +146,8 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
             )
     
         # Création du template
-        texte_étapes = énumération_texte(noms_étapes)
-        suffixe = d+texte_étapes+a+"".join(rues_interdites)
+
+        suffixe = "".join(noms_étapes)+"texte_étapes"+"".join(rues_interdites)
 
         vieux_fichier = glob("dijk/templates/dijk/résultat_itinéraire_complet**")
         for f in vieux_fichier:
@@ -167,21 +167,19 @@ def calcul_itinéraires(requête, d, a, ps_détour, z_d, noms_étapes, rues_inte
             """)
 
 
-        # Chargement du template
-        #p_détour_moyen = int(sum(ps_détour)/len(ps_détour)*100)
         # Ce dico sera envoyé au gabarit sous le nom de 'post_préc'
-        données = {"étapes": ";".join(noms_étapes), "rues_interdites": ";".join(rues_interdites),
+        données = {"étapes": ";".join(noms_étapes[1:-1]), "rues_interdites": ";".join(rues_interdites),
                    "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour)),
-                   "départ":d,
-                   "arrivée":a,
+                   "départ": noms_étapes[0],
+                   "arrivée": noms_étapes[-1],
                    "zone_t":z_d.nom,
                    }
-        #toutes_les_rues = Rue.objects.filter(ville__zone = z_d)
+        texte_étapes_inter = énumération_texte(noms_étapes[1:-1])
         return render(requête,
                       nom_fichier_html,
                       {**données,
                        **{"stats": stats,
-                           "étapes": texte_étapes,
+                           "texte_étapes_inter": texte_étapes_inter,
                            "rues_interdites": énumération_texte(rues_interdites),
                            "chemin":chemin.str_joli(),
                            "post_préc":données,
@@ -236,7 +234,7 @@ def relance_rapide(requête):
             
     é_inter.sort()
     étapes = [départ] + [é for _, é in é_inter] + [arrivée]
-    return calcul_itinéraires(requête, départ, arrivée, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, étapes_interdites=é_interdites, bavard=10)
+    return calcul_itinéraires(requête, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, étapes_interdites=é_interdites, bavard=10)
     
     
     
@@ -252,7 +250,7 @@ def trajet_retour(requête):
     z_d = g.charge_zone(requête.GET["zone_t"])
     ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
 
-    return calcul_itinéraires(requête, départ, arrivée, ps_détour, z_d, noms_étapes, rues_interdites)
+    return calcul_itinéraires(requête, ps_détour, z_d, [départ]+noms_étapes+[arrivée], rues_interdites)
 
 
 

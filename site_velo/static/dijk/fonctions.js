@@ -6,6 +6,10 @@ function gèreLesClics(){
     laCarte.on("click", addMarker);
 }
 
+function récupMarqueurs(form){
+    // Mets des marqueurs correspondant
+}
+
 
 function addMarker(e) {
     if (e.originalEvent.ctrlKey){
@@ -28,7 +32,7 @@ function markerHtmlStyles(coul){
   position: relative;
   border-radius: 3rem 3rem 0;
   transform: rotate(45deg);
-  border: 1px solid #FFFFFF`
+  border: 1px solid gray`
 			       }
 
 function mon_icone(coul){
