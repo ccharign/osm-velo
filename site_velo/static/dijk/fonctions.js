@@ -6,17 +6,31 @@ function gèreLesClics(){
     laCarte.on("click", addMarker);
 }
 
-function récupMarqueurs(form){
-    // Mets des marqueurs correspondant
+
+
+
+function récupMarqueurs(texte, fonction) {
+    for (coords_t of (texte.split(";"))){
+	if (coords_t){
+	    const tab_coords = coords_t.split(",").map(parseFloat);
+	    const coord = L.latLng(tab_coords[1], tab_coords[0]);
+	    //console.log(coord);
+	    fonction(coord);}
+    }
 }
 
 
+function marqueurs_of_form(form){
+    récupMarqueurs(form.elements["marqueurs_é"].value, nvÉtape);
+    récupMarqueurs(form.elements["marqueurs_i"].value, nvArêteInterdite);
+}
+
 function addMarker(e) {
     if (e.originalEvent.ctrlKey){
-	nvArêteInterdite(e);
+	nvArêteInterdite(e.latlng);
     }
     else{
-	nvÉtape(e);
+	nvÉtape(e.latlng);
     }
 }
 
@@ -36,7 +50,6 @@ function markerHtmlStyles(coul){
 			       }
 
 function mon_icone(coul){
-    console.log(markerHtmlStyles(coul));
     return L.divIcon({
 	className: "my-custom-pin",
 	iconAnchor: [0, 24],
@@ -50,15 +63,16 @@ function mon_icone(coul){
 
 
 
-function nvÉtape(e){
+function nvÉtape(latlng){
     nbÉtapes+=1;
     
     //const markerPlace = document.querySelector(".marker-position");
     //markerPlace.textContent = `new marker: ${e.latlng.lat}, ${e.latlng.lng}`;
 
-
-    const marker = new L.marker( e.latlng, {draggable: true, icon: mon_icone('green'), })
-	  .bindTooltip(""+nbÉtapes, {permanent: true, direction:"bottom"})
+    console.log(latlng);
+    const marker = new L.marker( latlng, {draggable: true, icon: mon_icone('green'), });
+    console.log(marker);
+    marker.bindTooltip(""+nbÉtapes, {permanent: true, direction:"bottom"})
 	  .addTo(laCarte)
 	  .bindPopup(buttonRemove);
     
@@ -76,15 +90,15 @@ function nvÉtape(e){
     marker.on("dragend", dragedMarker);
 
     form = document.getElementById("relance_rapide");
-    addHidden(form, marker.champ_du_form, e.latlng.lng +";"+ e.latlng.lat)    
+    addHidden(form, marker.champ_du_form, latlng.lng +";"+ latlng.lat)    
 }
 
 
-function nvArêteInterdite(e){
+function nvArêteInterdite(latlng){
 
     // Création du marqueur
     nbArêtesInterdites+=1;
-    const marker = new L.marker( e.latlng, {
+    const marker = new L.marker( latlng, {
 	icon: mon_icone('red'),
 	draggable: true
     })
@@ -101,7 +115,7 @@ function nvArêteInterdite(e){
     
     // Ajout du champ hidden au formulaire
     form = document.getElementById("relance_rapide");
-    addHidden(form, marker.champ_du_form, e.latlng.lng +";"+ e.latlng.lat)    
+    addHidden(form, marker.champ_du_form, latlng.lng +";"+ latlng.lat)    
 }
 
 

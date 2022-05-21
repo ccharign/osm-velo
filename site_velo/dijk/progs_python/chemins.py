@@ -4,7 +4,7 @@ import os
 import re
 
 
-from petites_fonctions import chrono, milieu
+from dijk.progs_python.petites_fonctions import chrono, milieu
 
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES, LOG
 from dijk.models import Sommet, Chemin_d, Zone, Arête
@@ -17,7 +17,7 @@ tic=perf_counter()
 from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville, Adresse
 chrono(tic, "lecture_adresse.normalisation")
 
-import dijkstra
+import dijk.progs_python.dijkstra
 tic=perf_counter()
 from lecture_adresse.recup_noeuds import nœuds_of_étape
 chrono(tic, "lecture_adresse.recup_noeuds")
@@ -133,7 +133,7 @@ class ÉtapeArête():
         """
         return f"Arête{self.coords_ini[0]},{self.coords_ini[1]}"
     
-    
+        
     def joli_texte(self):
         """
         Pour affichage utilisateur.

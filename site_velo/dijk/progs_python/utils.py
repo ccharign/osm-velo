@@ -96,19 +96,14 @@ def itinéraire( ps_détour, g, z_d, session,
              
     """
     assert len(noms_étapes)>1
-    ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
+ 
     
     ## Calcul des étapes
-    tic0 = perf_counter()
-
-    étapes = [chemins.Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
 
 
-    ## Arêtes interdites
-    étapes_interdites = [chemins.Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
 
     
-    tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
+
 
     return  itinéraire_of_étapes(étapes, ps_détour, g, z_d, session, rajouter_iti_direct, étapes_interdites, où_enregistrer, bavard, ouvrir)
  
@@ -140,6 +135,7 @@ def itinéraire_of_étapes(étapes,
     )
     """
     np = len(ps_détour)
+    ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
     à_dessiner = []
     stats = []
     
@@ -190,8 +186,10 @@ def itinéraire_of_étapes(étapes,
     return stats, c, [str(é) for é in étapes], [str(é) for é in étapes_interdites ], carte
 
 
+
 ### création du gpx ###
 # https://pypi.org/project/gpxpy/
+
 def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
     """
     Entrée : iti_d (Arête list)

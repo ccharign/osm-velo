@@ -78,11 +78,3 @@ def LOG(msg, type_de_log="divers", bavard=1):
         print(f"{décalage} {msg}\n")
 
 LOG_PB=lambda m, bavard=1: LOG(m, "pb", bavard=bavard)
-    
-# def LOG_PB(msg):
-#     f = open(os.path.join(RACINE_PROJET,"log/pb.log"), "a", encoding="utf-8")
-#     f.write(f"{datetime.now()}   {msg}\n")
-#     f.close()
-#     print(msg)
-    
-LOG_PB("Nouveau chargement de params.py\n\n")

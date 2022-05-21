@@ -302,7 +302,7 @@ def polyline_of_arête(g, a, popup=None, **kwargs):
     if popup is None:
         popup = nom
     loc_à_lenvers = [(lat, lon) for lon, lat in locations]
-    pl = folium.PolyLine(locations=loc_à_lenvers, popup=popup, **kwargs)
+    pl = folium.PolyLine(locations=loc_à_lenvers, popup=popup, opacity=.5, **kwargs)
     return pl
 
 

@@ -147,6 +147,14 @@
 <!-- Relance rapide du formulaire -->
 {% block modifs_rapides %}
 
+<!-- Ajout des marqueurs précédents -->
+<script>
+  $( document ).ready(function() {
+      laCarte = {{la_carte}};
+      marqueurs_of_form(document.getElementById("relance_rapide"));
+});
+</script>
+
 <form action = "{% url 'relance_rapide' %}" method="get" id="relance_rapide">
   Voici l’itinéraire obtenu à l’aide de mes connaissances actuelles. Pour me corriger:
   <ul>

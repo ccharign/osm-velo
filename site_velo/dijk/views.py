@@ -13,32 +13,32 @@ import re
 
 
 tic0=time.perf_counter()
-
-from dijk.progs_python.params import LOG
-from petites_fonctions import chrono, union_liste
-from dijk.progs_python.lecture_adresse.normalisation import Adresse
+#print(f"Répertoire courant : {os.getcwd() }")
+from .progs_python.params import LOG
+from .progs_python.petites_fonctions import chrono, union_liste
+from .progs_python.lecture_adresse.normalisation import Adresse
 tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 
-from dijk.progs_python.chemins import Chemin, chemins_of_csv, Étape, ÉtapeArête
+from .progs_python.chemins import Chemin, chemins_of_csv, Étape, ÉtapeArête
 tic=chrono(tic, "chemins", bavard=3)
 
-#from dijk.progs_python.init_graphe import charge_graphe
+#from .progs_python.init_graphe import charge_graphe
 #tic=chrono(tic, "charge_graphe", bavard=3)
 
-from dijk.progs_python.lecture_adresse.recup_noeuds import PasTrouvé
-from dijk.progs_python.lecture_adresse.normalisation0 import prétraitement_rue
-from dijk.progs_python import recup_donnees
-from dijk.progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
-from dijk.progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
+from .progs_python.lecture_adresse.recup_noeuds import PasTrouvé
+from .progs_python.lecture_adresse.normalisation0 import prétraitement_rue
+from .progs_python import recup_donnees
+from .progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
+from .progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
-from dijk.progs_python.utils import itinéraire, dessine_chemin, dessine_cycla, itinéraire_of_étapes
+from .progs_python.utils import itinéraire, dessine_chemin, dessine_cycla, itinéraire_of_étapes
 chrono(tic, "utils", bavard=3)
 
-from graphe_par_django import Graphe_django
-from dijk.progs_python.lecture_adresse.normalisation0 import découpe_adresse
+from .progs_python.graphe_par_django import Graphe_django
+from .progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
-from dijk.models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
+from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
@@ -126,26 +126,22 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
         ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
         
     try:
-        if étapes:
-            # On saute le calcul des étapes
-            stats, chemin, noms_étapes, rues_interdites, carte = itinéraire_of_étapes(
+        if not étapes:
+            tic0 = time.perf_counter()
+            étapes = [Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
+            étapes_interdites = [Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
+            tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
+
+        stats, chemin, noms_étapes, rues_interdites, carte = itinéraire_of_étapes(
             étapes, ps_détour, g, z_d, requête.session,
             rajouter_iti_direct=len(étapes)>2,
             étapes_interdites=étapes_interdites,
             bavard=10,
             où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
-        else:
-            stats, chemin, noms_étapes, rues_interdites, carte = itinéraire(
-                ps_détour, g, z_d, requête.session,
-                rajouter_iti_direct=len(noms_étapes)>0,
-                noms_étapes=noms_étapes,
-                rues_interdites=rues_interdites,
-                bavard=10,
-                où_enregistrer="dijk/templates/dijk/iti_folium.html"
-            )
+
     
-        # Création du template
+        ## Création du gabarit
 
         suffixe = "".join(noms_étapes)+"texte_étapes"+"".join(rues_interdites)
 
@@ -166,14 +162,31 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
             {{% block script %}} <script> {script} </script> {{% endblock %}}
             """)
 
+            
+        ## Chargement du gabarit
+
+        def texte_marqueurs(l_é):
+            """
+            Entrée : liste d’étapes
+            Sortie (str) : coords des étapes de type ÉtapeArête séparées par des ;
+            """
+            return ";".join(map(
+                lambda c: f"{c[0]},{c[1]}",
+                [é.coords_ini for é in l_é if isinstance(é, ÉtapeArête)]
+            ))
 
         # Ce dico sera envoyé au gabarit sous le nom de 'post_préc'
-        données = {"étapes": ";".join(noms_étapes[1:-1]), "rues_interdites": ";".join(rues_interdites),
+        
+        données = {"étapes": ";".join(noms_étapes[1:-1]),
+                   "rues_interdites": ";".join(rues_interdites),
                    "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour)),
                    "départ": noms_étapes[0],
                    "arrivée": noms_étapes[-1],
-                   "zone_t":z_d.nom,
+                   "zone_t": z_d.nom,
+                   "marqueurs_i": texte_marqueurs(étapes_interdites),
+                   "marqueurs_é": texte_marqueurs(étapes),
                    }
+        #print("données", données)
         texte_étapes_inter = énumération_texte(noms_étapes[1:-1])
         return render(requête,
                       nom_fichier_html,
@@ -181,17 +194,17 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
                        **{"stats": stats,
                            "texte_étapes_inter": texte_étapes_inter,
                            "rues_interdites": énumération_texte(rues_interdites),
-                           "chemin":chemin.str_joli(),
-                           "post_préc":données,
-                           "relance_rapide":forms.RelanceRapide(initial=données),
-                           "enregistrer_contrib":forms.EnregistrerContrib(initial=données),
+                           "chemin": chemin.str_joli(),
+                           "post_préc": données,
+                           "relance_rapide": forms.RelanceRapide(initial=données),
+                           "enregistrer_contrib": forms.EnregistrerContrib(initial=données),
                            "fouine": requête.session.get("fouine", None),
                            "la_carte": carte.get_name()
                        }}
                       )
 
     # Renvoi sur la page d’erreur
-    except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e: # Ceci ne fonctionne pas...
+    except (PasTrouvé, LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
     except Exception as e:
         traceback.print_exc()

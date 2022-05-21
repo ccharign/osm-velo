@@ -26,6 +26,8 @@ class RelanceRapide(forms.Form):
     arrivée = forms.CharField(widget=forms.HiddenInput())
     pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
     zone_t = forms.CharField(widget=forms.HiddenInput())
+    marqueurs_é = forms.CharField(widget=forms.HiddenInput(), required=False) # Pour les marqueurs d’étapes précédents.
+    marqueurs_i = forms.CharField(widget=forms.HiddenInput()) # Pour les marqueurs d’étape interdite précédents.
 
     
 class EnregistrerContrib(forms.Form):
