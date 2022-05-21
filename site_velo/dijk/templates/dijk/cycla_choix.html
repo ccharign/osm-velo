@@ -11,8 +11,8 @@ Choisissez la zone de laquelle afficher la carte de la cyclabilité :
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
-<form action="/cycla/" method="post">
-    {% csrf_token %}
+<form action="/cycla/" method="get">
+    <!-- {% csrf_token %} -->
     {% bootstrap_form form %}
 
     {% buttons %}

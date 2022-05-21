@@ -48,6 +48,7 @@ g=Graphe_django()
 
 
 
+
 #https://stackoverflow.com/questions/18176602/how-to-get-the-name-of-an-exception-that-was-caught-in-python
 def get_full_class_name(obj):
     module = obj.__class__.__module__
@@ -204,7 +205,7 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
                       )
 
     # Renvoi sur la page d’erreur
-    except (PasTrouvé, LieuPasTrouvé) as e:
+    except (PasTrouvé, recup_donnees.LieuPasTrouvé) as e:
         return vueLieuPasTrouvé(requête, e)
     except Exception as e:
         traceback.print_exc()
@@ -339,9 +340,9 @@ def téléchargement(requête):
 
 # Version formulaire de Django
 def choix_cycla(requête):
-    if requête.method == "POST":
+    if requête.method == "GET":
         # On est arrivé ici après remplissage du formulaire
-        form = forms.FormCycla(requête.POST)
+        form = forms.FormCycla(requête.GET)
         if form.is_valid():
             return carte_cycla(requête)
     else:
@@ -367,9 +368,10 @@ def carte_cycla(requête):
     """
     Renvoie la carte de la cyclabilité de la zone indiquée.
     """
-    z_d = Zone.objects.get(id=requête.POST["zone"])
+    z_d = Zone.objects.get(id=requête.GET["zone"])
     nom = f"dijk/cycla{z_d}.html"
-    if not os.path.exists("dijk/templates/"+nom) or "force_calcul" in requête.POST:
+    print(nom)
+    if not os.path.exists("dijk/templates/"+nom) or "force_calcul" in requête.GET:
         if z_d.nom not in g.zones : g.charge_zone(z_d.nom)
     
         dessine_cycla(g, z_d, où_enregistrer="dijk/templates/"+nom, bavard=1)

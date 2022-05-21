@@ -22,7 +22,7 @@ from dijk.models import Zone, Chemin_d, Arête
 from params import TMP
 
 tic=perf_counter()
-from mon_folium import folium_of_chemin, ajoute_marqueur, folium_of_arêtes
+from mon_folium import folium_of_chemin, ajoute_marqueur, folium_of_arêtes, couleur_of_cycla, color_dict, n_coul
 chrono(tic, "mon_folium", bavard=2)
 
 import dijkstra
@@ -68,6 +68,8 @@ def légende_et_aide(p_détour):
         return f"Profil détour {pourcent}%", ""
 
 
+    
+## Fonction obsolète
 def itinéraire( ps_détour, g, z_d, session,
                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
                où_enregistrer=os.path.join(TMP, "itinéraire.html"),
@@ -97,16 +99,9 @@ def itinéraire( ps_détour, g, z_d, session,
     """
     assert len(noms_étapes)>1
  
-    
-    ## Calcul des étapes
-
-
-
-    
-
-
     return  itinéraire_of_étapes(étapes, ps_détour, g, z_d, session, rajouter_iti_direct, étapes_interdites, où_enregistrer, bavard, ouvrir)
  
+
 
 def itinéraire_of_étapes(étapes,
                          ps_détour,
@@ -180,7 +175,7 @@ def itinéraire_of_étapes(étapes,
             s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct- 1.) * 100.)
 
     tic=perf_counter()
-    carte = dessine(à_dessiner, g, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
+    carte = dessine(à_dessiner, g, z_d, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     #chrono(tic0, f"Total pour le chemin {c}")
     return stats, c, [str(é) for é in étapes], [str(é) for é in étapes_interdites ], carte
@@ -228,7 +223,7 @@ def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-def dessine(listes_chemins, g, ad_départ, ad_arrivée,  où_enregistrer, ouvrir=False, bavard=0, fouine=False):
+def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, ouvrir=False, bavard=0, fouine=False):
     """
     Entrées :
       - listes_chemins : liste de couples (liste d'Arêtes, couleur)
@@ -241,12 +236,12 @@ def dessine(listes_chemins, g, ad_départ, ad_arrivée,  où_enregistrer, ouvrir
     l, coul, p = listes_chemins[0]
     #sous_graphe = g.g.multidigraphe.subgraph(l)
     #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
-    carte = folium_of_chemin(g, l, p, fit=True, color=coul)
+    carte = folium_of_chemin(g, z_d, l, p, fit=True, color=coul)
     #carte = plot_route_folium(g.g.multidigraphe, l, popup_attribute="name", color=coul) # Ne marche pas...
     for l, coul, p in listes_chemins[1:]:
         #sous_graphe = g.g.multidigraphe.subgraph(l)
         #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
-        carte = folium_of_chemin(g, l, p, carte=carte, color=coul)
+        carte = folium_of_chemin(g, z_d, l, p, carte=carte, color=coul)
 
     # Je mets les coords de début et fin du premier itinéraire si les chhamp coords des adresses n’était pas remplis.
     if not ad_départ.coords:
@@ -262,20 +257,6 @@ def dessine(listes_chemins, g, ad_départ, ad_arrivée,  où_enregistrer, ouvrir
     if ouvrir : ouvre_html(où_enregistrer)
     return carte
 
-
-list_colors = [# Du vert au rouge
-        "#00FF00",        "#12FF00",        "#24FF00",        "#35FF00",
-        "#47FF00",        "#58FF00",        "#6AFF00",        "#7CFF00",
-        "#8DFF00",        "#9FFF00",        "#B0FF00",        "#C2FF00",
-        #"#D4FF00",        "#E5FF00",        #"#F7FF00",        "#FFF600",
-        #"#FFE400",        "#FFD300",
-        "#FFC100",        "#FFAF00",
-        "#FF9E00",        "#FF8C00",        "#FF7B00",        "#FF6900",
-        "#FF5700",        "#FF4600",        "#FF3400",        "#FF2300",
-        "#FF1100",        "#FF0000",    ]
-list_colors.reverse() # maintenant du rouge au vert
-color_dict = {i: list_colors[i] for i in range(len(list_colors))}
-n_coul = len(list_colors)
 
 
 
@@ -325,27 +306,13 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
     Effet : Crée la carte de la cyclabilité.
     """
     g.calcule_cycla_min_max(z_d)
-    mini, maxi = g.cycla_min[z_d], g.cycla_max[z_d] #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
-    if bavard > 0: print(f"Valeurs extrêmes de la cyclabilité : {mini}, {maxi}")
 
-    def num_paquet(val):
-        """Renvoie un entier dans [|0, n_coul[|. 1 est associé à n_coul//2, mini à 0, maxi à 1."""
-
-        if val==maxi:
-            return n_coul-1
-        elif val <= 1.:
-            return int((val-mini)/(1-mini)*n_coul/2)  # dans [|0, n_coul/2 |]
-        else:
-            return int((val-1)/(maxi-1)*n_coul/2+n_coul/2)
 
     arêtes = []
 
     for a in mo.Arête.objects.filter(zone=z_d).exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
-        i=num_paquet(a.cycla)
-        arêtes.append((a, {"color":color_dict[i], "popup":a.cycla}))
+        arêtes.append((a, {"color": couleur_of_cycla(a, g, z_d), "popup":a.cycla}))
 
-    
-    
     carte = folium_of_arêtes(g, arêtes)
 
     carte.save(où_enregistrer)
