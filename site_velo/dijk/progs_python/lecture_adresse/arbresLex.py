@@ -16,21 +16,28 @@ class ArbreLex():
         self.term = False
     
     
-    def tous_les_mots(self):
+    def tous_les_mots(self, n_max=float("inf")):
         """
         Renvoie la liste des mots de l’arbre
+        n_max : nb max de résultats à renvoyer. Si le nb de mots dans l’arbre est > n_max, ceci renvoie [].
         """
-        if self.term:
-            res=[""]
+        if n_max<=0:
+            return []
         else:
-            res=[]
-        if len(self.fils)==0:
-            return res
-        else:
+            if self.term:
+                res=[""]
+            else:
+                res=[]
+
             for x, a in self.fils.items():
-                res.extend(
-                    map(lambda m:x+m, a.tous_les_mots())
-                )
+                mots_dans_fils = a.tous_les_mots(n_max=n_max-len(res))
+                if len(mots_dans_fils)==0:
+                    # nb max de mots dépassé.
+                    return []
+                else:
+                    res.extend(
+                        map(lambda m:x+m, mots_dans_fils)
+                    )
             return res
     
     
@@ -184,12 +191,18 @@ class ArbreLex():
         """
         Sortie (str set) : tous les mots de l’arbre commençant par mot.
         Paramètres:
-            - n_max_rés, nb max de résultats à renvoyer. Si le nb de rés dépasse ce paramètre, on renvoie uniquement les résultats avec tol=0, Si même ainsi le nb de rés dépasse n_max_rés, la fonction renvoie set().
+            - n_max_rés, nb max de résultats à renvoyer. Si le nb de rés dépasse ce paramètre, on renvoie uniquement les résultats avec tol=0 ; si même ainsi le nb de rés dépasse n_max_rés, la fonction renvoie set().
         """
         
         if len(mot)==0:
-            pass
-
+            return self.tous_les_mots(n_max=n_max_rés)
+        
+        else:
+            res = []
+            
+            # 1) essai avec la bonne lettre
+            if mot[0] in self.fils:
+                pass
 
         
     

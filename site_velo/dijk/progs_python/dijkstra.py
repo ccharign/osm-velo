@@ -28,12 +28,13 @@ def heuristique(g, s, arrivée, correction_max):
 ##############################################################################
 
 
-def chemin(g, départ, arrivée, p_détour, bavard=0):
-    """  Nécessite une classe graphe avec méthode « voisins » qui prend un sommet s et le pourcentage de détour p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)
+def chemin(g, départ:int, arrivée:int, p_détour:float, bavard=0):
+    """ 
+    Entrée :
+        - g (graphe) Nécessite une méthode « voisins » qui prend un sommet s et le pourcentage de détour p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)
+        - p_détour : proportion de détour, et pas pourcentage.
 
-    p_détour : proportion de détour, et pas pourcentage.
-
-    Sortie : (itinéraire, sa longueur)
+    Sortie (int list × float): (itinéraire, sa longueur)
     """
     assert p_détour < 10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
     dist = {départ: 0.}  # dist[s] contient l'estimation actuelle de d(départ, i) si s est gris, et la vraie valeur si s est noir.
@@ -52,7 +53,7 @@ def chemin(g, départ, arrivée, p_détour, bavard=0):
                     pred[t] = s
                     
     
-    ## reconstruction du chemin
+    ## rReconstruction du chemin
     if arrivée in dist:
         chemin = [arrivée]
         s = arrivée
@@ -102,8 +103,7 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
     """
 
     
-    if bavard>0:
-        print(f"Arêtes interdites dans vers_une_étape : {interdites}")
+    LOG(f"Arêtes interdites dans vers_une_étape : {interdites}", bavard=bavard-1)
     
     àVisiter = []
     
@@ -117,7 +117,7 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
         entasse(s,d)
 
     fini = False
-    sommetsFinalsTraités = set({})
+    sommetsFinalsTraités = set()
 
     def boucle_par_arêtes_doubles(s):
         for ((v1,d1), (v2, d2)) in arêtesDoubles(g, s, p_détour, interdites):
@@ -125,14 +125,12 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
                 dist[v2] = dist[s]+d1+d2
                 pred[v2] = (v1,s)
                 entasse(v2, dist[v2])
-                #heappush(àVisiter, (dist[v2]+heuristique(g, v2, arrivée, correction_max), v2))
 
     def boucle_simple(s):
         for t, l in g.voisins(s, p_détour, interdites=interdites):
             if t not in dist or dist[s]+l < dist[t]:  # passer par s vaut le coup
                 dist[t] = dist[s]+l
                 entasse(t, dist[t])
-                #heappush(àVisiter, (dist[t]+heuristique(g, t, arrivée, correction_max) , t))
                 pred[t] = s
 
     
@@ -153,9 +151,9 @@ def vers_une_étape(g, départ, arrivée, p_détour, dist, pred, première_étap
         _, plus_proche = min((heuristique(g, s, arrivée, correction_max), s) for s in dist.keys())
         chemin = [plus_proche]
         reconstruction(chemin, pred, départ)
-        raise PasDeChemin(f"Pas réussi à atteindre l’étape {arrivée}. Le sommet atteint le plus proche est {plus_proche}, le chemin pour y aller est {chemin}")
+        raise PasDeChemin(f"Pas réussi à atteindre l’étape {arrivée}. Le sommet atteint le plus proche est {plus_proche}, le chemin pour y aller est {chemin}.")
     if not fini:
-        LOG_PB(f"Avertissement : je n’ai pas réussi à atteindre tous les sommets de {arrivée}.\n Sommets non atteints:{[s for s in arrivée if s not in sommetsFinalsTraités]}")
+        LOG_PB(f"Avertissement : je n’ai pas réussi à atteindre tous les sommets de {arrivée}.\n Sommets non atteints:{[s for s in arrivée if s not in sommetsFinalsTraités]}.")
 
 
 def reconstruction(chemin, pred, départ):
@@ -214,3 +212,14 @@ def chemin_étapes_ensembles(g, c, bavard=0):
     LOG(f"(\ndijkstra.chemin_étapes_ensembles) Pour le chemin {c}, j’ai obtenu l’itinéraire\n {iti}. \n L’heuristique était {h}, la distance euclidienne {g.d_euc(s_d,fin)} et la longueur (ressentie) trouvée {dist[fin]}", bavard=bavard)
     return iti, dist[fin]
 
+
+
+
+
+##############################################
+### En passant par un *sommet* d’une étape ###
+##############################################
+
+## Emploi typique : passer par une boulangerie.
+
+# À FAIRE
