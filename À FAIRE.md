@@ -1,10 +1,8 @@
 
 À FAIRE :
 
-Rechargement et entraînement pratique...
-   - apprentissage auto. Tous les chemin qui ont un score de dernière modif>0
-   - réinit base ?
-
+Ménage:
+   - static dans dijk
 
 Amenities : les charger dans la base, et les mettre dans la complétion auto.
 Chercher dedans dans chemins.Étape
@@ -12,7 +10,13 @@ Traduire en français
 
 Faire un passer par un(e) ...
 
-BUG de la place Clémenceau. Il semble qu’il y mangue des arêtes.
+BUG de la place Clémenceau. Il semble qu’il y manque des arêtes.
+
+
+Rechargement et entraînement pratique...
+   - apprentissage auto. Tous les chemin qui ont un score de dernière modif>0
+   - réinit base ?
+
 
 Recherche dans l’arbre lex dans la complétion automatique, avec tolérance à faute de frappe.
 

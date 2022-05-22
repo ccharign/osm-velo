@@ -2,6 +2,15 @@
 
 ### Implantation des arbres lexicographiques ###
 
+def prefixed(lettre, l):
+    """
+    Entrées : 
+        - lettre, un caractère
+        - l (str list)
+    Sortie (str list): liste des lettre+m pour m dans l.
+    """
+    return [lettre+mot for mot in l]
+
 
 class ArbreLex():
     """
@@ -189,20 +198,71 @@ class ArbreLex():
     
     def complétion(self, mot:str, tol:int, n_max_rés=float("inf")):
         """
-        Sortie (str set) : tous les mots de l’arbre commençant par mot.
+        Sortie (str list list) : tableau t->liste des mots commençant par mot avec t fautes de frappe.
         Paramètres:
-            - n_max_rés, nb max de résultats à renvoyer. Si le nb de rés dépasse ce paramètre, on renvoie uniquement les résultats avec tol=0 ; si même ainsi le nb de rés dépasse n_max_rés, la fonction renvoie set().
-        """
+            - tol (int of infini) : nb de fautes de frappe max à autoriser. Si tol<0, [] est renvoyé.
+            - n_max_rés (int ou infini), nb max de résultats à renvoyer. 
+               tol sera automatiquement abaissé pour que le nb de rés soit <= n_max_rés.
         
-        if len(mot)==0:
-            return self.tous_les_mots(n_max=n_max_rés)
+        """
+
+        res = [[] for _ in range(tol+1)]
+        nb_rés=0
+        
+        if tol<0 or nb_rés<0: return [] # Cas de base utile dans les appels récursifs.
+
+        
+        elif len(mot)==0:
+            res[0] = self.tous_les_mots(n_max=n_max_rés)
+            return  res
+
         
         else:
-            res = []
             
-            # 1) essai avec la bonne lettre
+            def ajoute_et_tronque_res(à_rajouter):
+                """
+                Entrée : à_rajouter (str list list)
+                Précondition : len(à_rajouter)<=len(res)
+                Effet : Ajoute dans res les éléments de à_rajouter. De plus les dernières cases de res sont supprimées afin que la somme des longueurs de ses éléments devienne <= n_max.
+                Sortie : nb d'éléments dans res après l'opération.
+                """
+                n_tot=0
+                i=0
+                while i<len(res):
+                    # invariant de boucle : n_tot==\sum_{k=0}^{i-1} len(res[k])
+                    if n_tot+len(res[i])+len(à_rajouter[i])>n_max_rés:
+                        res.pop()
+                    else:
+                        res[i].extend(à_rajouter[i])
+                        n_tot+=len(res[i])
+                        i+=1
+                return n_tot
+
+            
+            # essai avec la bonne lettre
             if mot[0] in self.fils:
-                pass
+                res = self.fils[mot[0]].complétion(mot[1:], tol=tol, n_max_rés=n_max_rés)
+                nb_rés = sum(len(r) for r in res)
+                
+            # Listes des autres essais : avec une faute de frappe.
+            essais_à_faire=[ # syntaxe : (arbre où chercher, mot)
+                (self, mot[1:]), # en supprimant une lettre
+                *((f, mot[1:]) for (lettre, f) in self.fils.items() if lettre!=mot[0]), # En échangeant une lettre
+                *((f, mot) for f in self.fils.values()) # En ajoutant une lettre
+                ]
+
+            # Parcours de la liste des essais à faire.
+            for a, m in essais_à_faire:
+                n_tol=len(res)-1 # nb max de fautes de frappe à garder compte tenu du n_max_rés.
+                if n_tol<1: # Cela signifie que seuls les mots sans faute de frappe sont possibles à présent.
+                    return res
+                else:
+                    essai = a.complétion(m, n_tol-1, n_max_rés-nb_rés)
+                    nb_rés=ajoute_et_tronque_res([[]]+essai)
+                    
+            return res
+
+            
 
         
     
@@ -244,4 +304,4 @@ class ArbreLex():
             return aux()
                 
                 
-#test = ArbreLex.of_iterable(["bal", "blaa", "blu"])
+test = ArbreLex.of_iterable(["bal", "blaa", "blu"])
