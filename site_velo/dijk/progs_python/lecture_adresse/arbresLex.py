@@ -28,9 +28,8 @@ class ArbreLex():
             return res
         else:
             for x, a in self.fils.items():
-                #print(x)
                 res.extend(
-                    list(map(lambda m:x+m, a.tous_les_mots()))
+                    map(lambda m:x+m, a.tous_les_mots())
                 )
             return res
     
@@ -40,7 +39,7 @@ class ArbreLex():
             res=1
         else:
             res=0
-        return sum(len(a) for a in self.fils.values())
+        return res+sum(len(a) for a in self.fils.values())
 
     
     def insère(self, mot):
@@ -57,9 +56,13 @@ class ArbreLex():
                 self.fils[mot[0]] = ArbreLex()
                 self.fils[mot[0]].insère(mot[1:])
 
+                
     @classmethod
     def of_iterable(cls, l):
-        """ Crée l’arbre contenant les mots de l."""
+        """
+        Entrée : l (str iterable)
+        Sortie : l’arbre contenant les éléments de l.
+        """
         res = cls()
         for mot in l:
             res.insère(mot)

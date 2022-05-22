@@ -82,6 +82,8 @@ def mode_demploi(requête):
 def contribution(requête):
     return render(requête, "dijk/contribution.html", {})
 
+def sous_le_capot(requête):
+    return render(requête, "dijk/sous_le_capot.html", {})
 
 ### Recherche d’itinéraire simple ###
 
