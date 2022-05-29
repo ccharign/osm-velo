@@ -64,7 +64,8 @@ class ArbreLex():
         Effet : insère mot dans l’arbre.
         """
 
-        if mot == "": self.term = True
+        if mot == "":
+            self.term = True
         else:
             if mot[0] in self.fils:
                 self.fils[mot[0]].insère(mot[1:])
@@ -73,6 +74,21 @@ class ArbreLex():
                 self.fils[mot[0]].insère(mot[1:])
 
                 
+    def rajoute(self, arbre):
+        """
+        Effet : ajoute le contenu de arbre dans self.
+        """
+
+        if arbre.term:
+            self.term=True
+
+        for lettre, fils_a in arbre.fils.items():
+            if lettre in self.fils:
+                self.fils[lettre].rajoute(fils_a)
+            else:
+                self.fils[lettre] = fils_a
+
+        
     @classmethod
     def of_iterable(cls, l):
         """
@@ -304,3 +320,4 @@ class ArbreLex():
                 
 test = ArbreLex.of_iterable(["bal", "bla", "baffe", "bar", "art", "are", "as"])
 test2 = ArbreLex.of_iterable([ "bla", "as"])
+test3=ArbreLex.of_iterable(["truc", "base", "a","bague"])
