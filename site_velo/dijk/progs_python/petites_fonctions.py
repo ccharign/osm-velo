@@ -39,6 +39,7 @@ def distance_euc(c1, c2):
     lon1, lat1 = c1
     lon2, lat2 = c2
 
+    # Cnoversion en radian
     lat1*=pi/180
     lat2*=pi/180
     lon1*=pi/180
@@ -48,7 +49,7 @@ def distance_euc(c1, c2):
     dy = R_TERRE * (lat2-lat1)
     return (dx**2+dy**2)**.5
     
-    # vraie formule :
+    # vraie formule (pas utilisée) :
     return R_TERRE * acos(cos(lat1)*cos(lat2)*cos(lon2-lon1) + sin(lat1 * lat2))
 
 

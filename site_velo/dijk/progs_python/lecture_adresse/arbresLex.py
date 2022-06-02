@@ -199,6 +199,9 @@ class ArbreLex():
     def complétion(self, mot:str, tol=float("inf"), n_max_rés=float("inf")):
         """
         Sortie (str list list) : tableau t->liste des mots commençant par mot avec t fautes de frappe.
+        Ce tableau est vide si le nb de rés même avec tolérance 0 dépasse n_max_rés
+        Précisément, la longueur du rés -1 est le plus grand t∈[|0, tol[| tel que le nb de résultat pour une tolérance ⩽ t est ⩽ n_max_rés.
+
         Paramètres:
             - tol (int ou infini) : nb de fautes de frappe max à autoriser. Si tol<0, [] est renvoyé.
             - n_max_rés (int ou infini), nb max de résultats à renvoyer. 

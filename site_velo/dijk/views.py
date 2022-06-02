@@ -479,6 +479,10 @@ def pour_complétion(requête, nbMax = 10):
         req_villes = Subquery(villes.values("ville"))
 
         dicos=[]
+
+        # Complétion dans l’arbre lexicographique
+        
+        
         
         # Recherche dans les rues de la base
         dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in =req_villes ).prefetch_related("ville")

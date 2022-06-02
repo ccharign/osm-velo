@@ -413,3 +413,26 @@ class Graphe_django():
         Renvoie l’arête de l’arbre des arêtes de z_d la plus proche de coords.
         """
         return self.arbre_arêtes[z_d.nom].arête_la_plus_proche(coords)
+
+
+    def complétion_rue(self, début:str, villes, tol=2, n_max_rés=10):
+        """
+        Entrées : villes (iterable de models.Ville)
+        À l’arrache actuellement.
+        """
+        res=[]
+        nb_rés_restant = n_max_rés
+        for v_d in villes:
+            res_dans_v_d = self.arbres_des_rues[v_d.nom_norm].complétion(
+                no.prétraitement_rue(début),
+                tol=tol,
+                n_max_rés=nb_rés_restant
+            )
+            if len(res_dans_v_d)==0: return []
+            for r in res_dans_v_d:
+                res.extend(r)
+                nb_rés_restant -= len(r)
+                if nb_rés_restant < 0:
+                    return []
+        return [Rue.objects.get(nom_norm=r) for r in res]
+        

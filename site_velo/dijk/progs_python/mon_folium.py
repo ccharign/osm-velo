@@ -46,7 +46,7 @@ def polyline_of_arête(g, a, popup=None, **kwargs):
     if popup is None:
         popup = nom
     loc_à_lenvers = [(lat, lon) for lon, lat in locations]
-    pl = folium.PolyLine(locations=loc_à_lenvers, popup=popup, opacity=.5, **kwargs)
+    pl = folium.PolyLine(locations=loc_à_lenvers, popup=popup, **kwargs)
     return pl
 
 
@@ -68,12 +68,16 @@ def folium_of_chemin(g, z_d, iti_d, p, carte=None, tiles="cartodbpositron", zoom
     
     if carte is None:
         carte = folium.Map(location=(cm[1], cm[0]), zoom_start=zoom, tiles=tiles) #Dans folium les coords sont lat, lon au lieu de lon, lat
-    
+
+    if "color" in kwargs:
+        couleur = kwargs.pop("color")
 
     for a in iti_d:
-        if "color" in kwargs:
-            kwargs.pop("color")
-        pl=polyline_of_arête(g, a, color=couleur_of_cycla(a, g, z_d),  **kwargs)
+
+        # l’arête avec couleur cycla
+        pl=polyline_of_arête(g, a, color=couleur_of_cycla(a, g, z_d), opacity=.2, weight=6,  **kwargs)
+        pl.add_to(carte)
+        pl=polyline_of_arête(g, a, color=couleur, opacity=.6, weight=1,  **kwargs)
         pl.add_to(carte)
 
     if fit:
