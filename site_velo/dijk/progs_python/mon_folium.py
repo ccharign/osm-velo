@@ -62,21 +62,22 @@ def folium_of_chemin(g, z_d, iti_d, p, carte=None, tiles="cartodbpositron", zoom
     Sortie : carte de folium.Map
     """
 
-    #cd, cf = g.coords_of_id_osm(iti[0]), g.coords_of_id_osm(iti[-1])
-    cd, cf = iti_d[0].départ.coords(), iti_d[-1].arrivée.coords() # 
+    cd, cf = iti_d[0].départ.coords(), iti_d[-1].arrivée.coords()
     cm = (cd[0]+cf[0])/2., (cd[1]+cf[1])/2.
     
     if carte is None:
         carte = folium.Map(location=(cm[1], cm[0]), zoom_start=zoom, tiles=tiles) #Dans folium les coords sont lat, lon au lieu de lon, lat
+        fit = True
 
+    # Extraction de l’argument « color »
     if "color" in kwargs:
         couleur = kwargs.pop("color")
 
     for a in iti_d:
-
-        # l’arête avec couleur cycla
+        # L’arête avec couleur cycla
         pl=polyline_of_arête(g, a, color=couleur_of_cycla(a, g, z_d), opacity=.2, weight=6,  **kwargs)
         pl.add_to(carte)
+        # L’arête avec couleur passée en arg
         pl=polyline_of_arête(g, a, color=couleur, opacity=.6, weight=1,  **kwargs)
         pl.add_to(carte)
 

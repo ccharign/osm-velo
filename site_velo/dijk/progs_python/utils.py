@@ -70,36 +70,36 @@ def légende_et_aide(p_détour):
 
     
 ## Fonction obsolète
-def itinéraire( ps_détour, g, z_d, session,
-               rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
-               où_enregistrer=os.path.join(TMP, "itinéraire.html"),
-               bavard=0, ouvrir=False):
-    """ 
-    Entrées :
-      - ps_détour (float list), liste des proportion de détour pour lesquels afficher un chemin.
-      - g (graphe)
-      - z_d (Zone), sert pour récupérer la ville défaut.
-      - session (dic), le dico de la session Django
-      - départ, arrivée (str) Seront lues par chemins.Étape.
-      - noms_étapes (str list), liste de noms d’étapes (départ et arrivée inclues). Seront également lues par chemin.Étape.
-      - rues_interdites (str list) : liste des noms du rues à éviter.
+# def itinéraire( ps_détour, g, z_d, session,
+#                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
+#                où_enregistrer=os.path.join(TMP, "itinéraire.html"),
+#                bavard=0, ouvrir=False):
+#     """ 
+#     Entrées :
+#       - ps_détour (float list), liste des proportion de détour pour lesquels afficher un chemin.
+#       - g (graphe)
+#       - z_d (Zone), sert pour récupérer la ville défaut.
+#       - session (dic), le dico de la session Django
+#       - départ, arrivée (str) Seront lues par chemins.Étape.
+#       - noms_étapes (str list), liste de noms d’étapes (départ et arrivée inclues). Seront également lues par chemin.Étape.
+#       - rues_interdites (str list) : liste des noms du rues à éviter.
 
-    Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
+#     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
 
-    Sortie : ( liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
-                     # id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
-                     # aide sera affichée en infobulle dans les pages de résultat.
-               objet Chemin correspondant au dernier p_détour,
+#     Sortie : ( liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
+#                      # id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
+#                      # aide sera affichée en infobulle dans les pages de résultat.
+#                objet Chemin correspondant au dernier p_détour,
 
-               noms_étapes,
-               rues_interdites sont les valeurs après correction d’éventuelles fautes de frappe,
-               carte 
-              )
+#                noms_étapes,
+#                rues_interdites sont les valeurs après correction d’éventuelles fautes de frappe,
+#                carte 
+#               )
              
-    """
-    assert len(noms_étapes)>1
+#     """
+#     assert len(noms_étapes)>1
  
-    return  itinéraire_of_étapes(étapes, ps_détour, g, z_d, session, rajouter_iti_direct, étapes_interdites, où_enregistrer, bavard, ouvrir)
+#     return  itinéraire_of_étapes(étapes, ps_détour, g, z_d, session, rajouter_iti_direct, étapes_interdites, où_enregistrer, bavard, ouvrir)
  
 
 
@@ -228,30 +228,34 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, o
     Entrées :
       - listes_chemins : liste de couples (liste d'Arêtes, couleur)
       - g (instance de Graphe)
+      - ad_départ, ad_arrivée (instances d’Adresse). Pour la première et la dernière partie de l’itinéraire et les marqueurs de départ et arrivée.
       - où_enregistrer : adresse du fichier html à créer
     Effet:
       Crée le fichier html de la carte superposant tous les itinéraires fournis.
     """
 
-    l, coul, p = listes_chemins[0]
-    #sous_graphe = g.g.multidigraphe.subgraph(l)
-    #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul)
-    carte = folium_of_chemin(g, z_d, l, p, fit=True, color=coul)
-    #carte = plot_route_folium(g.g.multidigraphe, l, popup_attribute="name", color=coul) # Ne marche pas...
-    for l, coul, p in listes_chemins[1:]:
-        #sous_graphe = g.g.multidigraphe.subgraph(l)
-        #carte = plot_graph_folium(sous_graphe, popup_attribute="name", color=coul, graph_map=carte)
-        carte = folium_of_chemin(g, z_d, l, p, carte=carte, color=coul)
-
-    # Je mets les coords de début et fin du premier itinéraire si les chhamp coords des adresses n’était pas remplis.
+    # Initialisation de la carte avec le premier chemin.
+    #l, coul, p = listes_chemins[0]
+    #carte = folium_of_chemin(g, z_d, l, p, fit=True, color=coul)
+    
+    # Je mets les coords de début et fin du premier itinéraire si les champs coords des adresses n’était pas remplis.
     if not ad_départ.coords:
         ad_départ.coords=l[0].départ.coords()
     if not ad_arrivée.coords:
         ad_arrivée.coords=l[-1].arrivée.coords()
+
+    carte = None
+    for l, coul, p in listes_chemins:#[1:]:
+        carte = folium_of_chemin(g, z_d, l, p, carte=carte, color=coul)
+
+
     ajoute_marqueur(ad_départ, carte, fouine=fouine)
     ajoute_marqueur(ad_arrivée, carte, fouine=fouine)
+
+    # Bonus
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
+    
     carte.save(où_enregistrer)
 
     if ouvrir : ouvre_html(où_enregistrer)
