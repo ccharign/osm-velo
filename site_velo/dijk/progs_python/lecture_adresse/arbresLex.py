@@ -229,12 +229,10 @@ class ArbreLex():
         nb_rés=0
         
         if tol<0 or nb_rés<0: return [] # Cas de base utile dans les appels récursifs.
-
         
         elif len(mot)==0:
             res[0] = self.tous_les_mots(n_max=n_max_rés)
             return  res
-
         
         else:
             
@@ -247,12 +245,15 @@ class ArbreLex():
                 """
                 n_tot=0
                 i=0
+                tout = set() # Union de toutes les cases de res déjà traitées. (Pour éviter qu’un mot arrive dans plusieurs cases.)
                 while i<len(res):
                     # invariant de boucle : n_tot==\sum_{k=0}^{i-1} len(res[k])
-                    if n_tot+len(res[i])+len(à_rajouter[i])>n_max_rés:
+                    à_rajouter_sans_doublon = [m for m in à_rajouter[i] if m not in tout]
+                    if n_tot+len(res[i])+len(à_rajouter_sans_doublon) > n_max_rés:
                         res.pop()
                     else:
-                        res[i].update(à_rajouter[i])
+                        res[i].update(à_rajouter_sans_doublon)
+                        tout.update(res[i])
                         n_tot+=len(res[i])
                         i+=1
                 return n_tot
@@ -270,7 +271,7 @@ class ArbreLex():
                 *((f, mot[1:], lambda l, lettre=lettre:prefixed(lettre, l)) for (lettre, f) in self.fils.items() if lettre!=mot[0]), # En échangeant une lettre
                 *((f, mot, lambda l, lettre=lettre:prefixed(lettre, l) ) for (lettre, f) in self.fils.items()) # En ajoutant une lettre
                 ]
-
+            
             # Parcours de la liste des essais à faire.
             for (a, m, fonction) in essais_à_faire:
                 n_tol = len(res)-1 # nb max de fautes de frappe à garder compte tenu du n_max_rés.
@@ -278,9 +279,8 @@ class ArbreLex():
                 nb_rés =  ajoute_et_tronque_res([set()] + essai)
                     
             return res
-
-            
-
+        
+        
         
     
     def sauv(self, chemin):
