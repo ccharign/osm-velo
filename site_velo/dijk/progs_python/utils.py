@@ -235,7 +235,7 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, o
     """
 
     # Initialisation de la carte avec le premier chemin.
-    #l, coul, p = listes_chemins[0]
+    l, _, _ = listes_chemins[0]
     #carte = folium_of_chemin(g, z_d, l, p, fit=True, color=coul)
     
     # Je mets les coords de début et fin du premier itinéraire si les champs coords des adresses n’était pas remplis.

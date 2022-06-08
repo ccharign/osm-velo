@@ -35,6 +35,7 @@ class Graphe_django():
         ville_défaut (instance de models.Ville)
         arbres_des_rues : dico (ville_norm -> ArbreLex)
         arbre_arêtes : dico (nom de zone -> arbreQuad des arêtes).
+        arbre_lex_zone : dico (zone -> ArbreLex des noms de rue) (Pour autocomplétion)
     """
     
     def __init__(self):
@@ -50,6 +51,7 @@ class Graphe_django():
         self.cycla_min={}
         self.arbre_cache={}
         self.arbre_arêtes={}
+        self.arbre_lex_zone={}
     
         
     def charge_zone(self, zone_t, bavard=0):
@@ -65,11 +67,14 @@ class Graphe_django():
             
             ## Dicos des villes et des rues
             print("Chargement des arbres lex pour villes et rues...")
+            tic = perf_counter()
+            self.arbre_lex_zone[z_d] = ArbreLex()
             for v_d in z_d.villes():
                 #if bavard>0: print(v_d.nom_norm)
                 self.arbre_villes.insère(v_d.nom_norm)
                 self.arbres_des_rues[v_d.nom_norm] = ArbreLex.of_fichier(os.path.join(DONNÉES, v_d.nom_norm))
-            print("fini.")
+                self.arbre_lex_zone[z_d].rajoute(self.arbres_des_rues[v_d.nom_norm])
+            chrono(tic, " les arbres lex.")
 
             
             ## Cache
@@ -78,9 +83,6 @@ class Graphe_django():
             self.arbre_cache[zone_t] = ArbreLex.of_iterable(
                 [str(a.adresse) for a in Cache_Adresse.objects.filter(ville__in = Subquery(villes.values("ville")))]
             )
-
-            #tous_les_sommets = tuple(s.id_osm for s in Sommet.objects.filter(zone=z_d))
-            #print(f"{len(tous_les_sommets)} sommets dans la base pour {z_d}")
 
             ## Sommets
             tic = perf_counter()
@@ -110,7 +112,7 @@ class Graphe_django():
             tic=chrono(tic, f"Chargement de dico_voisins depuis la base de données pour la zone {zone_t}.")
 
             
-            ## arbre quad des arêtes:
+            ## Arbre quad des arêtes:
             chemin = os.path.join(dossier_données, f"arbre_arêtes_{z_d}")
             tic=perf_counter()
             LOG(f"Chargement de l’arbre quad des arêtes depuis {chemin}", bavard=bavard)
@@ -118,7 +120,7 @@ class Graphe_django():
             chrono(tic, "Chargement de l’arbre quad des arêtes", bavard=bavard, force=True)
                 
                 
-            #cycla min et max
+            ## Cycla min et max
             self.calcule_cycla_min_max(z_d)
 
             self.zones.append(z_d)

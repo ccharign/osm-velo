@@ -57,7 +57,7 @@ class Zone(models.Model):
     def __str__(self):
         return self.nom
     def __hash__(self):
-        return self.nom.__hash__()
+        return self.pk
 
     
 class Ville_Zone(models.Model):

@@ -13,7 +13,6 @@ import re
 
 
 tic0=time.perf_counter()
-#print(f"Répertoire courant : {os.getcwd() }")
 from .progs_python.params import LOG
 from .progs_python.petites_fonctions import chrono, union_liste
 from .progs_python.lecture_adresse.normalisation import Adresse
@@ -22,9 +21,6 @@ tic=chrono(tic0, "params, petites_fonctions, normalisation", bavard=3)
 from .progs_python.chemins import Chemin, chemins_of_csv, Étape, ÉtapeArête
 tic=chrono(tic, "chemins", bavard=3)
 
-#from .progs_python.init_graphe import charge_graphe
-#tic=chrono(tic, "charge_graphe", bavard=3)
-
 from .progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from .progs_python.lecture_adresse.normalisation0 import prétraitement_rue
 from .progs_python import recup_donnees
@@ -32,7 +28,7 @@ from .progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection,
 from .progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
-from .progs_python.utils import itinéraire, dessine_chemin, dessine_cycla, itinéraire_of_étapes
+from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_étapes# itinéraire, 
 chrono(tic, "utils", bavard=3)
 
 from .progs_python.graphe_par_django import Graphe_django
@@ -459,7 +455,11 @@ def pour_complétion(requête, nbMax = 10):
         if "zone_id" not in requête.session:
             z_d = Zone.objects.get(nom = requête.session["zone"])
             requête.session["zone_id"] = z_d.pk
-        z_id = requête.session["zone_id"]
+            z_id = z_d.pk
+        else:
+            z_id = requête.session["zone_id"]
+            z_d = Zone.objects.get(pk=z_id)
+        
 
         # découpage de la chaîne à chercher
         tout = requête.GET["term"].split(";")
@@ -481,7 +481,8 @@ def pour_complétion(requête, nbMax = 10):
         dicos=[]
 
         # Complétion dans l’arbre lexicographique
-        
+        dans_l_arbre = g.arbre_lex_zone[z_d].complétion(à_chercher, tol=2, n_max_rés=nbMax)
+        print(dans_l_arbre)
         
         
         # Recherche dans les rues de la base
@@ -502,6 +503,8 @@ def pour_complétion(requête, nbMax = 10):
             print(f"Trouvé dans CacheNomRue : {chose}")
             dicos.append( {"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
             
+            
+        # Création du json à renvoyer
         rés = json.dumps(dicos)
         
     else:
