@@ -5,11 +5,13 @@
 {% load static %}
 
 <script>
-  var laCarte;
-    $(document).ready(function() {
-	laCarte = {{la_carte}};
-	marqueurs_of_form(document.getElementById("relance_rapide"));
-	gèreLesClics();
+  //var laCarte;
+  //laCarte = document.getElementById("{{la_carte}}");
+  //console.log("laCarte ="+laCarte)
+  $(document).ready(function() {
+      const laCarte  = {{la_carte}}; // L’objet javascript créé par leaflet
+      marqueurs_of_form(document.getElementById("relance_rapide"), laCarte);
+      gèreLesClics(laCarte);
     });
 </script>
 

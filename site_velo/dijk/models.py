@@ -360,4 +360,11 @@ class CacheNomRue(models.Model):
 
 class Amenity(models.Model):
     nom = models.TextField()
+
+
+class Bug(models.Model):
+    titre = models.TextField()
+    description = models.TextField()
+    comment_reproduire = models.TextField()
+    date = models.DateField(auto_now=True)
     

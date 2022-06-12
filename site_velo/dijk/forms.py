@@ -3,6 +3,8 @@ from django import forms
 import dijk.models as mo
 
 
+
+
 class FormCycla(forms.Form):
     """
     Pour demander la zone de laquelle afficher la carte de cycla.
@@ -40,4 +42,7 @@ class EnregistrerContrib(forms.Form):
     étapes = forms.CharField(widget=forms.HiddenInput())
     rues_interdites = forms.CharField(widget=forms.HiddenInput())
     AR = forms.BooleanField(label="Valable aussi pour le retour ?", required=False)
+    
+
+#class RapportDeBug(forms.ModelForm): # créer un form automatiquement depuis un modèle https://docs.djangoproject.com/en/4.0/topics/forms/modelforms/
     

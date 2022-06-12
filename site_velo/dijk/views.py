@@ -138,6 +138,7 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
             bavard=10,
             où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
+        print(f"La carte s’appelle {carte.get_name()}")
 
     
         ## Création du gabarit

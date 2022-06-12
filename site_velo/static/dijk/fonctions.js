@@ -2,8 +2,10 @@
 var nbÉtapes = 0;
 var nbArêtesInterdites = 0;
 
-function gèreLesClics(){
-    laCarte.on("click", addMarker);
+function gèreLesClics(carte){
+    carte.on("click",
+	     e => addMarker(e, carte)
+	    );
 }
 
 
@@ -15,22 +17,23 @@ function récupMarqueurs(texte, fonction) {
 	    const tab_coords = coords_t.split(",").map(parseFloat);
 	    const coord = L.latLng(tab_coords[1], tab_coords[0]);
 	    //console.log(coord);
-	    fonction(coord);}
+	    fonction(coord);
+	}
     }
 }
 
 
-function marqueurs_of_form(form){
-    récupMarqueurs(form.elements["marqueurs_é"].value, nvÉtape);
-    récupMarqueurs(form.elements["marqueurs_i"].value, nvArêteInterdite);
+function marqueurs_of_form(form, carte){
+    récupMarqueurs(form.elements["marqueurs_é"].value, coords => nvÉtape(coords, carte));
+    récupMarqueurs(form.elements["marqueurs_i"].value, coords => nvArêteInterdite(coords, carte));
 }
 
-function addMarker(e) {
+function addMarker(e, carte) {
     if (e.originalEvent.ctrlKey){
-	nvArêteInterdite(e.latlng);
+	nvArêteInterdite(e.latlng, carte);
     }
     else{
-	nvÉtape(e.latlng);
+	nvÉtape(e.latlng, carte);
     }
 }
 
@@ -63,7 +66,7 @@ function mon_icone(coul){
 
 
 
-function nvÉtape(latlng){
+function nvÉtape(latlng, carte){
     nbÉtapes+=1;
     
     //const markerPlace = document.querySelector(".marker-position");
@@ -73,7 +76,7 @@ function nvÉtape(latlng){
     const marker = new L.marker( latlng, {draggable: true, icon: mon_icone('green'), });
     console.log(marker);
     marker.bindTooltip(""+nbÉtapes, {permanent: true, direction:"bottom"})
-	  .addTo(laCarte)
+	  .addTo(carte)
 	  .bindPopup(buttonRemove);
     
     //marker.numéro = nbÉtapes; // Inutile : champ_du_form suffit désormais.
@@ -84,7 +87,7 @@ function nvÉtape(latlng){
 
 
     // event remove marker
-    marker.on("popupopen", removeMarker);
+    marker.on("popupopen", () => removeMarker(carte, marker));
 
     // event draged marker
     marker.on("dragend", dragedMarker);
@@ -94,7 +97,7 @@ function nvÉtape(latlng){
 }
 
 
-function nvArêteInterdite(latlng){
+function nvArêteInterdite(latlng, carte){
 
     // Création du marqueur
     nbArêtesInterdites+=1;
@@ -102,13 +105,13 @@ function nvArêteInterdite(latlng){
 	icon: mon_icone('red'),
 	draggable: true
     })
-	  .addTo(laCarte)
+	  .addTo(carte)
 	  .bindPopup(buttonRemove);
 
     marker.champ_du_form = "interdite_coord"+nbArêtesInterdites;
 
     // event remove marker
-    marker.on("popupopen", removeMarker);
+    marker.on("popupopen", () => removeMarker(carte, marker));
 
     // event draged marker
     marker.on("dragend", dragedMarker);
@@ -124,9 +127,9 @@ const buttonRemove =
 
 
 // remove marker
-function removeMarker() {
+function removeMarker(carte, marker) {
     
-    const marker = this;// L’objet sur lequelle cette méthode est lancée
+    //const marker = this;// L’objet sur lequelle cette méthode est lancée
     const btn = document.querySelector(".remove");
     
     btn.addEventListener("click", function () {
@@ -134,7 +137,7 @@ function removeMarker() {
 	//markerPlace.textContent = "goodbye marker";
 	hidden = document.getElementById(marker.champ_du_form);
 	hidden.remove()
-	laCarte.removeLayer(marker);
+	carte.removeLayer(marker);
     });
 }
 
