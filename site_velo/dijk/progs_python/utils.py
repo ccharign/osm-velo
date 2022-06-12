@@ -7,6 +7,7 @@ import subprocess
 import os
 from django.db import transaction
 import gpxpy
+from branca.element import Element
 
 from petites_fonctions import chrono, deuxConséc, LOG
 tic=perf_counter()
@@ -255,7 +256,11 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, o
     # Bonus
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
-    
+
+    ## modif de la carte
+    carte.get_root().script.add_child(
+        Element(f"$(document).ready(function() {{gèreLesClics({carte.get_name()});}});")
+    )
     carte.save(où_enregistrer)
 
     if ouvrir : ouvre_html(où_enregistrer)
