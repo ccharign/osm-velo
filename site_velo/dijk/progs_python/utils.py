@@ -258,8 +258,14 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, o
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
 
     ## modif de la carte
+    nom_carte=carte.get_name()
     carte.get_root().script.add_child(
-        Element(f"$(document).ready(function() {{gèreLesClics({carte.get_name()});}});")
+        Element(f"""
+        $(document).ready(function() {{
+            gèreLesClics({nom_carte});
+            marqueurs_of_form(document.getElementById("relance_rapide"), {nom_carte});
+        ;}});
+""")
     )
     carte.save(où_enregistrer)
 
