@@ -27,8 +27,14 @@ function récupMarqueurs(texte, fonction) {
 
 
 function marqueurs_of_form(form, carte){
-    récupMarqueurs(form.elements["marqueurs_é"].value, coords => nvÉtape(coords, carte));
-    récupMarqueurs(form.elements["marqueurs_i"].value, coords => nvArêteInterdite(coords, carte));
+    récupMarqueurs(
+	form.elements["marqueurs_é"].value,
+	coords => nvÉtape(coords, carte)
+    );
+    récupMarqueurs(
+	form.elements["marqueurs_i"].value,
+	coords => nvArêteInterdite(coords, carte)
+    );
 }
 
 function addMarker(e, carte) {

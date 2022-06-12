@@ -10,7 +10,7 @@ import forms
 import traceback
 import json
 import re
-
+from branca.element import Element
 
 tic0=time.perf_counter()
 from .progs_python.params import LOG
@@ -138,9 +138,11 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
             bavard=10,
             où_enregistrer="dijk/templates/dijk/iti_folium.html"
         )
-        print(f"La carte s’appelle {carte.get_name()}")
 
-    
+
+        ## modif de la carte
+        carte.get_root().script.add_child(Element("gèreLesClics(this);"))
+        
         ## Création du gabarit
 
         suffixe = "".join(noms_étapes)+"texte_étapes"+"".join(rues_interdites)
