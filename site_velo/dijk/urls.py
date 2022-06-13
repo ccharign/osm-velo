@@ -33,7 +33,7 @@ urlpatterns = [
     
     path('ajax/recherche_rue/', views.pour_complétion, name="complète rue"),
     path('', views.choix_zone, name='index'),    
-    path('<str:zone_t>/', views.recherche, name='recherche'),
+    path('recherche/<str:zone_t>/', views.recherche, name='recherche'),
 
 
 

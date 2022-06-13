@@ -72,8 +72,6 @@
 	      
 	  });
 
-	  
-
       });
     </script>
 
@@ -97,7 +95,7 @@
 	    <ul class="nav navbar-nav">
 
 	      {% if zone_t %}
-	      <li><a href="{% url 'index' %}{{zone_t}}"> Nouvelle recherche </a></li>
+	      <li><a href="{% url 'recherche' zone_t %}"> Nouvelle recherche </a></li>
 	      {% endif %}
 	      
 	      <li class="dropdown">

@@ -55,11 +55,12 @@ def get_full_class_name(obj):
 
 
 def recherche(requête, zone_t):
-    print(f"Lancement de la vue « recherche », zone_t={zone_t}.")
     z_d = g.charge_zone(zone_t)
     requête.session["zone"]=zone_t
     requête.session["zone_id"] = z_d.pk
-    return render(requête, "dijk/recherche.html", {"ville":z_d.ville_défaut, "zone_t":zone_t})
+    return render(requête, "dijk/recherche.html",
+                  {"ville":z_d.ville_défaut, "zone_t":zone_t}
+                  )
 
 
 def fouine(requête):
@@ -70,7 +71,8 @@ def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
 
 def index(requête):
-    return render(requête, "dijk/index.html", {"zones":Zone.objects.all()})
+    return render(requête, "dijk/index.html"#, {"zones":Zone.objects.all()}
+                  )
 
 def mode_demploi(requête):
     return render(requête, "dijk/mode_demploi.html", {})
@@ -349,14 +351,14 @@ def choix_cycla(requête):
 
 
 def choix_zone(requête):
-    if requête.method == "POST":
-        form = forms.ChoixZone(requête.POST)
+    if requête.method == "GET":
+        form = forms.ChoixZone(requête.GET)
         if form.is_valid():
-            z_d = Zone.objects.get(pk=requête.POST["zone"])
+            z_d = Zone.objects.get(pk=requête.GET["zone"])
             return recherche(requête, z_d.nom)
     else:
         form = forms.ChoixZone()
-        print(f"Requête pas POST, formulaire créé : {form}")
+        print(f"Requête pas GET, formulaire créé : {form}")
     return render(requête, "dijk/index.html", {"form":form})
 
 
