@@ -38,13 +38,47 @@
 
   <body>
 
-    <!-- Autoriser les popover -->
+    
     <script>
-      $(document).ready(function(){
+      $(document).ready(  function(){
+
+	  //Autoriser les popover
 	  $('[data-toggle="popover"]').popover();
+
+
+	  // autocomplétion
+	  $(function () {
+
+	      $("#départ").autocomplete({
+		  source: "{% url 'complète rue' %}",
+		  minLength: 3,
+	      });
+	      
+	      
+	      $("#arrivée").autocomplete({
+		  source: "{% url 'complète rue' %}",
+		  minLength: 4,
+	      });
+	      
+	      $("#rues_interdites").autocomplete({
+		  source: "{% url 'complète rue' %}",
+		  minLength: 4,
+	      });
+
+	      $("#étapes").autocomplete({
+		source: "{% url 'complète rue' %}",
+		minLength: 4,
+	      });
+	      
+	  });
+
+	  
+
       });
     </script>
 
+
+    
     <!-- <header> -->
       <nav class="navbar navbar-default">
 	<div class="container-fluid">
@@ -97,50 +131,34 @@
   </body>
 
   
-  <!-- Autocomplétion -->
-  <script>
-    $(document).ready(function() {
-	$(function () {
-	    $("#départ").autocomplete({
-		source: "{% url 'complète rue' %}",
-		minLength: 3,
-	    });
-	});
-    })
-  </script>
+  <!-- <\!-- Autocomplétion -\-> -->
+  <!-- <script> -->
+  <!--   $(document).ready(function() { -->
+	
+  <!--   }) -->
+  <!-- </script> -->
 
-  <script>
-    $(document).ready(function() {
-	$(function () {
-	    $("#arrivée").autocomplete({
-		source: "{% url 'complète rue' %}",
-		minLength: 4,
-	    });
-	});
-    })
-  </script>
+  <!-- <script> -->
+  <!--   $(document).ready(function() { -->
 
-  <script>
-    $(document).ready(function() {
-	$(function () {
-	    $("#rues_interdites").autocomplete({
-		source: "{% url 'complète rue' %}",
-		minLength: 4,
-	    });
-	});
-    })
-  </script>
+  <!--   }) -->
+  <!-- </script> -->
 
-    <script>
-    $(document).ready(function() {
-	$(function () {
-	    $("#étapes").autocomplete({
-		source: "{% url 'complète rue' %}",
-		minLength: 4,
-	    });
-	});
-    })
-  </script>
+  <!-- <script> -->
+  <!--   $(document).ready(function() { -->
+  <!-- 	$(function () { -->
+
+  <!-- 	}); -->
+  <!--   }) -->
+  <!-- </script> -->
+
+  <!--   <script> -->
+  <!--   $(document).ready(function() { -->
+  <!-- 	$(function () { -->
+	    
+  <!-- 	}); -->
+  <!--   }) -->
+  <!-- </script> -->
   
 
   {% block script %} {% endblock %}

@@ -139,17 +139,19 @@ def itinéraire_of_étapes(étapes,
     
     def traite_un_chemin(c, coul, légende, aide):
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
+        longueur=g.longueur_itinéraire(iti_d)
         à_dessiner.append( (iti_d, coul, p))
         #nom_gpx = hash(c)
         
         stats.append({"légende": légende,
-                    "aide":aide,
-                    "id": f"ps{int(100*c.p_détour)}",
-                    "longueur":g.longueur_itinéraire(iti_d),
-                    "longueur_ressentie":int(l_ressentie),
-                    "couleur":coul,
-                    #"nom_gpx": nom_gpx,
-                    "gpx": gpx_of_iti(iti_d, session, bavard=bavard-1)}
+                      "aide":aide,
+                      "id": f"ps{int(100*c.p_détour)}",
+                      "longueur": longueur,
+                      "temps":longueur/15000*60,# Moyenne de 15km/h disons
+                      "longueur_ressentie":int(l_ressentie),
+                      "couleur":coul,
+                      #"nom_gpx": nom_gpx,
+                      "gpx": gpx_of_iti(iti_d, session, bavard=bavard-1)}
                    )
 
     tic = perf_counter()

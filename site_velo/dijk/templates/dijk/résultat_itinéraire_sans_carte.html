@@ -67,7 +67,7 @@
     <form action="{% url 'téléchargement' %}" method="post">
       {% csrf_token %}
       <span class="btn-xs btn-default" data-toggle="popover" title="{{x.légende}}" data-trigger="hover" data-content="{{x.aide}}">?</span>
-      <span style="color: {{x.couleur}};"> {{x.légende}} :  {{x.longueur}} m (détour de {{x.p_détour_effectif}} %)</span>
+      <span style="color: {{x.couleur}};"> {{x.légende}} :  {{x.longueur}} m, {{x.temps}} mn (détour de {{x.p_détour_effectif}} %)</span>
       <input type="hidden" id="gpx" name="gpx" value={{x.gpx}}>
       <input type="submit" class="btn btn-link" value="gpx">
     </form>
