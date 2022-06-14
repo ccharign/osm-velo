@@ -1,3 +1,4 @@
+
 from django.db import models
 from dijk.progs_python.params import CHEMIN_CHEMINS, LOG
 from dijk.progs_python.lecture_adresse.normalisation0 import partie_commune
@@ -13,10 +14,10 @@ class Ville(models.Model):
     nom_complet = models.CharField(max_length=100)
     nom_norm = models.CharField(max_length=100)
     code = models.IntegerField(null=True)
-    code_insee = models.IntegerField()
-    population = models.IntegerField()
-    densité = models.SmallIntegerField()
-    géom_texte = models.TextField(null=True)
+    code_insee = models.IntegerField(null=True, default=None, blank=True)
+    population = models.IntegerField(null=True, default=None, blank=True)
+    densité = models.SmallIntegerField(null=True, default=None, blank=True)
+    géom_texte = models.TextField(null=True, default=None, blank=True)
     données_présentes = models.BooleanField(default=False)
     #zone = models.ManyToManyField(Zone) # pb car la classe Zone n’est pas encore définie.
 
