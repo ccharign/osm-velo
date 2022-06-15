@@ -47,17 +47,16 @@ def arbre_des_villes(zone_d=None):
 
 def ajoute_code_postal(nom, code):
     """
-    Ajoute s’il n’y est pas déjà déjà, le code postal de la ville.
+    Ajoute ou corrige le code postal de la ville.
     Sortie (models.Ville)
     """
-    essai = Ville.objects.filter(nom_norm = partie_commune(nom), code = code).first()
+    essai = Ville.objects.filter(nom_norm = partie_commune(nom)).first()
     if essai:
+        essai.code=code
+        essai.save()
         return essai
     else:
-        v = Ville.objects.get(nom_norm= partie_commune(nom), code=None)
-        v.code=code
-        v.save()
-        return v
+        raise RuntimeError(f"Ville pas trouvée dans la base INSEE : {nom}, {(code)}")
 
         
 def nv_ville(nom, code, zone_d, tol=3):
