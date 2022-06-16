@@ -339,7 +339,7 @@ def téléchargement(requête):
 
 # Version formulaire de Django
 def choix_cycla(requête):
-    if requête.method == "GET":
+    if requête.method == "GET" and requête.GET:
         # On est arrivé ici après remplissage du formulaire
         form = forms.FormCycla(requête.GET)
         if form.is_valid():
@@ -351,7 +351,7 @@ def choix_cycla(requête):
 
 
 def choix_zone(requête):
-    if requête.method == "GET":
+    if requête.method == "GET" and requête.GET:
         form = forms.ChoixZone(requête.GET)
         if form.is_valid():
             z_d = Zone.objects.get(pk=requête.GET["zone"])

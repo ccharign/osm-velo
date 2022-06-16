@@ -147,7 +147,7 @@ def itinéraire_of_étapes(étapes,
                       "aide":aide,
                       "id": f"ps{int(100*c.p_détour)}",
                       "longueur": longueur,
-                      "temps":longueur/15000*60,# Moyenne de 15km/h disons
+                      "temps":int(longueur/15000*60),# Moyenne de 15km/h disons
                       "longueur_ressentie":int(l_ressentie),
                       "couleur":coul,
                       #"nom_gpx": nom_gpx,
