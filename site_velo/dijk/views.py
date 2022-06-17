@@ -157,7 +157,11 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
         with open(os.path.join("dijk/templates", nom_fichier_html), "w") as sortie:
             sortie.write(f"""
             {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
-            {{% block head_début %}}  {head}  {{% endblock %}}
+            {{% block head_début %}} 
+            {head} 
+            {{% load static %}}
+            <script src="{{% static 'dijk/leaflet-providers.js' %}}" type="text/javascript" > </script>
+            {{% endblock %}}
             {{% block carte %}} {body} {{% endblock %}}
             {{% block script %}} <script> {script} </script> {{% endblock %}}
             """)

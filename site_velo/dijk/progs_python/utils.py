@@ -23,7 +23,7 @@ from dijk.models import Zone, Chemin_d, Arête
 from params import TMP
 
 tic=perf_counter()
-from mon_folium import folium_of_chemin, ajoute_marqueur, folium_of_arêtes, couleur_of_cycla, color_dict, n_coul
+from mon_folium import folium_of_chemin, ajoute_marqueur, folium_of_arêtes, couleur_of_cycla, color_dict, NB_COUL
 chrono(tic, "mon_folium", bavard=2)
 
 import dijkstra
@@ -70,38 +70,6 @@ def légende_et_aide(p_détour):
 
 
     
-## Fonction obsolète
-# def itinéraire( ps_détour, g, z_d, session,
-#                rajouter_iti_direct=True, noms_étapes=[], rues_interdites=[],
-#                où_enregistrer=os.path.join(TMP, "itinéraire.html"),
-#                bavard=0, ouvrir=False):
-#     """ 
-#     Entrées :
-#       - ps_détour (float list), liste des proportion de détour pour lesquels afficher un chemin.
-#       - g (graphe)
-#       - z_d (Zone), sert pour récupérer la ville défaut.
-#       - session (dic), le dico de la session Django
-#       - départ, arrivée (str) Seront lues par chemins.Étape.
-#       - noms_étapes (str list), liste de noms d’étapes (départ et arrivée inclues). Seront également lues par chemin.Étape.
-#       - rues_interdites (str list) : liste des noms du rues à éviter.
-
-#     Effet :  Crée une page html contenant l’itinéraire demandé, et l’enregistre dans où_enregistrer
-
-#     Sortie : ( liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
-#                      # id est la chaîne 'ps'+str(int(100*p_détour)). Servira de champ id aux formulaires.
-#                      # aide sera affichée en infobulle dans les pages de résultat.
-#                objet Chemin correspondant au dernier p_détour,
-
-#                noms_étapes,
-#                rues_interdites sont les valeurs après correction d’éventuelles fautes de frappe,
-#                carte 
-#               )
-             
-#     """
-#     assert len(noms_étapes)>1
- 
-#     return  itinéraire_of_étapes(étapes, ps_détour, g, z_d, session, rajouter_iti_direct, étapes_interdites, où_enregistrer, bavard, ouvrir)
- 
 
 
 def itinéraire_of_étapes(étapes,
@@ -157,7 +125,7 @@ def itinéraire_of_étapes(étapes,
     tic = perf_counter()
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, étapes, p, False, interdites=interdites)
-        coul = color_dict[ (i*n_coul)//np ]
+        coul = color_dict[ (i*NB_COUL)//np ]
         traite_un_chemin(c, coul, *légende_et_aide(p))
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
@@ -266,6 +234,8 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, o
         $(document).ready(function() {{
             gèreLesClics({nom_carte});
             marqueurs_of_form(document.getElementById("relance_rapide"), {nom_carte});
+            L.tileLayer.provider('CyclOSM').addTo({nom_carte});
+            
         ;}});
 """)
     )

@@ -7,7 +7,7 @@ import folium
 #import json
 from petites_fonctions import deuxConséc
 
-list_colors = [# Du vert au rouge
+TAB_COULEURS = [# Du vert au rouge
         "#00FF00",        "#12FF00",        "#24FF00",        "#35FF00",
         "#47FF00",        "#58FF00",        "#6AFF00",        "#7CFF00",
         "#8DFF00",        "#9FFF00",        "#B0FF00",        "#C2FF00",
@@ -16,22 +16,37 @@ list_colors = [# Du vert au rouge
         "#FFC100",        "#FFAF00",
         "#FF9E00",        "#FF8C00",        "#FF7B00",        "#FF6900",
         "#FF5700",        "#FF4600",        "#FF3400",        "#FF2300",
-        "#FF1100",        "#FF0000",    ]
-list_colors.reverse() # maintenant du rouge au vert
-color_dict = {i: list_colors[i] for i in range(len(list_colors))}
-n_coul = len(list_colors)
+        "#FF1100",        "#FF0000",
+]
+TAB_COULEURS.reverse() # maintenant du rouge au vert
+NB_COUL = len(TAB_COULEURS)
+color_dict = {i: TAB_COULEURS[i] for i in range(NB_COUL)}
+
+
+
+def couleur_of_int(val, mini, maxi):
+    """
+    Renvoie une couleur en proportion avec val : mini -> rouge, maxi-> vert.
+    """
+    if val <= mini:
+        return TAB_COULEURS[0]
+    elif val>=maxi:
+        return TAB_COULEURS[-1]
+    else:
+        i = int((val-mini)/(maxi-mini)*NB_COUL)
+        return TAB_COULEURS[i]
 
 
 def couleur_of_cycla(a, g, z_d):
-    """Renvoie un entier dans [|0, n_coul[|. 1 est associé à n_coul//2, mini à 0, maxi à 1."""
+    """Renvoie un entier dans [|0, NB_COUL[|. 1 est associé à NB_COUL//2, mini à 0, maxi à 1."""
     val=a.cyclabilité()
     mini, maxi = g.cycla_min[z_d], g.cycla_max[z_d] #min(g.g.cyclabilité.values()), max(g.g.cyclabilité.values())
     if val==maxi:
-        i= n_coul-1
+        i= NB_COUL-1
     elif val <= 1.:
-        i= int((val-mini)/(1-mini)*n_coul/2)  # dans [|0, n_coul/2 |]
+        i= int((val-mini)/(1-mini)*NB_COUL/2)  # dans [|0, NB_COUL/2 |]
     else:
-        i= int((val-1)/(maxi-1)*n_coul/2+n_coul/2)
+        i= int((val-1)/(maxi-1)*NB_COUL/2+NB_COUL/2)
     return color_dict[i]
 
 
@@ -66,7 +81,10 @@ def folium_of_chemin(g, z_d, iti_d, p, carte=None, tiles="cartodbpositron", zoom
     cm = (cd[0]+cf[0])/2., (cd[1]+cf[1])/2.
     
     if carte is None:
-        carte = folium.Map(location=(cm[1], cm[0]), zoom_start=zoom, tiles=tiles) #Dans folium les coords sont lat, lon au lieu de lon, lat
+        carte = folium.Map(location=(cm[1], cm[0]),#Dans folium les coords sont lat, lon au lieu de lon, lat
+                           zoom_start=zoom,
+                           #tiles=tiles
+                           ) 
         fit = True
 
     # Extraction de l’argument « color »
@@ -75,10 +93,10 @@ def folium_of_chemin(g, z_d, iti_d, p, carte=None, tiles="cartodbpositron", zoom
 
     for a in iti_d:
         # L’arête avec couleur cycla
-        pl=polyline_of_arête(g, a, color=couleur_of_cycla(a, g, z_d), opacity=.2, weight=6,  **kwargs)
+        pl=polyline_of_arête(g, a, color=couleur_of_cycla(a, g, z_d), opacity=.1, weight=6,  **kwargs)
         pl.add_to(carte)
         # L’arête avec couleur passée en arg
-        pl=polyline_of_arête(g, a, color=couleur, opacity=.6, weight=1,  **kwargs)
+        pl=polyline_of_arête(g, a, color=couleur, opacity=.6, weight=2,  **kwargs)
         pl.add_to(carte)
 
     if fit:
