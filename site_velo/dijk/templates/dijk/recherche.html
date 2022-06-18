@@ -4,6 +4,8 @@
 
 {% block contenu %}
 
+{% load bootstrap3 %}
+
 <script>
   $(document).ready(  voir_si_géoLoc);
 </script>
@@ -19,14 +21,7 @@
     <div class="form-group">
       <div class="row">
 
-	<div class="col-md-4">
-	  <label class="sr-only" for="départ">Départ : </label>
-	  <input type="text" class="form-control" id="départ" name="départ" placeholder="Départ">
-	</div>
-	<div class="col-md-4">
-	  <label class="sr-only" for="arrivée"> Arrivée : </label>
-	  <input type="text" class="form-control" id="arrivée" name="arrivée" placeholder="Arrivée">
-	</div>
+	{% bootstrap_form recherche %}
 
 	<div class="col-md-4">
 	  <input type="submit" class="btn btn-default" value="C’est parti!">

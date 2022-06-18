@@ -20,6 +20,17 @@ class ChoixZone(forms.Form):
     zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label="")
 
 
+class Recherche(forms.Form):
+    """
+    Recherche initiale
+    """
+    départ = forms.CharField(label="Départ")
+    arrivée = forms.CharField(label="Arrivée")
+    partir_de_ma_position = forms.BooleanField(label="Partir de ma position",required=False, initial=False)
+    #pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
+    zone_t = forms.CharField(widget=forms.HiddenInput())
+    
+
 class RelanceRapide(forms.Form):
     """
     Pour relancer rapidement une recherche.

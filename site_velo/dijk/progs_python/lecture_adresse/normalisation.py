@@ -244,7 +244,6 @@ class Adresse():
     """
     Attributs
       - num (str, à cause des bis et ter)
-      # supprimé - rue (str) : nom de la rue complet
       - rue_norm (str) : nom de rue après normalisation (via normalise_rue)
       - rue_osm (str) : nom de la rue trouvé dans osm (le cas échéant)
       - rue_initiale (str) : le nom initialement fourni à __init__
@@ -253,8 +252,19 @@ class Adresse():
       - rés_nominatim : résultat de cherche_lieu s’il y a eu un appel à cette fonction.
       - coords : initialement None, sera rempli par la fonction recup_nœuds.un_seul_nœud le cas échéant.
     """
-    
-    def __init__(self, g, z_d, texte, norm_rue=True, nv_cache=1, bavard=0):
+
+    def __init__(self): 
+        self.rue_initiale=None
+        self.coords=None
+        self.num=None
+        self.rue_osm=None
+        self.rue_norm=None
+        self.ville=None
+        self.pays=None
+        self.rés_nominatim=None
+
+    @classmethod
+    def of_texte(cls, g, z_d, texte, norm_rue=True, nv_cache=1, bavard=0):
         """ 
         Entrée :
             g (graphe)
@@ -262,6 +272,7 @@ class Adresse():
             texte d’une adresse. Format : (num)? rue, code_postal? ville
         """
 
+        res=cls()
         num, bis_ter, rue_initiale, ville_t = découpe_adresse(texte, bavard=bavard)
         
         # Normalisation de la ville et de la rue
@@ -279,20 +290,23 @@ class Adresse():
 
         # Initialisation des attributs
         if num=="":
-            self.num=None
+            res.num=None
         else:
-            self.num= num
+            res.num= num
             if bis_ter:
-                self.num+= " "+bis_ter
-        #self.rue = rue
-        self.rue_initiale=rue_initiale
-        self.rue_norm = rue_n
-        self.rue_osm = rue_osm
-        self.ville = ville_n
-        self.pays=PAYS_DÉFAUT
-        self.coords = None
-        self.rés_nominatim=rés_nominatim
-        LOG(f"(Adresse.__init__) Après normalisation : num={num}, rue_initiale={rue_initiale}, rue_n={rue_n}, rue_osm={rue_osm}, ville_n={ville_n}", bavard=bavard)
+                res.num+= " "+bis_ter
+        #res.rue = rue
+        res.rue_initiale=rue_initiale
+        res.rue_norm = rue_n
+        res.rue_osm = rue_osm
+        res.ville = ville_n
+        res.pays=PAYS_DÉFAUT
+        res.coords = None
+        res.rés_nominatim=rés_nominatim
+        LOG(f"(Adresse.of_texte) Après normalisation : num={num}, rue_initiale={rue_initiale}, rue_n={rue_n}, rue_osm={rue_osm}, ville_n={ville_n}", bavard=bavard)
+
+        return res
+
         
     def rue(self):
         """

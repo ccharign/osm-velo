@@ -98,7 +98,7 @@ class ÉtapeArête():
         self.nœuds=set()
         self.coords_ini = None
         self.pk = None
-    
+        self.adresse = Adresse()
     
     @classmethod
     def of_arête(cls, a, coords):
@@ -107,6 +107,8 @@ class ÉtapeArête():
         res.nœuds = set((a.départ.id_osm, a.arrivée.id_osm))
         res.nom = a.nom
         res.pk = a.pk
+        res.adresse.rue_initiale=a.nom
+        res.adresse.coords=coords
         return res
 
     

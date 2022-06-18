@@ -19,8 +19,8 @@
     <!-- Ma feuille de style -->
     <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}?version=1" type="text/css"/>
     <!-- Mes fonctions javascript -->
-    <script src="{% static 'dijk/pour_leaflet.js'%}?version=4" type="text/javascript"> </script>
-    <script src="{% static 'dijk/fonctions.js'%}?version=4" type="text/javascript"> </script>
+    <script src="{% static 'dijk/pour_leaflet.js'%}?version=5" type="text/javascript"> </script>
+    <script src="{% static 'dijk/fonctions.js'%}?version=5" type="text/javascript"> </script>
 
 
     
@@ -50,13 +50,13 @@
 	  // autocomplétion
 	  $(function () {
 
-	      $("#départ").autocomplete({
+	      $("#id_départ").autocomplete({
 		  source: "{% url 'complète rue' %}",
 		  minLength: 3,
 	      });
 	      
 	      
-	      $("#arrivée").autocomplete({
+	      $("#id_arrivée").autocomplete({
 		  source: "{% url 'complète rue' %}",
 		  minLength: 4,
 	      });

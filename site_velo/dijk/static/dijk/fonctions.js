@@ -35,8 +35,8 @@ function voir_si_géoLoc(){
 }
 
 function àLaGéoloc(pos, form){
-    console.log(pos.coords);
-    form.elements["localisation"].value=pos.coords.lon+";"+pos.coords.lat;
+    console.log(pos.coords.longitude+";"+pos.coords.latitude);
+    form.elements["localisation"].value=pos.coords.longitude+";"+pos.coords.latitude;
 }
 
 

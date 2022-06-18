@@ -55,12 +55,32 @@ def get_full_class_name(obj):
 
 
 def recherche(requête, zone_t):
+    
     z_d = g.charge_zone(zone_t)
     requête.session["zone"]=zone_t
     requête.session["zone_id"] = z_d.pk
-    return render(requête, "dijk/recherche.html",
-                  {"ville":z_d.ville_défaut, "zone_t":zone_t}
-                  )
+    form_recherche = forms.Recherche(requête.GET or None)
+    
+    if form_recherche.is_valid():
+        données = form_recherche.cleaned_data
+        if données["partir_de_ma_position"] :
+            coords=tuple(map(float, données["localisation"].split(";")))
+            d = ÉtapeArête.of_coords(coords, g, z_d)
+        else:
+            d=Étape.of_texte(données["départ"])
+        a=Étape.of_texte(données["arrivée"])
+        noms_étapes = [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0]
+        étapes = [d] + [Étape.of_texte(é) for é in noms_étapes ] + [a]
+        ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
+        rues_interdites=None
+        étapes_interdites = [Étape.of_texte(r) for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
+
+        return calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites, étapes=étapes, étapes_interdites=étapes_interdites)
+
+    else:
+        return render(requête, "dijk/recherche.html",
+                      {"ville":z_d.ville_défaut, "zone_t":zone_t, "recherche":form_recherche}
+                      )
 
 
 def fouine(requête):
@@ -92,15 +112,23 @@ def sous_le_capot(requête):
 def visualisation_nv_chemin(requête):
     return render(requête, "dijk/iti_folium.html", {})
 
-    
+
+
+## Déprécié
 def vue_itinéraire(requête):
         """ Doit récupérer le résultat du formulaire via un get."""
 
     #try :
-        # Récupération des données du post
-        d=requête.GET["départ"]
-        a=requête.GET["arrivée"]
         z_d = g.charge_zone(requête.GET["zone_t"]) # On pourrait arriver ici sans être passé par la page recherche (?)
+        if "partir_de_ma_position" in requête.GET :
+            coords=tuple(map(float, requête.GET["localisation"].split(";")))
+            d = str(ÉtapeArête.of_coords(coords, g, z_d))
+            
+            
+        else:
+            d=requête.GET["départ"]
+        a=requête.GET["arrivée"]
+        
         #z_d = Zone.objects.get(nom=requête.GET["zone_t"])
 
         noms_étapes = [d] + [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0] + [a]
