@@ -19,7 +19,10 @@
     <!-- Ma feuille de style -->
     <link rel="stylesheet" media="screen" href="{% static 'dijk/styles.css' %}?version=1" type="text/css"/>
     <!-- Mes fonctions javascript -->
+    <script src="{% static 'dijk/pour_leaflet.js'%}?version=4" type="text/javascript"> </script>
     <script src="{% static 'dijk/fonctions.js'%}?version=4" type="text/javascript"> </script>
+
+
     
     <title>{% block titre %}Recherche d’itinéraire{% endblock %}</title>
 
@@ -27,11 +30,9 @@
     {% block head_début %} {% endblock %}
 
     <!-- Pour autocomplétion : jquery-ui -->
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js"> </script>
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js"> </script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
 
-
-    
   </head>
 
 
@@ -128,35 +129,6 @@
     </div>
   </body>
 
-  
-  <!-- <\!-- Autocomplétion -\-> -->
-  <!-- <script> -->
-  <!--   $(document).ready(function() { -->
-	
-  <!--   }) -->
-  <!-- </script> -->
-
-  <!-- <script> -->
-  <!--   $(document).ready(function() { -->
-
-  <!--   }) -->
-  <!-- </script> -->
-
-  <!-- <script> -->
-  <!--   $(document).ready(function() { -->
-  <!-- 	$(function () { -->
-
-  <!-- 	}); -->
-  <!--   }) -->
-  <!-- </script> -->
-
-  <!--   <script> -->
-  <!--   $(document).ready(function() { -->
-  <!-- 	$(function () { -->
-	    
-  <!-- 	}); -->
-  <!--   }) -->
-  <!-- </script> -->
   
 
   {% block script %} {% endblock %}

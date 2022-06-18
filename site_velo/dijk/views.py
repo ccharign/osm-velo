@@ -83,6 +83,9 @@ def contribution(requête):
 def sous_le_capot(requête):
     return render(requête, "dijk/sous_le_capot.html", {})
 
+
+
+
 ### Recherche d’itinéraire simple ###
 
 
@@ -190,7 +193,7 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
                    "marqueurs_i": texte_marqueurs(étapes_interdites),
                    "marqueurs_é": texte_marqueurs(étapes),
                    }
-        #print("données", données)
+        
         texte_étapes_inter = énumération_texte(noms_étapes[1:-1])
         return render(requête,
                       nom_fichier_html,
@@ -251,7 +254,7 @@ def relance_rapide(requête):
             
     é_inter.sort()
     étapes = [départ] + [é for _, é in é_inter] + [arrivée]
-    return calcul_itinéraires(requête, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, étapes_interdites=é_interdites, bavard=10)
+    return calcul_itinéraires(requête, requête.GET["pourcentage_détour"], z_d, [], [], étapes = étapes, étapes_interdites=é_interdites, bavard=3)
     
     
     

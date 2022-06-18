@@ -4,12 +4,16 @@
 
 {% block contenu %}
 
+<script>
+  $(document).ready(  voir_si_géoLoc);
+</script>
+
   <p>
     Bienvenue dans le calculateur participatif d’itinéraires cyclables de {{ville}} !
   </p>
 
 
-  <form action = "{% url 'résultat' %}" method="get">
+  <form action = "{% url 'résultat' %}" method="get" id="recherche">
     <!-- {% csrf_token %} -->
 
     <div class="form-group">

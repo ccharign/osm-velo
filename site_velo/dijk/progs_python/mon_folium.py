@@ -65,6 +65,28 @@ def polyline_of_arête(g, a, popup=None, **kwargs):
     return pl
 
 
+def folium_of_points(points, tuiles="cartodbpositron"):
+    """
+    Entrée: points ( ((float×float)×dico) list), liste de couples (coords, données)
+    Les coords au format (lon, lat)
+    """
+
+    carte = folium.Map(tiles=tuiles)
+    lons, lats = [], []
+    for (lon, lat), données in points:
+        folium.Marker(location=(lat, lon), **données).add_to(carte)
+        lons.append(lon)
+        lats.append(lat)
+    ajuste_fenêtre(lons, lats, carte)
+    return carte
+
+
+def ajuste_fenêtre(lons, lats, carte):
+    o,e = min(lons), max(lons)
+    s,n = min(lats), max(lats)
+    carte.fit_bounds([(s, o), (n, e)])
+
+    
 def folium_of_chemin(g, z_d, iti_d, p, carte=None, tiles="cartodbpositron", zoom=1, fit=False, **kwargs):
     """
     Entrées : 
@@ -83,7 +105,7 @@ def folium_of_chemin(g, z_d, iti_d, p, carte=None, tiles="cartodbpositron", zoom
     if carte is None:
         carte = folium.Map(location=(cm[1], cm[0]),#Dans folium les coords sont lat, lon au lieu de lon, lat
                            zoom_start=zoom,
-                           #tiles=tiles
+                           #tiles=tiles # Aucune tile initialement : sera rajouté via leaflet-providers en js
                            ) 
         fit = True
 

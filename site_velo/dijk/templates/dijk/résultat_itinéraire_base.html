@@ -35,12 +35,9 @@
   <div class="col-md-9">
     <!-- La carte -->
     
-    <!-- <div class="marker-position">click on the map, move the marker, click on the marker</div> -->
     <div class="carte">
       {% block carte %}
       {% endblock %}
-    
-	<!-- <a href="{% url 'visu nv chemin' %}" target="_blank"> L’itinéraire en plein écran dans un onglet séparé </a> -->
     </div>
     
   </div>
@@ -58,6 +55,11 @@
 </div>
 
 <br><br>
+
+
+<!-- Trajet retour -->
+{% block retour %}
+{% endblock %}
 
 
 <!-- Formulaire pour relancer le calcul -->

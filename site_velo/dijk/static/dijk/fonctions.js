@@ -23,17 +23,20 @@ $.fn.bindFirst = function(name, fn) {
     });
 };
 
-
 function voir_si_géoLoc(){
-    if (navigator.geolocation) {
-	
-    }
+    //if (navigator.geolocalisation){
+	form_recherche = document.getElementById("recherche");
+	addHidden(form_recherche, "localisation", (0.,0.));
+	navigator.geolocation.getCurrentPosition(
+	    pos => àLaGéoloc(pos, form_recherche),
+	    () => console.log("erreur à la géoloc")
+	);
+    //}
 }
 
-function àLaGéoloc(pos){
-    console.log(pos);
-    géoLoc=true;
-    
+function àLaGéoloc(pos, form){
+    console.log(pos.coords);
+    form.elements["localisation"].value=pos.coords.lon+";"+pos.coords.lat;
 }
 
 
@@ -94,7 +97,12 @@ function nvÉtape(latlng, carte){
 	  .addTo(carte)
 	  .bindPopup(buttonRemove);
     
+    //marker.numéro = nbÉtapes; // Inutile : champ_du_form suffit désormais.
     marker.champ_du_form = "étape_coord"+nbÉtapes;
+    // var marker = L.marker(props.coords,
+    // 			  {icon: myIcon}).bindTooltip(props.country, {permanent: true, direction : 'bottom'}
+    // 						     ).addTo(mymap);
+
 
     // event remove marker
     marker.on("popupopen", () => removeMarker(carte, marker));
@@ -128,7 +136,7 @@ function nvArêteInterdite(latlng, carte){
     
     // Ajout du champ hidden au formulaire
     form = document.getElementById("relance_rapide");
-    addHidden(form, marker.champ_du_form, latlng.lng +";"+ latlng.lat);  
+    addHidden(form, marker.champ_du_form, latlng.lng +";"+ latlng.lat);
 }
 
 
