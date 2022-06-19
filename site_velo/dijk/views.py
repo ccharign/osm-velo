@@ -59,9 +59,11 @@ def recherche(requête, zone_t):
     z_d = g.charge_zone(zone_t)
     requête.session["zone"]=zone_t
     requête.session["zone_id"] = z_d.pk
-    form_recherche = forms.Recherche(requête.GET or None)
+
+    print(requête.GET)
     
-    if form_recherche.is_valid():
+    if requête.GET and "arrivée" in requête.GET:
+        form_recherche = forms.Recherche(requête.GET)
         données = form_recherche.cleaned_data
         if données["partir_de_ma_position"] :
             coords=tuple(map(float, données["localisation"].split(";")))
@@ -78,6 +80,7 @@ def recherche(requête, zone_t):
         return calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites, étapes=étapes, étapes_interdites=étapes_interdites)
 
     else:
+        form_recherche=forms.Recherche() 
         return render(requête, "dijk/recherche.html",
                       {"ville":z_d.ville_défaut, "zone_t":zone_t, "recherche":form_recherche}
                       )

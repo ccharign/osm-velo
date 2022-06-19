@@ -29,7 +29,7 @@ function voir_si_géoLoc(){
 	addHidden(form_recherche, "localisation", (0.,0.));
 	navigator.geolocation.getCurrentPosition(
 	    pos => àLaGéoloc(pos, form_recherche),
-	    () => console.log("erreur à la géoloc")
+	    () => pasDeGéoloc(form_recherche)
 	);
     //}
 }
@@ -39,6 +39,10 @@ function àLaGéoloc(pos, form){
     form.elements["localisation"].value=pos.coords.longitude+";"+pos.coords.latitude;
 }
 
+function pasDeGéoloc(form){
+    console.log("pas de géoloc");
+    form_recherche.getElementsByClassName("checkbox")[0].remove();
+}
 
 
 function gèreLesClics(carte){
