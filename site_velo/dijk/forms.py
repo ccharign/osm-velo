@@ -24,7 +24,7 @@ class Recherche(forms.Form):
     """
     Recherche initiale
     """
-    départ = forms.CharField(label="Départ")
+    départ = forms.CharField(label="Départ", required=False)
     arrivée = forms.CharField(label="Arrivée")
     partir_de_ma_position = forms.BooleanField(label="Partir de ma position",required=False, initial=False)
     #pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
