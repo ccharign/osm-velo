@@ -247,29 +247,21 @@ class Graphe_django():
             self.cycla_max[z_d] = max(cycla_défaut_max, cycla_max)
             
         print(f"Cycla min et max : {self.cycla_min[z_d]}, {self.cycla_max[z_d]}")
+
         
     def liste_Arête_of_iti(self, iti, p_détour):
         return [self.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
 
+    
     def itinéraire(self, chemin, bavard=0):
         """
         Entrée : chemin (Chemin)
         Sortie : iti_d, l_ressentie (liste d'Arêtes, float)
         """
-        iti, l_ressentie = dijkstra.chemin_étapes_ensembles(self, chemin, bavard=bavard)
+        iti, l_ressentie = dijkstra.iti_étapes_ensembles(self, chemin, bavard=bavard)
         return self.liste_Arête_of_iti(iti, chemin.p_détour), l_ressentie
+
     
-    # def longueur_itinéraire(self, iti, p_détour):
-    #     """
-    #     Entrée : iti (Sommet list)
-    #              p_détour (float)
-    #     Renvoie la vraie longueur de l'itinéraire. p_détour sert à choisir l'arête en cas de multiarête.
-    #     """
-    #     res = 0.
-    #     #iti_d = [Sommet.objects.get(id_osm=s) for s in iti]
-    #     for s,t in deuxConséc(iti):
-    #         res += self.longueur_meilleure_arête(s,t,p_détour)
-    #     return res
     def longueur_itinéraire(self, iti_d):
         """
         Entrée : iti_d (Arête list)

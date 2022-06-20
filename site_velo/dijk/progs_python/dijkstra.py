@@ -173,10 +173,10 @@ def reconstruction(chemin, pred, départ):
             s=spp
 
 
-def chemin_étapes_ensembles(g, c, bavard=0):
+def iti_étapes_ensembles(g, c, bavard=0):
     """
     Entrées : - départ et arrivée, deux sommets
-              - c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds.)
+              - c, instance de Chemin (c.étapes est une liste d’Étapes. Pour toute étape é, é.nœuds est une liste de nœuds. Un nœud est un int (id_osm))
               - interdites : arêtes interdites. dico s->sommets interdits depuis s.
     Sortie (int list × float): plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins une arête de chaque étape intérmédiaire, longueur de l’itinéraire.
     """
@@ -223,3 +223,12 @@ def chemin_étapes_ensembles(g, c, bavard=0):
 ## Emploi typique : passer par une boulangerie.
 
 # À FAIRE
+
+
+def iti_passe_par_un_sommet(g, étapes, bavard=0):
+    """
+    Entrées : 
+        étapes (Étapes list)
+    
+    Sortie (int list × float) : plus court chemin passant par un *sommet* de chaque étape, longueur d’icelui.
+    """
