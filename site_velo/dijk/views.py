@@ -34,7 +34,7 @@ chrono(tic, "utils", bavard=3)
 from .progs_python.graphe_par_django import Graphe_django
 from .progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
-from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue
+from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue, Amenity
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
@@ -520,9 +520,10 @@ def pour_complétion(requête, nbMax = 10):
 
         dicos=[]
 
-        # Complétion dans l’arbre lexicographique
-        dans_l_arbre = g.arbre_lex_zone[z_d].complétion(à_chercher, tol=2, n_max_rés=nbMax)
-        print(dans_l_arbre)
+        # Complétion dans l’arbre lexicographique (pour les fautes de frappe...)
+        # Fonctionne sauf qu’on ne récupère pas la ville pour l’instant
+        #dans_l_arbre = g.arbre_lex_zone[z_d].complétion(à_chercher, tol=2, n_max_rés=nbMax)
+        #print(dans_l_arbre)
         
         
         # Recherche dans les rues de la base
@@ -530,6 +531,14 @@ def pour_complétion(requête, nbMax = 10):
         for rue_trouvée in dans_la_base:
             dicos.append( {"label": chaîne_à_renvoyer(rue_trouvée.nom_complet, rue_trouvée.ville.nom_complet)})
 
+        if len(dicos)>nbMax:
+            print(f"Nombre de résultats : {len(dicos)}. C’est trop.")
+            return HttpResponse("fail", mimeType)
+
+        # Recherche dans les amenities
+        amenities = Amenity.objects.filter(nom__icontains=rue, ville__in=req_villes).prefetch_related("ville")
+        for a in amenities:
+            dicos.append({"label": chaîne_à_renvoyer(a.nom, a.ville.nom_complet)})
         if len(dicos)>nbMax:
             print(f"Nombre de résultats : {len(dicos)}. C’est trop.")
             return HttpResponse("fail", mimeType)
