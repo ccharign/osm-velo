@@ -67,6 +67,7 @@ def recherche(requête, zone_t):
         données = form_recherche.cleaned_data
         if données["partir_de_ma_position"] :
             coords=tuple(map(float, données["localisation"].split(";")))
+            assert len (coords)==2, f"coords n'est pas de longueur 2 {coords}"
             d = ÉtapeArête.of_coords(coords, g, z_d)
         else:
             d=Étape.of_texte(données["départ"])
