@@ -1,3 +1,4 @@
+import json
 
 from django.db import models
 from dijk.progs_python.params import CHEMIN_CHEMINS, LOG
@@ -359,8 +360,58 @@ class CacheNomRue(models.Model):
             return res
 
 
+class TypeAmenity(models.Model):
+    nom_osm = models.TextField(unique=True)
+    nom_français = models.TextField(blank=True, default=None, null=True)
+
+
 class Amenity(models.Model):
-    nom = models.TextField()
+    """
+
+    texte_tout (str) : le dico récupéré d’osm en json
+    """
+    nom = models.TextField(blank=True, default=None, null=True)
+    type_amenity = models.ForeignKey(TypeAmenity, on_delete=models.CASCADE)
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    lon = models.FloatField()
+    lat = models.FloatField()
+    horaires = models.TextField(blank=True, default=None, null=True)
+    tél = models.TextField(blank=True, default=None, null=True)
+    id_osm = models.IntegerField(unique=True)
+    texte_tout = models.TextField(blank=True, default=None, null=True)
+
+    def coords(self):
+        return self.lon, self.lat
+
+    def toutes_les_infos(self):
+        return json.loads(self.texte_tout)
+
+    @classmethod
+    def of_dico(cls, d, v_d):
+
+        champs_obligatoires = ["amenity", "lon", "lat", "id_osm"]
+        if not all(x in d for x in champs_obligatoires):
+            raise RuntimeError("Il manquait des champs pour {d} : {(c for c in champs_obligatoires if c not in d)}")
+
+        
+        # Champs « normaux »
+        champs = {"name":"nom", "lon":"lon", "lat":"lat", "opening_hours":"horaires", "phone":"tél", "id_osm":"id_osm"}
+        d_nettoyé = {
+            cf: d.get(ce, None)
+            for ce, cf in champs.items()
+        }
+        res = cls(**d_nettoyé)
+
+        #Clefs étrangères
+        ta = TypeAmenity.objects.get(nom_osm = d["amenity"])
+        res.type_amenity = ta
+        res.ville = v_d
+
+        # texte_tout
+        res.texte_tout = json.dumps(d)
+        return res
+
+        
 
 
 class Bug(models.Model):

@@ -112,11 +112,6 @@ def nœuds_of_rue(adresse, bavard=0):
         return ids_node
     else:
         return []
-    # for truc in lieu:
-    #     if truc.raw["osm_type"]=="way":
-    #         id_way = truc.raw["osm_id"]
-    #         res.extend(nœuds_of_idrue(id_way))
-    # return res
 
     
 def bb_enveloppante(nœuds, bavard=0):
@@ -229,17 +224,12 @@ def coord_nœud(id_nœud):
     return float(n.lat), float(n.lon)
 
 
-# def coords_lieu(adresse, bavard=0):
-#     """ Renvoie les coordonnées du lieu obtenues par une recherche Nominatim"""
-    
-#     lieu = cherche_lieu(adresse, bavard=bavard)[0]
-#     return lieu.latitude, lieu.longitude
 
 
 
 def récup_amenities(ville, bavard=0):
     """
-    Entrée : ville (instance de normalisation.Ville)
+    Entrée : ville (objet avec un attribut nom_complet)
     Sortie : liste de dico des amenities avec un nom de la ville.
     """
     api = overpy.Overpass()
@@ -253,7 +243,7 @@ def récup_amenities(ville, bavard=0):
     res_req = api.query(requête)
     res=[]
     for n in res_req.nodes:
-        d = {"id_osm":n.id, "lon":float(n.lon), "float":float(n.lat)}
+        d = {"id_osm":n.id, "lon":float(n.lon), "lat":float(n.lat)}
         d.update(n.tags)
         res.append(d)
     return res
