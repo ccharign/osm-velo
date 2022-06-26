@@ -2,36 +2,30 @@
 # -*- coding:utf-8 -*-
 
 import os
-import subprocess
-
-# if os.getcwd()=="/home/moi/git/osm vélo":
-#     os.chdir("site_velo/")
-# else :
-#     print(f"Dossier actuel: {os.getcwd()}")
-    
 import osmnx
 
 from time import perf_counter
-from dijk.progs_python.params import TMP, CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, DONNÉES, BBOX_DÉFAUT
+from django.db import close_old_connections, transaction
+
+from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet, Rue, Arête
+
+from dijk.progs_python.params import CHEMIN_RUE_NUM_COORDS, CHEMIN_NŒUDS_VILLES, CHEMIN_NŒUDS_RUES, DONNÉES, BBOX_DÉFAUT, RACINE_PROJET
 from initialisation.crée_graphe import crée_graphe_bbox
-#from initialisation.élaguage import élague_xml
 from initialisation.numéros_rues import extrait_rue_num_coords
 from initialisation.noeuds_des_rues import sortie_csv as csv_nœud_des_rues, extrait_nœuds_des_rues
 from initialisation.ajoute_villes import crée_csv as csv_nœuds_des_villes, ajoute_villes, crée_csv_villes_of_nœuds
 from lecture_adresse.normalisation import créationArbre, arbre_rue_dune_ville, partie_commune, prétraitement_rue, normalise_rue
 from graphe_par_networkx import Graphe_nx
 from petites_fonctions import sauv_fichier, chrono, union
-#from networkx import read_graphml
-from dijk.models import Ville, Zone, Cache_Adresse, Ville_Zone, Sommet, Rue, Arête
-from django.db import close_old_connections, transaction
+
+
 import initialisation.vers_django as vd
 from utils import lecture_tous_les_chemins
-from params import RACINE_PROJET
 from quadrarbres import QuadrArbreSommet, QuadrArbreArête
+from initialisation.amenities import amenities_of_ville
 
-"""
-Fonctions pour (ré)initialiser ou ajouter une nouvelle ville ou zone.
-"""
+### Fonctions pour (ré)initialiser ou ajouter une nouvelle ville ou zone.
+
 
 
     
@@ -150,8 +144,11 @@ def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, vill
 
     ## Arbre q des arêtes
     if recalculer_arbre_arêtes_de_la_zone:
-        quadArbreArêtesDeZone(zone_d, sauv=True)
+        quadArbreAretesDeZone(zone_d, sauv=True)
         
+
+    ## amenities
+    amenities_of_ville(ville_d)
     
     ville_d.données_présentes = True
     ville_d.save()
@@ -201,6 +198,7 @@ ZONE_VOIRON={
 }.items()
 
 
+
 def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=0):
     """
     Entrée : liste_villes, itérable de (nom de ville, code postal)
@@ -210,9 +208,9 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
     Effet : charge toutes ces ville dans la base, associées à la zone indiquée.
             Si la zone n’existe pas, elle sera créée, en y associant ville_défaut.
 
-    Paramètres: 
+    Paramètres:
        Si réinit, tous les éléments associés à la zone (villes, rues, sommets, arêtes) ainsi que le cache sont au préalable supprimés.
-       Si effacer_cache, tous les fichiers .json du dossier cache du répertoire courant seront effacés.
+       À FAIRE : Si effacer_cache, tous les fichiers .json du dossier cache du répertoire courant seront effacés.
     """
 
     ## Récupération ou création de la zone :
@@ -220,10 +218,13 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
     if zs_d.exists():
         z_d=zs_d.first()
     else:
-        ville_défaut_d = Ville.objects.get(nom_complet=ville_defaut)
-        #ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
-        z_d = Zone(nom=zone, ville_défaut=ville_défaut_d)
-        z_d.save()
+        try:
+            ville_défaut_d = Ville.objects.get(nom_complet=ville_defaut)
+            #ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
+            z_d = Zone(nom=zone, ville_défaut=ville_défaut_d)
+            z_d.save()
+        except dijk.models.Ville.DoesNotExists :
+            raise RuntimeError("Ville pas trouvée. Avez-vous chargé la liste des villes avec communes.charge_villes() ?")
 
     ## Réinitialisation de la zone :
     if réinit:         
@@ -239,7 +240,7 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
         charge_ville(nom, code, zone, bavard=bavard, rapide=rapide, recalculer_arbre_arêtes_de_la_zone=False)
 
     ## Arbre quad des arêtes
-    quadArbreArêtesDeZone(z_d, sauv=True)
+    quadArbreAretesDeZone(z_d, sauv=True)
 
 
 
@@ -250,7 +251,7 @@ def init_totale():
  
     print("Chargement des données osm")
     charge_zone()
-    
+
 
 
 

@@ -1,5 +1,16 @@
 # -*- coding:utf-8 -*-
+
+import os
+import json
+from functools import reduce
+
+from django.db import transaction, close_old_connections
+
 from dijk.models import Ville
+
+from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, normalise_rue, prétraitement_rue, partie_commune
+
+from params import RACINE_PROJET
 
 
 ### Données INSEE ###

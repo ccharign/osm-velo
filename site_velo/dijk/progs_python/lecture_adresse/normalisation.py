@@ -4,7 +4,7 @@ import time
 import os
 
 from params import PAYS_DÉFAUT, CHEMIN_NŒUDS_RUES, LOG_PB, TOUTES_LES_VILLES, LOG, DONNÉES
-from dijk.models import Rue, CacheNomRue
+from dijk.models import Rue, CacheNomRue, Amenity
 from lecture_adresse.arbresLex import ArbreLex # Arbres lexicographiques et distance d’édition
 from petites_fonctions import chrono
 from recup_donnees import cherche_lieu
@@ -157,7 +157,7 @@ def dans_cache_nom_rue(nom, ville):
 
 def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv_cache=1, tol=2, bavard=0):
     """
-    Entrées : 
+    Entrées :
       - z_d (Zone)
       - ville (instance de Ville)
       - rue (str)
@@ -207,7 +207,7 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
         # Recherche d’un autre nom sur nominatim
         else:
             LOG(f"(normalise_rue) Je lance une recherche Nominatim avec '{rue}, {ville}'.", bavard=bavard)
-            lieu = cherche_lieu(Adresse(g, z_d, f"{rue}, {ville}", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
+            lieu = cherche_lieu(Adresse.of_texte(g, z_d, f"{rue}, {ville}", norm_rue=False, bavard=bavard-2 ), bavard=bavard-1)
             LOG(f"(normalise_rue) La recherche Nominatim a donné {lieu}.", bavard=bavard)
             if not lieu:
                 LOG_PB(f"Pas de lieu trouvé pour {rue}")
@@ -251,6 +251,7 @@ class Adresse():
       - pays
       - rés_nominatim : résultat de cherche_lieu s’il y a eu un appel à cette fonction.
       - coords : initialement None, sera rempli par la fonction recup_nœuds.un_seul_nœud le cas échéant.
+      - amen (bool): indique si c'est l'adresse d'un «amenity»
     """
 
     def __init__(self): 
@@ -262,10 +263,20 @@ class Adresse():
         self.ville=None
         self.pays=None
         self.rés_nominatim=None
+        self.amen=False
 
     @classmethod
+    def of_amenity(cls, amen, ville):
+        res=cls()
+        res.rue_osm=amen.nom
+        res.ville=ville
+        res.amen=True
+        res.coords=amen.lon, amen.lat
+        return res
+        
+    @classmethod
     def of_texte(cls, g, z_d, texte, norm_rue=True, nv_cache=1, bavard=0):
-        """ 
+        """
         Entrée :
             g (graphe)
             z_d (Zone)
@@ -275,18 +286,21 @@ class Adresse():
         res=cls()
         num, bis_ter, rue_initiale, ville_t = découpe_adresse(texte, bavard=bavard)
         
-        # Normalisation de la ville et de la rue
+        # Normalisation de la ville
         ville_n = normalise_ville(g, z_d, ville_t) # ville_t doit-elle contenir le code postal ?
+
+        # Voyons s’il s’agit d’une amenity venant de la base:
+        essai = Amenity.objects.filter(nom=rue_initiale, ville__nom_norm = ville_n.nom_norm)
+        if essai:
+            print(f"\nAmenity detectée : {essai}")
+            return Adresse.of_amenity(essai.first(), ville_n)
+        
+        # Normalisation de la rue
         rés_nominatim = None
         rue_osm = None
         rue_n = None
         if norm_rue:
             rue_n, rue_osm, rés_nominatim = normalise_rue(g, z_d, rue_initiale, ville_n, nv_cache=nv_cache, bavard=bavard-1)
-        # else:
-        #     rue = rue_initiale
-        #     rue_n = None
-        
-
 
         # Initialisation des attributs
         if num=="":
@@ -295,7 +309,6 @@ class Adresse():
             res.num= num
             if bis_ter:
                 res.num+= " "+bis_ter
-        #res.rue = rue
         res.rue_initiale=rue_initiale
         res.rue_norm = rue_n
         res.rue_osm = rue_osm

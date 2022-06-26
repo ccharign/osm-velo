@@ -195,33 +195,6 @@ def nœuds_of_idsrue(ids_rue, bavard=0):
     return res
 
 
-def villes_of_bbox(bbox):
-    requête="""[out:json][timeout:25];
-// gather results
-(
-  node["place"~"city|town|village|hamlet"]({{bbox}});
-  way["place"="village"]({{bbox}});
-  relation["place"="village"]({{bbox}});
-);
-// print results
-out body;
->;
-out skel qt;"""
-
-
-def infos_nœud(id_nœud):
-    r = api.query(f"""
-    node({id_nœud});out;
-    """)
-    return r
-
-
-def coord_nœud(id_nœud):
-    n = api.query(f"""
-    node({id_nœud});out;
-    """).nodes[0]
-    print(n)
-    return float(n.lat), float(n.lon)
 
 
 
@@ -237,13 +210,19 @@ def récup_amenities(ville, bavard=0):
     area[name="{ville.nom_complet}"]->.searchArea;
     (
     node["amenity"]["name"](area.searchArea);
+    node["shop"]["name"](area.searchArea);
     );
+    
     out;"""
     if bavard>0:print(requête)
     res_req = api.query(requête)
     res=[]
     for n in res_req.nodes:
         d = {"id_osm":n.id, "lon":float(n.lon), "lat":float(n.lat)}
+        if "amenity" in n.tags:
+            d["type"] = n.tags.pop("amenity")
+        else:
+            d["type"] = n.tags.pop("shop")
         d.update(n.tags)
         res.append(d)
     return res

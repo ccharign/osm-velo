@@ -6,7 +6,14 @@
 ### Transférer les données dans la base Django ###
 ##################################################
 
+import re
+import os
+import json
 
+from time import perf_counter, sleep
+
+from django.db import transaction, close_old_connections
+from django.db.models import Q
 
 from dijk.progs_python.params import CHEMIN_NŒUDS_RUES, RACINE_PROJET
 from dijk.models import Ville, Rue, Sommet, Arête, Cache_Adresse, Chemin_d, Ville_Zone, Zone, Ville_Ville
@@ -14,14 +21,7 @@ from dijk.progs_python.lecture_adresse.normalisation import normalise_ville, nor
 #from dijk.progs_python.init_graphe import charge_graphe
 from params import CHEMIN_CHEMINS, LOG
 from petites_fonctions import union, mesure_temps, intersection, distance_euc
-from time import perf_counter, sleep
-from django.db import transaction, close_old_connections
-from django.db.models import Q
 from lecture_adresse.arbresLex import ArbreLex
-import re
-import os
-import json
-from functools import reduce
 
 # L’arbre contient les f"{nom_norm}|{code}"
 def à_mettre_dans_arbre(nom_n, code):
@@ -156,9 +156,9 @@ def sauv_données(à_sauver):
     Sauvegarde les objets en une seule transaction.
     Pour remplacer bulk_create si besoin du champ id nouvellement créé.
     """
-    for i, o in enumerate(à_sauver):
+    for o in à_sauver:
         o.save()
-    print("fin de sauv_données")
+    LOG("fin de sauv_données")
 
     
 def géom_texte(s, t, a, g):
@@ -187,19 +187,18 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
     """
     # disponible dans le graphe venant de osmnx :
     # maxspeed, highway, lanes, oneway, access, width
-    critères={
+    critères= {
         #att : {val: bonus}
-        "highway":{
+        "highway": {
             "residential":1,
             "cycleway":3,
-            "step":-5,
+            "step":-10,
             "pedestrian":1,
             "tertiary":1,
             "living_street":1,
-            "pedestrian":1,
             "footway":1,
         },
-        "maxspeed":{
+        "maxspeed": {
             "10":3,
             "20":2,
             "30":1,
@@ -210,7 +209,7 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
         "sens_interdit":{True:-5}
     }
     bonus = 0
-    for att in critères.keys():
+    for att in critères:
         if att in a:
             val_s = a[att]
             if isinstance(val_s, str) and val_s in critères[att]:
@@ -220,7 +219,7 @@ def cycla_défaut(a, sens_interdit=False, pas=1.1):
                     if v in critères[att]:
                         bonus+= critères[att][v]
 
-    return 1.1**bonus
+    return pas**bonus
 
 
 def a_la_valeur(a, att, val):
@@ -390,8 +389,6 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                     
                 return True, arêtes_ordre, arêtes
 
-    à_créer = []
-    à_màj = []
     
     #@mesure_temps("màj_arêtes", temps, nb_appels)
     def màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x):
@@ -402,29 +399,29 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
         Précondition : les deux listes représentent les mêmes arêtes, et dans le même ordre
         Effet:
             Met à jour les champs cycla_défaut, zone, géométrie des arêtes_d avec les données des arête_nx.
-            Rajoute les arêtes dans à_màj : il faudra encore un Arête.bulk_update(à_maj).
+        Sortie : les arêtes modifiées. Il faudra encore un Arête.bulk_update.
         """
+        res=[]
         for a_d, a_x in zip(arêtes_d, arêtes_x):
             #a_d.geom = géom_texte(s, t, a_x, g)
             #a_d.zone.add(zone_d)
             a_d.cycla_défaut = cycla_défaut(a_x)
-            à_màj.append(a_d)
-
+            res.append(a_d)
+        return res
 
     #@mesure_temps("remplace_arêtes", temps, nb_appels)
     def remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx, bavard=0):
         """
         Supprime les arêtes de arêtes_d, et crée à la place celles venant de gx[s][t].
-        Sortie (Arête list): les arêtes créées.
+        Sortie (Arête list): les arêtes créées. Pas encore sauvées.
+        Effet : les arêtes à créer sont ajoutées dans à_créer.
         """
         #arêtes_d.delete()
-
         
         if t in gx[s]:
             arêtes_nx = gx[s][t].values()
         else:
-            arêtes_nx=[]
-        
+            arêtes_nx = []
         
         for a in arêtes_d:
             LOG(f"arête à supprimer : {a} -> {a.départ, a.arrivée, a.nom}\n à remplacer par {arêtes_nx} -> {list(arêtes_nx)[0].get('name')}.", bavard=bavard-1)
@@ -440,31 +437,30 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                         geom = géom_texte(s, t, a_nx, g)
             )
             res.append(a_d)
-        à_créer.extend(res)
         return res
 
     LOG("Chargement des arêtes depuis le graphe osmnx", bavard)
     nb=0
-
-    with transaction.atomic():
+    à_créer = []
+    à_màj = []
+    with transaction.atomic(): # Utile pour les suppressions d’anciennes arêtes.
         for s in gx.nodes:
             s_d = tous_les_sommets.get(id_osm=s)
-            for t, arêtes in gx[s].items():
+            for t, _ in gx[s].items():
                 if t!=s : # Suppression des boucles
                     nb+=1
-                    if nb%500==0:print(f"    {nb} arêtes traitées\n ") #{temps}\n{nb_appels}\n")
+                    if nb%500==0: print(f"    {nb} arêtes traitées\n ") #{temps}\n{nb_appels}\n")
                     t_d = tous_les_sommets.get(id_osm=t)
-                    correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
-                    if rapide<2 and arêtes_d:
+                    if rapide<2:
+                        correspondent, arêtes_d, arêtes_x =  correspondance(s_d, t_d, s, t, gx)
                         if rapide==0 or not correspondent:
-                            arêtes_d = remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx, bavard=bavard-1)
+                            à_créer.extend(remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx, bavard=bavard-1))
                         else:
-                            màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x)
+                            à_maj.extend(màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x))
     
-    LOG("Ajout des nouvelles arêtes dans la base", bavard)
-    #créées=Arête.objects.bulk_create(à_créer)
-    sauv_données(à_créer)
-    LOG("Mise à jour des anciennes arêtes")
+    LOG(f"Ajout des {len(à_créer)} nouvelles arêtes dans la base", bavard)
+    sauv_données(à_créer) # bulk_create pas possible
+    LOG(f"Mise à jour des {len(à_màj)} anciennes arêtes")
     Arête.objects.bulk_update(à_màj, ["cycla_défaut"])
 
     

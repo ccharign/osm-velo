@@ -29,6 +29,11 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
     # Lecture de l’adresse
     assert c != ""
     ad = Adresse.of_texte(g, z_d, c, nv_cache=nv_cache, bavard=bavard-1) # Actuellement, ceci lance déjà un nominatim si la rue n’est pas dans la base.
+
+    # Si c était dans la table des amenities :
+    if ad.amen:
+        a, _ = g.arête_la_plus_proche(ad.coords, z_d)
+        return [a.départ.id_osm, a.arrivée.id_osm], ad
     
     # Recherche dans le cache
     essai = g.dans_le_cache(ad)
@@ -134,7 +139,7 @@ def tous_les_nœuds(g, z_d, adresse, nv_cache=1, bavard=0):
             LOG(f"Essai 4 : Je vais chercher le nœud de g le plus proche de {truc}.", bavard=bavard)
             coords = (float(truc["lon"]), float(truc["lat"]))
             rue, ville, code = rue_of_coords(coords, bavard=bavard)
-            ad =  Adresse(g, z_d, f"{rue}, {ville}")
+            ad =  Adresse.of_texte(g, z_d, f"{rue}, {ville}")
             ad.coords = coords
             res = nœud_sur_rue_le_plus_proche(g, ad, bavard=bavard)
             if res:

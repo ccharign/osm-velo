@@ -19,18 +19,18 @@ def charge_type_amenities(ld):
     déjà_présente = set((x[0] for x in TypeAmenity.objects.values_list("nom_osm")))
 
     for r in ld:
-        if r["amenity"] in déjà_présente:
+        if r["type"] in déjà_présente:
             # mise à jour ?
             #ta = TypeAmenity.objects.get(nom_osm = r["name"])
             None
         else:
-            ta = TypeAmenity(nom_osm=r["amenity"])
-            nom_traduit = input(f"Traduction de {r['amenity']} ? C’est pour {r['name']}. ")
+            ta = TypeAmenity(nom_osm=r["type"])
+            nom_traduit = input(f"Traduction de {r['type']} ? C’est pour {r['name']}. ")
             ta.nom_français = nom_traduit
-            déjà_présente.add(r["amenity"])
+            déjà_présente.add(r["type"])
             ta.save()
             if not nom_traduit:
-                print(f"J’ignorerai à l’avenir le type {r['amenity']}")
+                print(f"J’ignorerai à l’avenir le type {r['type']}")
 
 
 @atomic
@@ -44,7 +44,7 @@ def charge_amenities(ld, v_d):
     types_ignorés = set(x[0] for x in TypeAmenity.objects.filter(nom_français="").values_list("nom_osm"))
     
     for r in ld:
-        if r["id_osm"] not in déjà_présentes and r["amenity"] not in types_ignorés:
+        if r["id_osm"] not in déjà_présentes and r["type"] not in types_ignorés:
             déjà_présentes.add(r["id_osm"])
             try:
                 am = Amenity.of_dico(r, v_d)
@@ -53,14 +53,12 @@ def charge_amenities(ld, v_d):
                 print(e)
 
 
-def amenities_of_ville(nom_ville: str, bavard=0):
+def amenities_of_ville(v_d, bavard=0):
     """
-    Récupère sur osm toutes les amenities de la ville, et remplit les tables TypeAmenity et Amenity avec.
+    Récupère sur osm toutes les amenities (et shops) de la ville, et remplit les tables TypeAmenity et Amenity avec.
     """
 
-    print(f"ville de {nom_ville}")
-    v_d = Ville.objects.get(nom_complet=nom_ville)
-    
+    LOG(f"Amenities de {v_d}", bavard=1)
     LOG("Récupération des données via overpass", bavard=1)
     ld = récup_amenities(v_d)
     
@@ -74,6 +72,6 @@ def amenities_of_ville(nom_ville: str, bavard=0):
 def amenities_of_zone(z_t):
     z_d= Zone.objects.get(nom=z_t)
     for rel in z_d.ville_zone_set.all():
-        amenities_of_ville(rel.ville.nom_complet)
+        amenities_of_ville(rel.ville)
         print("Pause de 10s pour overpass")
         time.sleep(10)

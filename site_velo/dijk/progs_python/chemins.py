@@ -37,8 +37,8 @@ class ÉchecChemin(Exception):
 
 class Étape():
     """
-    Attributs : 
-        #texte (str), adresse de l'étape. 
+    Attributs :
+        #texte (str), adresse de l'étape.
         adresse (instance de Adresse)
         nœuds (Sommet set) : ensemble de nœuds
     """
@@ -57,26 +57,26 @@ class Étape():
         res=cls()
         #res.texte = texte
 
-        # Voyons si le texte venait d’un ÉtapeArête.__str__
+        # 1) Voyons si le texte venait d’un ÉtapeArête.__str__
         essai = re.match("^Arête(.*),(.*)", texte)
         if essai:
             lon, lat = map(float, essai.groups())
             return ÉtapeArête.of_coords((lon,lat), g, z_d)
-        else:
 
-            # voyons s’il venait d’un ÉtapeArête.joli_texte
-            essai2 = re.match("^Arête numéro ([0-9]*).*", texte)
-            if essai2:
-                pk=map(int, essai.groups())
-                return ÉtapeArête.of_pk(pk)
 
-            # Cas général : le texte est une adresse.
-            else:
-                n, res.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
-                res.nœuds = set(n)
-                return res
-        #for n in self.nœuds:
-        #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
+        # 2) voyons s’il venait d’un ÉtapeArête.joli_texte
+        essai2 = re.match("^Arête numéro ([0-9]*).*", texte)
+        if essai2:
+            pk=map(int, essai.groups())
+            return ÉtapeArête.of_pk(pk)
+
+        
+        # Cas général : le texte est une adresse.
+        n, res.adresse = nœuds_of_étape(texte, g, z_d, nv_cache=nv_cache, bavard=bavard-1)
+        res.nœuds = set(n)
+        return res
+    #for n in self.nœuds:
+    #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
 
         
     def __str__(self):

@@ -389,7 +389,7 @@ class Amenity(models.Model):
     @classmethod
     def of_dico(cls, d, v_d):
 
-        champs_obligatoires = ["amenity", "lon", "lat", "id_osm"]
+        champs_obligatoires = ["type", "lon", "lat", "id_osm"]
         if not all(x in d for x in champs_obligatoires):
             raise RuntimeError("Il manquait des champs pour {d} : {(c for c in champs_obligatoires if c not in d)}")
 
@@ -403,7 +403,7 @@ class Amenity(models.Model):
         res = cls(**d_nettoyé)
 
         #Clefs étrangères
-        ta = TypeAmenity.objects.get(nom_osm = d["amenity"])
+        ta = TypeAmenity.objects.get(nom_osm = d["type"])
         res.type_amenity = ta
         res.ville = v_d
 

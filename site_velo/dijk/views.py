@@ -1,15 +1,19 @@
 # -*- coding:utf-8 -*-
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.db.models import  Subquery, Q
+
 import time
+
 from datetime import datetime
 from glob import glob
 import os
-import forms
 import traceback
 import json
 import re
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.db.models import  Subquery, Q
+
+import dijk.forms as forms
 
 
 tic0=time.perf_counter()
@@ -28,7 +32,7 @@ from .progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection,
 from .progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
 tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
-from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_étapes# itinéraire, 
+from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_étapes
 chrono(tic, "utils", bavard=3)
 
 from .progs_python.graphe_par_django import Graphe_django
@@ -501,7 +505,7 @@ def pour_complétion(requête, nbMax = 10):
             z_d = Zone.objects.get(pk=z_id)
         
 
-        # découpage de la chaîne à chercher
+        # Découpage de la chaîne à chercher
         tout = requête.GET["term"].split(";")
         à_chercher = prétraitement_rue(tout[-1])
         num, bis_ter, rue, ville = découpe_adresse(à_chercher)
@@ -537,6 +541,7 @@ def pour_complétion(requête, nbMax = 10):
 
         # Recherche dans les amenities
         amenities = Amenity.objects.filter(nom__icontains=rue, ville__in=req_villes).prefetch_related("ville")
+        print(f"{len(amenities)} amenities trouvées")
         for a in amenities:
             dicos.append({"label": chaîne_à_renvoyer(a.nom, a.ville.nom_complet)})
         if len(dicos)>nbMax:
