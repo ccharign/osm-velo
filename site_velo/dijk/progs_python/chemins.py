@@ -78,7 +78,26 @@ class Étape():
     #for n in self.nœuds:
     #    assert n in g, f"J’ai obtenu un nœud qui n’est pas dans le graphe en lisant l’étape {texte} : {n}"
 
-        
+
+    @classmethod
+    def of_dico(cls, d, champ, g, z_d):
+        """
+        Entrée :
+           d, dico contenant a priori le résultat d’un get
+           champ, nom du champ dans lequel chercher l’étape. S’il existe un champ nommé 'coords_'+champ et qu’il est rempli, sera utilisé pour obtenir directement les sommets via arête_la_plus_proche.
+        """
+        print(f"of_dico lancé. d: {d},\n champ:{champ}")
+        ch_coords = "coords_" + champ
+
+        if ch_coords in d and d[ch_coords]:
+            coords = tuple(map(float, d[ch_coords].split(";")))
+            print(f"Coords trouvées dans le champ {ch_coords} : {coords}")
+            return ÉtapeArête.of_coords(coords, g, z_d)
+        else:
+            nom = d[champ]
+            return cls.of_texte(nom, g, z_d)
+    
+
     def __str__(self):
         return str(self.adresse)
 

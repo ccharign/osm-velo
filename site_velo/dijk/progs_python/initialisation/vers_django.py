@@ -28,6 +28,7 @@ def à_mettre_dans_arbre(nom_n, code):
     return f"{nom_n}|{code}"
 
 
+
 def arbre_des_villes(zone_d=None):
     """
     Renvoie l’arbre lexicographique des villes de la base.
@@ -456,7 +457,7 @@ def transfert_graphe(g, zone_d, bavard=0, rapide=1, juste_arêtes=False):
                         if rapide==0 or not correspondent:
                             à_créer.extend(remplace_arêtes(s_d, t_d, s, t, arêtes_d, gx, bavard=bavard-1))
                         else:
-                            à_maj.extend(màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x))
+                            à_màj.extend(màj_arêtes(s_d, t_d, s, t, arêtes_d, arêtes_x))
     
     LOG(f"Ajout des {len(à_créer)} nouvelles arêtes dans la base", bavard)
     sauv_données(à_créer) # bulk_create pas possible

@@ -232,3 +232,4 @@ def iti_passe_par_un_sommet(g, étapes, bavard=0):
     
     Sortie (int list × float) : plus court chemin passant par un *sommet* de chaque étape, longueur d’icelui.
     """
+    

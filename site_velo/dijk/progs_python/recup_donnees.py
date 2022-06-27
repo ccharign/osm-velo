@@ -99,16 +99,16 @@ def nœuds_of_rue(adresse, bavard=0):
     Sortie : liste des nœuds osm correspondant aux ways correspondant à l'adresse.
     """
 
-    lieu = cherche_lieu(adresse, seulement_non_structurée=True , bavard=bavard)
-    if bavard>0:print(f"rd.nœuds_of_rue : la recherche Nominatim pour {adresse} a donné {lieu}.")
+    lieu = cherche_lieu(adresse, seulement_non_structurée=True, bavard=bavard)
+    LOG(f"rd.nœuds_of_rue : la recherche Nominatim pour {adresse} a donné {lieu}.", bavard=bavard)
     res = []
 
     ids_way = [truc.raw["osm_id"] for truc in lieu if truc.raw["osm_type"]=="way"]
     ids_node = [truc.raw["osm_id"] for truc in lieu if truc.raw["osm_type"]=="node"]
-    if bavard>0:print(f"Voici les ids_way trouvés : {ids_way}")
-    if len(ids_way)>0:
+    LOG(f"Voici les ids_way trouvés : {ids_way}", bavard=bavard)
+    if len(ids_way) > 0:
         return nœuds_of_idsrue(ids_way, bavard=bavard-1)
-    elif len(ids_node)>0:
+    elif len(ids_node) > 0:
         return ids_node
     else:
         return []
@@ -175,6 +175,7 @@ def nœuds_reliés(nœuds):
 
 # nœuds de place saint louis de gonzague = [782224313, 782408135, 8428498156, 782155281, 343660472, 782224313]
 
+
 def nœuds_of_idsrue(ids_rue, bavard=0):
     """
     Entrée : ids_rue (int itérable), ids osm de ways.
@@ -197,9 +198,6 @@ def nœuds_of_idsrue(ids_rue, bavard=0):
 
 
 
-
-
-
 def récup_amenities(ville, bavard=0):
     """
     Entrée : ville (objet avec un attribut nom_complet)
@@ -212,13 +210,13 @@ def récup_amenities(ville, bavard=0):
     node["amenity"]["name"](area.searchArea);
     node["shop"]["name"](area.searchArea);
     );
-    
     out;"""
-    if bavard>0:print(requête)
+    print("J’attends 30s pour overpass")
+    time.sleep(30)
     res_req = api.query(requête)
-    res=[]
+    res = []
     for n in res_req.nodes:
-        d = {"id_osm":n.id, "lon":float(n.lon), "lat":float(n.lat)}
+        d = {"id_osm": n.id, "lon": float(n.lon), "lat": float(n.lat)}
         if "amenity" in n.tags:
             d["type"] = n.tags.pop("amenity")
         else:

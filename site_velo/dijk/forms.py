@@ -3,8 +3,6 @@ from django import forms
 import dijk.models as mo
 
 
-
-
 class FormCycla(forms.Form):
     """
     Pour demander la zone de laquelle afficher la carte de cycla.
@@ -12,7 +10,7 @@ class FormCycla(forms.Form):
     zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label='Zone')
     force_calcul = forms.BooleanField(label="Forcer le calcul", required=False)
 
-    
+  
 class ChoixZone(forms.Form):
     """
     Choix de zone. A priori pour la page d'index.
@@ -25,22 +23,26 @@ class Recherche(forms.Form):
     Recherche initiale
     """
     départ = forms.CharField(label="Départ", required=False)
+    coords_départ = forms.CharField(widget=forms.HiddenInput(), required=False)
     arrivée = forms.CharField(label="Arrivée")
-    partir_de_ma_position = forms.BooleanField(label="Partir de ma position",required=False, initial=False)
-    #pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
+    coords_arrivée = forms.CharField(widget=forms.HiddenInput(), required=False)
+    partir_de_ma_position = forms.BooleanField(label="Partir de ma position", required=False, initial=False)
+    # pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
     zone_t = forms.CharField(widget=forms.HiddenInput())
-    
+
 
 class RelanceRapide(forms.Form):
     """
     Pour relancer rapidement une recherche.
     """
     départ = forms.CharField(widget=forms.HiddenInput())
+    coords_départ = forms.CharField(widget=forms.HiddenInput())
     arrivée = forms.CharField(widget=forms.HiddenInput())
+    coords_arrivée = forms.CharField(widget=forms.HiddenInput())
     pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
     zone_t = forms.CharField(widget=forms.HiddenInput())
-    marqueurs_é = forms.CharField(widget=forms.HiddenInput(), required=False) # Pour les marqueurs d’étapes précédents.
-    marqueurs_i = forms.CharField(widget=forms.HiddenInput()) # Pour les marqueurs d’étape interdite précédents.
+    marqueurs_é = forms.CharField(widget=forms.HiddenInput(), required=False)  # Pour les marqueurs d’étapes précédents.
+    marqueurs_i = forms.CharField(widget=forms.HiddenInput())  # Pour les marqueurs d’étape interdite précédents.
 
     
 class EnregistrerContrib(forms.Form):
@@ -48,7 +50,9 @@ class EnregistrerContrib(forms.Form):
     Pour enregistrer une contribution.
     """
     départ = forms.CharField(widget=forms.HiddenInput())
+    coords_départ = forms.CharField(widget=forms.HiddenInput())
     arrivée = forms.CharField(widget=forms.HiddenInput())
+    coords_arrivée = forms.CharField(widget=forms.HiddenInput())
     zone_t = forms.CharField(widget=forms.HiddenInput())
     étapes = forms.CharField(widget=forms.HiddenInput())
     rues_interdites = forms.CharField(widget=forms.HiddenInput())

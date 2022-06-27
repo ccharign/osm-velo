@@ -23,6 +23,19 @@ $.fn.bindFirst = function(name, fn) {
     });
 };
 
+
+function onSelect(e, ui, form, champ){
+    // e : l’événement, ui : l’objet sélectionné
+    // form : formulaire à modifier
+    // Effet : ajoute un champ caché nommé {champ} avec les coords de ui
+    lieu = ui.item;
+    if (lieu.hasOwnProperty("lon")){
+	coords = lieu.lon+";"+lieu.lat;
+	form.elements[champ].value=coords;
+    }
+}
+
+
 function voir_si_géoLoc(){
     //if (navigator.geolocalisation){
 	form_recherche = document.getElementById("recherche");
@@ -163,6 +176,7 @@ function removeMarker(carte, marker) {
     });
 }
 
+
 // draged
 function dragedMarker() {
   //const markerPlace = document.querySelector(".marker-position");
@@ -172,6 +186,7 @@ function dragedMarker() {
     const marker=this;
     document.getElementById(marker.champ_du_form).value = marker.getLatLng().lng+";"+ marker.getLatLng().lat;
 }
+
 
 function addHidden(theForm, key, value) {
     // Create a hidden input element, and append it to the form:
