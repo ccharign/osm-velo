@@ -76,7 +76,7 @@ def recherche(requête, zone_t):
             else:
                 d = Étape.of_dico(données, "départ", g, z_d)
             a = Étape.of_dico(données, "arrivée", g, z_d)
-            noms_étapes = [é for é in données["étapes"].strip().split(";") if len(é)>0]
+            noms_étapes = [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0]
             étapes = [d] + [Étape.of_texte(é) for é in noms_étapes] + [a]
             ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
             rues_interdites=None

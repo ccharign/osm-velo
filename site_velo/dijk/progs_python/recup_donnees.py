@@ -60,6 +60,7 @@ def rue_of_coords(c, bavard=0):
 
 ### Avec Nominatim ###
 
+
 def cherche_lieu(adresse, seulement_structurée=False, seulement_non_structurée=False, bavard=0):
     """
     Entrée : adresse (instance de Adresse)
@@ -93,6 +94,29 @@ def cherche_lieu(adresse, seulement_structurée=False, seulement_non_structurée
 
 
 ### Avec overpass ###
+
+
+def réessaie(n_max):
+    """
+    Renvoie un décorateur qui relance la fonction au maximum n_max fois en attendant 1mn entre deux essais jusqu’à ce quelle fonctionne.
+    """
+    def décorateur(f):
+        def rés(*args, **kwargs):
+            n_restant = n_max
+            while n_restant > 0:
+                try:
+                    return f(*args, **kwargs)
+                except overpy.exception.OverpassGatewayTimeout as e:
+                    n_restant -= 1
+                    print(f"Erreur dans {f.__name__} : {e}")
+                    if n_restant == 0:
+                        print("J’abandonne")
+                    else:
+                        print("Je réessaie dans 1mn")
+                        time.sleep(60)
+        return rés
+    return décorateur
+
 
 def nœuds_of_rue(adresse, bavard=0):
     """
@@ -196,8 +220,7 @@ def nœuds_of_idsrue(ids_rue, bavard=0):
     return res
 
 
-
-
+@réessaie(10)
 def récup_amenities(ville, bavard=0):
     """
     Entrée : ville (objet avec un attribut nom_complet)
