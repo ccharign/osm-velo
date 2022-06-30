@@ -10,7 +10,7 @@ class FormCycla(forms.Form):
     zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label='Zone')
     force_calcul = forms.BooleanField(label="Forcer le calcul", required=False)
 
-  
+
 class ChoixZone(forms.Form):
     """
     Choix de zone. A priori pour la page d'index.
@@ -18,17 +18,23 @@ class ChoixZone(forms.Form):
     zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), label="")
 
 
-class Recherche(forms.Form):
+class RechercheBase(forms.Form):
     """
-    Recherche initiale
+    Classe mère pour les formulaires de recherche d’itinéraire
     """
     départ = forms.CharField(label="Départ", required=False)
     coords_départ = forms.CharField(widget=forms.HiddenInput(), required=False)
     arrivée = forms.CharField(label="Arrivée")
     coords_arrivée = forms.CharField(widget=forms.HiddenInput(), required=False)
+    zone_t = forms.CharField(widget=forms.HiddenInput())
+
+
+class Recherche(RechercheBase):
+    """
+    Recherche initiale
+    """
     partir_de_ma_position = forms.BooleanField(label="Partir de ma position", required=False, initial=False)
     # pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
-    zone_t = forms.CharField(widget=forms.HiddenInput())
 
 
 class RelanceRapide(forms.Form):
