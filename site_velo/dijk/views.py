@@ -28,7 +28,7 @@ from .progs_python.lecture_adresse.normalisation0 import prétraitement_rue
 from .progs_python import recup_donnees
 from .progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
 from .progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
-tic=chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
+tic = chrono(tic, "recup_noeuds, recup_donnees, bib_vues", bavard=3)
 
 from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_étapes
 chrono(tic, "utils", bavard=3)
@@ -57,7 +57,9 @@ def get_full_class_name(obj):
 
 
 def recherche(requête, zone_t):
-    
+    """
+    Vue pour une recherche de base.
+    """
     z_d = g.charge_zone(zone_t)
     requête.session["zone"] = zone_t
     requête.session["zone_id"] = z_d.pk
@@ -68,7 +70,7 @@ def recherche(requête, zone_t):
         form_recherche = forms.Recherche(requête.GET)
         if form_recherche.is_valid():
             données = form_recherche.cleaned_data
-            print(données)
+            print(f"cleaned_data : {données}")
             if données["partir_de_ma_position"]:
                 coords = tuple(map(float, données["localisation"].split(";")))
                 assert len(coords) == 2, f"coords n'est pas de longueur 2 {coords}"
@@ -76,10 +78,12 @@ def recherche(requête, zone_t):
             else:
                 d = Étape.of_dico(données, "départ", g, z_d)
             a = Étape.of_dico(données, "arrivée", g, z_d)
-            noms_étapes = [é for é in données["étapes"].strip().split(";") if len(é)>0]
+            # Les champs étapes, rues_interdites et ps_détour ne sont pas dans cleaned_data car rajoutés directement dans le .html
+            # (car mis plus loin dans le formulaire, après le bouton « c’est parti »)
+            noms_étapes = [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0]
             étapes = [d] + [Étape.of_texte(é) for é in noms_étapes] + [a]
             ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
-            rues_interdites=None
+            rues_interdites = None
             étapes_interdites = [Étape.of_texte(r) for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
 
             return calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites, étapes=étapes, étapes_interdites=étapes_interdites)
@@ -103,7 +107,7 @@ def limitations(requête):
 
 
 def index(requête):
-    return render(requête, "dijk/index.html"#  , {"zones":Zone.objects.all()}
+    return render(requête, "dijk/index.html"  #  , {"zones":Zone.objects.all()}
                   )
 
 
@@ -203,8 +207,8 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
         with open(os.path.join("dijk/templates", nom_fichier_html), "w") as sortie:
             sortie.write(f"""
             {{% extends "dijk/résultat_itinéraire_sans_carte.html" %}}
-            {{% block head_début %}} 
-            {head} 
+            {{% block head_début %}}
+            {head}
             {{% load static %}}
             <script src="{{% static 'dijk/leaflet-providers.js' %}}" type="text/javascript" > </script>
             {{% endblock %}}
@@ -218,18 +222,18 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
         def texte_marqueurs(l_é):
             """
             Entrée : liste d’étapes
-            Sortie (str) : coords des étapes de type ÉtapeArête séparées par des ;
+            Sortie (str) : coords des étapes de type ÉtapeArête séparées par des ;. La première et la dernière étape sont supprimées (départ et arrivée).
             """
             return ";".join(map(
                 lambda c: f"{c[0]},{c[1]}",
-                [é.coords_ini for é in l_é if isinstance(é, ÉtapeArête)]
+                [é.coords_ini for é in l_é[1:-1] if isinstance(é, ÉtapeArête)]
             ))
 
         # Ce dico sera envoyé au gabarit sous le nom de 'post_préc'
         
         données = {"étapes": ";".join(noms_étapes[1:-1]),
                    "rues_interdites": ";".join(rues_interdites),
-                   "pourcentage_détour": ";".join(map(lambda p : str(int(p*100)), ps_détour)),
+                   "pourcentage_détour": ";".join(map(lambda p: str(int(p*100)), ps_détour)),
                    "départ": noms_étapes[0],
                    "arrivée": noms_étapes[-1],
                    "zone_t": z_d.nom,

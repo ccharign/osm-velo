@@ -64,6 +64,17 @@ function gèreLesClics(carte){
 	    );
 }
 
+function marqueurs_of_form(form, carte){
+    récupMarqueurs(
+	form.elements["marqueurs_é"].value,
+	coords => nvÉtape(coords, carte)
+    );
+    récupMarqueurs(
+	form.elements["marqueurs_i"].value,
+	coords => nvArêteInterdite(coords, carte)
+    );
+}
+
 
 function récupMarqueurs(texte, fonction) {
     for (coords_t of (texte.split(";"))){
@@ -77,17 +88,6 @@ function récupMarqueurs(texte, fonction) {
 }
 
 
-function marqueurs_of_form(form, carte){
-    récupMarqueurs(
-	form.elements["marqueurs_é"].value,
-	coords => nvÉtape(coords, carte)
-    );
-    récupMarqueurs(
-	form.elements["marqueurs_i"].value,
-	coords => nvArêteInterdite(coords, carte)
-    );
-}
-
 function addMarker(e, carte) {
     if (e.originalEvent.ctrlKey){
 	nvArêteInterdite(e.latlng, carte);
@@ -96,8 +96,6 @@ function addMarker(e, carte) {
 	nvÉtape(e.latlng, carte);
     }
 }
-
-
 
 
 
@@ -190,6 +188,7 @@ function dragedMarker() {
 
 function addHidden(theForm, key, value) {
     // Create a hidden input element, and append it to the form:
+    console.log(`Je crée un hidden. this : ${this}, form: ${theForm}, key:${key}`);
     var input = document.createElement('input');
     input.type = 'hidden';
     input.name = key; // 'the key/name of the attribute/field that is sent to the server

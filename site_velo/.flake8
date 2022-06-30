@@ -3,3 +3,4 @@
 ignore=E501, non-ascii-name, line-too-long,
 # espaces autour d’opérateur arith
 E226,
+ne-else-return,
