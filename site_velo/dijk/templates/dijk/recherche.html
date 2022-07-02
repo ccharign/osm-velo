@@ -16,7 +16,6 @@
 
 
   <form action = "{% url 'recherche' zone_t %}" method="get" id="recherche">
-    <!-- {% csrf_token %} -->
 
     <div class="form-group">
       <div class="row">
@@ -72,7 +71,7 @@
 
     
     
-    <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}">
+    <!-- <input type="hidden" id="zone_t" name="zone_t" value="{{zone_t}}"> -->
 
     
     <input type="submit" class="btn btn-default" value="C’est parti!">

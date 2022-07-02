@@ -25,6 +25,7 @@ $.fn.bindFirst = function(name, fn) {
 
 
 function onSelect(e, ui, form, champ){
+    // Lancé lors de la sélection d’un élément dans un champ autocomplété.
     // e : l’événement, ui : l’objet sélectionné
     // form : formulaire à modifier
     // Effet : ajoute un champ caché nommé {champ} avec les coords de ui
@@ -53,6 +54,7 @@ function àLaGéoloc(pos, form){
 }
 
 function pasDeGéoloc(form){
+    // Supprime la chekbox « partir de ma position »
     console.log("pas de géoloc");
     form_recherche.getElementsByClassName("checkbox")[0].remove();
 }
@@ -65,6 +67,7 @@ function gèreLesClics(carte){
 }
 
 function marqueurs_of_form(form, carte){
+    
     récupMarqueurs(
 	form.elements["marqueurs_é"].value,
 	coords => nvÉtape(coords, carte)
@@ -77,11 +80,13 @@ function marqueurs_of_form(form, carte){
 
 
 function récupMarqueurs(texte, fonction) {
+    // Entrée :
+    //     texte contient des coords (chacune de la forme "lon,lat") séparées par un ;
+    // Effet : transforme chaque coord en un objet latLng puis lance fonction dessus.
     for (coords_t of (texte.split(";"))){
 	if (coords_t){
 	    const tab_coords = coords_t.split(",").map(parseFloat);
 	    const coord = L.latLng(tab_coords[1], tab_coords[0]);
-	    //console.log(coord);
 	    fonction(coord);
 	}
     }
@@ -89,6 +94,7 @@ function récupMarqueurs(texte, fonction) {
 
 
 function addMarker(e, carte) {
+    // Appelé lors d’un clic sur la carte leaflet.
     if (e.originalEvent.ctrlKey){
 	nvArêteInterdite(e.latlng, carte);
     }

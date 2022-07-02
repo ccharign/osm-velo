@@ -254,16 +254,16 @@ class Adresse():
       - amen (bool): indique si c'est l'adresse d'un «amenity»
     """
 
-    def __init__(self): 
-        self.rue_initiale=None
-        self.coords=None
-        self.num=None
-        self.rue_osm=None
-        self.rue_norm=None
-        self.ville=None
-        self.pays=None
-        self.rés_nominatim=None
-        self.amen=False
+    def __init__(self):
+        self.rue_initiale = None
+        self.coords = None
+        self.num = None
+        self.rue_osm = None
+        self.rue_norm = None
+        self.ville = None
+        self.pays = None
+        self.rés_nominatim = None
+        self.amen = False
 
     @classmethod
     def of_amenity(cls, amen, ville):
@@ -283,14 +283,14 @@ class Adresse():
             texte d’une adresse. Format : (num)? rue, code_postal? ville
         """
 
-        res=cls()
+        res = cls()
         num, bis_ter, rue_initiale, ville_t = découpe_adresse(texte, bavard=bavard)
         
         # Normalisation de la ville
-        ville_n = normalise_ville(g, z_d, ville_t) # ville_t doit-elle contenir le code postal ?
+        ville_n = normalise_ville(g, z_d, ville_t)  # ville_t doit-elle contenir le code postal ?
 
         # Voyons s’il s’agit d’une amenity venant de la base:
-        essai = Amenity.objects.filter(nom=rue_initiale, ville__nom_norm = ville_n.nom_norm)
+        essai = Amenity.objects.filter(nom=rue_initiale, ville__nom_norm=ville_n.nom_norm)
         if essai:
             print(f"\nAmenity detectée : {essai}")
             return Adresse.of_amenity(essai.first(), ville_n)

@@ -88,7 +88,7 @@ def itinéraire_of_étapes(étapes,
         étapes (listes d’étapes), départ et arrivée inclus.
         étapes_interdites (Étape list)
 
-    Sortie : 
+    Sortie :
     (stats : liste de dicos (légende, aide, id, p_détour, longueur, longueur ressentie, couleur, gpx) pour les itinéraires obtenus,
      c : chemin avec le plus grand p_détour,
      dép : nom du départ après éventuelle correction,
@@ -99,7 +99,7 @@ def itinéraire_of_étapes(étapes,
     )
     """
     np = len(ps_détour)
-    ps_détour.sort() # Pour être sûr que l’éventuel 0 est en premier.
+    ps_détour.sort()  # Pour être sûr que l’éventuel 0 est en premier.
     à_dessiner = []
     stats = []
     
@@ -107,54 +107,52 @@ def itinéraire_of_étapes(étapes,
     
     def traite_un_chemin(c, coul, légende, aide):
         iti_d, l_ressentie = g.itinéraire(c, bavard=bavard-1)
-        longueur=g.longueur_itinéraire(iti_d)
-        à_dessiner.append( (iti_d, coul, p))
-        #nom_gpx = hash(c)
+        longueur = g.longueur_itinéraire(iti_d)
+        à_dessiner.append((iti_d, coul, p))
         
         stats.append({"légende": légende,
-                      "aide":aide,
+                      "aide": aide,
                       "id": f"ps{int(100*c.p_détour)}",
                       "longueur": longueur,
-                      "temps":int(longueur/15000*60),# Moyenne de 15km/h disons
-                      "longueur_ressentie":int(l_ressentie),
-                      "couleur":coul,
-                      #"nom_gpx": nom_gpx,
+                      "temps": int(longueur/15000*60),  # Moyenne de 15km/h disons
+                      "longueur_ressentie": int(l_ressentie),
+                      "couleur": coul,
                       "gpx": gpx_of_iti(iti_d, session, bavard=bavard-1)}
-                   )
+                     )
 
     tic = perf_counter()
     for i, p in enumerate(ps_détour):
         c = chemins.Chemin(z_d, étapes, p, False, interdites=interdites)
-        coul = color_dict[ (i*NB_COUL)//np ]
+        coul = color_dict[(i*NB_COUL)//np]
         traite_un_chemin(c, coul, *légende_et_aide(p))
         tic = chrono(tic, f"dijkstra {c} et sa longueur")
 
-    if ps_détour[0]==0.:
+    if ps_détour[0] == 0.:
         longueur_ch_direct = stats[0]["longueur"]
         
     d, a = étapes[0], étapes[-1]
     if rajouter_iti_direct:
-        cd = chemins.Chemin(z_d, [d,a], 0, False)
+        cd = chemins.Chemin(z_d, [d, a], 0, False)
         coul = "#000000"
         traite_un_chemin(cd, coul, "Trajet direct", "Le trajet le plus court, sans prendre en compte les étapes imposées.")
         tic=chrono(tic, "Calcul de l'itinéraire direct.")
         longueur_ch_direct = stats[-1]["longueur"]
 
     # Calculer les pourcentages de détour effectifs
-    if rajouter_iti_direct or ps_détour[0]==0.:
+    if rajouter_iti_direct or ps_détour[0] == 0.:
         for s in stats:
-            s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct- 1.) * 100.)
+            s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct - 1.) * 100.)
 
-    tic=perf_counter()
+    tic = perf_counter()
     carte = dessine(à_dessiner, g, z_d, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
-    #chrono(tic0, f"Total pour le chemin {c}")
-    return stats, c, [str(é) for é in étapes], [str(é) for é in étapes_interdites ], carte
+    return stats, c, [str(é) for é in étapes], [str(é) for é in étapes_interdites], carte
 
 
 
 ### création du gpx ###
 # https://pypi.org/project/gpxpy/
+
 
 def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
     """
@@ -167,24 +165,17 @@ def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
     res = gpxpy.gpx.GPX()
     tronçon = gpxpy.gpx.GPXTrack()
     res.tracks.append(tronçon)
-    segment=gpxpy.gpx.GPXTrackSegment()
+    segment = gpxpy.gpx.GPXTrackSegment()
     tronçon.segments.append(segment)
     
     for a in iti_d:
-        for lon,lat in a.géométrie():
+        for lon, lat in a.géométrie():
             segment.points.append( gpxpy.gpx.GPXTrackPoint(lat, lon) )
 
-    #chemin_sortie = os.path.join(dossier_sortie, nom)
-    # with open(chemin_sortie , "w") as sortie:
-    #     sortie.write(res.to_xml())
-    #     print(f"gpx enregistré à {chemin_sortie}")
     res_str = res.to_xml().replace(" ", "%20").replace("\n","ν")
-    #print(res_str)
     return res_str
-    #session[nom] = res.to_xml()
-    #return nom
 
-    
+
 #################### Affichage ####################
 
 # Pour utiliser folium sans passer par osmnx regarder :
@@ -194,7 +185,7 @@ def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, ouvrir=False, bavard=0, fouine=False):
+def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée, où_enregistrer, ouvrir=False, bavard=0, fouine=False):
     """
     Entrées :
       - listes_chemins : liste de couples (liste d'Arêtes, couleur)
@@ -207,18 +198,16 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée,  où_enregistrer, o
 
     # Initialisation de la carte avec le premier chemin.
     l, _, _ = listes_chemins[0]
-    #carte = folium_of_chemin(g, z_d, l, p, fit=True, color=coul)
     
     # Je mets les coords de début et fin du premier itinéraire si les champs coords des adresses n’était pas remplis.
     if not ad_départ.coords:
-        ad_départ.coords=l[0].départ.coords()
+        ad_départ.coords = l[0].départ.coords()
     if not ad_arrivée.coords:
-        ad_arrivée.coords=l[-1].arrivée.coords()
+        ad_arrivée.coords = l[-1].arrivée.coords()
 
     carte = None
-    for l, coul, p in listes_chemins:#[1:]:
+    for l, coul, p in listes_chemins:
         carte = folium_of_chemin(g, z_d, l, p, carte=carte, color=coul)
-
 
     ajoute_marqueur(ad_départ, carte, fouine=fouine)
     ajoute_marqueur(ad_arrivée, carte, fouine=fouine)

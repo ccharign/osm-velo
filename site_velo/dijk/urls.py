@@ -4,7 +4,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
-    path("resultat", views.vue_itinéraire, name="résultat"),
+    path("resultat", views.recherche, name="résultat"),
     path("relance_rapide", views.relance_rapide, name="relance_rapide"),
     path("retour", views.trajet_retour, name="retour"),
     

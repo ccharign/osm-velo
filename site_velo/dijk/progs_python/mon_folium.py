@@ -151,32 +151,31 @@ def folium_of_arêtes(g, arêtes, carte=None, tiles="cartodbpositron", zoom=3):
     
     if carte is None:
         lon, lat = arêtes[0][0].départ.coords()
-        carte = folium.Map(location=(lat,lon), zoom_start=zoom, tiles=tiles)
+        carte = folium.Map(location=(lat, lon), zoom_start=zoom, tiles=tiles)
 
     lons, lats = [], []
     for a, kwargs in arêtes:
         c1, c2 = a.départ.coords(), a.arrivée.coords()
         lons.extend((c1[0], c2[0]))
         lats.extend((c1[1], c2[1]))
-        pl=polyline_of_arête(g, a, **kwargs)
+        pl = polyline_of_arête(g, a, **kwargs)
         pl.add_to(carte)
-    o=min(lons)
-    e=max(lons)
-    s=min(lats)
-    n=max(lats)
+    o = min(lons)
+    e = max(lons)
+    s = min(lats)
+    n = max(lats)
     carte.fit_bounds([(s,o), (n,e)])
     return carte
 
-    
-        
+
 def ajoute_marqueur(ad, carte, fouine=False, **kwargs):
     """
     Entrée :
         ad (Adresse)
         carte (folium.Map)
     """
-    lon,lat = ad.coords
+    lon, lat = ad.coords
     if fouine:
-        folium.Marker(location=(lat,lon), popup=str(ad), icon= folium.Icon(icon="paw", color="black", prefix="fa"), **kwargs).add_to(carte)
+        folium.Marker(location=(lat, lon), popup=str(ad), icon=folium.Icon(icon="paw", color="black", prefix="fa"), **kwargs).add_to(carte)
     else:
-        folium.Marker(location=(lat,lon), popup=str(ad),**kwargs).add_to(carte)
+        folium.Marker(location=(lat, lon), popup=str(ad), **kwargs).add_to(carte)

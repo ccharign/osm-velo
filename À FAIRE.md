@@ -4,13 +4,18 @@
 
 page de rapport de bug
    - Table rapport de bug
+   
+nom des arêtes
+	- pour affichage dans «enregistrer contrib »
+	
+	
 
 Ménage:
    - static dans dijk
 
-Amenities : les charger dans la base, et les mettre dans la complétion auto.
-    Chercher dedans dans chemins.Étape
-    Traduire en français
+Amenities :
+	Afficher le nom dans les popups
+	Afficher l’adresse dans la complétion auto
     Faire un passer par un(e) ...
 
 
@@ -23,7 +28,6 @@ BUG de la place Clémenceau. Il semble qu’il y manque des arêtes.
 
 
 Recherche dans l’arbre lex dans la complétion automatique, avec tolérance à faute de frappe.
-    -> Enregistrer l’arbre de chaque zone
     -> Mettre le nom de rue aux feuilles
 
 

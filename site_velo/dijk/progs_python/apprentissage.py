@@ -2,7 +2,7 @@
 #from module_graphe import Graphe
 #from recup_donnees import coords_lieu
 import dijkstra
-from params import LOG_PB
+from params import LOG_PB, LOG
 from django.db.transaction import atomic
 
 ETA = 0.1
@@ -27,22 +27,21 @@ def dico_arêtes(iti):
 
 @atomic
 def lecture_meilleur_chemin(g, chemin, bavard=0):
-    """ 
+    """
     Entrée : le chemin à suivre, instance de Chemin.
     Effet : Compare chemin avec le chemin renvoyé par g.chemin. Multiplie par 1+ETA la cyclabilité de chaque arrête présente dans chemin mais pas dans l'autre et multiplie par 1-ETA chaque arrête présente dans l'autre et pas dans chemin.
     Sortie : nb d'arêtes modifiées, longueur du trajet direct
 
     """
     
-    if bavard>0: print(f"\n\n(lecture_meilleur_chemin) Chemin reçu : {chemin}")
-    iti_complet, _ = g.itinéraire(chemin, bavard=bavard-1)
-    if bavard>0:print(f" Nouvel itinéraire :\n {iti_complet}")
+    LOG(f"\n\n(lecture_meilleur_chemin) Chemin reçu : {chemin}", bavard=bavard)
+    iti_complet, _ = g.itinéraire_sommets(chemin, bavard=bavard-1)
+    LOG(f" Nouvel itinéraire :\n {iti_complet}", bavard=bavard)
     # Pour vieux chemin, je prends le chemin qui utilise le même nœud de départ et d’arrivée que chemin_complet (pour éviter de biaiser l’apprentissage dans le cas de gros ensembles)
-    départ = iti_complet[0]
-    arrivée = iti_complet[-1]
-    vieux_iti, longueur = dijkstra.chemin(g, départ, arrivée, chemin.p_détour, bavard=bavard-1)
-    if bavard>0:
-        print(f"Vieil itinéraire :\n {vieux_iti}")
+    s_départ = iti_complet[0]
+    s_arrivée = iti_complet[-1]
+    vieux_iti, longueur = dijkstra.chemin(g, s_départ, s_arrivée, chemin.p_détour, bavard=bavard-1)
+    LOG(f"Vieil itinéraire :\n {vieux_iti}", bavard=bavard)
     arêtes_chemin = dico_arêtes(iti_complet)
     arêtes_vieux_chemin = dico_arêtes(vieux_iti)
     n_modif = 0
@@ -50,18 +49,16 @@ def lecture_meilleur_chemin(g, chemin, bavard=0):
     # Lecture du nouveau chemin pour augmenter les coeffs :
     for a in liste_arêtes(iti_complet):
         if a not in arêtes_vieux_chemin:
-            if bavard >0: print(f"J'augmente la cyclabilité de l'arête {a}.")
-            n_modif+=1
+            n_modif += 1
             g.incr_cyclabilité(a, chemin.p_détour, 1+ETA)
 
     #Lecture du vieux chemin pour diminuer les coeffs :
     for a in liste_arêtes(vieux_iti):
-        if not a in arêtes_chemin:
-            if bavard >0: print(f"Je diminue la cyclabilité de l'arête {a}.")
+        if a not in arêtes_chemin:
             n_modif += 1
             g.incr_cyclabilité(a, chemin.p_détour, 1-ETA)
             
-    if bavard >= 0: print(f"nombre d'arêtes modifiées : {n_modif}")
+    LOG(f"nombre d'arêtes modifiées : {n_modif}", bavard=bavard)
     return n_modif, longueur
 
 

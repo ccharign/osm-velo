@@ -28,7 +28,7 @@ def heuristique(g, s, arrivée, correction_max):
 ##############################################################################
 
 
-def chemin(g, départ:int, arrivée:int, p_détour:float, bavard=0):
+def chemin(g, départ: int, arrivée: int, p_détour: float, bavard=0):
     """ 
     Entrée :
         - g (graphe) Nécessite une méthode « voisins » qui prend un sommet s et le pourcentage de détour p_détour et renvoie un itérable de (point, longueur de l'arrête corrigée)
@@ -37,6 +37,7 @@ def chemin(g, départ:int, arrivée:int, p_détour:float, bavard=0):
     Sortie (int list × float): (itinéraire, sa longueur)
     """
     assert p_détour < 10, f"J'ai reçu p_détour = {p_détour}. As-tu pensé à diviser par 100 le pourcentage ?"
+    assert isinstance(départ, int) and isinstance(arrivée, int), f"Le départ ou l’arrivée n’était pas un int. départ : {départ}, arrivée : {arrivée}."
     dist = {départ: 0.}  # dist[s] contient l'estimation actuelle de d(départ, i) si s est gris, et la vraie valeur si s est noir.
     pred = {départ: -1}
     àVisiter =[(0., départ)]  # tas des sommets à visiter. Doublons autorisés.
@@ -53,7 +54,7 @@ def chemin(g, départ:int, arrivée:int, p_détour:float, bavard=0):
                     pred[t] = s
                     
     
-    ## rReconstruction du chemin
+    ## Reconstruction du chemin
     if arrivée in dist:
         chemin = [arrivée]
         s = arrivée
@@ -161,7 +162,7 @@ def reconstruction(chemin, pred, départ):
                   - départ, sommets de départ de l’étape (structure permettant un «in»)
                   - pred, le dictionnaire (sommet -> sommet ou couple de sommets précédents), créé par Dijkstra.
         Effet : remplit chemin avec un plus court trajet de chemin[-1] vers un sommet de départ.
-    """  
+    """ 
     s = chemin[-1]
     while s not in départ:
         if isinstance(pred[s], int):
@@ -169,8 +170,8 @@ def reconstruction(chemin, pred, départ):
             chemin.append(s)
         else:
             sp, spp = pred[s]
-            chemin.extend((sp,spp))
-            s=spp
+            chemin.extend((sp, spp))
+            s = spp
 
 
 def iti_étapes_ensembles(g, c, bavard=0):
@@ -181,7 +182,7 @@ def iti_étapes_ensembles(g, c, bavard=0):
     Sortie (int list × float): plus court chemin d’un sommet de étapes[0] vers un sommet de étapes[-1] qui passe par au moins une arête de chaque étape intérmédiaire, longueur de l’itinéraire.
     """
     correction_max = 1. / formule_pour_correction_longueur(1., g.cycla_max[c.zone], c.p_détour)
-    if bavard>0: print(f"correction_max : {correction_max}")
+    LOG(f"correction_max : {correction_max}", bavard=bavard)
     étapes = c.étapes
     départ = étapes[0].nœuds
     arrivée = étapes[-1].nœuds
@@ -191,10 +192,9 @@ def iti_étapes_ensembles(g, c, bavard=0):
     preds_précs = []
 
     for i in range(1, len(étapes)):
-        if bavard>1:
-            print(f"Recherche d’un chemin de {étapes[i-1]} à {étapes[i]}.")
+        LOG(f"Recherche d’un chemin de {étapes[i-1]} à {étapes[i]}.", bavard=bavard)
         vers_une_étape(g, étapes[i-1].nœuds, étapes[i].nœuds, c.p_détour, dist, pred, i==1, correction_max, c.interdites, bavard=bavard)
-        if bavard>1: print(f"Je suis arrivé à {étapes[i]}")
+        LOG(f"Je suis arrivé à {étapes[i]}", bavard=bavard)
         preds_précs.append(copy.deepcopy(pred))  # pour la reconstruction finale
         # preds_précs[k] contient les données pour aller de étapes[k] vers étapes[k+1], k==i-1
         dist = {s: d for (s, d) in dist.items() if s in étapes[i].nœuds}  # On efface tout sauf les sommets de l’étape qu’on vient d’atteindre
@@ -206,10 +206,10 @@ def iti_étapes_ensembles(g, c, bavard=0):
         reconstruction(iti, preds_précs[i-1], étapes[i-1].nœuds)
     iti.reverse()
     s_d = iti[0]
-    h = heuristique(g, s_d, arrivée, correction_max) 
+    h = heuristique(g, s_d, arrivée, correction_max)
     if h > dist[fin]:
         raise RuntimeError(f"L’heuristique {h} était plus grande que la distance finale {dist[fin]} pour {c}.")
-    LOG(f"(\ndijkstra.chemin_étapes_ensembles) Pour le chemin {c}, j’ai obtenu l’itinéraire\n {iti}. \n L’heuristique était {h}, la distance euclidienne {g.d_euc(s_d,fin)} et la longueur (ressentie) trouvée {dist[fin]}", bavard=bavard)
+    LOG(f"(\ndijkstra.chemin_étapes_ensembles) Pour le chemin {c}, j’ai obtenu l’itinéraire\n {iti}. \n L’heuristique était {h}, la distance euclidienne {g.d_euc(s_d,fin)} et la longueur (ressentie) trouvée {dist[fin]}", bavard=bavard-1)
     return iti, dist[fin]
 
 

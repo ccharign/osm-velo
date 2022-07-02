@@ -26,43 +26,56 @@ class RechercheBase(forms.Form):
     coords_départ = forms.CharField(widget=forms.HiddenInput(), required=False)
     arrivée = forms.CharField(label="Arrivée")
     coords_arrivée = forms.CharField(widget=forms.HiddenInput(), required=False)
-    zone_t = forms.CharField(widget=forms.HiddenInput())
+    #zone_t = forms.CharField(widget=forms.HiddenInput())
+    zone = forms.ModelChoiceField(queryset=mo.Zone.objects.all(), widget=forms.HiddenInput())
+    marqueurs_é = forms.CharField(widget=forms.HiddenInput(), required=False)  # Pour les marqueurs d’étapes précédents.
+    marqueurs_i = forms.CharField(widget=forms.HiddenInput(), required=False)  # Pour les marqueurs d’étape interdite précédents.
+    partir_de_ma_position = forms.BooleanField(label="Partir de ma position", required=False, initial=False)
 
 
 class Recherche(RechercheBase):
     """
-    Recherche initiale
+    Recherche initiale.
     """
-    partir_de_ma_position = forms.BooleanField(label="Partir de ma position", required=False, initial=False)
+    pass
     # pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
 
 
-class RelanceRapide(forms.Form):
+class RelanceRapide(RechercheBase):
     """
     Pour relancer rapidement une recherche.
     """
     départ = forms.CharField(widget=forms.HiddenInput())
-    coords_départ = forms.CharField(widget=forms.HiddenInput())
     arrivée = forms.CharField(widget=forms.HiddenInput())
-    coords_arrivée = forms.CharField(widget=forms.HiddenInput())
     pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
-    zone_t = forms.CharField(widget=forms.HiddenInput())
-    marqueurs_é = forms.CharField(widget=forms.HiddenInput(), required=False)  # Pour les marqueurs d’étapes précédents.
-    marqueurs_i = forms.CharField(widget=forms.HiddenInput())  # Pour les marqueurs d’étape interdite précédents.
-
+    partir_de_ma_position = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     
-class EnregistrerContrib(forms.Form):
+
+
+class ToutCaché(RechercheBase):
     """
-    Pour enregistrer une contribution.
+    Pour ce formulaire, tout est caché : seul le bouton « trajet retour » sera affiché.
     """
     départ = forms.CharField(widget=forms.HiddenInput())
-    coords_départ = forms.CharField(widget=forms.HiddenInput())
     arrivée = forms.CharField(widget=forms.HiddenInput())
-    coords_arrivée = forms.CharField(widget=forms.HiddenInput())
-    zone_t = forms.CharField(widget=forms.HiddenInput())
-    étapes = forms.CharField(widget=forms.HiddenInput())
-    rues_interdites = forms.CharField(widget=forms.HiddenInput())
-    AR = forms.BooleanField(label="Valable aussi pour le retour ?", required=False)
+    pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
+    étapes = forms.CharField(widget=forms.HiddenInput(), required=False)
+    rues_interdites = forms.CharField(widget=forms.HiddenInput(), required=False)
+    partir_de_ma_position = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+
+    
+# class EnregistrerContrib(forms.Form):
+#     """
+#     Pour enregistrer une contribution.
+#     """
+#     départ = forms.CharField(widget=forms.HiddenInput())
+#     coords_départ = forms.CharField(widget=forms.HiddenInput())
+#     arrivée = forms.CharField(widget=forms.HiddenInput())
+#     coords_arrivée = forms.CharField(widget=forms.HiddenInput())
+#     zone_t = forms.CharField(widget=forms.HiddenInput())
+#     étapes = forms.CharField(widget=forms.HiddenInput())
+#     rues_interdites = forms.CharField(widget=forms.HiddenInput())
+#     AR = forms.BooleanField(label="Valable aussi pour le retour ?", required=False)
     
 
 #class RapportDeBug(forms.ModelForm): # créer un form automatiquement depuis un modèle https://docs.djangoproject.com/en/4.0/topics/forms/modelforms/

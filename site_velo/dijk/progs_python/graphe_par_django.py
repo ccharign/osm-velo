@@ -261,6 +261,13 @@ class Graphe_django():
         iti, l_ressentie = dijkstra.iti_étapes_ensembles(self, chemin, bavard=bavard)
         return self.liste_Arête_of_iti(iti, chemin.p_détour), l_ressentie
 
+    def itinéraire_sommets(self, chemin, bavard=0):
+        """
+        Entrée : chemin (Chemin)
+        Sortie : iti, l_ressentie (int list, float)
+        """
+        return dijkstra.iti_étapes_ensembles(self, chemin, bavard=bavard)
+    
     
     def longueur_itinéraire(self, iti_d):
         """
@@ -274,7 +281,7 @@ class Graphe_django():
         return Sommet.objects.all()
 
 
-    def voisins(self, s, p_détour, interdites={}):
+    def voisins(self, s: int, p_détour: float, interdites={}):
         """
         La méthode utilisée par dijkstra.
         Entrées :
@@ -287,13 +294,13 @@ class Graphe_django():
         """
         tout = [ (t, a.longueur_corrigée(p_détour) ) for (t, a) in self.dico_voisins[s]]
         if s in interdites:
-            return [(t,l) for (t,l) in tout if t not in interdites[s]]
+            return [(t, l) for (t, l) in tout if t not in interdites[s]]
         else:
             return tout
 
         
     def voisins_nus(self, s):
-        return [t for (t,_) in self.dico_voisins[s]]
+        return [t for (t, _) in self.dico_voisins[s]]
 
         
     def nœuds_of_rue(self, adresse, persévérant=True, bavard=0):

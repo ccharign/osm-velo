@@ -9,16 +9,17 @@ from dijk.progs_python.petites_fonctions import chrono, milieu
 from params import LOG_PB, CHEMIN_CHEMINS, DONNÉES, LOG
 from dijk.models import Sommet, Chemin_d, Zone, Arête
 
-tic=perf_counter()
+tic = perf_counter()
 from recup_donnees import cherche_lieu, coords_of_adresse
 chrono(tic, "recup_donnees")
 
-tic=perf_counter()
+tic = perf_counter()
+from lecture_adresse.normalisation0 import découpe_adresse
 from lecture_adresse.normalisation import normalise_adresse, normalise_rue, normalise_ville, Adresse
 chrono(tic, "lecture_adresse.normalisation")
 
 import dijk.progs_python.dijkstra
-tic=perf_counter()
+tic = perf_counter()
 from lecture_adresse.recup_noeuds import nœuds_of_étape
 chrono(tic, "lecture_adresse.recup_noeuds")
 
@@ -80,19 +81,23 @@ class Étape():
 
 
     @classmethod
-    def of_dico(cls, d, champ, g, z_d):
+    def of_dico(cls, d, champ, g, z_d, bavard=0):
         """
         Entrée :
            d, dico contenant a priori le résultat d’un get
-           champ, nom du champ dans lequel chercher l’étape. S’il existe un champ nommé 'coords_'+champ et qu’il est rempli, sera utilisé pour obtenir directement les sommets via arête_la_plus_proche.
+           champ, nom du champ dans lequel chercher l’étape. S’il existe un champ nommé 'coords_'+champ et qu’il est rempli, sera utilisé pour obtenir directement les sommets via arête_la_plus_proche. L’objet renvoyé sera alors une ÉtapeArête et pas une Étape.
         """
-        print(f"of_dico lancé. d: {d},\n champ:{champ}")
+        LOG(f"of_dico lancé. d: {d},\n champ:{champ}", bavard=bavard)
         ch_coords = "coords_" + champ
 
         if ch_coords in d and d[ch_coords]:
             coords = tuple(map(float, d[ch_coords].split(";")))
-            print(f"Coords trouvées dans le champ {ch_coords} : {coords}")
-            return ÉtapeArête.of_coords(coords, g, z_d)
+            LOG(f"Coords trouvées dans le champ {ch_coords} : {coords}", bavard=bavard)
+            nom, bis_ter, nom, ville = découpe_adresse(d[champ])
+            ad = Adresse()
+            ad.rue_initiale = nom
+            ad.ville = ville
+            return ÉtapeArête.of_coords(coords, g, z_d, ad=ad)
         else:
             nom = d[champ]
             return cls.of_texte(nom, g, z_d)
@@ -110,24 +115,28 @@ class ÉtapeArête():
         nœuds (int set), set d’id_osm de sommets
         coords_ini (float×float), coords du point dont cette arête était la plus proche. Servira de str pour l’enregistrement dans la base.
         pk (int), clef primaire de l’arête dans la base models.Arête.
-        nom (str), nom de la rue contenant cette arête.
+        nom (str)
     """
     
     def __init__(self):
-        self.nœuds=set()
+        self.nœuds = set()
         self.coords_ini = None
         self.pk = None
         self.adresse = Adresse()
+        self.nom = None
     
     @classmethod
-    def of_arête(cls, a, coords):
-        res=cls()
+    def of_arête(cls, a, coords, ad=None):
+        res = cls()
         res.coords_ini = coords
         res.nœuds = set((a.départ.id_osm, a.arrivée.id_osm))
-        res.nom = a.nom
+        #res.nom = nom
         res.pk = a.pk
-        res.adresse.rue_initiale=a.nom
-        res.adresse.coords=coords
+        if ad:
+            res.adresse = ad
+        else:
+            res.adresse.rue_initiale = a.nom
+        res.adresse.coords = coords
         return res
 
     
@@ -138,14 +147,14 @@ class ÉtapeArête():
         """
         a = Arête.objects.get(pk=pk)
         premier_segment = a.géométrie()[:2]
-        coords= milieu(*premier_segment)
+        coords = milieu(*premier_segment)
         return cls.of_arête(a, coords)
         
     
     @classmethod
-    def of_coords(cls, coords, g, z_d):
+    def of_coords(cls, coords, g, z_d, ad=None):
         a, _ = g.arête_la_plus_proche(coords, z_d)
-        return cls.of_arête(a, coords)
+        return cls.of_arête(a, coords, ad=ad)
     
     
     def __str__(self):
@@ -159,7 +168,7 @@ class ÉtapeArête():
         """
         Pour affichage utilisateur.
         """
-        return f"Arête numéro {self.pk} ({self.nom})"
+        return f"{self.nom}"
 
 
 def dico_arête_of_nœuds(g, nœuds):
