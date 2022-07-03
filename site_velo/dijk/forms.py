@@ -47,6 +47,8 @@ class RelanceRapide(RechercheBase):
     """
     départ = forms.CharField(widget=forms.HiddenInput())
     arrivée = forms.CharField(widget=forms.HiddenInput())
+    étapes = forms.CharField(widget=forms.HiddenInput(), required=False)
+    rues_interdites = forms.CharField(widget=forms.HiddenInput(), required=False)
     pourcentage_détour = forms.CharField(widget=forms.HiddenInput())
     partir_de_ma_position = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     
@@ -76,7 +78,9 @@ class ToutCaché(RechercheBase):
 #     étapes = forms.CharField(widget=forms.HiddenInput())
 #     rues_interdites = forms.CharField(widget=forms.HiddenInput())
 #     AR = forms.BooleanField(label="Valable aussi pour le retour ?", required=False)
-    
 
-#class RapportDeBug(forms.ModelForm): # créer un form automatiquement depuis un modèle https://docs.djangoproject.com/en/4.0/topics/forms/modelforms/
-    
+
+class RapportDeBug(forms.ModelForm):  # créer un form automatiquement depuis un modèle https://docs.djangoproject.com/en/4.0/topics/forms/modelforms/
+    class Meta:
+        model = mo.Bug
+        fields = ["importance", "titre", "description", "message_d_erreur", "comment_reproduire"]

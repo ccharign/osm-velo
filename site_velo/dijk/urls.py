@@ -12,6 +12,7 @@ urlpatterns = [
     path("mode_demploi", views.mode_demploi, name="mode d’emploi"),
     path("limitations", views.limitations, name="limitations"),
     path("sous_le_capot", views.sous_le_capot, name="sous le capot"),
+    path("rapport_de_bug", views.rapport_de_bug, name="bug"),
     
     #path("visu_nv_chemin", views.visualisation_nv_chemin, name="visu nv chemin"),
     path("confirme_nv_chemin", views.confirme_nv_chemin, name="confirme nv chemin"),

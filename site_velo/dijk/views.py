@@ -32,7 +32,7 @@ from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_é
 from .progs_python.graphe_par_django import Graphe_django
 from .progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
-from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue, Amenity
+from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue, Amenity, Bug
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
@@ -148,18 +148,13 @@ def relance_rapide(requête):
     Les étapes sont dans des champs dont le nom contient 'étape_coord', sous la forme 'lon;lat'
     Les arêtes interdites sont dans des champs dont le nom contient 'interdite_coord', sous la même forme.
     """
-    # form = forms.RelanceRapide(requête.GET)
-    # if not form.is_valid():
-    #     print(form.errors)
-    # données = dict_of_get(requête.GET)
-    # données.update(form.cleaned_data)
 
     données = récup_données(requête.GET, forms.RelanceRapide)
+    z_d, étapes, étapes_interdites, ps_détour = z_é_i_d(g, données)
     
-    z_d = g.charge_zone(données["zone"].nom)
     
-    départ = Étape.of_dico(requête.GET, "départ", g, z_d)
-    arrivée = Étape.of_dico(requête.GET, "arrivée", g, z_d)
+    départ = étapes[0]
+    arrivée = étapes[-1]
 
     é_inter = []
     é_interdites = []
@@ -179,7 +174,7 @@ def relance_rapide(requête):
             
     é_inter.sort()
     étapes = [départ] + [é for _, é in é_inter] + [arrivée]
-    return calcul_itinéraires(requête, requête.GET["pourcentage_détour"], z_d,
+    return calcul_itinéraires(requête, ps_détour, z_d,
                               étapes, étapes_interdites=é_interdites,
                               données=données,
                               bavard=3)
@@ -459,25 +454,6 @@ def autreErreur(requête, e):
     return render(requête, "dijk/autreErreur.html", {"msg": f"{e.__class__.__name__} : {e}"})
 
 
-### Stats ###
-
-def recherche_pourcentages(requête):
-    return render(requête, "dijk/recherche_pourcentages.html")
-
-def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
-    """
-    Renvoie un tableau avec les pourcentages de voies piétonnes et de pistes cyclables pour les villes dans requête.POSTE["villes"]. Lequel est un str contenant les villes séparées par des virgules.
-    """
-    from dijk.progs_python.stats import pourcentage_piéton_et_pistes_cyclables
-    if ville:
-        villes=[ville]
-    else:
-        villes = requête.POST["villes"].split(";")
-    res = []
-    for v in villes:
-        res.append( (v,) + pourcentage_piéton_et_pistes_cyclables(v))
-    return render(requête, "dijk/pourcentages.html", {"stats":res})
-
 
 
 ### Auto complétion ###
@@ -530,7 +506,7 @@ def pour_complétion(requête, nbMax=15):
         # print(dans_l_arbre)
         
         
-        ## Recherche dans les rues de la base
+        # Recherche dans les rues de la base
         dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in=req_villes).prefetch_related("ville")
         for rue_trouvée in dans_la_base:
             dicos.append({"label": chaîne_à_renvoyer(rue_trouvée.nom_complet, rue_trouvée.ville.nom_complet)})
@@ -540,12 +516,11 @@ def pour_complétion(requête, nbMax=15):
             return HttpResponse("fail", mimeType)
 
         
-        ## Recherche dans les amenities
+        # Recherche dans les amenities
         amenities = Amenity.objects.filter(nom__icontains=rue, ville__in=req_villes).prefetch_related("ville", "type_amenity")
         chaînes_déjà_présentes = set()
         print(f"{len(amenities)} amenities trouvées")
         for a in amenities:
-            #chaîne = chaîne_à_renvoyer(a.nom, a.ville.nom_complet, parenthèse=a.type_amenity.nom_français)
             chaîne = str(a)
             if chaîne not in chaînes_déjà_présentes:
                 chaînes_déjà_présentes.add(chaîne)
@@ -555,7 +530,7 @@ def pour_complétion(requête, nbMax=15):
             return HttpResponse("fail", mimeType)
 
         
-        ## Recherche dans les caches
+        # Recherche dans les caches
         for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans Cache_Adresse : {truc}")
             dicos.append({"label": chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)})
@@ -563,13 +538,48 @@ def pour_complétion(requête, nbMax=15):
         for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue), ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans CacheNomRue : {chose}")
             dicos.append({"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
-            
-            
+               
         # Création du json à renvoyer
         rés = json.dumps(dicos)
         
     else:
-        rés="fail"
+        rés = "fail"
         
-
     return HttpResponse(rés, mimeType)
+
+
+### Stats ###
+
+def recherche_pourcentages(requête):
+    return render(requête, "dijk/recherche_pourcentages.html")
+
+def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
+    """
+    Renvoie un tableau avec les pourcentages de voies piétonnes et de pistes cyclables pour les villes dans requête.POSTE["villes"]. Lequel est un str contenant les villes séparées par des virgules.
+    """
+    from dijk.progs_python.stats import pourcentage_piéton_et_pistes_cyclables
+    if ville:
+        villes = [ville]
+    else:
+        villes = requête.POST["villes"].split(";")
+    res = []
+    for v in villes:
+        res.append((v,) + pourcentage_piéton_et_pistes_cyclables(v))
+    return render(requête, "dijk/pourcentages.html", {"stats": res})
+
+
+
+### Rapport de bug ###
+
+def rapport_de_bug(requête):
+    if requête.POST:
+        # données = récup_données(requête.POST, forms.RapportDeBug)
+        # print(données)
+        # bug = Bug.of_dico(données)
+        # bug.save()
+        form = forms.RapportDeBug(requête.POST)
+        form.save()
+        return render(requête, "dijk/message.html", {"message": "C’est enregistré, merci !"})
+    else:
+        form = forms.RapportDeBug()
+        return render(requête, "dijk/rapport_de_bug.html", {"form": form})

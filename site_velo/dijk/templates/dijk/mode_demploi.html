@@ -17,10 +17,11 @@ Ce site permet de calculer des itinéraires à vélo. Sa spécificité est d’�
 </p>
 
 <p>
-Cependant dans les zones où l’IA n’a pas encore été suffisamment entraînée, elle se rabat sur les critères simples tels que la présence d’une piste cyclable ou d’une zone 30 ou piétonne.
+  Cependant dans les zones où l’IA n’a pas encore été suffisamment entraînée, elle se rabat sur les critères simples tels que la présence d’une piste cyclable ou d’une zone 30 ou piétonne.
+  </p>
 
-Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s’il permet de gagner beaucoup de temps ou si la plupart des utilisateurs le prennent... 
-
+<p>
+Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s’il permet de gagner beaucoup de temps ou si la plupart des utilisateurs le prennent...
 </p>
 
 <p>La carte de la cyclabilité permet de se rendre compte de l’état de L’IA. Les rues à favoriser apparaissent en vert, et celles à éviter en rouge.</p>
@@ -28,15 +29,6 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 
 <h2>Recherche simple d’itinéraire</h2>
 
-
-
-<p>
-  Pour indiquer une autre ville que la ville par défaut de la zone choisie, la mettre après une virgule. Par exemple : « 12 rue de l’église, Lons », « europub, billère », ou encore « boulangerie, Bizanos ». (Pour ce dernier exemple, l’algo renverra la première boulangerie de Bizanos qu’il aura trouvé. Un jour je travaillerai à lui faire renvoyer la plus proche.)<br>
-
-  Pour les noms de rue et de ville, l’algo est tolérant à deux fautes de frappe (« plac Clamenceau » au lieu de « place Clémenceau ») et ne fait pas attention aux majuscules.
-
-  Les autres noms de lieu sont traités par le moteur de recherche d’openstreetmap, qu’on peut tester <a href="https://www.openstreetmap.org/"> ici </a>.
-</p>
 
 <p>Si vous indiquez une rue sans préciser de numéro, l’algo ira au point le plus proche de cette rue.</p>
 
@@ -50,14 +42,14 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 <p>
   C’est que l’IA est peu ou mal entrainée dans ce quartier !<br>
 
-  Cliquez sur la carte pour imposer des points de passage.
+  Cliquez sur la carte pour imposer des points de passage. Controle-cliquez pour interdire des portions de rue.<br>
   
-  Vous pouvez remplir les champs « étapes » ou « rues interdites » par une ou plusieurs rues, séparées par des point-virgules. Après une première recherche, ces champs sont disponibles en dessous de la carte.
+  Vous pouvez également remplir les champs « étapes » ou « rues interdites » par une ou plusieurs rues, séparées par des point-virgules. Après une première recherche, ces champs sont disponibles en dessous de la carte.
 </p>
 
 
 
-
+  
 <h2>Entraîner l’IA</h2>
 
 
@@ -65,7 +57,7 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
   <br>
   Pour ce, effectuer une recherche sur un trajet que vous connaissez bien (domicile-travail par exemple). Si l’itinéraire proposé vous semble moins adapté que le votre, corrigez-le jusqu’à obtenir l’itinéraire souhaité.
 
-  Cochez les profils de cyclistes à qui vous semble pouvoir s’adresser votre itinéraire (plus de détails sur les profils cyclistes ci-dessous); si le même itinéraire est valable dans les deux sens (pas de sens interdit notamment), cochez la case idoine; et validez  : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
+  Cochez les profils de cyclistes à qui vous semble pouvoir s’adresser votre itinéraire (plus de détails sur les profils cyclistes ci-dessous); si le même itinéraire est valable pour le trajet retour aussi (pas de sens interdit notamment), cochez la case idoine; et validez  : vous avez œuvré pour l’amélioration de la qualité de vie à {{ville_défaut}} et vous avez gagné toute ma gratitude !
 </p>
 
 
@@ -76,7 +68,7 @@ Concernant les sens interdits : l’itinéraire renvoyé pourra en contenir un s
 
   Précisément, le nombre utilisé est le pourcentage duquel le cycliste est prêt à rallonger son parcours pour remplacer un trajet entièrement sur des rues de centre-ville limitées à 50km/h non aménagées, par un trajet entièrement sur des vraies pistes cyclables.</br>
 
-  Par défaut, les trajets proposés correspondent aux pourcentages 0 (trajet direct), 15 (intermédiaire) et 30 (priorité confort). Cependant, vous pouvez indiquer d’autres valeurs en remplissant le champ idoine du formulaire. On peut rentrer plusieurs valeurs, séparées par des point-virgule.
+  Par défaut, les trajets proposés correspondent aux pourcentages 0 (trajet direct), 15 (intermédiaire) et 30 (priorité confort). Cependant, vous pouvez indiquer d’autres valeurs en remplissant le champ idoine du formulaire. On peut rentrer plusieurs valeurs, séparées par des point-virgule : l’appli affichera un itinéraire pour chaque valeur.
   </p>
 
 

@@ -39,6 +39,7 @@
 
   <body>
 
+    {% load bootstrap3 %}
     
     <script>
       $(document).ready(  function(){
@@ -100,6 +101,8 @@
 	      {% if zone_t %}
 	      <li><a href="{% url 'recherche' zone_t %}"> Nouvelle recherche </a></li>
 	      {% endif %}
+
+	      <li><a href="{% url 'index' %}">Entrée</a></li>
 	      
 	      <li class="dropdown">
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -107,8 +110,9 @@
 		  <span class="caret"></span></a>
 		<ul class="dropdown-menu">
 		  <li> <a href="{% url 'mode d’emploi' %}"> Mode d’emploi </a></li>
-		  <li><a href="{% url 'limitations'%}"> Problèmes connus </a> </li>
+		  <!-- <li><a href="{% url 'limitations'%}"> Problèmes connus </a> </li> -->
 		  <li><a href="{% url 'sous le capot'%}"> Sous le capot </a> </li>
+		  <li><a href="{% url 'bug'%}"> Signaler un bug ou proposer une amélioration </a> </li>
 		</ul>
 	      </li>
 	      

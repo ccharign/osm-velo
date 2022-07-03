@@ -424,8 +424,15 @@ class Amenity(models.Model):
 
 
 class Bug(models.Model):
+    """
+    Pour enregistrer un rapport de bug.
+    """
     titre = models.TextField()
     description = models.TextField()
+    message_d_erreur = models.TextField(blank=True, default=None, null=True)
     comment_reproduire = models.TextField()
     date = models.DateField(auto_now=True)
-    
+    importance = models.SmallIntegerField()
+
+    class meta:
+        ordering = ["importance"]
