@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='TypeAmenity',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nom_osm', models.TextField(unique=True)),
+                ('nom_osm', models.CharField(max_length=200, unique=True)),
                 ('nom_français', models.TextField(blank=True, default=None, null=True)),
             ],
         ),

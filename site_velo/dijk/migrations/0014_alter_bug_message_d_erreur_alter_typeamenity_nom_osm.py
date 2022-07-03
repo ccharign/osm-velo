@@ -15,9 +15,5 @@ class Migration(migrations.Migration):
             name='message_d_erreur',
             field=models.TextField(blank=True, default=None, null=True),
         ),
-        migrations.AlterField(
-            model_name='typeamenity',
-            name='nom_osm',
-            field=models.CharField(max_length=200, unique=True),
-        ),
+ 
     ]
