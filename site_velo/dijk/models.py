@@ -345,7 +345,7 @@ class CacheNomRue(models.Model):
 
 
 class TypeAmenity(models.Model):
-    nom_osm = models.TextField(unique=True)
+    nom_osm = models.CharField(max_length=200, unique=True)
     nom_français = models.TextField(blank=True, default=None, null=True)
 
     def __str__(self):
