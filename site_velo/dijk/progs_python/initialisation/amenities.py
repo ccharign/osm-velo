@@ -27,6 +27,7 @@ def charge_type_amenities(ld):
         else:
             ta = TypeAmenity(nom_osm=r["type"])
             nom_traduit = input(f"Traduction de {r['type']} ? C’est pour {r['name']}. ")
+            close_old_connections()
             ta.nom_français = nom_traduit
             déjà_présente.add(r["type"])
             ta.save()

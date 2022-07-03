@@ -25,7 +25,7 @@ class VillePasTrouvée(Exception):
 class Graphe_django():
     """
     Cette classe sert d'interface avec la base Django.
-    Attribut: 
+    Attribut:
         dico_voisins (dico int -> (int, Arête) list) associe à un id_osm la liste de ses (voisins, arête)
         dico_Sommet (dico int->Sommet) associe le sommet à chaque id_osm
         arbre_villes : arbre lex des villes (toutes les villes de la base pour l’instant). Noms normalisée.

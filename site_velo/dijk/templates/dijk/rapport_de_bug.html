@@ -12,7 +12,7 @@ Indiquez ici les problèmes techniques ou vos suggestions d’amélioration !
   <li> 5 : bug qui empêche l’utilisation fluide de l’appli. </li>
 </ul>
 
-<form method="post" action=""{% url 'bug' %}"">
+<form method="post" action="{% url 'bug' %}">
   {% csrf_token %}
   {% bootstrap_form form %}
 

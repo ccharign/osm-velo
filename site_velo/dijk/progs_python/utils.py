@@ -40,20 +40,20 @@ def liste_Arête_of_iti(g, iti, p_détour):
     Entrée : iti (int list), liste d'id osm
     Sortie : liste d'Arêtes
     """
-    tic=perf_counter()
-    res = [g.meilleure_arête(s,t,p_détour) for (s,t) in deuxConséc(iti)]
+    tic = perf_counter()
+    res = [g.meilleure_arête(s, t, p_détour) for (s, t) in deuxConséc(iti)]
     chrono(tic, "conversion de l'itinéraire en liste d'Arêtes.")
     return res
 
 
 DICO_PROFIl = {
-    0:("Le plus court",
+    0: ("Le plus court",
        "Le trajet le plus court tenant compte des contraintes indiquées."
        ),
-    15:("Intermédiaire",
+    15: ("Intermédiaire",
         "Un cycliste de profil « intermédiaire » rallonge en moyenne ses trajets de 10% pour éviter les rues désagréables. Il rallongera son trajet de 15% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."
         ),
-    30:("Priorité confort",
+    30: ("Priorité confort",
         "Un cycliste de profil « priorité confort » rallonge en moyenne ses trajets de 15% pour passer par les zones plus agréables. Il pourra faire un détour de 30% pour remplacer un itinéraire entièrement non aménagé par un itinéraire entièrement sur piste cyclable."
         )
 }
@@ -75,8 +75,7 @@ def itinéraire_of_étapes(étapes,
                          rajouter_iti_direct=True,
                          étapes_interdites={},
                          où_enregistrer=os.path.join(TMP, "itinéraire.html"),
-                         bavard=0,
-                         ouvrir=False):
+                         bavard=0):
     """
     Entrées:
         ps_détour (float list)
@@ -139,7 +138,7 @@ def itinéraire_of_étapes(étapes,
             s["p_détour_effectif"] = int((s["longueur"]/longueur_ch_direct - 1.) * 100.)
 
     tic = perf_counter()
-    carte = dessine(à_dessiner, g, z_d, d.adresse, a.adresse, où_enregistrer=où_enregistrer, ouvrir=ouvrir, bavard=bavard, fouine="fouine" in session)
+    carte = dessine(à_dessiner, g, z_d, d.adresse, a.adresse, où_enregistrer=où_enregistrer, bavard=bavard, fouine="fouine" in session)
     chrono(tic, "Dessin")
     return stats, c, [str(é) for é in étapes], [str(é) for é in étapes_interdites], carte
 

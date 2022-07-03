@@ -28,7 +28,7 @@ def nœuds_of_étape(c:str, g, z_d, nv_cache=1, bavard=0):
     
     # Lecture de l’adresse
     assert c != ""
-    ad = Adresse.of_texte(g, z_d, c, nv_cache=nv_cache, bavard=bavard-1) # Actuellement, ceci lance déjà un nominatim si la rue n’est pas dans la base.
+    ad = Adresse.of_texte(g, z_d, c, nv_cache=nv_cache, bavard=bavard-1)  # Actuellement, ceci lance déjà un nominatim si la rue n’est pas dans la base.
 
     # Si c était dans la table des amenities :
     if ad.amen:

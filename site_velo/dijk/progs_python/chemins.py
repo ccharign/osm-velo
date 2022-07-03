@@ -45,7 +45,7 @@ class Étape():
     """
     
     def __init__(self):
-        self.adresse=None
+        self.adresse = None
         self.nœuds = set()
 
         
@@ -62,7 +62,7 @@ class Étape():
         essai = re.match("^Arête(.*),(.*)", texte)
         if essai:
             lon, lat = map(float, essai.groups())
-            return ÉtapeArête.of_coords((lon,lat), g, z_d)
+            return ÉtapeArête.of_coords((lon, lat), g, z_d)
 
 
         # 2) voyons s’il venait d’un ÉtapeArête.joli_texte

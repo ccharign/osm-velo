@@ -533,11 +533,17 @@ def pour_complétion(requête, nbMax=15):
         # Recherche dans les caches
         for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans Cache_Adresse : {truc}")
-            dicos.append({"label": chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)})
+            chaîne = chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)
+            if chaîne not in chaînes_déjà_présentes:
+                chaînes_déjà_présentes.add(chaîne)
+                dicos.append({"label": chaîne})
             
         for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue), ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans CacheNomRue : {chose}")
-            dicos.append({"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
+            chaîne = chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)
+            if chaîne not in chaînes_déjà_présentes:
+                chaînes_déjà_présentes.add(chaîne)
+                dicos.append({"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
                
         # Création du json à renvoyer
         rés = json.dumps(dicos)

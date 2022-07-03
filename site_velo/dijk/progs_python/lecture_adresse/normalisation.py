@@ -218,7 +218,7 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
                 return étape1, nom_osm, lieu
 
 
-    
+
 ### Adresses ###
 
 
@@ -235,7 +235,7 @@ class Adresse():
       - pays
       - rés_nominatim : résultat de cherche_lieu s’il y a eu un appel à cette fonction.
       - coords : initialement None, sera rempli par la fonction recup_nœuds.un_seul_nœud le cas échéant.
-      - amen (bool): indique si c'est l'adresse d'un «amenity»
+      - amen (bool): indique si c'est l'adresse d'un «amenity» de la base.
     """
 
     def __init__(self):
@@ -249,15 +249,17 @@ class Adresse():
         self.rés_nominatim = None
         self.amen = False
 
+        
     @classmethod
     def of_amenity(cls, amen, ville):
-        res=cls()
-        res.rue_osm=amen.nom
-        res.ville=ville
-        res.amen=True
-        res.coords=amen.lon, amen.lat
+        res = cls()
+        res.rue_osm = amen.nom
+        res.ville = ville
+        res.amen = True
+        res.coords = amen.lon, amen.lat
         return res
-        
+
+    
     @classmethod
     def of_texte(cls, g, z_d, texte, norm_rue=True, nv_cache=1, bavard=0):
         """
@@ -287,19 +289,19 @@ class Adresse():
             rue_n, rue_osm, rés_nominatim = normalise_rue(g, z_d, rue_initiale, ville_n, nv_cache=nv_cache, bavard=bavard-1)
 
         # Initialisation des attributs
-        if num=="":
-            res.num=None
+        if num == "":
+            res.num = None
         else:
-            res.num= num
+            res.num = num
             if bis_ter:
-                res.num+= " "+bis_ter
-        res.rue_initiale=rue_initiale
+                res.num += " " + bis_ter
+        res.rue_initiale = rue_initiale
         res.rue_norm = rue_n
         res.rue_osm = rue_osm
         res.ville = ville_n
-        res.pays=PAYS_DÉFAUT
+        res.pays = PAYS_DÉFAUT
         res.coords = None
-        res.rés_nominatim=rés_nominatim
+        res.rés_nominatim = rés_nominatim
         LOG(f"(Adresse.of_texte) Après normalisation : num={num}, rue_initiale={rue_initiale}, rue_n={rue_n}, rue_osm={rue_osm}, ville_n={ville_n}", bavard=bavard)
 
         return res
@@ -314,6 +316,7 @@ class Adresse():
         else:
             return self.rue_initiale
 
+        
     def num_ou_pas(self):
         """
         Sortie (str) : self.num+' ' si num présent, '' sinon.
@@ -322,13 +325,15 @@ class Adresse():
             return f"{self.num} "
         else:
             return ""
-    
+
+        
     def __str__(self):
         """
         Utilisé en particulier pour l’enregistrement dans chemins.csv, pour l’affichage pour vérification à l’utilisateur, et pour la recherche de coordonnése
         """
         return f"{self.num_ou_pas()}{self.rue()}, {self.ville}"
-        
+
+    
     def pour_nominatim(self):
         """
         Renvoie une chaîne de car pour la recherche Nominatim non structurée (si échec de la recherche structurée).

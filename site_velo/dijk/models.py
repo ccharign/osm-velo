@@ -293,7 +293,6 @@ class Chemin_d(models.Model):
                 sortie.write(ligne + "\n")
 
 
-    
 class Cache_Adresse(models.Model):
     """
     Table d'association ville -> adresse -> chaîne de nœuds
