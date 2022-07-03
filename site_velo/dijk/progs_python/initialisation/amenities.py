@@ -34,11 +34,9 @@ def charge_type_amenities(ld):
                 print(f"J’ignorerai à l’avenir le type {r['type']}")
 
 
-@atomic
 def charge_amenities(ld, v_d, force=False):
     """
     ld (liste de dicos) : résultat de récup_amenities
-    liste_types (str set): ensembles des types pris en compte.
     v_d (instance de Ville)
     params:
         force: si vrai, remplace celles déjà présentes dans la base.
