@@ -166,10 +166,9 @@ def crée_tous_les_arbres_des_rues():
             ville_d,
             map(prétraitement_rue, l)
         )
-    
 
-    
-À_RAJOUTER_PAU={
+
+À_RAJOUTER_PAU = {
     "Gelos": 64110,
     "Lée": 64320,
     "Pau": 64000,
@@ -178,19 +177,28 @@ def crée_tous_les_arbres_des_rues():
     "Jurançon": 64110,
     "Ousse": 64320,
     "Idron": 64320,
-    "Lons": 64140 ,
+    "Lons": 64140,
     "Bizanos": 64320,
     "Artigueloutan": 64420,
     "Mazères-Lezons": 64110
 }.items()
 
-ZONE_VOIRON={
-    "saint étienne de crossey":38960,
-    "coublevie":38500,
-    "la buisse":38500,
-    "saint aupre":38960,
-    "voiron":38500
+ZONE_VOIRON = {
+    "saint étienne de crossey": 38960,
+    "coublevie": 38500,
+    "la buisse": 38500,
+    "saint aupre": 38960,
+    "voiron": 38500
 }.items()
+
+ZONE_GRENOBLE = [
+    ("Grenoble", 38000),
+    ("Saint Martin d’Hères", 38400),
+    ("Eybens", 38320),
+    ("Poisat", 38309),
+    ("Voreppe", 38340),
+    ("Échirolles", 38130),
+]
 
 
 
@@ -208,21 +216,21 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
        À FAIRE : Si effacer_cache, tous les fichiers .json du dossier cache du répertoire courant seront effacés.
     """
 
-    ## Récupération ou création de la zone :
+    # Récupération ou création de la zone :
     zs_d = Zone.objects.filter(nom=zone)
     if zs_d.exists():
-        z_d=zs_d.first()
+        z_d = zs_d.first()
     else:
         try:
             ville_défaut_d = Ville.objects.get(nom_complet=ville_defaut)
             #ville_défaut_d, _ = Ville.objects.get_or_create(nom_complet=ville_défaut, code=code, nom_norm=partie_commune(ville_défaut))
             z_d = Zone(nom=zone, ville_défaut=ville_défaut_d)
             z_d.save()
-        except dijk.models.Ville.DoesNotExists :
+        except dijk.models.Ville.DoesNotExists:
             raise RuntimeError("Ville pas trouvée. Avez-vous chargé la liste des villes avec communes.charge_villes() ?")
 
-    ## Réinitialisation de la zone :
-    if réinit:         
+    # Réinitialisation de la zone :
+    if réinit:
         for v in z_d.villes():
             v.delete()
         Sommet.objects.filter(zone=z_d).delete()
@@ -230,11 +238,11 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
 
     # Vidage du cache d’osmnx
     
-    ## Chargement des villes :
+    # Chargement des villes :
     for nom, code in liste_villes:
         charge_ville(nom, code, zone, bavard=bavard, rapide=rapide, recalculer_arbre_arêtes_de_la_zone=False)
 
-    ## Arbre quad des arêtes
+    # Arbre quad des arêtes
     quadArbreAretesDeZone(z_d, sauv=True)
 
 
@@ -250,14 +258,14 @@ def init_totale():
 
 
 
-def charge_multidigraph():
-    """
-    Renvoie le multidigraph de la zone défaut, supposé enregistré sur le disque. Plutôt pour tests.
-    """
-    s,o,n,e = BBOX_DÉFAUT
-    nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
-    g = osmnx.load_graphml(nom_fichier)
-    return g
+# def charge_multidigraph():
+#     """
+#     Renvoie le multidigraph de la zone défaut, supposé enregistré sur le disque. Plutôt pour tests.
+#     """
+#     s,o,n,e = BBOX_DÉFAUT
+#     nom_fichier = f'{DONNÉES}/{s}{o}{n}{e}.graphml'
+#     g = osmnx.load_graphml(nom_fichier)
+#     return g
 
 
 def charge_fichier_cycla_défaut(g, chemin=os.path.join(RACINE_PROJET, "progs_python/initialisation/données_à_charger/rues et cyclabilité.txt"), zone="Pau_agglo"):

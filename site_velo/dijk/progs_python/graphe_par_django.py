@@ -3,7 +3,7 @@
 from time import perf_counter
 import os
 from django.db.models import Max, Min, Subquery
-from django.db import transaction
+from django.db import transaction, close_old_connections
 
 from dijk.models import Rue, Ville, Arête, Sommet, Cache_Adresse, Zone, Ville_Zone
 
@@ -58,6 +58,7 @@ class Graphe_django():
         """
         Charge les données présentes dans la base concernant la zone indiquée.
         """
+        close_old_connections()
         z_d = Zone.objects.get(nom=zone_t)
         if z_d not in self.zones:
             print(f"Zone pas en mémoire : {z_d}. Voici les zones que j’ai chargées : {self.zones}")

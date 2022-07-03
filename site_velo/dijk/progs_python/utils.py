@@ -5,7 +5,7 @@
 from time import perf_counter
 import subprocess
 import os
-from django.db import transaction
+from django.db import transaction, close_old_connections
 import gpxpy
 from branca.element import Element
 
@@ -14,8 +14,6 @@ tic=perf_counter()
 import folium
 chrono(tic, "folium", bavard=2)
 from folium.plugins import Fullscreen, LocateControl
-
-
 
 import dijk.models as mo
 from dijk.models import Zone, Chemin_d, Arête
@@ -33,7 +31,6 @@ import chemins  # classe chemin et lecture du csv
 chrono(tic, "chemins", bavard=2)
 
 from lecture_adresse.normalisation import normalise_rue, normalise_ville
-
 import apprentissage as ap
 
 
@@ -49,7 +46,7 @@ def liste_Arête_of_iti(g, iti, p_détour):
     return res
 
 
-DICO_PROFIl={
+DICO_PROFIl = {
     0:("Le plus court",
        "Le trajet le plus court tenant compte des contraintes indiquées."
        ),
@@ -61,15 +58,13 @@ DICO_PROFIl={
         )
 }
 
+
 def légende_et_aide(p_détour):
     pourcent = int(100*p_détour)
     if pourcent in DICO_PROFIl:
         return DICO_PROFIl[pourcent]
     else:
         return f"Profil détour {pourcent}%", ""
-
-
-    
 
 
 def itinéraire_of_étapes(étapes,
@@ -185,7 +180,7 @@ def gpx_of_iti(iti_d, session, dossier_sortie="dijk/tmp", bavard=0):
 # Affichage folium avec couleur
 # voir https://stackoverflow.com/questions/56234047/osmnx-plot-a-network-on-an-interactive-web-map-with-different-colours-per-infra
 
-def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée, où_enregistrer, ouvrir=False, bavard=0, fouine=False):
+def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée, où_enregistrer, bavard=0, fouine=False):
     """
     Entrées :
       - listes_chemins : liste de couples (liste d'Arêtes, couleur)
@@ -216,28 +211,25 @@ def dessine(listes_chemins, g, z_d, ad_départ, ad_arrivée, où_enregistrer, ou
     Fullscreen(title="Plein écran", title_cancel="Quitter le plein écran").add_to(carte)
     LocateControl(locateOptions={"enableHighAccuracy":True}).add_to(carte)
 
-    ## modif de la carte
-    nom_carte=carte.get_name()
+    # modif de la carte
+    nom_carte = carte.get_name()
     carte.get_root().script.add_child(
         Element(f"""
         $(document).ready(function() {{
             gèreLesClics({nom_carte});
             marqueurs_of_form(document.getElementById("relance_rapide"), {nom_carte});
             L.tileLayer.provider('CyclOSM').addTo({nom_carte});
-            
         ;}});
 """)
     )
     carte.save(où_enregistrer)
-
-    if ouvrir : ouvre_html(où_enregistrer)
     return carte
 
 
 
 
 def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvrir=False, bavard=0):
-    """ 
+    """
     Entrées :
        - c (instance de Chemin)
        - g (instance de Graphe)
@@ -261,19 +253,8 @@ def dessine_chemin(c, g, où_enregistrer=os.path.join(TMP, "chemin.html"), ouvri
     return longueur, longueur_direct
 
 
-def affiche_rue(nom_ville, rue, g, bavard=0):
-    """
-    Entrées : g, graphe
-              
-    """
-    #sommets = chemins.nœud_of_étape(adresse, g, bavard=bavard-1)
-    ville=normalise_ville(nom_ville)
-    sommets = g.nœuds[ville.nom][normalise_rue(rue, ville)]
-    affiche_sommets(sommets, g)
-
-
 def moyenne(t):
-    return sum(t)/len(t)
+    return sum(t) / len(t)
 
 
 def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
@@ -283,11 +264,10 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
     """
     g.calcule_cycla_min_max(z_d)
 
-
     arêtes = []
 
     for a in mo.Arête.objects.filter(zone=z_d).exclude(cycla__isnull=True).prefetch_related("départ", "arrivée"):
-        arêtes.append((a, {"color": couleur_of_cycla(a, g, z_d), "popup":a.cycla}))
+        arêtes.append((a, {"color": couleur_of_cycla(a, g, z_d), "popup": a.cycla}))
 
     carte = folium_of_arêtes(g, arêtes)
 
@@ -300,8 +280,10 @@ def dessine_cycla(g, z_d, où_enregistrer, bavard=0):
 
 def lecture_tous_les_chemins(g, z_t=None, n_lectures_max=20, bavard=2):
     """
-    Lance une fois l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
+    Lance l’apprentissage sur chaque chemin de la zone. Si None, parcourt toutes les zones de g.
+    On lit n_lectures_max fois la liste de tous les chemins, ceux qui n’ont pas été modifiés étant retirés de la liste.
     """
+    close_old_connections()
     if z_t is None:
         à_parcourir = g.zones
     else:
@@ -309,7 +291,7 @@ def lecture_tous_les_chemins(g, z_t=None, n_lectures_max=20, bavard=2):
         à_parcourir = [z]
 
     # Liste des chemins à lire
-    à_lire=[]
+    à_lire = []
     for z in à_parcourir:
         for c_d in Chemin_d.objects.filter(zone=z):
             c = chemins.Chemin.of_django(c_d, g , bavard=bavard-1)
