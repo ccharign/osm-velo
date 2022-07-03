@@ -52,10 +52,11 @@ def charge_amenities(ld, v_d, force=False):
                 am.save()
             except RuntimeError as e:
                 print(e)
-            except django.db.utils.IntegrityError as e:
+            except Exception as e:
                 print(r)
                 print(déjà_présentes)
                 print(e)
+                raise(e)
                 
         elif force and r["id_osm"] in déjà_présentes:
             # Remplacer l’ancienne
