@@ -2,7 +2,9 @@ import json
 
 from django.db import models
 from dijk.progs_python.params import CHEMIN_CHEMINS, LOG
-from dijk.progs_python.lecture_adresse.normalisation0 import partie_commune
+from dijk.progs_python.lecture_adresse.normalisation0 import partie_commune, prétraitement_rue
+#from dijk.progs_python.lecture_adresse.normalisation import normalise_rue
+from dijk.progs_python.recup_donnees import rue_of_coords
 
 # Create your models here.
 
@@ -30,7 +32,7 @@ class Ville(models.Model):
 
     def voisine(self):
         rels = Ville_Ville.objects.filter(ville1=self).select_related("ville2")
-        return  tuple(r.ville2 for r in rels)
+        return tuple(r.ville2 for r in rels)
 
     @classmethod
     def of_nom(cls, nom):
@@ -54,14 +56,17 @@ class Zone(models.Model):
     """
     nom = models.CharField(max_length=100, unique=True)
     ville_défaut = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    
     def villes(self):
         return (rel.ville for rel in Ville_Zone.objects.filter(zone=self).prefetch_related("ville"))
+    
     def __str__(self):
         return self.nom
+    
     def __hash__(self):
         return self.pk
 
-    
+
 class Ville_Zone(models.Model):
     """
     Table d’association
@@ -72,7 +77,8 @@ class Ville_Zone(models.Model):
         constraints=[
             models.UniqueConstraint(fields=["zone", "ville"], name = "Pas de relation en double.")
         ]
-    
+
+
 class Sommet(models.Model):
     
     id_osm = models.BigIntegerField(unique=True)
@@ -86,8 +92,6 @@ class Sommet(models.Model):
     # Sert dans les tas de Dijkstra au cas où deux sommets aient exactement la même distance au départ
     def __lt__(self, autre):
         return self.id_osm < autre
-    # def __gt__(self, autre):
-    #     return False
 
     def __hash__(self):
         return self.id_osm
@@ -107,38 +111,37 @@ class Sommet(models.Model):
         arêtes = Arête.objects.filter(arrivée=self).select_related("départ")
         return [a.départ for a in arêtes]
 
-    
-#https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
+
+# https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
 class Rue(models.Model):
     """
     Une entrée pour chaque couple (rue, ville) : certaines rues peuvent apparaître en double.
     """
     nom_complet = models.CharField(max_length=200)
     nom_norm = models.CharField(max_length=200)
-    ville = models.ForeignKey(Ville, on_delete=models.CASCADE )
-    nœuds_à_découper = models.TextField() #chaîne de caractères contenant les nœuds à splitter
+    ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    nœuds_à_découper = models.TextField()  # chaîne de caractères contenant les nœuds à splitter
 
     class Meta:
-        constraints=[
-            models.UniqueConstraint(fields=["nom_norm", "ville"], name = "une seule rue pour chaque nom_norm pour chaque ville.")
+        constraints = [
+            models.UniqueConstraint(fields=["nom_norm", "ville"], name="une seule rue pour chaque nom_norm pour chaque ville.")
         ]
     
     def __str__(self):
-        return f"{self.nom_complet} ({self.ville})"
+        return f"{self.nom_complet}"
     
     def nœuds(self):
         return découpe_chaîne_de_nœuds(self.nœuds_à_découper)
 
 
 
-    
 def formule_pour_correction_longueur(l, cy, p_détour):
     """
     Ceci peut être changé. Actuellement : l / cy**( p_détour*1.5)
     Rappel : cy>1 == bien
              cy<1 == pas bien
     """
-    return l / cy**( p_détour*1.5)
+    return l / cy**(p_détour*1.5)
 
 
 class Arête(models.Model):
@@ -206,26 +209,8 @@ class Arête(models.Model):
         Sortie : Longueur corrigée par la cyclabilité.
         """
         cy = self.cyclabilité()
-        assert cy>0, f"cyclabilité ⩽ pour l’arête {self}. Valeur : {cy}."
+        assert cy > 0, f"cyclabilité ⩽ pour l’arête {self}. Valeur : {cy}."
         return formule_pour_correction_longueur(self.longueur, cy, p_détour)
-
-    # def inverse(self):
-    #     """
-    #     Renvoie l’arête inverse. Elle a une cyclabilité_défaut de .8 * self.cycla_défaut
-    #     """
-    #     return Arête(
-    #         départ=self.arrivée,
-    #         arrivée=self.départ,
-    #         nom=self.nom,
-    #         longueur=self.longueur,
-    #         #zone=self.zone, # À faire après coup, en cas de bulk_create
-    #         cycla_défaut=.8*self.cycla_défaut,
-    #         #rue=self.rue,
-    #         geom=self.geom,
-    #         sensInterdit=True
-    #     )
-    
-    
 
 
 
@@ -253,17 +238,15 @@ class Chemin_d(models.Model):
     # Les quatre attributs suivant servent uniquement à empêcher les doublons. Mysql n’accepte pas les contraintes Unique sur des champs TextField...
     début = models.CharField(max_length=255)
     fin = models.CharField(max_length=255)
-    interdites_début=models.CharField(max_length=255)
-    interdites_fin=models.CharField(max_length=255)
+    interdites_début = models.CharField(max_length=255)
+    interdites_fin = models.CharField(max_length=255)
 
-    
-    # def étapes(self):
-    #     return map(Étape, self.étapes_texte.split(";"))
-    # def interdites(self):
-    #     return map(Étape, self.interdites_texte.split(";"))
+
     class Meta:
-        constraints=[
-            models.UniqueConstraint(fields=["ar", "p_détour", "début", "fin", "interdites_début", "interdites_fin"], name = "Pas de chemins en double.")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ar", "p_détour", "début", "fin", "interdites_début", "interdites_fin"],
+                name="Pas de chemins en double.")
         ]
         ordering = ["-dernier_p_modif", "date"]
     
@@ -304,15 +287,15 @@ class Chemin_d(models.Model):
         Enregistre les chemins de la base dans le csv indiqué.
         Attention : pour l’instant cette fonction n’est pas compatible avec of_ligne_csv car elle rajoute les champs utilisateur et zone.
         """
-        with open(chemin, "w") as sortie :
+        with open(chemin, "w") as sortie:
             for c in cls.objects.all():
-                ligne = "|".join(map(str, (c.ar, c.p_détour, c.étapes_texte, c.interdites_texte, c.utilisateur, c.zone )))
-                sortie.write(ligne+"\n")
+                ligne = "|".join(map(str, (c.ar, c.p_détour, c.étapes_texte, c.interdites_texte, c.utilisateur, c.zone)))
+                sortie.write(ligne + "\n")
 
 
     
 class Cache_Adresse(models.Model):
-    """ 
+    """
     Table d'association ville -> adresse -> chaîne de nœuds
     Note : tout ce qui correspond à des ways dans Nominatim sera enregistré dans la table Rue, via g.nœuds_of_rue.
     Ceci est destiné aux lieux particuliers (bars, bâtiment administratifs, etc. )
@@ -338,9 +321,10 @@ class CacheNomRue(models.Model):
     nom = models.CharField(max_length=200)
     nom_osm = models.CharField(max_length=200)
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    
     class Meta:
-        constraints=[
-            models.UniqueConstraint(fields=["nom", "ville"], name = "Une seule entrée pour chaque (nom, ville).")
+        constraints = [
+            models.UniqueConstraint(fields=["nom", "ville"], name="Une seule entrée pour chaque (nom, ville).")
         ]
 
     @classmethod
@@ -364,15 +348,19 @@ class TypeAmenity(models.Model):
     nom_osm = models.TextField(unique=True)
     nom_français = models.TextField(blank=True, default=None, null=True)
 
+    def __str__(self):
+        return self.nom_français
+
 
 class Amenity(models.Model):
     """
-
-    texte_tout (str) : le dico récupéré d’osm en json
+    Pour enregistrer un lieu public, bar, magasin, etc
+    texte_tout (str): le dico récupéré d’osm en json
     """
     nom = models.TextField(blank=True, default=None, null=True)
     type_amenity = models.ForeignKey(TypeAmenity, on_delete=models.CASCADE)
     ville = models.ForeignKey(Ville, on_delete=models.CASCADE)
+    rue = models.ForeignKey(Rue, on_delete=models.CASCADE, blank=True, default=None, null=True)
     lon = models.FloatField()
     lat = models.FloatField()
     horaires = models.TextField(blank=True, default=None, null=True)
@@ -384,7 +372,22 @@ class Amenity(models.Model):
         return self.lon, self.lat
 
     def toutes_les_infos(self):
+        """
+        Renvoie le dico des données présentes sur osm.
+        """
         return json.loads(self.texte_tout)
+
+    def rue_ou_pas(self):
+        """
+        Renvoie ', nom_de_l_rue' si connue, et '' sinon
+        """
+        if self.rue:
+            return f", {self.rue}"
+        else:
+            return ""
+
+    def __str__(self):
+        return f"{self.nom} ({self.type_amenity}){self.rue_ou_pas()}, {self.ville}"
 
     @classmethod
     def of_dico(cls, d, v_d):
@@ -392,7 +395,6 @@ class Amenity(models.Model):
         champs_obligatoires = ["type", "lon", "lat", "id_osm"]
         if not all(x in d for x in champs_obligatoires):
             raise RuntimeError("Il manquait des champs pour {d} : {(c for c in champs_obligatoires if c not in d)}")
-
         
         # Champs « normaux »
         champs = {"name":"nom", "lon":"lon", "lat":"lat", "opening_hours":"horaires", "phone":"tél", "id_osm":"id_osm"}
@@ -402,16 +404,23 @@ class Amenity(models.Model):
         }
         res = cls(**d_nettoyé)
 
-        #Clefs étrangères
-        ta = TypeAmenity.objects.get(nom_osm = d["type"])
+        # Clefs étrangères
+        ta = TypeAmenity.objects.get(nom_osm=d["type"])
         res.type_amenity = ta
+        
         res.ville = v_d
 
+        nom_rue = "pas trouvée"
+        try:
+            nom_rue, _, _ = rue_of_coords((d_nettoyé["lon"], d_nettoyé["lat"]))
+            rue = Rue.objects.get(nom_norm=prétraitement_rue(nom_rue), ville=v_d)
+            res.rue = rue
+        except Exception as e:
+            print(f"Problème lors de la récupération de la rue de {d}.\n Ville {v_d}.\n Nom de rue obtenu sur data.gouv.fr : {nom_rue}. Nom normalisé {prétraitement_rue(nom_rue)}\n Erreur : {e}.\n")
+        
         # texte_tout
         res.texte_tout = json.dumps(d)
         return res
-
-        
 
 
 class Bug(models.Model):

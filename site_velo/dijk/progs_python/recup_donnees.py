@@ -234,8 +234,6 @@ def récup_amenities(ville, bavard=0):
     node["shop"]["name"](area.searchArea);
     );
     out;"""
-    print("J’attends 30s pour overpass")
-    time.sleep(30)
     res_req = api.query(requête)
     res = []
     for n in res_req.nodes:

@@ -123,23 +123,7 @@ def arbre_rue_dune_ville(ville_d, rues):
         res.insère(rue)
     res.sauv(os.path.join(DONNÉES, ville_d.nom_norm))
 
-#créationArbre()
 
-# def charge_arbres_rues(g):
-#     """
-#     Renvoie le dictionnaire ville (normalisée) -> arbre de ses rues
-#     """
-#     res={}
-#     for ville in TOUTES_LES_VILLES.keys():
-#         ville_n = str(normalise_ville(g, ville))
-#         res[ville_n] = ArbreLex.of_fichier(os.path.join(DONNÉES, ville_n))
-#     return res
-
-# tic=time.perf_counter()
-# ARBRE_DES_RUES = charge_arbres_rues()
-# chrono(tic, "Arbre lex des rues")
-
-# ---> dans g.arbres_des_rues
 
 def dans_cache_nom_rue(nom, ville):
     """
@@ -174,12 +158,12 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
 
     étape1 = prétraitement_rue(rue)
     
-    res, d =  g.arbres_des_rues[ville.nom_norm].mots_les_plus_proches(étape1, d_max=tol)
-    if len(res)==1:
+    res, d = g.arbres_des_rues[ville.nom_norm].mots_les_plus_proches(étape1, d_max=tol)
+    if len(res) == 1:
         LOG(f"Nom trouvé à distance {d} de {rue} : {list(res)[0]}", bavard=bavard-1)
         rue_n = list(res)[0]
         # Récupérons le nom complet dans la base
-        r=Rue.objects.get(nom_norm=rue_n, ville__nom_norm=ville.nom_norm)
+        r = Rue.objects.get(nom_norm=rue_n, ville__nom_norm=ville.nom_norm)
         return rue_n, r.nom_complet, None
         
     else:
@@ -187,20 +171,20 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
 
         # Autre nom dans le cache ?
         essai = dans_cache_nom_rue(étape1, ville)
-        if essai and rue!=essai:
-            LOG(f"J’ai trouvé {essai} dans le cache.", bavard=bavard)            
+        if essai and rue != essai:
+            LOG(f"J’ai trouvé {essai} dans le cache.", bavard=bavard)
             #return normalise_rue(g, z_d, essai, ville, persevérant=persevérant, bavard=bavard, rés_nominatim=rés_nominatim, nv_cache=0, tol=tol)
             return prétraitement_rue(essai), essai, None
         
         # Résultats ambigüs dans l’arbre
-        if len(res)>1:
+        if len(res) > 1:
             # Devrait être très rare
             LOG(f"Rues les plus proches de {rue} : {res}. Je ne sais que choisir, du coup je reste avec {rue} (normalisé en {étape1}).",
                 bavard=bavard+1)
             return étape1, rue, rés_nominatim
         
         # Abandon si non persévérant
-        elif not persevérant :
+        elif not persevérant:
             LOG("Je laisse tomber", bavard=bavard+1)
             return étape1, rue, rés_nominatim
 
@@ -215,8 +199,8 @@ def normalise_rue(g, z_d, rue, ville, persevérant=True, rés_nominatim=None, nv
             
             nom_osm = None
             # Préférence pour les ways
-            way_osm = [ t.raw for t in lieu if t.raw["osm_type"]=="way"]
-            if len(way_osm)>0:            
+            way_osm = [t.raw for t in lieu if t.raw["osm_type"]=="way"]
+            if len(way_osm) > 0:           
                 nom_osm = way_osm[0]["display_name"].split(",")[0]  # est-ce bien fiable ?
             else:
                 nom_osm = lieu[0].raw["display_name"].split(",")[0]

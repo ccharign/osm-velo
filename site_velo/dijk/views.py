@@ -23,7 +23,7 @@ from .progs_python.lecture_adresse.recup_noeuds import PasTrouvé
 from .progs_python.lecture_adresse.normalisation0 import prétraitement_rue
 from .progs_python import recup_donnees
 from .progs_python.apprentissage import n_lectures, lecture_jusqu_à_perfection, lecture_plusieurs_chemins
-from .progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script
+from .progs_python.bib_vues import bool_of_checkbox, énumération_texte, sans_style, récup_head_body_script, récup_données, z_é_i_d
 
 
 from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_étapes
@@ -51,12 +51,6 @@ def get_full_class_name(obj):
     return module + '.' + obj.__class__.__name__
 
 
-def dict_of_get(g):
-    """
-    Un simple dict(g) semble ne pas fonctionner...
-    """
-    return dict(g.items())
-
 
 
 def choix_zone(requête):
@@ -73,57 +67,6 @@ def choix_zone(requête):
     return render(requête, "dijk/index.html", {"form": form})
 
 
-
-def recherche(requête, zone_t):
-    """
-    Vue pour une recherche de base.
-    """
-    données = dict_of_get(requête.GET)
-    form_zone = forms.ChoixZone(requête.GET)
-    if not form_zone.is_valid():
-        print(form_zone.errors)
-    données.update(form_zone.cleaned_data)
-    z_d = g.charge_zone(données["zone"])
-    requête.session["zone"] = z_d.nom
-    requête.session["zone_id"] = z_d.pk
-    
-    if requête.GET and "arrivée" in requête.GET:
-        form_recherche = forms.Recherche(données)
-        if form_recherche.is_valid():
-            données.update(form_recherche.cleaned_data)
-            if données["partir_de_ma_position"]:
-                coords = tuple(map(float, données["localisation"].split(";")))
-                assert len(coords) == 2, f"coords n'est pas de longueur 2 {coords}"
-                données["départ_coords"] = str(coords)[1:-1]
-                d = ÉtapeArête.of_coords(coords, g, z_d)
-            else:
-                d = Étape.of_dico(données, "départ", g, z_d)
-                print(f"Étape de départ : {d}, son adresse : {d.adresse}.")
-            a = Étape.of_dico(données, "arrivée", g, z_d)
-            
-            # Les champs étapes, rues_interdites et ps_détour ne sont pas dans cleaned_data car rajoutés directement dans le .html
-            # (car mis plus loin dans le formulaire, après le bouton « c’est parti »)
-            noms_étapes = [é for é in données["étapes"].strip().split(";") if len(é)>0]
-            étapes = [d] + [Étape.of_texte(é, g, z_d) for é in noms_étapes] + [a]
-            ps_détour = list(map( lambda x: float(x)/100, données["pourcentage_détour"].split(";")) )
-            rues_interdites = None
-            étapes_interdites = [Étape.of_texte(r, g, z_d) for r in données["rues_interdites"].strip().split(";") if len(r)>0]
-
-            return calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites,
-                                      étapes=étapes,
-                                      étapes_interdites=étapes_interdites,
-                                      données=données
-                                      )
-        else:
-            # form pas valide
-            print(form_recherche.errors)
-    else:
-        form_recherche = forms.Recherche(initial=données)
-    return render(requête, "dijk/recherche.html",
-                  {"ville": z_d.ville_défaut, "zone_t": zone_t, "recherche": form_recherche}
-                  )
-
-
 def fouine(requête):
     requête.session["fouine"] = True
     return choix_zone(requête)
@@ -131,11 +74,6 @@ def fouine(requête):
 
 def limitations(requête):
     return render(requête, "dijk/limitations.html", {})
-
-
-# def index(requête):
-#     return render(requête, "dijk/index.html"
-#                   )
 
 
 def mode_demploi(requête):
@@ -150,47 +88,158 @@ def sous_le_capot(requête):
     return render(requête, "dijk/sous_le_capot.html", {})
 
 
-
-
-### Recherche d’itinéraire simple ###
-
-
-def visualisation_nv_chemin(requête):
-    return render(requête, "dijk/iti_folium.html", {})
+# def visualisation_nv_chemin(requête):
+#     return render(requête, "dijk/iti_folium.html", {})
 
 
 
-## Déprécié
-# def vue_itinéraire(requête):
-#         """ Doit récupérer le résultat du formulaire via un get."""
 
-#     #try :
-#         z_d = g.charge_zone(requête.GET["zone_t"])  # On pourrait arriver ici sans être passé par la page recherche (?)
-#         if "partir_de_ma_position" in requête.GET:
-#             coords = tuple(map(float, requête.GET["localisation"].split(";")))
-#             d = str(ÉtapeArête.of_coords(coords, g, z_d))
-            
-            
-#         else:
-#             d=requête.GET["départ"]
-#         a=requête.GET["arrivée"]
-        
-#         #z_d = Zone.objects.get(nom=requête.GET["zone_t"])
 
-#         noms_étapes = [d] + [é for é in requête.GET["étapes"].strip().split(";") if len(é)>0] + [a]
 
-#         ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
+### Formulaires de recherche d’itinéraire
 
-#         rues_interdites = [r for r in requête.GET["rues_interdites"].strip().split(";") if len(r) > 0]
-#         print(f"Recherche d’itinéraire entre {d} et {a} avec étapes {noms_étapes[1:-1]} et rues interdites = {rues_interdites}.")
 
-#         return calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites)
+def recherche(requête, zone_t):
+    """
+    Vue pour une recherche de base.
+    """
+    # données = dict_of_get(requête.GET)
+    # form_zone = forms.ChoixZone(requête.GET)
+    # if not form_zone.is_valid():
+    #     print(form_zone.errors)
+    # données.update(form_zone.cleaned_data)
+    données = récup_données(requête.GET, forms.ChoixZone, validation_obligatoire=False)
+    if "zone" in données and données["zone"]:
+        z_d = g.charge_zone(données["zone"].nom)
+        requête.session["zone"] = z_d.nom
+        requête.session["zone_id"] = z_d.pk
+    elif "zone" in requête.session:
+        z_d = g.charge_zone(requête.session["zone"])
+        données["zone"] = z_d
+    else:
+        return choix_zone(requête)
     
-#     #except Exception as e:
-#     #    return autreErreur(requête, e)
+    if requête.GET and "arrivée" in requête.GET:
+        form_recherche = forms.Recherche(données)
+        if form_recherche.is_valid():
+            données.update(form_recherche.cleaned_data)
+            z_d, étapes, étapes_interdites, ps_détour = z_é_i_d(g, données)
+
+            return calcul_itinéraires(requête, ps_détour, z_d,
+                                      étapes,
+                                      étapes_interdites=étapes_interdites,
+                                      données=données,
+                                      bavard=1
+                                      )
+        else:
+            # form pas valide
+            print(form_recherche.errors)
+    else:
+        form_recherche = forms.Recherche(initial=données)
+    return render(requête, "dijk/recherche.html",
+                  {"ville": z_d.ville_défaut, "zone_t": zone_t, "recherche": form_recherche}
+                  )
 
 
-def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites, étapes=None, étapes_interdites=[], données={}, bavard=0):
+
+def relance_rapide(requête):
+    """
+    Relance un calcul à partir du résultat du formulaire de relance rapide.
+    Les étapes sont dans des champs dont le nom contient 'étape_coord', sous la forme 'lon;lat'
+    Les arêtes interdites sont dans des champs dont le nom contient 'interdite_coord', sous la même forme.
+    """
+    # form = forms.RelanceRapide(requête.GET)
+    # if not form.is_valid():
+    #     print(form.errors)
+    # données = dict_of_get(requête.GET)
+    # données.update(form.cleaned_data)
+
+    données = récup_données(requête.GET, forms.RelanceRapide)
+    
+    z_d = g.charge_zone(données["zone"].nom)
+    
+    départ = Étape.of_dico(requête.GET, "départ", g, z_d)
+    arrivée = Étape.of_dico(requête.GET, "arrivée", g, z_d)
+
+    é_inter = []
+    é_interdites = []
+    
+    for c, v in requête.GET.items():
+        if "étape_coord" in c:
+            num = int(re.match("étape_coord([0-9]*)", c).groups()[0])
+            print(num)
+            coords = tuple(map(float, v.split(";")))
+            a, _ = g.arête_la_plus_proche(coords, z_d)
+            é_inter.append((num, ÉtapeArête.of_arête(a, coords)))
+            
+        elif "interdite_coord" in c:
+            coords = tuple(map(float, v.split(";")))
+            a, _ = g.arête_la_plus_proche(coords, z_d)
+            é_interdites.append(ÉtapeArête.of_arête(a, coords))
+            
+    é_inter.sort()
+    étapes = [départ] + [é for _, é in é_inter] + [arrivée]
+    return calcul_itinéraires(requête, requête.GET["pourcentage_détour"], z_d,
+                              étapes, étapes_interdites=é_interdites,
+                              données=données,
+                              bavard=3)
+
+
+
+
+def chaîne_avec_points_virgule_renversée(c: str):
+    """
+    c contient des point-virgules
+    Sortie : la même en inversant l’ordre des morceaux séparés par les points-virgules.
+    """
+    return ";".join(
+        reversed(
+            c.split(";")
+        )
+    )
+
+def trajet_retour(requête):
+    """
+    Renvoie le résultat pour le trajet retour de celui reçu dans la requête.
+    """
+
+    # form = forms.ToutCaché(requête.GET)
+    # if not form.is_valid():
+    #     print(form.errors)
+    #     raise RuntimeError(f"Formulaire pas valide {form}")
+    # données = dict_of_get(requête.GET)
+    # données.update(form.cleaned_data)
+
+    données = récup_données(requête.GET, forms.ToutCaché)
+    
+    z_d = g.charge_zone(données["zone"].nom)
+    départ = Étape.of_dico(requête.GET, "départ", g, z_d)
+    arrivée = Étape.of_dico(requête.GET, "arrivée", g, z_d)
+    rues_interdites = [Étape.of_texte(r, g, z_d) for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
+    ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
+
+    #  Échange départ-arrivée dans le dico de données
+    #données = dict_of_get(requête.GET)
+    données["départ"], données["arrivée"] = données["arrivée"], données["départ"]
+    données["coords_départ"], données["coords_arrivée"] = données["coords_arrivée"], données["coords_départ"]
+
+    #  Étapes à l’envers
+    étapes = [arrivée] + [Étape.of_texte(é, g, z_d) for é in reversed(requête.GET["étapes"].strip().split(";")) if len(é)>0] + [départ]
+    données["marqueurs_é"] = chaîne_avec_points_virgule_renversée(données["marqueurs_é"])
+
+    return calcul_itinéraires(requête, ps_détour, z_d,
+                              étapes,
+                              étapes_interdites=rues_interdites,
+                              données=données
+                              )
+
+
+
+
+### Fonction principale
+
+
+def calcul_itinéraires(requête, ps_détour, z_d, étapes, étapes_interdites=[], données={}, bavard=0):
     """
     Entrées : ps_détour (float list ou str)
               z_d (models.Zone)
@@ -205,11 +254,11 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
         ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
         
     try:
-        if not étapes:
-            tic0 = time.perf_counter()
-            étapes = [Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
-            étapes_interdites = [Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
-            tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
+        # if not étapes:
+        #     tic0 = time.perf_counter()
+        #     étapes = [Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in noms_étapes]
+        #     étapes_interdites = [Étape.of_texte(é, g, z_d, bavard=bavard-1) for é in rues_interdites]
+        #     tic = chrono(tic0, "Calcul des étapes et arêtes interdites.")
 
         stats, chemin, noms_étapes, rues_interdites, carte = itinéraire_of_étapes(
             étapes, ps_détour, g, z_d, requête.session,
@@ -295,92 +344,8 @@ def calcul_itinéraires(requête, ps_détour, z_d, noms_étapes, rues_interdites
         traceback.print_exc()
         return autreErreur(requête, e)
 
-    
-def relance_rapide(requête):
-    """
-    Relance un calcul à partir du résultat du formulaire de relance rapide.
-    Les étapes sont dans des champs dont le nom contient 'étape_coord', sous la forme 'lon;lat'
-    Les arêtes interdites sont dans des champs dont le nom contient 'interdite_coord', sous la même forme.
-    """
-    #z_d = g.charge_zone(requête.GET["zone_t"])
-    form = forms.RelanceRapide(requête.GET)
-    if not form.is_valid():
-        print(form.errors)
-    données = dict_of_get(requête.GET)
-    données.update(form.cleaned_data)
-    z_d = g.charge_zone(données["zone"].nom)
-    
-    départ = Étape.of_dico(requête.GET, "départ", g, z_d)
-    arrivée = Étape.of_dico(requête.GET, "arrivée", g, z_d)
-
-    é_inter = []
-    é_interdites = []
-    
-    for c, v in requête.GET.items():
-        if "étape_coord" in c:
-            num = int(re.match("étape_coord([0-9]*)", c).groups()[0])
-            print(num)
-            coords = tuple(map(float, v.split(";")))
-            a, _ = g.arête_la_plus_proche(coords, z_d)
-            é_inter.append((num, ÉtapeArête.of_arête(a, coords)))
-            
-        elif "interdite_coord" in c:
-            coords = tuple(map(float, v.split(";")))
-            a, _ = g.arête_la_plus_proche(coords, z_d)
-            é_interdites.append(ÉtapeArête.of_arête(a, coords))
-            
-    é_inter.sort()
-    étapes = [départ] + [é for _, é in é_inter] + [arrivée]
-    return calcul_itinéraires(requête, requête.GET["pourcentage_détour"], z_d, [], [],
-                              étapes=étapes, étapes_interdites=é_interdites,
-                              données=dict_of_get(requête.GET),
-                              bavard=3)
 
 
-def chaîne_avec_points_virgule_renversée(c: str):
-    """
-    c contient des point-virgules
-    Sortie : la même en inversant l’ordre des morceaux séparés par les points-virgules.
-    """
-    return ";".join(
-        reversed(
-            c.split(";")
-        )
-    )
-
-
-def trajet_retour(requête):
-    """
-    Renvoie le résultat pour le trajet retour de celui reçu dans la requête.
-    """
-
-    form = forms.ToutCaché(requête.GET)
-    if not form.is_valid():
-        print(form.errors)
-        raise RuntimeError(f"Formulaire pas valide {form}")
-    données = dict_of_get(requête.GET)
-    données.update(form.cleaned_data)
-    
-    z_d = g.charge_zone(données["zone"].nom)
-    départ = Étape.of_dico(requête.GET, "départ", g, z_d)
-    arrivée = Étape.of_dico(requête.GET, "arrivée", g, z_d)
-    rues_interdites = [Étape.of_texte(r, g, z_d) for r in requête.GET["rues_interdites"].strip().split(";") if len(r)>0]
-    ps_détour = list(map( lambda x: float(x)/100, requête.GET["pourcentage_détour"].split(";")) )
-
-    #  Échange départ-arrivée dans le dico de données
-    données = dict_of_get(requête.GET)
-    données["départ"], données["arrivée"] = données["arrivée"], données["départ"]
-    données["coords_départ"], données["coords_arrivée"] = données["coords_arrivée"], données["coords_départ"]
-
-    #  Étapes à l’envers
-    étapes = [arrivée] + [Étape.of_texte(é, g, z_d) for é in reversed(requête.GET["étapes"].strip().split(";")) if len(é)>0] + [départ]
-    données["marqueurs_é"] = chaîne_avec_points_virgule_renversée(données["marqueurs_é"])
-
-    return calcul_itinéraires(requête, ps_détour, z_d, [], [],
-                              étapes=étapes,
-                              étapes_interdites=rues_interdites,
-                              données=données
-                              )
 
 
 
@@ -393,25 +358,26 @@ def confirme_nv_chemin(requête):
     Traitement du formulaire d’enregistrement d’un nouveau chemin.
     """
     try:
-        form = forms.ToutCaché(requête.POST)
-        if not form.is_valid():
-            raise ValueError(f"Formulaire pas valide pour l’enregistrement du chemin. {form.errors}")
-        données = form.cleaned_data
-        zone = g.charge_zone(données["zone"].nom)
+        # form = forms.ToutCaché(requête.POST)
+        # if not form.is_valid():
+        #     raise ValueError(f"Formulaire pas valide pour l’enregistrement du chemin. {form.errors}")
+        # données = dict_of_get(requête.POST)
+        # données.update(form.cleaned_data)
+
+        données = récup_données(requête.POST, forms.ToutCaché)
+        z_d, étapes, étapes_interdites, _ = z_é_i_d(g, données)
+
         nb_lectures = 50
-        d = requête.POST["départ"]
-        a = requête.POST["arrivée"]
-        noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
+
+        #noms_étapes = [é for é in requête.POST["étapes"].strip().split(";") if len(é)>0]
         AR = bool_of_checkbox(requête.POST, "AR")
-        rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
-        #zone = Zone.objects.get(nom=requête.POST["zone_t"])
-        print(f"étapes : {noms_étapes}, AR : {AR}, rues interdites : {rues_interdites}\n")
+        #rues_interdites = [r for r in requête.POST["rues_interdites"].strip().split(";") if len(r)>0]
 
         chemins = []
         for id_chemin in requête.POST.keys():
             if id_chemin[:2] == "ps" and requête.POST[id_chemin] == "on":
                 pourcentage_détour = int(id_chemin[2:])
-                c = Chemin.of_étapes(zone, [d]+noms_étapes+[a], pourcentage_détour, AR, g, noms_rues_interdites=rues_interdites, nv_cache=2, bavard=2)
+                c = Chemin.of_étapes(z_d, étapes, pourcentage_détour, AR, g, étapes_interdites=étapes_interdites, nv_cache=2, bavard=2)
                 chemins.append(c)
                 for é in c.étapes:
                     print(é.nœuds)
@@ -421,7 +387,7 @@ def confirme_nv_chemin(requête):
                 c_d.dernier_p_modif = prop_modif
                 c_d.save()
 
-        return render(requête, "dijk/merci.html", {"chemin": chemins, "zone_t": zone.nom})
+        return render(requête, "dijk/merci.html", {"chemin": chemins, "zone_t": z_d.nom})
     
     except Exception as e:
         traceback.print_exc()
@@ -458,10 +424,7 @@ def choix_cycla(requête):
     else:
         # Formulaire pas encore rempli (premier appel)
         form = forms.FormCycla()
-    return render(requête, "dijk/cycla_choix.html", {"form":form})
-
-
-
+    return render(requête, "dijk/cycla_choix.html", {"form": form})
 
 
 def carte_cycla(requête):
@@ -544,7 +507,7 @@ def vue_pourcentages_piétons_pistes_cyclables(requête, ville=None):
 ### Auto complétion ###
 
 
-def pour_complétion(requête, nbMax=10):
+def pour_complétion(requête, nbMax=15):
     """
     Renvoie la réponse nécessitée par autocomplete.
     Laisse tel quel la partie avant le dernier ;
@@ -556,7 +519,7 @@ def pour_complétion(requête, nbMax=10):
 
         # id de la zone
         if "zone_id" not in requête.session:
-            z_d = Zone.objects.get(nom = requête.session["zone"])
+            z_d = Zone.objects.get(nom=requête.session["zone"])
             requête.session["zone_id"] = z_d.pk
             z_id = z_d.pk
         else:
@@ -606,7 +569,8 @@ def pour_complétion(requête, nbMax=10):
         chaînes_déjà_présentes = set()
         print(f"{len(amenities)} amenities trouvées")
         for a in amenities:
-            chaîne = chaîne_à_renvoyer(a.nom, a.ville.nom_complet, parenthèse=a.type_amenity.nom_français)
+            #chaîne = chaîne_à_renvoyer(a.nom, a.ville.nom_complet, parenthèse=a.type_amenity.nom_français)
+            chaîne = str(a)
             if chaîne not in chaînes_déjà_présentes:
                 chaînes_déjà_présentes.add(chaîne)
                 dicos.append({"label": chaîne, "lon": a.lon, "lat": a.lat})
@@ -616,13 +580,13 @@ def pour_complétion(requête, nbMax=10):
 
         
         ## Recherche dans les caches
-        for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, ville__in =req_villes).prefetch_related("ville"):
+        for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans Cache_Adresse : {truc}")
-            dicos.append( {"label": chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)})
+            dicos.append({"label": chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)})
             
         for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue), ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans CacheNomRue : {chose}")
-            dicos.append( {"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
+            dicos.append({"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
             
             
         # Création du json à renvoyer

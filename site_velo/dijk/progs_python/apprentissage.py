@@ -70,7 +70,7 @@ def lecture_plusieurs_chemins(g, chemins, bavard=0):
     (proportion de modif = nb_modif/longueur, pour détecter d'éventuels chemins aberrants)
     """
     n_modif_total = 0
-    prop_modif=[]
+    prop_modif = []
     for chemin in chemins:
         n_modif, l = lecture_meilleur_chemin(g, chemin, bavard=bavard-1)
         n_modif_total+=n_modif

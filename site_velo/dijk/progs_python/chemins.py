@@ -304,27 +304,28 @@ class Chemin():
         Enregistre le chemin dans la base.
         """
         c = Chemin_d(p_détour=self.p_détour,
-                   étapes=";".join(map(str, self.étapes)),
-                   ar=self.AR,
-                   interdites=self.noms_rues_interdites,
-                   )
+                     étapes=";".join(map(str, self.étapes)),
+                     ar=self.AR,
+                     interdites=self.noms_rues_interdites,
+                     )
         c.sauv()
-    
+
+
     @classmethod
-    def of_étapes(cls, z_d, noms_étapes, pourcentage_détour, AR, g, noms_rues_interdites=[], nv_cache=1, bavard=0):
+    def of_étapes(cls, z_d, étapes, pourcentage_détour, AR, g, étapes_interdites=[], nv_cache=1, bavard=0):
         """
-        Entrées : noms_étapes (str list).
+        Entrées : étapes (Étape list).
                   pourcentage_détour (int)
                   AR (bool)
                   g (Graphe)
+                  étapes_interdites (Étape list)
         Sortie : instance de Chemin
         """
-        étapes = [Étape.of_texte(é, g, z_d, nv_cache=nv_cache) for é in noms_étapes]
-        if bavard>0:
-            print(f"List des étapes obtenues : {étapes}")
+        # étapes = [Étape.of_texte(é, g, z_d, nv_cache=nv_cache) for é in noms_étapes]
 
 
-        étapes_interdites = (Étape.of_texte(é, g, z_d, nv_cache=nv_cache) for é in noms_rues_interdites)
+        #étapes_interdites = (Étape.of_texte(é, g, z_d, nv_cache=nv_cache) for é in noms_rues_interdites)
+        noms_rues_interdites = [str(é) for é in étapes_interdites]
         return cls(z_d, étapes, pourcentage_détour/100, AR,
                    interdites=arêtes_interdites(g, z_d, étapes_interdites),
                    texte_interdites=";".join(noms_rues_interdites)

@@ -28,14 +28,12 @@ from initialisation.amenities import amenities_of_ville
 
 
 
-    
 def quadArbreDeZone(z_d, bavard=0):
     l = list(Sommet.objects.filter(zone=z_d))
     tic = perf_counter()
     res = QuadrArbreSommet.of_list(l)
     chrono(tic, f"arbre quad de la zone {z_d}", bavard=bavard)
     return res
-
 
 
 def quadArbreAretesDeZone(z_d, sauv=True, bavard=0):
@@ -59,7 +57,7 @@ def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, vill
     Entrées : nom (str), nom de la ville à charger.
               code (int)
               zone (str)
-    Effet : 
+    Effet :
         Charge les données osm de la ville dans la base, à savoir:
            - Sommets
            - Arêtes
@@ -98,9 +96,9 @@ def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, vill
     ## Récup des graphe via osmnx
     print(f"\nRécupération du graphe pour « {ville_d.code} {ville_d.nom_complet}, {pays} » avec une marge :\n")
     gr_avec_marge = osmnx.graph_from_place(
-        {"city":f"{ville_d.nom_complet}", "postcode":ville_d.code, "country":pays},
-        network_type="all", # Tout sauf private
-        retain_all="False", # Sinon il peut y avoir des enclaves déconnectées car accessibles seulement par chemin privé (ex: CSTJF)
+        {"city": f"{ville_d.nom_complet}", "postcode": ville_d.code, "country":pays},
+        network_type="all",  # Tout sauf private
+        retain_all="False",  # Sinon il peut y avoir des enclaves déconnectées car accessibles seulement par chemin privé (ex: CSTJF)
         buffer_dist=500  # Marge de 500m
     )
     print("\n\nRécupération du graphe exact:\n")
@@ -112,7 +110,6 @@ def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, vill
     ## Noms des villes ajouté dans g (Graphe_nx)
     print("\n\nAjout du nom de ville.")
     for n in gr_strict:
-        #if n not in g.villes_of_nœud: g.villes_of_nœud=[]
         g.villes_of_nœud[n] = [nom]
 
         
@@ -123,8 +120,6 @@ def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, vill
     close_old_connections()
     vd.charge_dico_rues_nœuds(ville_d, dico_rues[nom])
     print(f"\nPlaces piétonnes trouvées : {places_piétonnes}\n")
-    #input("presser une touche")
-    
     
     print("Création de l'arbre lexicographique")
     arbre_rue_dune_ville(
