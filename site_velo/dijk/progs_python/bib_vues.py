@@ -40,7 +40,7 @@ def z_é_i_d(g, données):
     """
     
     z_d = g.charge_zone(données["zone"])
-    if données["partir_de_ma_position"]:
+    if "partir_de_ma_position" in données and données["partir_de_ma_position"]:
         coords = tuple(map(float, données["localisation"].split(";")))
         assert len(coords) == 2, f"coords n'est pas de longueur 2 {coords}"
         données["départ_coords"] = str(coords)[1:-1]

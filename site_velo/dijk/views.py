@@ -305,7 +305,7 @@ def calcul_itinéraires(requête, ps_détour, z_d, étapes, étapes_interdites=[
                           "chemin": chemin.str_joli(),
                           "post_préc": données,
                           "relance_rapide": forms.RelanceRapide(initial=données),
-                          "enregistrer_contrib": forms.ToutCaché(initial=données),
+                          "enregistrer_contrib": forms.EnregistrerContrib(initial=données),
                           "trajet_retour": forms.ToutCaché(initial=données),
                           "fouine": requête.session.get("fouine", None),
                           "la_carte": carte.get_name()
