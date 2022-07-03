@@ -365,7 +365,7 @@ class Amenity(models.Model):
     lat = models.FloatField()
     horaires = models.TextField(blank=True, default=None, null=True)
     tél = models.TextField(blank=True, default=None, null=True)
-    id_osm = models.IntegerField(unique=True)
+    id_osm = models.BigIntegerField(unique=True)
     texte_tout = models.TextField(blank=True, default=None, null=True)
 
     def coords(self):
