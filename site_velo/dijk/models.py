@@ -407,15 +407,16 @@ class Amenity(models.Model):
         ta = TypeAmenity.objects.get(nom_osm=d["type"])
         res.type_amenity = ta
         
-        res.ville = v_d
 
         nom_rue = "pas trouvée"
         try:
-            nom_rue, _, _ = rue_of_coords((d_nettoyé["lon"], d_nettoyé["lat"]))
+            nom_rue, nom_ville, _ = rue_of_coords((d_nettoyé["lon"], d_nettoyé["lat"]))
+            v_d = Ville.objects.get(nom_norm=partie_commune(nom_ville))
             rue = Rue.objects.get(nom_norm=prétraitement_rue(nom_rue), ville=v_d)
             res.rue = rue
         except Exception as e:
             print(f"Problème lors de la récupération de la rue de {d}.\n Ville {v_d}.\n Nom de rue obtenu sur data.gouv.fr : {nom_rue}. Nom normalisé {prétraitement_rue(nom_rue)}\n Erreur : {e}.\n")
+        res.ville = v_d
         
         # texte_tout
         res.texte_tout = json.dumps(d)

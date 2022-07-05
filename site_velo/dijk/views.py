@@ -32,7 +32,7 @@ from .progs_python.utils import dessine_chemin, dessine_cycla, itinéraire_of_é
 from .progs_python.graphe_par_django import Graphe_django
 from .progs_python.lecture_adresse.normalisation0 import découpe_adresse
 
-from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue, Amenity, Bug
+from .models import Chemin_d, Zone, Rue, Ville_Zone, Cache_Adresse, CacheNomRue, Amenity, Bug, Ville
 
 chrono(tic0, "Chargement total\n\n", bavard=3)
 
@@ -495,7 +495,9 @@ def pour_complétion(requête, nbMax=15):
             return res
 
         # Villes de la zone z_id
+        print(f"ville : {ville}")
         villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=ville)
+        print(f"villes : {[Ville.objects.get(pk=v) for v, in villes.values_list('ville')]}. Zone : {z_d}.")
         req_villes = Subquery(villes.values("ville"))
 
         dicos = []

@@ -48,11 +48,12 @@ def quadArbreAretesDeZone(z_d, sauv=True, bavard=0):
     if sauv:
         rép = os.path.join(DONNÉES, z_d.nom)
         res.sauv(os.path.join(rép, f"arbre_arêtes_{z_d}"))
+        print(f"Arbre sauvegardé dans {os.path.join(rép, f'arbre_arêtes_{z_d}')}")
     chrono(tic, f"création et sauvegarde de l’arbre quad de la zone {z_d}", bavard=bavard)
     return res
 
 
-def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, ville_defaut=None, pays="France", bavard=2, rapide = 0):
+def charge_ville(nom, code, zone, recalculer_arbre_arêtes_de_la_zone=True, ville_defaut=None, pays="France", bavard=2, rapide=0):
     """
     Entrées : nom (str), nom de la ville à charger.
               code (int)
@@ -202,7 +203,7 @@ ZONE_GRENOBLE = [
 
 
 
-def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False, zone="Pau_agglo", ville_defaut="Pau", bavard=2, rapide=0):
+def charge_zone(liste_villes, zone:str, ville_defaut:str, réinit=False, effacer_cache=False, bavard=2, rapide=0):
     """
     Entrée : liste_villes, itérable de (nom de ville, code postal)
              zone (str), nom de la zone
@@ -243,6 +244,7 @@ def charge_zone(liste_villes=À_RAJOUTER_PAU, réinit=False, effacer_cache=False
         charge_ville(nom, code, zone, bavard=bavard, rapide=rapide, recalculer_arbre_arêtes_de_la_zone=False)
 
     # Arbre quad des arêtes
+    LOG("R-arbre des arêtes")
     quadArbreAretesDeZone(z_d, sauv=True)
 
 
