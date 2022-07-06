@@ -466,6 +466,40 @@ def pour_complétion(requête, nbMax=15):
     Découpe l’adresse en (num? bis_ter? rue(, ville)?), et cherche des complétions pour rue et ville.
     nbMax : nb max de résultat. S’il y en a plus, aucun n’est renvoyé.
     """
+
+    class Résultat():
+        """
+        Pour enregistrer le résultat à renvoyer.
+        Un nouvel élément d n’est ajouté que si self.f_hach(d) n’est pas déjà présent et si le nb de résultats est < self.n_max
+        """
+        def __init__(self, f_hach, n_max):
+            self.res = []
+            self.f_hach = f_hach
+            self.n_max = n_max
+            self.déjà_présent = set()
+            self.nb = 0
+            self.trop_de_rés = False
+
+        def __len__(self):
+            return self.nb
+
+        def ajoute(self, d):
+            if self.nb < self.n_max:
+                if self.f_hach(d) not in self.déjà_présent:
+                    self.déjà_présent.add(self.f_hach(d))
+                    self.res.append(d)
+                    self.nb += 1
+            else:
+                self.trop_de_rés = True
+
+        def vers_json(self):
+            if self.trop_de_rés:
+                return "fail"
+            else:
+                return json.dumps(self.res)
+            
+
+    
     mimeType = "application/json"
     if "term" in requête.GET:
 
@@ -482,7 +516,7 @@ def pour_complétion(requête, nbMax=15):
         # Découpage de la chaîne à chercher
         tout = requête.GET["term"].split(";")
         à_chercher = prétraitement_rue(tout[-1])
-        num, bis_ter, rue, ville = découpe_adresse(à_chercher)
+        num, bis_ter, rue, déb_ville = découpe_adresse(à_chercher)
         print(f"Recherche de {rue}")
         début = " ".join(x for x in [num, bis_ter] if x)
         if début: début += " "
@@ -495,12 +529,12 @@ def pour_complétion(requête, nbMax=15):
             return res
 
         # Villes de la zone z_id
-        print(f"ville : {ville}")
-        villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=ville)
+        villes = Ville_Zone.objects.filter(zone=z_id, ville__nom_norm__icontains=déb_ville)
         print(f"villes : {[Ville.objects.get(pk=v) for v, in villes.values_list('ville')]}. Zone : {z_d}.")
         req_villes = Subquery(villes.values("ville"))
 
-        dicos = []
+        
+        res = Résultat(lambda d: d["label"], nbMax)
 
         # Complétion dans l’arbre lexicographique (pour les fautes de frappe...)
         # Fonctionne sauf qu’on ne récupère pas la ville pour l’instant
@@ -511,49 +545,36 @@ def pour_complétion(requête, nbMax=15):
         # Recherche dans les rues de la base
         dans_la_base = Rue.objects.filter(nom_norm__icontains=rue, ville__in=req_villes).prefetch_related("ville")
         for rue_trouvée in dans_la_base:
-            dicos.append({"label": chaîne_à_renvoyer(rue_trouvée.nom_complet, rue_trouvée.ville.nom_complet)})
-
-        if len(dicos) > nbMax:
-            print(f"Nombre de résultats : {len(dicos)}. C’est trop.")
-            return HttpResponse("fail", mimeType)
+            res.ajoute({"label": chaîne_à_renvoyer(rue_trouvée.nom_complet, rue_trouvée.ville.nom_complet)})
 
         
         # Recherche dans les amenities
         amenities = Amenity.objects.filter(nom__icontains=rue, ville__in=req_villes).prefetch_related("ville", "type_amenity")
-        chaînes_déjà_présentes = set()
         print(f"{len(amenities)} amenities trouvées")
         for a in amenities:
             chaîne = str(a)
-            if chaîne not in chaînes_déjà_présentes:
-                chaînes_déjà_présentes.add(chaîne)
-                dicos.append({"label": chaîne, "lon": a.lon, "lat": a.lat})
-        if len(dicos) > nbMax:
-            print(f"Nombre de résultats : {len(dicos)}. C’est trop.")
-            return HttpResponse("fail", mimeType)
+            res.ajoute({"label": chaîne, "lon": a.lon, "lat": a.lat})
+
 
         
         # Recherche dans les caches
         for truc in Cache_Adresse.objects.filter(adresse__icontains=rue, ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans Cache_Adresse : {truc}")
             chaîne = chaîne_à_renvoyer(truc.adresse, truc.ville.nom_complet)
-            if chaîne not in chaînes_déjà_présentes:
-                chaînes_déjà_présentes.add(chaîne)
-                dicos.append({"label": chaîne})
+            res.ajoute({"label": chaîne})
             
         for chose in CacheNomRue.objects.filter(Q(nom__icontains=rue) | Q(nom_osm__icontains=rue), ville__in=req_villes).prefetch_related("ville"):
             print(f"Trouvé dans CacheNomRue : {chose}")
             chaîne = chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)
-            if chaîne not in chaînes_déjà_présentes:
-                chaînes_déjà_présentes.add(chaîne)
-                dicos.append({"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
-               
-        # Création du json à renvoyer
-        rés = json.dumps(dicos)
+            res.ajoute({"label": chaîne_à_renvoyer(chose.nom_osm, chose.ville.nom_complet)})
+
+        return HttpResponse(res.vers_json(), mimeType)
         
     else:
-        rés = "fail"
+        return HttpResponse("fail", mimeType)
+
         
-    return HttpResponse(rés, mimeType)
+    
 
 
 ### Stats ###
